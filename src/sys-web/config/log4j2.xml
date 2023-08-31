@@ -14,7 +14,7 @@
 	</appenders>
 	<loggers>
 		<!-- sql日志 -->
-		<Logger name="jdbc.sqlonly" level="off"></Logger>
+		<Logger name="jdbc.sqlonly" level="on"></Logger>
 		<Logger name="jdbc.sqltiming" level="off"></Logger>
 		<Logger name="jdbc.audit" level="off"></Logger>
 		<Logger name="jdbc.resultset" level="off"></Logger>

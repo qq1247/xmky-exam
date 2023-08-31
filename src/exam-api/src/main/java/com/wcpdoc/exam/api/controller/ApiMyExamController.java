@@ -110,6 +110,8 @@ public class ApiMyExamController extends BaseController{
 				.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
 				.addAttr("examStartTime", DateUtil.formatDateTime(exam.getStartTime()))
 				.addAttr("examEndTime", DateUtil.formatDateTime(exam.getEndTime()))// 考试结束时间（进入我的试卷使用）
+				.addAttr("examMarkStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
+				.addAttr("examMarkEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)// 如果是交卷后公布，但试卷是主观题试卷，页面提示几点之后查询
 				.addAttr("examPaperName", exam.getPaperName())// 考试试卷名称
 				.addAttr("answerStartTime", ValidateUtil.isValid(myExam.getAnswerStartTime()) ? DateUtil.formatDateTime(myExam.getAnswerStartTime()) : null)
 				.addAttr("answerEndTime", ValidateUtil.isValid(myExam.getAnswerEndTime()) ? DateUtil.formatDateTime(myExam.getAnswerEndTime()) : null)
