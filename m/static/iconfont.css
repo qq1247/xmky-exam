@@ -1,0 +1,471 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 3690861 */
+  src: url('/static/iconfont.woff2?t=1690613976000') format('woff2'),
+       url('/static/iconfont.woff?t=1690613976000') format('woff'),
+       url('/static/iconfont.ttf?t=1690613976000') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-biaoji:before {
+  content: "\e660";
+}
+
+.icon-datika:before {
+  content: "\e609";
+}
+
+.icon-dianzan1:before {
+  content: "\e60e";
+}
+
+.icon-dianzan3:before {
+  content: "\e610";
+}
+
+.icon-fuwuzhichi:before {
+  content: "\e652";
+}
+
+.icon-ai-users:before {
+  content: "\e60f";
+}
+
+.icon-bandui:before {
+  content: "\e642";
+}
+
+.icon-duigoux:before {
+  content: "\ec9e";
+}
+
+.icon-cuo:before {
+  content: "\e6e5";
+}
+
+.icon-jiangbei:before {
+  content: "\e872";
+}
+
+.icon-shijianxuanzhong:before {
+  content: "\e6c5";
+}
+
+.icon-approval-fulll:before {
+  content: "\e88e";
+}
+
+.icon-peixunkaoshi:before {
+  content: "\e60b";
+}
+
+.icon-kuaisuxiadan:before {
+  content: "\e69b";
+}
+
+.icon-kongbaiwendang:before {
+  content: "\e6c6";
+}
+
+.icon-qiye:before {
+  content: "\e632";
+}
+
+.icon-quanxuan:before {
+  content: "\e729";
+}
+
+.icon-search:before {
+  content: "\e606";
+}
+
+.icon-dongjie:before {
+  content: "\e604";
+}
+
+.icon-chongwutubiao15:before {
+  content: "\e603";
+}
+
+.icon-diannao:before {
+  content: "\e605";
+}
+
+.icon-piyue:before {
+  content: "\e7fb";
+}
+
+.icon-menu-s:before {
+  content: "\e656";
+}
+
+.icon-shiti:before {
+  content: "\e665";
+}
+
+.icon-count-down:before {
+  content: "\e63a";
+}
+
+.icon-wait-exam:before {
+  content: "\e64a";
+}
+
+.icon-wait-mark:before {
+  content: "\e69c";
+}
+
+.icon-fullscreen:before {
+  content: "\e7ec";
+}
+
+.icon-fullscreen-exit:before {
+  content: "\e7ed";
+}
+
+.icon-ranking:before {
+  content: "\e611";
+}
+
+.icon-anonymous:before {
+  content: "\e6bc";
+}
+
+.icon-score:before {
+  content: "\e7ca";
+}
+
+.icon-test:before {
+  content: "\e657";
+}
+
+.icon-score-plate:before {
+  content: "\e62b";
+}
+
+.icon-minimize:before {
+  content: "\e659";
+}
+
+.icon-reset-order:before {
+  content: "\e65c";
+}
+
+.icon-fenshudixian:before {
+  content: "\e679";
+}
+
+.icon-arrow-down:before {
+  content: "\e692";
+}
+
+.icon-arrow-left:before {
+  content: "\e693";
+}
+
+.icon-arrow-right:before {
+  content: "\e694";
+}
+
+.icon-arrow-up:before {
+  content: "\e695";
+}
+
+.icon-more-row:before {
+  content: "\e684";
+}
+
+.icon-more-col:before {
+  content: "\e6a5";
+}
+
+.icon-list-row:before {
+  content: "\e600";
+}
+
+.icon-close:before {
+  content: "\e69a";
+}
+
+.icon-plus:before {
+  content: "\e6b9";
+}
+
+.icon-minus:before {
+  content: "\e6ba";
+}
+
+.icon-delete:before {
+  content: "\e636";
+}
+
+.icon-edit:before {
+  content: "\e67c";
+}
+
+.icon-wo:before {
+  content: "\e602";
+}
+
+.icon-lock:before {
+  content: "\e615";
+}
+
+.icon-content:before {
+  content: "\e62e";
+}
+
+.icon-shaixuan:before {
+  content: "\e6b3";
+}
+
+.icon-role:before {
+  content: "\e644";
+}
+
+.icon-explain:before {
+  content: "\e64f";
+}
+
+.icon-person:before {
+  content: "\e650";
+}
+
+.icon-knowledge:before {
+  content: "\e617";
+}
+
+.icon-archive:before {
+  content: "\e666";
+}
+
+.icon-statistics:before {
+  content: "\e719";
+}
+
+.icon-drag:before {
+  content: "\e698";
+}
+
+.icon-clear:before {
+  content: "\e61a";
+}
+
+.icon-fold:before {
+  content: "\e680";
+}
+
+.icon-readPaper:before {
+  content: "\e6ec";
+}
+
+.icon-publish:before {
+  content: "\e61d";
+}
+
+.icon-login-out:before {
+  content: "\e653";
+}
+
+.icon-org:before {
+  content: "\e6cf";
+}
+
+.icon-merge:before {
+  content: "\e669";
+}
+
+.icon-move:before {
+  content: "\e667";
+}
+
+.icon-judge:before {
+  content: "\e654";
+}
+
+.icon-cloze:before {
+  content: "\e761";
+}
+
+.icon-checkbox:before {
+  content: "\e738";
+}
+
+.icon-radio:before {
+  content: "\e67b";
+}
+
+.icon-ask:before {
+  content: "\e6d6";
+}
+
+.icon-exam:before {
+  content: "\e724";
+}
+
+.icon-examing:before {
+  content: "\e63c";
+}
+
+.icon-preview:before {
+  content: "\e627";
+}
+
+.icon-mark:before {
+  content: "\e65f";
+}
+
+.icon-marking:before {
+  content: "\e661";
+}
+
+.icon-wait:before {
+  content: "\e61e";
+}
+
+.icon-finish:before {
+  content: "\e655";
+}
+
+.icon-index:before {
+  content: "\e63d";
+}
+
+.icon-mine:before {
+  content: "\e61f";
+}
+
+.icon-notice:before {
+  content: "\e62f";
+}
+
+.icon-paper-manage:before {
+  content: "\e6e7";
+}
+
+.icon-classify:before {
+  content: "\e62d";
+}
+
+.icon-persons:before {
+  content: "\e621";
+}
+
+.icon-perfect:before {
+  content: "\e6a8";
+}
+
+.icon-user-manage:before {
+  content: "\e623";
+}
+
+.icon-base-manage:before {
+  content: "\e639";
+}
+
+.icon-question-manage:before {
+  content: "\e626";
+}
+
+.icon-onLine:before {
+  content: "\e677";
+}
+
+.icon-time:before {
+  content: "\e628";
+}
+
+.icon-setting:before {
+  content: "\e629";
+}
+
+.icon-recycle:before {
+  content: "\e66c";
+}
+
+.icon-copy:before {
+  content: "\e66b";
+}
+
+.icon-sensitive:before {
+  content: "\e62c";
+}
+
+.icon-pwd-reset:before {
+  content: "\e634";
+}
+
+.icon-end:before {
+  content: "\e631";
+}
+
+.icon-start:before {
+  content: "\e64b";
+}
+
+.icon-off-line:before {
+  content: "\e6ca";
+}
+
+.icon-once:before {
+  content: "\e63e";
+}
+
+.icon-template-down:before {
+  content: "\e640";
+}
+
+.icon-template-up:before {
+  content: "\e641";
+}
+
+.icon-subscript:before {
+  content: "\e81d";
+}
+
+.icon-change:before {
+  content: "\e645";
+}
+
+.icon-mark-paper:before {
+  content: "\e6b0";
+}
+
+.icon-simulate:before {
+  content: "\e64d";
+}
+
+.icon-image:before {
+  content: "\e658";
+}
+
+.icon-click:before {
+  content: "\e708";
+}
+
+.icon-line-upload:before {
+  content: "\ebb3";
+}
+
+.icon-line-dowmload:before {
+  content: "\ebb4";
+}
+
+.icon-word-template:before {
+  content: "\e75d";
+}
+
+.icon-email:before {
+  content: "\e7b1";
+}
+
+.icon-add:before {
+  content: "\e7e6";
+}
+

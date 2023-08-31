@@ -1,0 +1,129 @@
+{
+	"pages": [{
+		"path": "pages/index/index",
+		"style": {
+			"navigationBarTitleText": "小猫考试",
+			"navigationBarBackgroundColor": "white",
+			"enablePullDownRefresh": true
+		}
+	}, {
+		"path": "pages/login/login",
+		"style": {
+			"navigationBarTitleText": "登录"
+		}
+	}, {
+		"path": "pages/myExam/myExam",
+		"style": {
+			"navigationBarTitleText": "我的考试"
+		}
+	}, {
+		"path": "pages/myExam/myExamPage",
+		"style": {
+			"navigationBarTitleText": "考试试卷"
+		}
+	}, {
+		"path": "pages/myExam/myExamResult",
+		"style": {
+			"navigationBarTitleText": "考试结果"
+		}
+
+	}, {
+		"path": "pages/myExer/myExer",
+		"style": {
+			"navigationBarTitleText": "我的模拟"
+		}
+	}, {
+		"path": "pages/myExer/myExerPage",
+		"style": {
+			"navigationBarTitleText": "模拟试卷"
+		}
+	}, {
+		"path": "pages/myExer/myExerResult",
+		"style": {
+			"navigationBarTitleText": "模拟结果"
+		}
+	}, {
+		"path": "pages/my/my",
+		"style": {
+			"navigationBarTitleText": "个人中心"
+		}
+
+	}, {
+		"path": "pages/my/pwd",
+		"style": {
+			"navigationBarTitleText": "修改密码"
+		}
+
+	}, {
+		"path": "pages/bulletin/bulletin",
+		"style": {
+			"navigationBarTitleText": "公告列表"
+		}
+	}, {
+		"path": "pages/bulletin/bulletinDetail",
+		"style": {
+			"navigationBarTitleText": "公告详情"
+		}
+	}],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app2",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"background": "#efeff4"
+		}
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#F8F8F8",
+		"iconfontSrc": "/static/iconfont.ttf",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconfont": {
+					"text": "\ue63d",
+					"selectedText": "\ue63d",
+					"fontSize": "48rpx",
+					"color": "#000000",
+					"selectedColor": "#2979ff"
+				}
+			},
+			{
+				"pagePath": "pages/myExam/myExam",
+				"text": "考试",
+				"iconfont": {
+					"text": "\ue605",
+					"selectedText": "\ue605",
+					"fontSize": "48rpx",
+					"color": "#000000",
+					"selectedColor": "#2979ff"
+				}
+			},
+			{
+				"pagePath": "pages/myExer/myExer",
+				"text": "练习",
+				"iconfont": {
+					"text": "\ue665",
+					"selectedText": "\ue665",
+					"fontSize": "48rpx",
+					"color": "#000000",
+					"selectedColor": "#2979ff"
+				}
+			},
+			{
+				"pagePath": "pages/my/my",
+				"text": "我的",
+				"iconfont": {
+					"text": "\ue61f",
+					"selectedText": "\ue61f",
+					"fontSize": "48rpx",
+					"color": "#000000",
+					"selectedColor": "#2979ff"
+				}
+			}
+		]
+	}
+}
