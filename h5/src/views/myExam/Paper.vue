@@ -82,7 +82,7 @@
                         :errShow="scoreShow"
                         >
                         <template #bottom-right v-if="myExam.state === 3 || (myExam.state === 1 && myExam.markState === 3)"><!-- 已交卷或（未考试已阅卷） -->
-                            <el-tooltip placement="top" effect="light" :content="answerShow(examQuestion)" raw-content>
+                            <el-tooltip placement="top" effect="light" :content="answerShow(examQuestion)" popper-class="popper-class">
                                 <el-button type="success" size="small">标准答案</el-button>
                             </el-tooltip>
                         </template>
@@ -467,5 +467,10 @@ function answerShow(examQuestion: ExamQuestion) {
             }
         }
     }
+}
+</style>
+<style>
+.popper-class {
+    max-width: 800px;
 }
 </style>

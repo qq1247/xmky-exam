@@ -79,7 +79,7 @@
                 :errShow="!exer.answerShow && curQuestion.question.userScore != null"
                 >
                 <template #bottom-right>
-                    <el-tooltip placement="top" effect="light" :content="answerFormat(curQuestion.question)" raw-content>
+                    <el-tooltip placement="top" effect="light" :content="answerFormat(curQuestion.question)" popper-class="popper-class">
                         <el-button type="success" size="small">标准答案</el-button>
                     </el-tooltip>
                 </template>
@@ -624,5 +624,10 @@ async function rmkLike(exerRmkId: number) {
             }
         }
     }
+}
+</style>
+<style>
+.popper-class {
+    max-width: 800px;
 }
 </style>

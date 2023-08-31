@@ -68,7 +68,8 @@
             :score="question.score" 
             :answers="question.answers"
             :options="question.options" 
-            :display="display" 
+            :display="display"
+            :userAnswerShow="false"
             >
             <template #bottom-right>
                 <el-button type="primary" @click="editForm.id = question.id; editForm.show = true" size="small">
