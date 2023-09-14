@@ -44,6 +44,8 @@ public class Question {
 	private Integer state;
 	@Column(name = "QUESTION_TYPE_ID")
 	private Integer questionTypeId;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -158,5 +160,13 @@ public class Question {
 		}
 		
 		this.markOptions = StringUtil.join(markOptions);
+	}
+
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
 	}
 }

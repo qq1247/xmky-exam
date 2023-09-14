@@ -27,6 +27,8 @@ public class QuestionType {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -64,5 +66,13 @@ public class QuestionType {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
 	}
 }

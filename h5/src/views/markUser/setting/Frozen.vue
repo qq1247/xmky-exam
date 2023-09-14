@@ -1,12 +1,15 @@
 <template>
     <el-card class="edit" shadow="never">
         <template #header>
-            <div class="edit-title">删除</div>
-            <div class="edit-desc">该子管理员创建的协助阅卷用户，也会删除</div>
+            <div class="edit-title">账号冻结</div>
+            <div class="edit-desc">账号冻结</div>
         </template>
-        <el-button :type="form.doubleConfirm ? 'danger' : 'warning'" @click="del">
-            {{ form.doubleConfirm ? '再次确认' : '删除' }}
-        </el-button>
+        <el-switch 
+            v-model="form.state"
+            :active-value="2"
+            :inactive-value="1"
+            @click="frozen"
+            />
     </el-card>
 </template>
 
@@ -19,31 +22,26 @@ import { useRouter, useRoute } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 const form = reactive({// 表单
-    id: 0,
-    doubleConfirm: false
+    id: null,
+    state: null,
 })
 
 // 组件挂载完成后，执行如下方法
-onMounted(() => {
-    form.id = parseInt(route.params.id as string)
+onMounted(async() => {
+    let { data: { data } } = await http.post("user/get", { id: route.params.id })
+    form.id = data.id
+    form.state = data.state
 })
 
-// 删除
-async function del() {
-    if (!form.doubleConfirm) {
-        form.doubleConfirm = true
-        return
-    }
-
-    let { data: { code } } = await http.post("user/del", {
-        id: form.id,
-    })
+// 账号冻结
+async function frozen() {
+    let { data: { code, data } } = await http.post("user/frozen", {...form})
 
     if (code !== 200) {
         return
     }
 
-    router.push("/subAdmin")
+    router.push("/markUser")
 
 }
 </script>

@@ -1,42 +1,21 @@
 <template>
     <el-card class="edit" shadow="never">
         <template #header>
-            <div class="edit-title">子管理信息</div>
-            <div class="edit-desc">当考试用户过多时，建议分配一些子管理员，分别对考试用户进行管理</div>
+            <div class="edit-title">阅卷用户</div>
+            <div class="edit-desc">当考试用户过多时，建议分配一些协助阅卷用户，分别对试卷进行阅卷</div>
         </template>
         <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large">
-            <el-form-item label="子管理姓名" prop="name">
-                <el-input v-model="form.name" placeholder="请输入子管理姓名"/>
+            <el-form-item label="姓名" prop="name">
+                <el-input v-model="form.name" placeholder="请输入姓名"/>
             </el-form-item>
             <el-form-item label="登录账号" prop="loginName">
                 <el-input v-model="form.loginName" placeholder="请输入登录账号"/>
             </el-form-item>
             <el-form-item label="拥有权限" prop="">
-                <el-tag size="small">组织考试</el-tag>&nbsp;
-                <el-tag type="success" size="small">模拟练习</el-tag>&nbsp;
-                <el-tag type="warning" size="small">分配阅卷</el-tag>&nbsp;
-                <el-tag type="danger" size="small">统计查询</el-tag>&nbsp;
-            </el-form-item>
-            <el-form-item label="管理用户" prop="userIds">
-                <Select
-                    v-model="form.userIds"
-                    url="user/listpage"
-                    :params="{ state: 1, type: 1 }"
-                    search-parm-name="name"
-                    option-label="name"
-                    option-value="id"
-                    :options="users"
-                    :multiple="true"
-                    clearable
-                    searchPlaceholder="请输入机构用户名称进行筛选"
-                    >
-                    <template #default="{ option }">
-                        {{ option.name }} - {{option.orgName}}
-                    </template>
-                </Select>
+                <el-tag size="small">协助阅卷</el-tag>&nbsp;
             </el-form-item>
             <el-form-item>
-                <el-button v-if="$route.path.indexOf('subAdmin/add') !== -1" type="primary" @click="add">
+                <el-button v-if="$route.path.indexOf('markUser/add') !== -1" type="primary" @click="add">
                     添加
                 </el-button>
                 <el-button v-else type="primary" @click="edit">
@@ -59,8 +38,7 @@ import Select from '@/components/Select.vue'
 const route = useRoute()
 const router = useRouter()
 const form = reactive({ // 表单
-    type: 2,
-    userIds: [] as number[],
+    type: 3,
 } as User)
 const formRef = ref<FormInstance>() // 表单引用
 const formRules = reactive<FormRules>({// 表单校验规则
@@ -72,40 +50,18 @@ const formRules = reactive<FormRules>({// 表单校验规则
         { required: true, message: '请输入子管理姓名', trigger: 'blur' },
         { min: 1, max: 8, message: '长度介于1-8', trigger: 'blur' },
     ],
-    userIds: [
-        { required: true, message: '请选择管理用户', trigger: 'blur' },
-    ],
 })
 const users = ref([] as User[])
 
 // 组件挂载完成后，执行如下方法
 onMounted(async () => {
-    if (route.path.indexOf('subAdmin/add') !== -1) {
+    if (route.path.indexOf('markUser/add') !== -1) {
     } else {
         let { data: { data } } = await http.post("user/get", { id: route.params.id })
         form.id = data.id
         form.name = data.name
         form.loginName = data.loginName
-        form.userIds = data.userIds
-
-        let curPage = 1
-        let pageSize = 100
-        while (true) {
-            let { data: { data } } = await http.post("user/listpage", { 
-                ids: form.userIds.join(),
-                state: 1, // 状态正常
-                type: 1,// 考试用户
-                curPage: curPage++,
-                pageSize: pageSize,
-            })
-    
-            users.value.push(...data.list)
-            if (users.value.length >= data.total) {// 分批次取出
-                break
-            }
-        }
     }
-
 })
 
 // 添加
@@ -127,7 +83,7 @@ async function add() {
             duration: 0,
             showClose: true
         })
-        router.push("/subAdmin")
+        router.push("/markUser")
     })
 }
 
@@ -152,7 +108,7 @@ async function edit() {
             })
         }
 
-        router.push("/subAdmin")
+        router.push("/markUser")
     })
 }
 </script>

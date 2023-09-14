@@ -73,6 +73,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		addExValid(question, options, answers, scores, questionType);
 		
 		// 添加试题
+		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setState(1);

@@ -49,10 +49,7 @@ public class ShiroServiceImpl implements ShiroService {
 
 			@Override
 			public String[] getRoles() {
-				if (user.getLoginName().equals("admin")) {
-					return new String[] { "admin" };
-				} 
-				return new String[] { "user" };
+				return new String[] { user.getType().toString() };
 			}
 		};
 	}

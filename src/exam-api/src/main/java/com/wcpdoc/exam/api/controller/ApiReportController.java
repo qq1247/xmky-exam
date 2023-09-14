@@ -68,6 +68,26 @@ public class ApiReportController extends BaseController{
         }
     }
     
+    /**
+     * 子管理员首页
+     * 
+     * v1.0 chenyun 2021年12月10日上午10:14:34
+     * @return PageResult
+     */
+    @RequestMapping("/subAdmin/home")
+    @ResponseBody
+    public PageResult subAdminHome() {
+        try {
+            return PageResultEx.ok().data(reportService.subAdminHome());
+        } catch (MyException e) {
+            log.error("子管理员首页错误：{}", e.getMessage());
+            return PageResult.err().msg(e.getMessage());
+        } catch (Exception e) {
+            log.error("子管理员首页错误：", e);
+            return PageResult.err();
+        }
+    }
+    
 //    /**
 //     * 服务器参数 // 第三方dll有bug
 //     * 

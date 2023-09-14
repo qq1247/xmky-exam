@@ -1,8 +1,8 @@
 <template>
-    <template v-if="$route.path === '/subAdmin'">
+    <template v-if="$route.path === '/markUser'">
         <el-form :inline="true" :model="queryForm" size="large" class="query">
             <el-form-item label="">
-                <el-input v-model="queryForm.name" placeholder="请输入子管理姓名" />
+                <el-input v-model="queryForm.name" placeholder="请输入姓名" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="query">
@@ -10,18 +10,18 @@
                 </el-button>
             </el-form-item>
             <el-form-item style="float: right;">
-                <el-button type="success" @click="$router.push('/subAdmin/add')">
+                <el-button type="success" @click="$router.push('/markUser/add')">
                     <Iconfont icon="icon-plus" color="white">&nbsp;添加</Iconfont>
                 </el-button>
             </el-form-item>
         </el-form>
         <el-table :data="listpage.list" style="width: 100%" class="table" size="large" row-key="id"
             default-expand-all>
-            <el-table-column prop="name" label="子管理姓名" align="center" />
+            <el-table-column prop="name" label="阅卷用户" align="center" />
             <el-table-column prop="loginName" label="登录账号" align="center" />
             <el-table-column prop="" label="拥有权限" align="center" width="400">
                 <template #default="scope">
-                    组织考试、模拟练习、分配阅卷、统计查询
+                    协助阅卷
                 </template>
             </el-table-column>
             <el-table-column prop="state" label="状态" align="center">
@@ -33,19 +33,19 @@
                 <template #default="scope">
                     <el-tooltip ffect="dark" content="修改">
                         <Iconfont icon="icon-edit" :size="18" color="#409eff"
-                            @click="$router.push(`/subAdmin/edit/${scope.row.id}`)"></Iconfont>
+                            @click="$router.push(`/markUser/edit/${scope.row.id}`)"></Iconfont>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="删除">
                         <Iconfont icon="icon-delete" :size="18" color="#409eff"
-                            @click="$router.push(`/subAdmin/del/${scope.row.id}`)"></Iconfont>
+                            @click="$router.push(`/markUser/del/${scope.row.id}`)"></Iconfont>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="密码重置">
                         <Iconfont icon="icon-pwd-reset" :size="18" color="#409eff"
-                            @click="$router.push(`/subAdmin/pwdInit/${scope.row.id}`)"></Iconfont>
+                            @click="$router.push(`/markUser/pwdInit/${scope.row.id}`)"></Iconfont>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="账号冻结">
                         <Iconfont icon="icon-dongjie" :size="18" color="#409eff"
-                            @click="$router.push(`/subAdmin/frozen/${scope.row.id}`)"></Iconfont>
+                            @click="$router.push(`/markUser/frozen/${scope.row.id}`)"></Iconfont>
                     </el-tooltip>
                 </template>
             </el-table-column>
@@ -78,7 +78,7 @@ const dictStore = useDictStore()// 字典缓存
 const queryForm = reactive({// 查询表单
     name: '',
     state: '',
-    type: 2,
+    type: 3 // 查询阅卷用户
 })
 const listpage = reactive({// 分页列表
     curPage: 1,
@@ -94,7 +94,7 @@ onMounted(() => {
 
 // 如果是跳转到列表页，重新查询
 watch(() => route.path, (n, o) => {
-    if (n === '/subAdmin') {
+    if (n === '/markUser') {
         query()
     }
 })

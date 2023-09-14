@@ -11,6 +11,29 @@ import com.wcpdoc.core.service.BaseService;
  * v1.0 zhanghc 2016-6-15下午17:24:19
  */
 public interface UserService extends BaseService<User> {
+	/**
+	 * 用户添加
+	 * 
+	 * v1.0 zhanghc 2023年9月4日上午10:23:40
+	 * @param user void
+	 */
+	void addEx(User user);
+	
+	/**
+	 * 用户修改
+	 * 
+	 * v1.0 zhanghc 2023年9月4日上午10:49:14
+	 * @param user void
+	 */
+	void editEx(User user);
+	
+	/**
+	 * 用户删除
+	 * 
+	 * v1.0 zhanghc 2023年9月4日下午4:36:22
+	 * @param id void
+	 */
+	void delEx(Integer id);
 
 	/**
 	 * 获取用户 
@@ -23,7 +46,7 @@ public interface UserService extends BaseService<User> {
 	User getUser(String loginName);
 
 	/**
-	 * 修改密码
+	 * 密码初始化
 	 * 
 	 * v1.0 zhanghc 2017年7月14日下午3:09:25
 	 * 
@@ -31,7 +54,7 @@ public interface UserService extends BaseService<User> {
 	 * @param newPwd
 	 * String
 	 */
-	String pwdUpdate(Integer id);
+	String pwdInit(Integer id);
 
 	/**
 	 * 获取加密后的密码
@@ -73,7 +96,7 @@ public interface UserService extends BaseService<User> {
 	List<User> getList(Integer[] ids);
 	
 	/**
-	 * 冻结账户
+	 * 用户冻结
 	 * 
 	 * v1.0 chenyun 2022年04月21日下午18:48:00
 	 * @param ids void
@@ -87,4 +110,6 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getList();
+
+
 }

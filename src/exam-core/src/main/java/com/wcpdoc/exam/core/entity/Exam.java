@@ -70,6 +70,8 @@ public class Exam {
 	private String sxes;
 	@Column(name = "STATE")
 	private Integer state;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -265,5 +267,13 @@ public class Exam {
 
 	public void setPaperName(String paperName) {
 		this.paperName = paperName;
+	}
+
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
 	}
 }

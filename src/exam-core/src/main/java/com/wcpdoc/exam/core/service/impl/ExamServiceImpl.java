@@ -414,6 +414,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setUpdateTime(new Date());
 		
 		if (!ValidateUtil.isValid(examInfo.getId())) {
+			exam.setCreateUserId(getCurUser().getId());
 			add(exam);
 			examInfo.setId(exam.getId());// 同步exam.id到examInfo.id
 		} else {

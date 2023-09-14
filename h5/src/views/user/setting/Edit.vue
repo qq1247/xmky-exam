@@ -14,7 +14,7 @@
                     option-label="name"
                     option-value="id"
                     :multiple="false"
-                    :options="form.orgs"
+                    :options="orgs"
                     placeholder="请选择机构"
                 >
                 <template #default="{ option }">
@@ -46,18 +46,16 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import http from '@/request/index'
 import { useRouter, useRoute } from 'vue-router'
 import Select from '@/components/Select.vue'
+import type { User, Org } from '@/ts'
 
 // 定义变量
 const route = useRoute()
 const router = useRouter()
 const form = reactive({// 表单
-    id: null,
-    name: null,
-    loginName: null,
     type: 1,
     orgId: 1,
-    orgs: [] as any[]
-})
+} as User)
+const orgs = ref([] as Org[])
 const formRef = ref<FormInstance>() // 表单引用
 const formRules = reactive<FormRules>({// 表单校验规则
     loginName: [
@@ -82,7 +80,7 @@ onMounted(async () => {
     }
 
     let { data: { data } } = await http.post("org/get", { id: form.orgId })
-    form.orgs.push({id: data.id, name: data.name, parentName: data.parentName})
+    orgs.value.push(data)
 })
 
 // 添加
@@ -97,6 +95,7 @@ async function add() {
             loginName: form.loginName,
             name: form.name,
             orgId: form.orgId,
+            type: form.type,
         })
 
         if (code !== 200) {
@@ -125,6 +124,7 @@ async function edit() {
             loginName: form.loginName,
             name: form.name,
             orgId: form.orgId,
+            type: form.type,
         })
 
         if (code !== 200) {

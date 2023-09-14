@@ -72,6 +72,7 @@ public class ApiQuestionTypeController extends BaseController {
 			//} // 不同的子管理员添加可以重复
 			
 			// 添加题库
+			questionType.setCreateUserId(getCurUser().getId());
 			questionType.setUpdateTime(new Date());
 			questionType.setUpdateUserId(getCurUser().getId());
 			questionTypeService.add(questionType);

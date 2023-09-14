@@ -15,64 +15,30 @@ import com.wcpdoc.core.entity.PageOut;
 public interface ReportDao extends RBaseDao<Object> {
 	
 	/**
-	 * 首页user
+	 * 管理员首页
 	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> adminHome();
+	
+	/**
+	 * 用户首页
+	 * 
+	 * v1.0 zhanghc 2023年3月19日下午2:06:57
 	 * @param userId
 	 * @return Map<String,Object>
 	 */
-	List<Map<String, Object>> homeUser(Integer userId);
+	Map<String, Object> userHome(Integer userId);
 	
 	/**
-	 * 缺考数
+	 * 子管理员首页
 	 * 
-	 * v1.0 chenyun 2022年1月19日下午2:23:33
-	 * @param userId
-	 * @return Integer
-	 */
-	Integer homeUserMissNum(Integer userId);
-	
-	/**
-	 * 首页subAdmin
-	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
-	 * @param userId
-	 * @return Integer
-	 */
-	Integer homeSubAdminQuestion(Integer userId);
-	/**
-	 * 首页subAdmin
-	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
-	 * @param userId
-	 * @return Integer
-	 */
-	Integer homeSubAdminMark(Integer userId);
-
-	/**
-	 * 首页admin
-	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * v1.0 zhanghc 2023年3月19日下午2:06:57
+	 * @param userId 子管理员ID
 	 * @return Map<String,Object>
 	 */
-	List<Map<String, Object>> homeAdminUser();
-	
-	/**
-	 * 首页admin
-	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
-	 * @return Integer
-	 */
-	Integer homeAdminBulletin();
-
-	/**
-	 * 考试统计-试题类型列表
-	 * 
-	 * v1.0 chenyun 2021年12月16日上午9:38:30
-	 * @param examId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> examStatisType(Integer examId);
+	Map<String, Object> subAdminHome(Integer userId);
 	
 	/**
 	 * 我的考试列表
@@ -101,20 +67,4 @@ public interface ReportDao extends RBaseDao<Object> {
 	 */
 	List<Map<String, Object>> count(Integer examId);
 
-	/**
-	 * 管理员首页
-	 * 
-	 * v1.0 chenyun 2021年12月10日上午10:14:11
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> adminHome();
-	
-	/**
-	 * 用户首页
-	 * 
-	 * v1.0 zhanghc 2023年3月19日下午2:06:57
-	 * @param userId
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> userHome(Integer userId);
 }

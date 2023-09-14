@@ -2,7 +2,7 @@
     <el-card class="edit" shadow="never">
         <template #header>
             <div class="edit-title">删除</div>
-            <div class="edit-desc">该子管理员创建的协助阅卷用户，也会删除</div>
+            <div class="edit-desc">用户阅卷等信息会保留</div>
         </template>
         <el-button :type="form.doubleConfirm ? 'danger' : 'warning'" @click="del">
             {{ form.doubleConfirm ? '再次确认' : '删除' }}
@@ -43,7 +43,7 @@ async function del() {
         return
     }
 
-    router.push("/subAdmin")
+    router.push("/markUser")
 
 }
 </script>

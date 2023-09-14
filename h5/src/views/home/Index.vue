@@ -6,7 +6,7 @@
                     <span>考试概览</span>
                 </template>
                 <div class="home-left-top-content">
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/exam')">
+                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-diannao" :size="24" color="#09c8bd;" :width="48" :height="48"
                             background-color="#e5faf8" />
                         <div>
@@ -14,7 +14,7 @@
                             <div class="home-left-top-content-item-desc">创建考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/questionType')">
+                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/questionType')">
                         <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
                             background-color="#fff4e7" />
                         <div>
@@ -22,7 +22,7 @@
                             <div class="home-left-top-content-item-desc">创建试题（道）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/exer')">
+                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/exer')">
                         <Iconfont icon="icon-mark-paper" :size="27" color="#0094e5;" :width="48" :height="48"
                             background-color="#e5f4fd" />
                         <div>
@@ -30,7 +30,7 @@
                             <div class="home-left-top-content-item-desc">创建练习（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/user')">
+                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/user')">
                         <Iconfont icon="icon-ai-users" :size="29" color="#eb5b5b;" :width="48" :height="48"
                             background-color="#fdeeee" />
                         <div>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
 
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
+                    <div v-if="userStore.type === 1" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-diannao" :size="24" color="#09c8bd;" :width="48" :height="48"
                             background-color="#e5faf8" />
                         <div>
@@ -47,7 +47,7 @@
                             <div class="home-left-top-content-item-desc">参与考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExer')">
+                    <div v-if="userStore.type === 1" class="home-left-top-content-item" @click="$router.push('/myExer')">
                         <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
                             background-color="#fff4e7" />
                         <div>
@@ -55,7 +55,7 @@
                             <div class="home-left-top-content-item-desc">参与练习（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
+                    <div v-if="userStore.type === 1" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-mark-paper" :size="27" color="#0094e5;" :width="48" :height="48"
                             background-color="#e5f4fd" />
                         <div>
@@ -63,7 +63,7 @@
                             <div class="home-left-top-content-item-desc">及格次数（次）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
+                    <div v-if="userStore.type === 1" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-ai-users" :size="29" color="#eb5b5b;" :width="48" :height="48"
                             background-color="#fdeeee" />
                         <div>
@@ -134,8 +134,8 @@
                                     <el-text type="info" size="small">{{ todoExam.examStartTime }} - {{ todoExam.examEndTime }}</el-text>
                                     <el-text v-if="todoExam.examMarkType === 2" type="info" size="small"><br/>{{ todoExam.examMarkStartTime }} - {{ todoExam.examMarkEndTime }}（阅卷时间）</el-text>
                                 </div>
-                                <el-button v-if="userStore.roles.includes('admin') && todoExam.examMarkType === 2" type="primary" plain @click="toMark(todoExam)">开始阅卷</el-button>
-                                <el-button v-else-if="userStore.roles.includes('user')" type="primary" plain @click="toExam(todoExam)">开始考试</el-button>
+                                <el-button v-if="userStore.type === 0 && todoExam.examMarkType === 2" type="primary" plain @click="toMark(todoExam)">开始阅卷</el-button>
+                                <el-button v-else-if="userStore.type === 1" type="primary" plain @click="toExam(todoExam)">开始考试</el-button>
                             </div>
                             <el-empty v-if="!todoExamList.length" description="暂无考试"/>
                         </el-scrollbar>
@@ -150,7 +150,7 @@
                                     <el-text tag="b">{{ todoExer.name }}</el-text><br/>
                                     <el-text type="info" size="small">{{ todoExer.startTime }} - {{ todoExer.endTime }}</el-text>
                                 </div>
-                                <el-button v-if="userStore.roles.includes('user')" type="primary" plain @click="toExer(todoExer)">开始练习</el-button>
+                                <el-button v-if="userStore.type === 1" type="primary" plain @click="toExer(todoExer)">开始练习</el-button>
                             </div>
                             <el-empty v-if="!todoExerList.length" description="暂无练习"/>
                         </el-scrollbar>
@@ -164,42 +164,42 @@
                     <span>快捷菜单</span>
                 </template>
                 <div class="home-right-menu-content">
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/user')">
+                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/user')">
                         <Iconfont icon="icon-user-manage" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#0094e5" />
                         <span>用户管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/org')">
+                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/org')">
                         <Iconfont icon="icon-base-manage" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#6b77f9" />
                         <span>机构管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/bulletin')">
+                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/bulletin')">
                         <Iconfont icon="icon-mark-paper" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#eb5b5b" />
                         <span>公告管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/exam')">
+                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-diannao" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#09c8bd" />
                         <span>考试管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/questionType')">
+                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/questionType')">
                         <Iconfont icon="icon-shiti" :size="22" color="white" :width="40" :height="40" :radius="10"
                             background-color="#fb901b" />
                         <span>题库管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/exer')">
+                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/exer')">
                         <Iconfont icon="icon-piyue" :size="22" color="white" :width="40" :height="40" :radius="10"
                             background-color="#67C23A" />
                         <span>模拟练习</span>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-right-menu-content-item" @click="$router.push('/myExam')">
+                    <div v-if="userStore.type === 1" class="home-right-menu-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-diannao" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#09c8bd" />
                         <span>我的考试</span>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-right-menu-content-item" @click="$router.push('/myExer')">
+                    <div v-if="userStore.type === 1" class="home-right-menu-content-item" @click="$router.push('/myExer')">
                         <Iconfont icon="icon-piyue" :size="22" color="white" :width="40" :height="40" :radius="10"
                             background-color="#67C23A" />
                         <span>我的练习</span>
@@ -276,7 +276,7 @@ onMounted(async () => {
     calendar.value = curTime
 
     // 任务查询
-    if (userStore.roles.includes('admin')) {// 如果是admin登录
+    if (userStore.type === 0) {// 如果是admin登录
         let { data: { data } } = await http.post("report/admin/home", {  })// 首页统计
         statis.examNum = data.examNum
         statis.questionNum = data.questionNum
@@ -289,7 +289,7 @@ onMounted(async () => {
         let { data: { data: data3 } } = await http.post("exer/listpage", { pageSize: 100, todo: true })// 未完成的练习列表
         todoExerList.value.push(...data3.list) 
     }
-    if (userStore.roles.includes('user')) {// 如果是用户登录
+    if (userStore.type === 1) {// 如果是用户登录
         let { data: { data } } = await http.post("report/user/home", {  })// 首页统计
         statis.examNum = data.examNum
         statis.exerNum = data.exerNum
@@ -332,7 +332,7 @@ watch(() => calendar.value, async (n, o) => {
     let startTime = dayjs(n).startOf('month').format('YYYY-MM-DD HH:mm:ss')
     let endTime = dayjs(n).endOf('month').format('YYYY-MM-DD HH:mm:ss')
     taskList.value.length = 0
-    if (userStore.roles.includes('admin')) {
+    if (userStore.type === 0) {
         let { data: { data } } = await http.post("myMark/listpage", { pageSize: 100, startTime, endTime })
         taskList.value.push(...data.list.map((task: any) => {
             task.startTime = task.examStartTime
@@ -347,7 +347,7 @@ watch(() => calendar.value, async (n, o) => {
             task.type = 2
             return task
         })) 
-    } else if (userStore.roles.includes('user')) {
+    } else if (userStore.type === 1) {
         let { data: { data } } = await http.post("myExam/listpage", { pageSize: 100, startTime, endTime })
         taskList.value.push(...data.list.map((task: any) => {
             task.startTime = task.examStartTime

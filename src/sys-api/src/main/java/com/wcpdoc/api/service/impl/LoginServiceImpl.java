@@ -53,7 +53,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 
 	@Override
 	public UserToken in(String loginName, String pwd) throws LoginException {
-		//校验数据有效性
+		// 数据校验
 		if(!ValidateUtil.isValid(loginName)) {
 			throw new LoginException("参数错误：loginName");
 		}
@@ -72,11 +72,12 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		// 生成令牌（登陆由shiro接收令牌控制）
 		Date curTime = new Date();
 		Long tokenId = curTime.getTime();
-		Date expTime = DateUtil.getNextMinute(new Date(), tokenExpireMinute);
+		Date expTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
 		String accessToken = JwtUtil.getInstance()
 				.createToken(tokenId.toString(), active, expTime)
 				.addAttr("userId", user.getId())
 				.addAttr("loginName", user.getLoginName())
+				.addAttr("type", user.getType())
 				.build();
 		if (log.isDebugEnabled()) {
 			log.debug("shiro权限：用户【{}】登陆，旧令牌创建时间【{}】，当前令牌创建时间【{}】", 
@@ -94,11 +95,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		userToken.setUserName(user.getName());
 		userToken.setAccessToken(accessToken);
 		userToken.setUserId(user.getId());
-		if (user.getLoginName().equals("admin")) {
-			userToken.setRoles(new String[] { "admin" });
-		} else {
-			userToken.setRoles(new String[] { "user" });
-		}
+		userToken.setType(user.getType());
 		return userToken;
 	}
 

@@ -44,37 +44,37 @@ const curTab = computed({// 当前标签页
 
 // 组件挂载完成后，执行如下方法
 onMounted(() => {
-    if (route.path.indexOf('subAdmin/add') !== -1) {
+    if (route.path.indexOf('markUser/add') !== -1) {
         tabs.push({
-            title: '子管理信息',
+            title: '阅卷用户',
             desc: '添加',
             icon: 'icon-edit',
-            url: `/subAdmin/add/${route.params.parentId}`,
+            url: `/markUser/add/${route.params.parentId}`,
         })
     } else {
         tabs.push({
-            title: '子管理信息',
+            title: '阅卷用户',
             desc: '修改',
             icon: 'icon-edit',
-            url: `/subAdmin/edit/${route.params.id}`,
+            url: `/markUser/edit/${route.params.id}`,
         })
         tabs.push({
             title: '密码重置',
             desc: '密码重置',
             icon: 'icon-pwd-reset',
-            url: `/subAdmin/pwdInit/${route.params.id}`,
+            url: `/markUser/pwdInit/${route.params.id}`,
         })
         tabs.push({
             title: '账号冻结',
             desc: '账号冻结',
             icon: 'icon-dongjie',
-            url: `/subAdmin/frozen/${route.params.id}`,
+            url: `/markUser/frozen/${route.params.id}`,
         })
         tabs.push({
             title: '删除',
-            desc: '删除子管理',
+            desc: '删除阅卷用户',
             icon: 'icon-delete',
-            url: `/subAdmin/del/${route.params.id}`,
+            url: `/markUser/del/${route.params.id}`,
         })
     }
 })

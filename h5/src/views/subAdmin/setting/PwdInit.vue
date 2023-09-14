@@ -3,8 +3,7 @@
         <template #header>
             <div class="edit-title">密码重置</div>
             <div class="edit-desc">
-                恢复默认密码，一般在用户忘记密码时使用。可在【系统配置/默认密码】设置默认值。 
-                <router-link to="/parm/pwd">去设置</router-link>
+                恢复默认密码，一般在用户忘记密码时使用。
             </div>
         </template>
         <el-button type="danger" @click="pwdInit">

@@ -42,6 +42,11 @@ public class UserContextServiceImpl implements UserContextService {
 			public String getLoginName() {
 				return oldJwtResult.getClaims().get("loginName", String.class);
 			}
+
+			@Override
+			public Integer getType() {
+				return oldJwtResult.getClaims().get("type", Integer.class);
+			}
 		};
 	}
 

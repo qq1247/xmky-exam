@@ -8,7 +8,7 @@ package com.wcpdoc.core.entity;
 public interface LoginUser {
 
 	/**
-	 * 获取用户ID
+	 * 用户ID
 	 * 
 	 * v1.0 zhanghc 2015-6-19下午08:30:16
 	 * 
@@ -17,10 +17,18 @@ public interface LoginUser {
 	public Integer getId();
 	
 	/**
-	 * 获取登录账号
+	 * 登录账号
 	 * 
 	 * v1.0 zhanghc 2015-6-19下午08:30:16
 	 * @return String
 	 */
 	public String getLoginName();
+	
+	/**
+	 * 用户类型
+	 * 
+	 * v1.0 zhanghc 2023年9月4日上午10:30:30
+	 * @return String
+	 */
+	public Integer getType();
 }

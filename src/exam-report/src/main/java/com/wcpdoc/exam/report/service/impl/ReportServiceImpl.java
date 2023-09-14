@@ -93,6 +93,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	}
 	
 	@Override
+	public Map<String, Object> subAdminHome() {
+		return reportDao.subAdminHome(getCurUser().getId());
+	}
+	
+	@Override
 	public List<String> serverLog() throws Exception {
 		if (getCurUser().getId().intValue() != 1) {
 			throw new MyException("登录用户角色错误");
@@ -382,4 +387,5 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		StandardDeviation standardDeviation =new StandardDeviation(false);
 		System.out.println("标准差：" + standardDeviation.evaluate(values));
 	}
+
 }

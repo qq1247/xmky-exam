@@ -4,7 +4,6 @@ import java.util.Date;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.ShiroException;
@@ -56,8 +55,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	 */
 	@Override
 	protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		String jwt = httpRequest.getHeader("Authorization");
+		String jwt = WebUtils.toHttp(request).getHeader("Authorization");
 		return ValidateUtil.isValid(jwt);
 	}
 
@@ -97,7 +95,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		}
 		
 		try {
-			if (!TokenCache.tryWriteLock(tokenKey, 10000)) { // 同一用户并发请求时，只让一个请求通过，该请求更新令牌后，其他请求就变成了旧令牌，旧令牌宽限30秒有效
+			if (!TokenCache.tryWriteLock(tokenKey, 6000)) { // 同一用户并发请求时，只让一个请求通过，该请求更新令牌后，其他请求就变成了旧令牌，旧令牌宽限30秒有效
 				throw new AuthenticationException(String.format("用户【%s】并发【{}】请求超时", oldLoginName, WebUtils.toHttp(request).getRequestURI()));
 			}
 			

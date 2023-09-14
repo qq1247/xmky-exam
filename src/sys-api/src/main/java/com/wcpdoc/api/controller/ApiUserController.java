@@ -1,6 +1,5 @@
 package com.wcpdoc.api.controller;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.base.cache.UserCache;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgService;
@@ -25,6 +23,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
@@ -61,7 +60,22 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult listpage() {
 		try {
-			PageOut pageOut = userService.getListpage(new PageIn(request));
+			PageIn pageIn = new PageIn(request);
+			if (getCurUser().getType() == 0) {// 如果是管理员，根据类型显示考试用户，还是子管理员
+				
+			} else if (getCurUser().getType() == 2) {// 如果是子管理
+				if (!ValidateUtil.isValid(pageIn.get("type")) || pageIn.get("type").equals("1")) {// 默认查询考试用户
+					User user = userService.getEntity(getCurUser().getId());
+					pageIn.addAttr("ids", StringUtil.join(user.getUserIds()));
+				} else if (pageIn.get("type").equals("3")) {// 查看阅卷用户
+					pageIn.addAttr("parentId", getCurUser().getId());
+				}
+			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限
+				
+			} else if (getCurUser().getType() == 1) {// 考试用户没有角色权限
+				
+			}
+			PageOut pageOut = userService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
@@ -70,10 +84,9 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
-	 * 添加用户
+	 * 用户添加
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
 	 * @param user
 	 * @return PageResult
 	 */
@@ -81,50 +94,27 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult add(User user) {
 		try {
-			UserCache.tryWriteLock("userAdd", 2000);
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(user.getLoginName())) {
-				throw new MyException("参数错误：loginName");
-			}
-			if (userService.existLoginName(user)) {
-				throw new MyException("登录账号已存在");
-			}
-			if (user.getOrgId() == null) {
-				user.setOrgId(1);// 如果没有默认为根节点
-			}
+			// 用户添加
+			userService.addEx(user);
 
-			// 添加用户
-			Date curTime = new Date();
-			user.setRegistTime(curTime);
-			user.setUpdateTime(curTime);
-			user.setUpdateUserId(getCurUser().getId());
-			user.setState(1);
-			if(ValidateUtil.isValid(user.getHeadFileId())){
-				fileService.upload(user.getHeadFileId());
-			}
-			userService.add(user);
-
-			// 设置密码
-			String initPwd = userService.pwdUpdate(user.getId());
+			// 密码初始化
+			String initPwd = userService.pwdInit(user.getId());
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
-			log.error("添加用户错误：{}", e.getMessage());
+			log.error("用户添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加用户错误：", e);
+			log.error("用户添加错误：", e);
 			return PageResult.err();
-		} finally {
-			UserCache.releaseWriteLock("userAdd");
 		}
 	}
 
 	/**
-	 * 修改用户
+	 * 用户修改
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
 	 * @param user
 	 * @return PageResult
 	 */
@@ -132,54 +122,31 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult edit(User user) {
 		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(user.getLoginName())) {
-				throw new MyException("参数错误：loginName");
-			}
-			if (userService.existLoginName(user)) {
-				throw new MyException("登录账号已存在");
-			}
-
-			// 修改用户
+			// 用户修改
 			User entity = userService.getEntity(user.getId());
-			boolean changeLoginName = false;
-			if (!entity.getLoginName().equals(user.getLoginName())) {
-				changeLoginName = true;
-			}
-
-			entity.setOrgId(user.getOrgId());
-			//entity.setRoles(null); // 修改不允许修改角色
-			entity.setName(user.getName());
-			entity.setLoginName(user.getLoginName());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			entity.setEmail(user.getEmail());
-			if((!ValidateUtil.isValid(entity.getHeadFileId()) && ValidateUtil.isValid(user.getHeadFileId())) 
-					|| (ValidateUtil.isValid(user.getHeadFileId()) && user.getHeadFileId().intValue() != entity.getHeadFileId().intValue())){
-				fileService.upload(user.getHeadFileId());
-			}
-			entity.setHeadFileId(user.getHeadFileId());
-			userService.update(entity);
+			String oldLoginName = entity.getLoginName();
+			userService.editEx(user);
+			String newLoginName = entity.getLoginName();
 			
 			// 更新密码
 			Map<String, Object> data = new HashMap<String, Object>();
-			if (changeLoginName) {
-				String initPwd = userService.pwdUpdate(user.getId());
+			if (!oldLoginName.equals(newLoginName)) {
+				String initPwd = userService.pwdInit(user.getId());
 				data.put("initPwd", initPwd);
 			}
 
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
-			log.error("修改用户错误：{}", e.getMessage());
+			log.error("用户修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改用户错误：", e);
+			log.error("用户修改错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 删除用户
+	 * 用户删除
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * 
@@ -190,25 +157,19 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			User user = userService.getEntity(id);
-			if (user.getState() == 1) {
-				user.setState(0);
-				user.setUpdateTime(new Date());
-				user.setUpdateUserId(getCurUser().getId());
-				userService.update(user);
-			}
+			userService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除用户错误：{}", e.getMessage());
+			log.error("用户删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除用户错误：", e);
+			log.error("用户删除错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取用户
+	 * 用户获取
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * 
@@ -234,19 +195,22 @@ public class ApiUserController extends BaseController {
 				.addAttr("loginName", user.getLoginName())
 				.addAttr("orgId", user.getOrgId())
 				.addAttr("orgName", org == null ? null : org.getName())
-				.addAttr("state", user.getState());
+				.addAttr("state", user.getState())
+				.addAttr("userIds", user.getUserIds())
+				.addAttr("orgIds", user.getOrgIds())
+				;
 			return pageResult;
 		} catch (MyException e) {
-			log.error("获取用户错误：{}", e.getMessage());
+			log.error("用户获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取用户错误：", e);
+			log.error("用户获取错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 初始化密码
+	 * 密码初始化
 	 * 
 	 * v1.0 zhanghc 2017年7月13日下午9:27:18
 	 * 
@@ -257,15 +221,34 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult pwdInit(Integer id) {
 		try {
-			String pwdInit = userService.pwdUpdate(id);
+			String pwdInit = userService.pwdInit(id);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", pwdInit);
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
-			log.error("初始化密码错误：{}", e.getMessage());
+			log.error("密码初始化错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("初始化密码错误：", e);
+			log.error("密码初始化错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 用户冻结  
+	 * 
+	 * v1.0 chenyun 2022年04月21日下午3:36:55
+	 * @param userId
+	 * @return pageOut
+	 */
+	@RequestMapping("/frozen")
+	@ResponseBody
+	public PageResult frozen(Integer id) {
+		try {
+			userService.frozen(id);
+			return PageResult.ok();
+		} catch (Exception e) {
+			log.error("账户冻结错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -290,25 +273,7 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
-	 * 冻结账户  v1.0 chenyun 2022年04月21日下午3:36:55
-	 * 
-	 * @param userId
-	 * @return pageOut
-	 */
-	@RequestMapping("/frozen")
-	@ResponseBody
-	public PageResult frozen(Integer id) {
-		try {
-			userService.frozen(id);
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("冻结账户错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 导入用户
+	 * 用户导入
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * 
@@ -321,16 +286,16 @@ public class ApiUserController extends BaseController {
 			userExService.xlsImport(fileId);
 			return PageResultEx.ok();
 		} catch (MyException e) {
-			log.error("导入用户错误：{}", e.getMessage());
+			log.error("用户导入错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("导入用户错误：", e);
+			log.error("用户导入错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 导出模板
+	 * 用户模板导出
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * 
@@ -342,7 +307,7 @@ public class ApiUserController extends BaseController {
 		try {
 			fileService.exportTemplate("用户.xlsx");
 		} catch (Exception e) {
-			log.error("用户导出模板下载附件失败：", e);
+			log.error("用户模板导出失败：", e);
 		}
 	}
 }

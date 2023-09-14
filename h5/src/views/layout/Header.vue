@@ -7,24 +7,28 @@
             <span class="header-top-orgname">{{ ent.name }}</span>
             <el-menu default-active="/" mode="horizontal" :router="true" class="header-top-menu">
                 <el-menu-item index="/">首页</el-menu-item>
-                <el-menu-item v-if="userStore.roles.includes('admin')" index="/questionType">题库</el-menu-item>
-                <el-menu-item v-if="userStore.roles.includes('admin')" index="/exer">练习</el-menu-item>
-                <el-menu-item v-if="userStore.roles.includes('user')" index="/myExer">练习</el-menu-item>
-                <el-menu-item v-if="userStore.roles.includes('admin')" index="/exam">考试</el-menu-item>
-                <el-sub-menu v-if="userStore.roles.includes('admin')" index="/user">
+                <el-menu-item v-if="userStore.type === 0 || userStore.type === 2" index="/questionType">题库</el-menu-item>
+                <el-menu-item v-if="userStore.type === 0 || userStore.type === 2" index="/exer">练习</el-menu-item>
+                <el-menu-item v-if="userStore.type === 1" index="/myExer">练习</el-menu-item>
+                <el-menu-item v-if="userStore.type === 0 || userStore.type === 2" index="/exam">考试</el-menu-item>
+                <el-sub-menu v-if="userStore.type === 0" index="/user">
                     <template #title>用户</template>
                     <el-menu-item index="/org">机构管理</el-menu-item>
                     <el-menu-item index="/user">用户管理</el-menu-item>
-                    <!-- <el-menu-item index="/subAdmin">子管理员</el-menu-item> -->
+                    <el-menu-item index="/subAdmin">子管理员</el-menu-item>
                 </el-sub-menu>
-                <el-sub-menu v-if="userStore.roles.includes('admin')" index="/sys">
+                <el-sub-menu v-if="userStore.type === 2" index="/user">
+                    <template #title>用户</template>
+                    <el-menu-item index="/markUser">阅卷用户</el-menu-item>
+                </el-sub-menu>
+                <el-sub-menu v-if="userStore.type === 0" index="/sys">
                     <template #title>系统</template>
                     <el-menu-item index="/bulletin">公告管理</el-menu-item>
                     <el-menu-item index="/parm">系统配置</el-menu-item>
                     <el-menu-item index="/cron">定时任务</el-menu-item>
                     <el-menu-item index="/dict">数据字典</el-menu-item>
                 </el-sub-menu>
-                <el-menu-item v-if="userStore.roles.includes('user')" index="/myExam">考试</el-menu-item>
+                <el-menu-item v-if="userStore.type === 1" index="/myExam">考试</el-menu-item>
             </el-menu>
             <el-dropdown @command="dropdownCmd" :teleported="false" class="header-top-username">
                 <span class="el-dropdown-link">

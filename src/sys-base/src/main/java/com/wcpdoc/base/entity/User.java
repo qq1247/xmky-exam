@@ -13,6 +13,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wcpdoc.core.entity.LoginUser;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 用户实体
@@ -56,6 +58,14 @@ public class User implements LoginUser {
 	private Integer state;
 	@Column(name = "HEAD_FILE_ID")
 	private Integer headFileId;
+	@Column(name = "TYPE")
+	private Integer type;
+	@Column(name = "PARENT_ID")
+	private Integer parentId;
+	@Column(name = "USER_IDS")
+	private String userIds;
+	@Column(name = "ORG_IDS")
+	private String orgIds;
 
 	public Integer getId() {
 		return id;
@@ -161,5 +171,67 @@ public class User implements LoginUser {
 
 	public void setHeadFileId(Integer headFileId) {
 		this.headFileId = headFileId;
+	}
+
+	/** 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户） */
+	public Integer getType() {
+		return type;
+	}
+
+	/** 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户） */
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
+	}
+	
+	public Integer[] getUserIds() {
+		if (!ValidateUtil.isValid(userIds)) {
+			return new Integer[0];
+		}
+
+		String[] userIdStrArr = userIds.substring(1, userIds.length() - 1).split(",");
+		Integer[] userIdArr = new Integer[userIdStrArr.length];
+		for (int i = 0; i < userIdStrArr.length; i++) {
+			userIdArr[i] = Integer.parseInt(userIdStrArr[i]);
+		}
+		return userIdArr;
+	}
+	
+	public void setUserIds(Integer[] userIds) {
+		if (!ValidateUtil.isValid(userIds)) {
+			this.userIds = null;
+			return;
+		}
+
+		this.userIds = String.format(",%s,", StringUtil.join(userIds));
+	}
+	
+	public Integer[] getOrgIds() {
+		if (!ValidateUtil.isValid(orgIds)) {
+			return new Integer[0];
+		}
+
+		String[] orgIdStrArr = orgIds.substring(1, orgIds.length() - 1).split(",");
+		Integer[] orgIdArr = new Integer[orgIdStrArr.length];
+		for (int i = 0; i < orgIdStrArr.length; i++) {
+			orgIdArr[i] = Integer.parseInt(orgIdStrArr[i]);
+		}
+		return orgIdArr;
+	}
+	
+	public void setOrgIds(Integer[] orgIds) {
+		if (!ValidateUtil.isValid(orgIds)) {
+			this.orgIds = null;
+			return;
+		}
+
+		this.orgIds = String.format(",%s,", StringUtil.join(orgIds));
 	}
 }

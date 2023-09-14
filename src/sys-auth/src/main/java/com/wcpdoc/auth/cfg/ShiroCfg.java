@@ -58,13 +58,21 @@ public class ShiroCfg {
 		filterChainMap.put("/api/bulletin/get", "jwt");// 公告详情列表需登录
 		filterChainMap.put("/api/user/get", "jwt");// 用户信息需登录
 		
-		// 用户权限
-		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[user]");// 我的考试
-		filterChainMap.put("/api/myExer/*", "jwt,anyRolesEx[user]");// 我的练习
-		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[user]");// 用户首页
+		// 子管理员权限
+		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[0,2]");// 用户添加
+		filterChainMap.put("/api/user/add", "jwt,anyRolesEx[0,2]");// 用户添加
+		filterChainMap.put("/api/user/edit", "jwt,anyRolesEx[0,2]");// 用户修改
+		filterChainMap.put("/api/user/del", "jwt,anyRolesEx[0,2]");// 用户删除
+		filterChainMap.put("/api/user/pwdInit", "jwt,anyRolesEx[0,2]");// 用户密码初始化
+		filterChainMap.put("/api/user/frozen", "jwt,anyRolesEx[0,2]");// 用户冻结
+		
+		// 考试用户权限
+		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[1]");// 我的考试
+		filterChainMap.put("/api/myExer/*", "jwt,anyRolesEx[1]");// 我的练习
+		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[1]");// 用户首页
 		
 		// 管理员权限
-		filterChainMap.put("/api/**", "jwt,anyRolesEx[admin]");// 剩余都是
+		filterChainMap.put("/api/**", "jwt,anyRolesEx[0]");// 剩余都是
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}

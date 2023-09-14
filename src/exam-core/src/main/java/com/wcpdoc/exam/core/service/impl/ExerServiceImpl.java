@@ -77,6 +77,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		
 		// 练习添加
 		exer.setState(1);
+		exer.setCreateUserId(getCurUser().getId());
 		exer.setUpdateUserId(getCurUser().getId());
 		exer.setUpdateTime(new Date());
 		add(exer);

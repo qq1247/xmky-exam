@@ -104,8 +104,51 @@ const router = createRouter({
                                     meta: { title: '密码初始化' },
                                 },
                                 {
+                                    path: 'frozen/:id',
+                                    component: () => import('../views/subAdmin/setting/Frozen.vue'),
+                                    meta: { title: '冻结' },
+                                },
+                                {
                                     path: 'del/:id',
                                     component: () => import('../views/subAdmin/setting/Del.vue'),
+                                    meta: { title: '删除' },
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
+                    path: 'markUser',
+                    component: () => import('../views/markUser/Index.vue'),
+                    meta: { title: '阅卷用户' },
+                    children: [
+                        {
+                            path: '',
+                            component: () => import('../views/markUser/setting/Index.vue'),
+                            children: [
+                                {
+                                    path: 'add',
+                                    component: () => import('../views/markUser/setting/Edit.vue'),
+                                    meta: { title: '添加' },
+                                },
+                                {
+                                    path: 'edit/:id',
+                                    component: () => import('../views/markUser/setting/Edit.vue'),
+                                    meta: { title: '修改' },
+                                },
+                                {
+                                    path: 'pwdInit/:id',
+                                    component: () => import('../views/markUser/setting/PwdInit.vue'),
+                                    meta: { title: '密码初始化' },
+                                },
+                                {
+                                    path: 'frozen/:id',
+                                    component: () => import('../views/markUser/setting/Frozen.vue'),
+                                    meta: { title: '冻结' },
+                                },
+                                {
+                                    path: 'del/:id',
+                                    component: () => import('../views/markUser/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]

@@ -78,7 +78,7 @@ async function login() {
         const userStore = useUserStore()
         userStore.id = data.userId
         userStore.name = data.userName
-        userStore.roles = data.roles
+        userStore.type = data.type
         userStore.accessToken = data.accessToken
 
         // 缓存数据字典
