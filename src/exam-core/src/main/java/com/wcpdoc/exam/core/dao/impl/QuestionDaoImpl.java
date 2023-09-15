@@ -34,9 +34,10 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.TITLE, "
 				+ "QUESTION.MARK_TYPE, QUESTION.STATE, QUESTION.ANALYSIS, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
-				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS "
+				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS, UPDATE_USER.NAME AS UPDATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
+				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
+				+ "LEFT JOIN SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId")), "QUESTION.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("questionTypeName")))
@@ -49,7 +50,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = 1")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > :UPDATE_TIME", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = :STATE", pageIn.get("state"))
-				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION.CREATE_USER_ID = :CREATE_USER_ID", pageIn.get("curUserId", Integer.class))
+				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.ID", Order.DESC)// 页面修改的时候，保持原位
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
@@ -76,6 +78,12 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public List<Question> getListByDel() {
 		String sql = "SELECT QUESTION.* FROM EXM_QUESTION QUESTION WHERE QUESTION.STATE = 0 AND NOT EXISTS (SELECT 1 FROM EXM_EXAM_QUESTION Z WHERE Z.QUESTION_ID = QUESTION.ID)";
 		return getList(sql, new Object[] {});
+	}
+
+	@Override
+	public int getNum(Integer questionTypeId) {
+		String sql = "SELECT COUNT(*) FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = :QUESTION_TYPE_ID";
+		return getCount(sql, new Object[] { questionTypeId });
 	}
 
 }

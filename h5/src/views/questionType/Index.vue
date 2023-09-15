@@ -22,6 +22,7 @@
                 :menu="[
                     { name: '修改', icon: 'icon-edit', event: () => $router.push(`/questionType/edit/${questionType.id}`) },
                     { name: '删除', icon: 'icon-delete', event: () => $router.push(`/questionType/del/${questionType.id}`) },
+                    { name: '清空试题', icon: 'icon-clear', event: () => $router.push(`/questionType/clear/${questionType.id}`) },
                     { name: '试题列表', icon: 'icon-list-row', event: () => $router.push(`/questionType/question/${questionType.id}`) },
                     ]" 
                 >
@@ -30,6 +31,7 @@
                 </template>
                 <template #content>
                     <div style="margin-bottom: 10px;">试题数量：{{questionType.questionNum}}道</div>
+                    <div v-if="userStore.type === 0" style="margin-bottom: 10px;">创建用户：{{questionType.createUserName}}</div>
                 </template>
             </Griddata>
         </div>
@@ -55,8 +57,10 @@ import { useRouter, useRoute } from 'vue-router'
 import http from "@/request"
 import Griddata from '@/components/Griddata.vue';
 import Gridadd from '@/components/Gridadd.vue';
+import { useUserStore } from '@/stores/user';
 
 //  定义变量
+const userStore = useUserStore()
 const route = useRoute()
 const queryForm = reactive({// 查询表单
     name: '',

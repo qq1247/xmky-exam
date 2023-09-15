@@ -3,7 +3,7 @@
 
 	onLaunch(() => {
 		uni.request({
-			url: './static/config.js?t=' + new Date().getTime(),
+			url: '/static/config.js?t=' + new Date().getTime(),
 		}).then((res: any) => {
 			let SERVER = eval(res.data)
 			uni.setStorageSync('BASE_URL', SERVER.BASE_URL)

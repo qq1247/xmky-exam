@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -23,7 +24,6 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -60,6 +60,9 @@ public class ApiQuestionController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
+			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}
 			PageOut pageout = questionService.getListpage(pageIn);
 			List<Map<String, Object>> resultList = pageout.getList();
 			for (Map<String, Object> result : resultList) {
@@ -194,10 +197,9 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			// 校验数据有效性
+			// 数据校验
 			Question question = questionService.getEntity(id);
-			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-			if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
 			

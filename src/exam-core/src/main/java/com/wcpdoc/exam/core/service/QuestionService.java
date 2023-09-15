@@ -78,4 +78,13 @@ public interface QuestionService extends BaseService<Question>{
 	 * @return List<Question>
 	 */
 	List<Question> getList(Integer questionTypeId);
+
+	/**
+	 * 试题数量获取
+	 * 
+	 * v1.0 zhanghc 2023年9月15日上午10:21:35
+	 * @param questionTypeId 题库ID
+	 * @return int
+	 */
+	int getNum(Integer questionTypeId);
 }

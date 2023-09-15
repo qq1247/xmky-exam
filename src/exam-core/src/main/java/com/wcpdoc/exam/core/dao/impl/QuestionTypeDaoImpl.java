@@ -20,13 +20,15 @@ import com.wcpdoc.exam.core.entity.QuestionType;
 public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements QuestionTypeDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, "
+		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, CREATE_USER.NAME AS CREATE_USER_NAME, "
 				+ "(SELECT COUNT(*) FROM EXM_QUESTION Z WHERE Z.QUESTION_TYPE_ID = QUESTION_TYPE.ID AND Z.STATE = 1) AS QUESTION_NUM "
-				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
+				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION_TYPE.CREATE_USER_ID = CREATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION_TYPE.ID = :ID", pageIn.get("id"))// 组卷回显规则的时候用
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
-				.addOrder("QUESTION_TYPE.UPDATE_TIME", Order.DESC);
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.CREATE_USER_ID = :CREATE_USER_ID", pageIn.get("curUserId", Integer.class))
+				.addOrder("QUESTION_TYPE.ID", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
 	}
 }

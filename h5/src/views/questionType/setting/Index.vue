@@ -64,6 +64,12 @@ onMounted(() => {
             icon: 'icon-delete',
             url: `/questionType/del/${route.params.id}`,
         })
+        tabs.push({
+            title: '清空试题',
+            desc: '清空试题',
+            icon: 'icon-clear',
+            url: `/questionType/clear/${route.params.id}`,
+        })
     }
 })
 

@@ -313,6 +313,11 @@ const router = createRouter({
                                     meta: { title: '修改' },
                                 },
                                 {
+                                    path: 'clear/:id',
+                                    component: () => import('../views/questionType/setting/Clear.vue'),
+                                    meta: { title: '清空' },
+                                },
+                                {
                                     path: 'del/:id',
                                     component: () => import('../views/questionType/setting/Del.vue'),
                                     meta: { title: '删除' },

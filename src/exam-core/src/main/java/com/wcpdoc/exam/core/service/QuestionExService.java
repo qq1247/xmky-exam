@@ -11,11 +11,11 @@ import com.wcpdoc.exam.core.entity.Question;
 public interface QuestionExService extends BaseService<Question> {
 
 	/**
-	 * 修改试题
+	 * 试题校验
 	 * 
 	 * v1.0 zhanghc 2022年9月6日上午9:49:47
 	 * @param question void
 	 */
-	void updateEx(Question question);
+	void updateValid(Question question);
 
 }

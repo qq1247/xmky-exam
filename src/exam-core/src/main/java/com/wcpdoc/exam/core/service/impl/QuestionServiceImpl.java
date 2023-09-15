@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -17,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
@@ -65,7 +64,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void addEx(Question question, String[] options, String[] answers, BigDecimal[] scores) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(question.getQuestionTypeId())) {
 			throw new MyException("参数错误：questionTypeId");
 		}
@@ -73,36 +72,36 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		addExValid(question, options, answers, scores, questionType);
 		
 		// 添加试题
-		question.setCreateUserId(getCurUser().getId());
+		question.setCreateUserId(questionType.getCreateUserId());// 如果是管理员添加子管理的题库，创建人还是子管理员（比如需要，根据创建人查询自己的试题）
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setState(1);
 		add(question);
 
 		// 添加答案
-		addExQuestionAnswer(question, answers, scores);
+		addQuestionAnswer(question, answers, scores);
 		
 		// 添加选项
-		addExQuestionOption(question, options);
+		addQuestionOption(question, options);
 
 		// 保存附件
-		addExQuestionFile(question, options);
+		addQuestionFile(question, options);
 	}
 
 	@Override
 	public void updateEx(Question question, String[] options, String[] answers, BigDecimal[] scores) {
-		// 校验数据有效性
+		// 数据校验
 		Question entity = getEntity(question.getId());
-		if (entity.getType() != question.getType()) {
+		if (entity.getType() != question.getType()) {// 类型不能改
 			throw new MyException("参数错误：type");
 		}
-		if (entity.getState() == 0) {
+		if (entity.getState() == 0) {// 已删除不能改
 			throw new MyException("参数错误：id");
 		}
+		
 		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
 		addExValid(question, options, answers, scores, questionType);
-		
-		questionExService.updateEx(question);
+		questionExService.updateValid(question);
 
 		// 修改试题
 		entity.setTitle(question.getTitle());
@@ -116,13 +115,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		update(entity);
 
 		// 修改答案
-		addExQuestionAnswer(question, answers, scores);
+		addQuestionAnswer(question, answers, scores);
 		
 		// 修改选项
-		addExQuestionOption(question, options);
+		addQuestionOption(question, options);
 
 		// 保存附件
-		addExQuestionFile(question, options);
+		addQuestionFile(question, options);
 		
 		// 清理缓存
 		QuestionCache.clear(question.getId());
@@ -130,32 +129,21 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void delEx(Integer[] ids) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(ids)) {
 			throw new MyException("参数错误：ids");
 		}
-		List<Question> questionList = new ArrayList<>();
-		Map<Integer, QuestionType> questionTypeCache = new HashMap<>();
 		for (Integer id : ids) {
 			Question question = getEntity(id);
 			if (question.getState() == 0) {
 				continue;
 			}
 			
-			QuestionType questionType = questionTypeCache.get(question.getQuestionTypeId());
-			if (questionType == null) {
-				questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-				questionTypeCache.put(questionType.getId(), questionType);
-			}
-			if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
 			
-			questionList.add(question);
-		}
-		
-		// 删除试题
-		for (Question question : questionList) {
+			// 删除试题
 			question.setState(0);
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
@@ -209,10 +197,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void copy(Integer id) throws Exception{
-		// 校验数据有效性
+		// 数据校验
 		Question question = getEntity(id);
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -264,7 +251,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 	
 	private void addExValid(Question question, String[] options, String[] answers, BigDecimal[] scores, QuestionType questionType) {
-		if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+		if (!(CurLoginUserUtil.isSelf(questionType.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 			throw new MyException("无操作权限");
 		}
 		
@@ -457,7 +444,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addExQuestionAnswer(Question question, String[] answers, BigDecimal[] scores) {
+	private void addQuestionAnswer(Question question, String[] answers, BigDecimal[] scores) {
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		for(QuestionAnswer questionAnswer : questionAnswerList){
 			questionAnswerService.del(questionAnswer.getId());
@@ -497,7 +484,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addExQuestionOption(Question question, String[] options) {
+	private void addQuestionOption(Question question, String[] options) {
 		List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
 		for (QuestionOption questionOption : questionOptionList) {
 			questionOptionService.del(questionOption.getId());
@@ -513,7 +500,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 
-	private void addExQuestionFile(Question question, String[] options) {
+	private void addQuestionFile(Question question, String[] options) {
 		List<Integer> fileIdList = html2FileIds(question.getTitle());
 		fileIdList.addAll(html2FileIds(question.getAnalysis()));
 		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
@@ -540,5 +527,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
 		return questionDao.getList(questionTypeId);
+	}
+
+	@Override
+	public int getNum(Integer questionTypeId) {
+		return questionDao.getNum(questionTypeId);
 	}
 }

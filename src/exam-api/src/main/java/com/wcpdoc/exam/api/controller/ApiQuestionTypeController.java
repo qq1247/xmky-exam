@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -44,7 +45,9 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}
 			PageOut pageOut = questionTypeService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
@@ -55,15 +58,15 @@ public class ApiQuestionTypeController extends BaseController {
 
 	/**
 	 * 题库添加
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
 	public PageResult add(QuestionType questionType) {
 		try {
-			//校验数据有效性
+			// 数据校验
 			if (!ValidateUtil.isValid(questionType.getName())) {
 				throw new MyException("参数错误：name");
 			}
@@ -71,7 +74,7 @@ public class ApiQuestionTypeController extends BaseController {
 			//	throw new MyException("名称已存在");
 			//} // 不同的子管理员添加可以重复
 			
-			// 添加题库
+			// 题库添加
 			questionType.setCreateUserId(getCurUser().getId());
 			questionType.setUpdateTime(new Date());
 			questionType.setUpdateUserId(getCurUser().getId());
@@ -89,8 +92,8 @@ public class ApiQuestionTypeController extends BaseController {
 
 	/**
 	 * 题库修改
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return pageOut
 	 */
 	@RequestMapping("/edit")
@@ -102,13 +105,14 @@ public class ApiQuestionTypeController extends BaseController {
 				throw new MyException("参数错误：name");
 			}
 			QuestionType entity = questionTypeService.getEntity(questionType.getId());
-			if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 				throw new MyException("无操作权限");
 			}
 			
 			// 保存题库
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
 			questionTypeService.update(entity);
 			
 			return PageResult.ok();
@@ -123,8 +127,8 @@ public class ApiQuestionTypeController extends BaseController {
 	
 	/**
 	 * 题库删除
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
@@ -153,7 +157,7 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
-			if (entity.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
 			return PageResultEx.ok()
@@ -168,27 +172,27 @@ public class ApiQuestionTypeController extends BaseController {
 		}
 	}
 	
-	/**
-	 * 题库合并
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/move")
-	@ResponseBody
-	public PageResult move(Integer sourceId, Integer targetId) {
-		try {
-			questionTypeService.move(sourceId, targetId);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("题库合并错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("题库合并错误：", e);
-			return PageResult.err();
-		}
-	}
+//	/**
+//	 * 题库合并
+//	 * 
+//	 * v1.0 zhanghc 2017-05-07 14:56:29
+//	 * @param id
+//	 * @return pageOut
+//	 */
+//	@RequestMapping("/move")
+//	@ResponseBody
+//	public PageResult move(Integer sourceId, Integer targetId) {
+//		try {
+//			questionTypeService.move(sourceId, targetId);
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("题库合并错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		}  catch (Exception e) {
+//			log.error("题库合并错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 	
 	/**
 	 * 题库清空

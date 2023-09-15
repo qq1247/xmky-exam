@@ -15,6 +15,9 @@
             <el-tag effect="plain" size="small" type="danger" round>
                 {{ score }}分
             </el-tag>
+            <el-tag effect="plain" size="small" type="warning" round>
+                {{ updateUserName }}
+            </el-tag>
         </div>
         <div class="question-list-bottom-right">
             <slot name="bottom-right"></slot>
@@ -117,6 +120,7 @@ const props = withDefaults(defineProps<{
     options?: string[] // 试题选项
     userAnswerShow?: boolean // 用户答案显示（true：用户答案；false：标准答案）
     errShow?: boolean // 错误显示（true：标记错误；false：不显示）
+    updateUserName?: string // 修改用户名称
 }>(), {
     editable: false,
     display: 'paper',

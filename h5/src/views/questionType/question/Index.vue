@@ -69,6 +69,7 @@
             :answers="question.answers"
             :options="question.options" 
             :display="display"
+            :updateUserName="question.updateUserName"
             :userAnswerShow="false"
             >
             <template #bottom-right>
