@@ -40,8 +40,6 @@ public class ExerDaoImpl extends RBaseDaoImpl<Exer> implements ExerDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId", Integer.class)) , 
 						"EXER.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXER.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), // 查询某个用户
-						"(EXER.USER_IDS LIKE :USER_IDS OR EXER.USER_IDS IS NULL)", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
 				.addWhere("true".equals(pageIn.get("todo")), ":CUR_TIME <= EXER.END_TIME", new Date())// 查找我的未完成的练习列表
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
 						"(( :START_TIME1 <= EXER.START_TIME AND EXER.START_TIME <= :END_TIME1) "
@@ -51,6 +49,10 @@ public class ExerDaoImpl extends RBaseDaoImpl<Exer> implements ExerDao {
 						pageIn.get("startTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
 						)
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), // 子管理员登录，各看各的
+						"EXER.CREATE_USER_ID = :CREATE_USER_ID", pageIn.get("curUserId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("examUserId", Integer.class)),// 考试用户，看自己的
+						"(EXER.USER_IDS LIKE :USER_IDS)", String.format("%%,%s,%%", pageIn.get("examUserId", Integer.class)))
 				.addWhere("EXER.STATE = 1")
 				.addOrder("EXER.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

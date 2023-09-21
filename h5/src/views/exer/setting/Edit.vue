@@ -35,7 +35,7 @@
                     value-format="YYYY-MM-DD HH:mm:ss"
                     />
             </el-form-item>
-            <el-form-item label="用户" prop="userIds">
+            <el-form-item label="考试用户" prop="userIds">
                 <Select
                     v-model="form.userIds"
                     url="user/listpage"
@@ -99,6 +99,9 @@ const formRules = reactive<FormRules>({// 表单校验规则
     ],
     exerTimes: [
         { required: true, message: '请选择练习时间', trigger: 'blur' },
+    ],
+    userIds: [
+        { required: true, message: '请选择考试用户', trigger: 'blur' },
     ],
 })
 const questionTypes = ref([] as any[]) // 题库列表

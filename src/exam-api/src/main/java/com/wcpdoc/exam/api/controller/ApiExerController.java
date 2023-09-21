@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -51,6 +52,9 @@ public class ApiExerController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
+			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}
 			PageOut pageOut = exerService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("userIds") == null) {
@@ -120,7 +124,13 @@ public class ApiExerController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
+			// 数据校验
 			Exer exer = exerService.getEntity(id);
+			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			
+			// 删除
 			exer.setState(0);
 			exer.setUpdateTime(new Date());
 			exer.setUpdateUserId(getCurUser().getId());
@@ -146,6 +156,9 @@ public class ApiExerController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exer exer = exerService.getEntity(id);
+			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
 			return PageResultEx.ok()
 					.addAttr("id", exer.getId())
 					.addAttr("name", exer.getName())
@@ -157,10 +170,10 @@ public class ApiExerController extends BaseController {
 					.addAttr("rmkState", exer.getRmkState())
 					;
 		} catch (MyException e) {
-			log.error("练习删除错误：{}", e.getMessage());
+			log.error("练习获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("练习删除错误：", e);
+			log.error("练习获取错误：", e);
 			return PageResult.err();
 		}
 	}

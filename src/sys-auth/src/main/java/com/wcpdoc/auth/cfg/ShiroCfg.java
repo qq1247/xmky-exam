@@ -51,7 +51,7 @@ public class ShiroCfg {
 
 		// 公共请求
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
-		filterChainMap.put("/api/login/**", "anon");// 登录相关功能免登录
+		filterChainMap.put("/api/login/*", "anon");// 登录相关功能免登录
 		filterChainMap.put("/api/file/download", "anon");// 下载免登录
 		filterChainMap.put("/api/dict/listpage", "jwt");// 数据字典分页列表需登录
 		filterChainMap.put("/api/bulletin/listpage", "jwt");// 公告分页列表需登录
@@ -67,6 +67,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/user/frozen", "jwt,anyRolesEx[0,2]");// 用户冻结
 		filterChainMap.put("/api/questionType/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/question/*", "jwt,anyRolesEx[0,2]");// 题库
+		filterChainMap.put("/api/exer/*", "jwt,anyRolesEx[0,2]");// 练习
 		
 		// 考试用户权限
 		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[1]");// 我的考试

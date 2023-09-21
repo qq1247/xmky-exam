@@ -69,7 +69,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：questionTypeId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		addExValid(question, options, answers, scores, questionType);
+		addValid(question, options, answers, scores, questionType);
 		
 		// 添加试题
 		question.setCreateUserId(questionType.getCreateUserId());// 如果是管理员添加子管理的题库，创建人还是子管理员（比如需要，根据创建人查询自己的试题）
@@ -100,7 +100,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		
 		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
-		addExValid(question, options, answers, scores, questionType);
+		addValid(question, options, answers, scores, questionType);
 		questionExService.updateValid(question);
 
 		// 修改试题
@@ -250,7 +250,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addExValid(Question question, String[] options, String[] answers, BigDecimal[] scores, QuestionType questionType) {
+	private void addValid(Question question, String[] options, String[] answers, BigDecimal[] scores, QuestionType questionType) {
 		if (!(CurLoginUserUtil.isSelf(questionType.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 			throw new MyException("无操作权限");
 		}

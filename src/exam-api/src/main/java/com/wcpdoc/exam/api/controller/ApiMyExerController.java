@@ -24,6 +24,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.QuestionCache;
@@ -68,7 +69,7 @@ public class ApiMyExerController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			pageIn.addAttr("examUserId", getCurUser().getId());
 			PageOut pageOut = exerService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				map.remove("userIds");// 我的练习不需要该字段
@@ -91,6 +92,9 @@ public class ApiMyExerController extends BaseController {
 	public PageResult get(Integer exerId) {
 		try {
 			Exer exer = exerService.getEntity(exerId);
+			if (!CollectionUtil.toSet(exer.getUserIds()).contains(getCurUser().getId())) {
+				throw new MyException("无操作权限");
+			}
 			return PageResultEx.ok()
 					.addAttr("id", exer.getId())
 					.addAttr("name", exer.getName())
@@ -121,10 +125,10 @@ public class ApiMyExerController extends BaseController {
 	@ResponseBody
 	public PageResult question(Integer exerId, Integer questionId) {
 		try {
-			// 数据有效性校验
+			// 数据校验
 			Exer exer = exerService.getEntity(exerId);
 			if (exer.getState() == 0) {
-				throw new MyException("无权限");
+				throw new MyException("已删除");
 			}
 			long curTime = System.currentTimeMillis();
 			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {

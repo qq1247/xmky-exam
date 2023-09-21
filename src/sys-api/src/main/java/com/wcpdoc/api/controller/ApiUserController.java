@@ -61,13 +61,15 @@ public class ApiUserController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			if (getCurUser().getType() == 0) {// 如果是管理员，根据类型显示考试用户，还是子管理员
-				
+			if (getCurUser().getType() == 0) {// 如果是管理员
+				if (!ValidateUtil.isValid(pageIn.get("type"))) {// 默认查询考试用户
+					pageIn.addAttr("type", "1");
+				}
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.get("type")) || pageIn.get("type").equals("1")) {// 默认查询考试用户
 					User user = userService.getEntity(getCurUser().getId());
 					pageIn.addAttr("ids", StringUtil.join(user.getUserIds()));
-				} else if (pageIn.get("type").equals("3")) {// 查看阅卷用户
+				} else /*if (pageIn.get("type").equals("3"))*/ {// 查看阅卷用户
 					pageIn.addAttr("parentId", getCurUser().getId());
 				}
 			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限
