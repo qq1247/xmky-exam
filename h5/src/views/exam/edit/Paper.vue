@@ -171,7 +171,8 @@
             :score="question.score" 
             :answers="question.answers"
             :options="question.options" 
-            :display="questionType.display" 
+            :display="questionType.display"
+            :updateUserName="question.updateUserName"
             >
             <template #bottom-right>
                 <el-button type="success" @click="questionAdd(question)" size="small">

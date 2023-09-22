@@ -22,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.LoginUser;
@@ -97,6 +98,9 @@ public class ApiExamController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
+			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}
 			PageOut pageOut = examService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("sxes") == null) {
@@ -160,7 +164,7 @@ public class ApiExamController extends BaseController {
 	}
 	
 	/**
-	 * 获取考试信息
+	 * 考试试卷
 	 * 
 	 * v1.0 zhanghc 2022年10月25日下午3:30:55
 	 * @param id
@@ -169,105 +173,117 @@ public class ApiExamController extends BaseController {
 	@RequestMapping("/paper")
 	@ResponseBody
 	public PageResult paper(Integer id) {
-		Exam exam = examService.getEntity(id);
-		List<Map<String, Object>> examQuestions = new ArrayList<>();
-		List<Map<String, Object>> examRules = new ArrayList<>();
-		if (exam.getGenType() == 1) {// 人工组卷
-			List<ExamQuestion> _examQuestionList = examQuestionService.getList(id);
-			for (ExamQuestion _examQuestion : _examQuestionList) {
-				Map<String, Object> examQuestion = new HashMap<>();
-				examQuestion.put("type", _examQuestion.getType());
-				if (_examQuestion.getType() == 1) {
-					examQuestion.put("chapterName", _examQuestion.getChapterName());
-					examQuestion.put("chapterTxt", _examQuestion.getChapterTxt());
-				} else {
-					Question _question = QuestionCache.getQuestion(_examQuestion.getQuestionId());// 已关联考试的试题不会改变，缓存起来加速查询。
-					examQuestion.put("questionId", _question.getId());
-					examQuestion.put("questionType", _question.getType());
-					examQuestion.put("markType", _question.getMarkType());
-					examQuestion.put("title", _question.getTitle());
-					examQuestion.put("markOptions", _examQuestion.getMarkOptions());
-					examQuestion.put("score", _examQuestion.getScore());
-					examQuestion.put("scores", _examQuestion.getScores());
-					examQuestion.put("analysis", _question.getAnalysis());
-					
-					List<String> _options = new ArrayList<>();
-					if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasMultipleChoice(_question)) {// 如果是单选或多选，添加选项字段
-						List<QuestionOption> questionOptionList = QuestionCache.getOption(_question.getId());
-						for (QuestionOption questionOption : questionOptionList) {
-							_options.add(questionOption.getOptions());
-						}
-						examQuestion.put("options", _options);
-					}
-					
-					List<QuestionAnswer> _questionAnswerList = QuestionCache.getAnswer(_question.getId());
-					List<Object> _answers = new ArrayList<>();
-					for(QuestionAnswer answer : _questionAnswerList){
-						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
-								|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasSubjective(_question))) {
-							_answers.add(answer.getAnswer());
-						} else if (QuestionUtil.hasMultipleChoice(_question)) {
-							Collections.addAll(_answers, answer.getAnswer().split(","));
-						} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
-								&& QuestionUtil.hasObjective(_question))) {
-							_answers.add(answer.getAnswer());
-						}
-					}
-					examQuestion.put("answers", _answers);
-				}
-				examQuestions.add(examQuestion);
+		try {
+			Exam exam = examService.getEntity(id);
+			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
 			}
-		} else if (exam.getGenType() == 2) {// 随机组卷
-			List<ExamRule> _examRuleList = examRuleService.getList(id);
-			for (ExamRule _examRule : _examRuleList) {
-				Map<String, Object> examRule = new HashMap<>();
-				examRule.put("type", _examRule.getType());
-				if (_examRule.getType() == 1) {
-					examRule.put("chapterName", _examRule.getChapterName());
-					examRule.put("chapterTxt", _examRule.getChapterTxt());
-				} else {
-					examRule.put("questionTypeId", _examRule.getQuestionTypeId());
-					examRule.put("questionType", _examRule.getQuestionType());
-					examRule.put("markType", _examRule.getMarkType());
-					examRule.put("markOptions", _examRule.getMarkOptions());
-					examRule.put("num", _examRule.getNum());
-					examRule.put("score", _examRule.getScore());
-					examRule.put("scores", _examRule.getQuestionType() == 2 ? _examRule.getScores() : new BigDecimal[0]);// 客观填空等不需要页面处理
+			
+			List<Map<String, Object>> examQuestions = new ArrayList<>();
+			List<Map<String, Object>> examRules = new ArrayList<>();
+			if (exam.getGenType() == 1) {// 人工组卷
+				List<ExamQuestion> _examQuestionList = examQuestionService.getList(id);
+				for (ExamQuestion _examQuestion : _examQuestionList) {
+					Map<String, Object> examQuestion = new HashMap<>();
+					examQuestion.put("type", _examQuestion.getType());
+					if (_examQuestion.getType() == 1) {
+						examQuestion.put("chapterName", _examQuestion.getChapterName());
+						examQuestion.put("chapterTxt", _examQuestion.getChapterTxt());
+					} else {
+						Question _question = QuestionCache.getQuestion(_examQuestion.getQuestionId());// 已关联考试的试题不会改变，缓存起来加速查询。
+						examQuestion.put("questionId", _question.getId());
+						examQuestion.put("questionType", _question.getType());
+						examQuestion.put("markType", _question.getMarkType());
+						examQuestion.put("title", _question.getTitle());
+						examQuestion.put("markOptions", _examQuestion.getMarkOptions());
+						examQuestion.put("score", _examQuestion.getScore());
+						examQuestion.put("scores", _examQuestion.getScores());
+						examQuestion.put("analysis", _question.getAnalysis());
+						
+						List<String> _options = new ArrayList<>();
+						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasMultipleChoice(_question)) {// 如果是单选或多选，添加选项字段
+							List<QuestionOption> questionOptionList = QuestionCache.getOption(_question.getId());
+							for (QuestionOption questionOption : questionOptionList) {
+								_options.add(questionOption.getOptions());
+							}
+							examQuestion.put("options", _options);
+						}
+						
+						List<QuestionAnswer> _questionAnswerList = QuestionCache.getAnswer(_question.getId());
+						List<Object> _answers = new ArrayList<>();
+						for(QuestionAnswer answer : _questionAnswerList){
+							if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
+									|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasSubjective(_question))) {
+								_answers.add(answer.getAnswer());
+							} else if (QuestionUtil.hasMultipleChoice(_question)) {
+								Collections.addAll(_answers, answer.getAnswer().split(","));
+							} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
+									&& QuestionUtil.hasObjective(_question))) {
+								_answers.add(answer.getAnswer());
+							}
+						}
+						examQuestion.put("answers", _answers);
+					}
+					examQuestions.add(examQuestion);
 				}
-				examRules.add(examRule);
+			} else if (exam.getGenType() == 2) {// 随机组卷
+				List<ExamRule> _examRuleList = examRuleService.getList(id);
+				for (ExamRule _examRule : _examRuleList) {
+					Map<String, Object> examRule = new HashMap<>();
+					examRule.put("type", _examRule.getType());
+					if (_examRule.getType() == 1) {
+						examRule.put("chapterName", _examRule.getChapterName());
+						examRule.put("chapterTxt", _examRule.getChapterTxt());
+					} else {
+						examRule.put("questionTypeId", _examRule.getQuestionTypeId());
+						examRule.put("questionType", _examRule.getQuestionType());
+						examRule.put("markType", _examRule.getMarkType());
+						examRule.put("markOptions", _examRule.getMarkOptions());
+						examRule.put("num", _examRule.getNum());
+						examRule.put("score", _examRule.getScore());
+						examRule.put("scores", _examRule.getQuestionType() == 2 ? _examRule.getScores() : new BigDecimal[0]);// 客观填空等不需要页面处理
+					}
+					examRules.add(examRule);
+				}
 			}
+			
+			List<MyExam> _myExamList = myExamService.getList(id);
+			List<Integer> examUserIdList = new ArrayList<>();
+			for (MyExam myExam : _myExamList) {
+				examUserIdList.add(myExam.getUserId());
+			}
+			
+			return PageResultEx.ok()
+					.addAttr("id", exam.getId())
+					.addAttr("name", exam.getName())
+					.addAttr("paperName", exam.getPaperName())
+					.addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
+					.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
+					.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
+					.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
+					.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
+					.addAttr("genType", exam.getGenType())
+					.addAttr("showType", exam.getShowType())
+					.addAttr("passScore", exam.getPassScore())
+					.addAttr("anonState", exam.getAnonState())
+					.addAttr("scoreState", exam.getScoreState())
+					.addAttr("rankState", exam.getRankState())
+					.addAttr("sxes", exam.getSxes())
+					.addAttr("state", exam.getState())
+					.addAttr("examQuestions", examQuestions)
+					.addAttr("examRules", examRules)
+					.addAttr("examUserIds", examUserIdList);
+		} catch (MyException e) {
+			log.error("考试获取错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试获取错误：", e);
+			return PageResult.err();
 		}
-		
-		List<MyExam> _myExamList = myExamService.getList(id);
-		List<Integer> examUserIdList = new ArrayList<>();
-		for (MyExam myExam : _myExamList) {
-			examUserIdList.add(myExam.getUserId());
-		}
-		
-		return PageResultEx.ok()
-				.addAttr("id", exam.getId())
-				.addAttr("name", exam.getName())
-				.addAttr("paperName", exam.getPaperName())
-				.addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
-				.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
-				.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
-				.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
-				.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
-				.addAttr("genType", exam.getGenType())
-				.addAttr("showType", exam.getShowType())
-				.addAttr("passScore", exam.getPassScore())
-				.addAttr("anonState", exam.getAnonState())
-				.addAttr("scoreState", exam.getScoreState())
-				.addAttr("rankState", exam.getRankState())
-				.addAttr("sxes", exam.getSxes())
-				.addAttr("state", exam.getState())
-				.addAttr("examQuestions", examQuestions)
-				.addAttr("examRules", examRules)
-				.addAttr("examUserIds", examUserIdList);
 	}
 	
 	/**
-	 * 完成删除考试
+	 * 考试删除
 	 * 
 	 * v1.0 zhanghc 2017-06-11 09:13:23
 	 * 
@@ -289,7 +305,7 @@ public class ApiExamController extends BaseController {
 	}
 	
 	/**
-	 * 获取考试
+	 * 考试获取
 	 * 
 	 * v1.0 zhanghc 2021年12月21日下午4:36:14
 	 * @param id
@@ -300,6 +316,10 @@ public class ApiExamController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
+			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			
 			return PageResultEx.ok()
 					.addAttr("id", exam.getId())
 					.addAttr("name", exam.getName())
@@ -329,7 +349,7 @@ public class ApiExamController extends BaseController {
 	}
 
 	/**
-	 * 变更考试时间
+	 * 考试变更时间
 	 * 
 	 * v1.0 zhanghc 2022年4月17日下午6:52:08
 	 * @param id 考试ID
@@ -347,10 +367,10 @@ public class ApiExamController extends BaseController {
 			examService.timeUpdate(id, timeType, minute);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("变更考试时间错误：{}", e.getMessage());
+			log.error("考试变更时间错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("变更考试时间错误：", e);
+			log.error("考试变更时间错误：", e);
 			return PageResult.err();
 		} finally {
 			AutoMarkCache.releaseWriteLock(id);

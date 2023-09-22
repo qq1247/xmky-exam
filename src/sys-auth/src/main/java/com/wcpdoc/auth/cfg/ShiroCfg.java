@@ -57,6 +57,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/bulletin/listpage", "jwt");// 公告分页列表需登录
 		filterChainMap.put("/api/bulletin/get", "jwt");// 公告详情列表需登录
 		filterChainMap.put("/api/user/get", "jwt");// 用户信息需登录
+		filterChainMap.put("/api/progressBar/*", "jwt");// 用户信息需登录
 		
 		// 子管理员权限
 		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[0,2]");// 用户添加
@@ -68,6 +69,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/questionType/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/question/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/exer/*", "jwt,anyRolesEx[0,2]");// 练习
+		filterChainMap.put("/api/exam/*", "jwt,anyRolesEx[0,2]");// 考试
 		
 		// 考试用户权限
 		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[1]");// 我的考试

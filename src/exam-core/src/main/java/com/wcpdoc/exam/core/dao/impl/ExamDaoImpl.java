@@ -44,6 +44,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 			.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询已暂停和已发布
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = :STATE", pageIn.get("state"))
+			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.CREATE_USER_ID = :CREATE_USER_ID", pageIn.get("curUserId", Integer.class))
 			.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(),

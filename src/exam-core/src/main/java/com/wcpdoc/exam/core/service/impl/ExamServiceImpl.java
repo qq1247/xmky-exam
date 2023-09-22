@@ -20,14 +20,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
+import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
@@ -148,7 +152,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public void publish(ExamInfo examInfo, String processBarId) {
 		/**
-		 * 校验前数据处理
+		 * 数据处理
 		 * 1：如果是人工组卷，且从题库抽题，试题类型等重新查一遍数据库，不要依赖前端，用于检测包含主观题等
 		 * 2：如果是随机组卷，提前返回需要的题库，用于随机抽题
 		 */
@@ -157,7 +161,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		Map<Integer, List<Question>> questionListCache = publishHandle(examInfo);
 		ProgressBarCache.setProgressBar(processBarId, 1.0, processLen, "校验前数据处理完成", HttpStatus.OK.value());
 		
-		// 校验数据有效性
+		// 数据校验
 		publishValid(examInfo, questionListCache);
 		ProgressBarCache.setProgressBar(processBarId, 2.0, processLen, "校验数据完成", HttpStatus.OK.value());
 
@@ -184,7 +188,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public void delEx(Integer id) {
 		// 校验数据有效性（只要有权限就删，不管是否考试中，如创建了一个超长的结束时间）
 		Exam exam = getEntity(id);
-		if (exam.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -279,7 +283,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	public void timeUpdate(Integer id, Integer timeType, Integer minute) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误:id");
 		}
@@ -289,8 +293,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(minute)) {
 			throw new MyException("参数错误:minute");
 		}
-		
 		Exam exam = getEntity(id);
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
+		}
+		
 		Date curTime = new Date();
 		if (timeType == 1) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
 			if (exam.getStartTime().getTime() < curTime.getTime()) {
@@ -448,6 +455,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						if (questionType == null) {
 							questionType = new QuestionType();
 							questionType.setName(examInfo.getName());
+							questionType.setCreateUserId(getCurUser().getId());
 							questionType.setUpdateTime(new Date());
 							questionType.setUpdateUserId(getCurUser().getId());
 							questionTypeService.add(questionType);
@@ -665,6 +673,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException("考试用户重复");
 		}
 		
+		if (getCurUser().getType() != 0) {
+			User curUser = userService.getEntity(getCurUser().getId());
+			Set<Integer> haveUsers = CollectionUtil.toSet(curUser.getUserIds());
+			Set<Integer> examUsers = CollectionUtil.toSet(examInfo.getExamUserIds());
+			if (!haveUsers.containsAll(examUsers)) {
+				throw new MyException("无用户操作权限");
+			}
+		}
+		
 		if (ValidateUtil.isValid(examInfo.getMarkUserIds())) {// 不一定有，如果有则校验是否重复
 			Set<Integer> markUserIdSet = new HashSet<>(Arrays.asList(examInfo.getMarkUserIds()));
 			if (markUserIdSet.size() != examInfo.getMarkUserIds().length) {
@@ -748,19 +765,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						}
 					}
 					
-					if (ValidateUtil.isValid(examQuestion.getQuestionId())) {
+					if (ValidateUtil.isValid(examQuestion.getQuestionId())) {// 导入的试题没有ID
 						if (questionIdCache.contains(examQuestion.getQuestionId())) {// 一张试卷不能有重复的试题
 							throw new MyException(String.format("试题重复，编号：%s", examQuestion.getQuestionId()));
 						}
 						questionIdCache.add(examQuestion.getQuestionId());
-						
-//						if (questionTypeCache.get(examQuestion.getQuestionId()) == null) {// 校验是否有使用权限
-//							questionTypeCache.put(examQuestion.getQuestionId(), questionTypeService.getEntity(examQuestion.getQuestion().getQuestionTypeId()));
-//						}
-//						QuestionType questionType = questionTypeCache.get(examQuestion.getQuestionId());
-//						if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
-//							throw new MyException(String.format("试题无权限，编号：%s", examQuestion.getQuestionId()));
-//						}
+					
+						Question question = QuestionCache.getQuestion(examQuestion.getQuestionId());
+						if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+							throw new MyException(String.format("试题无权限，编号：%s", examQuestion.getQuestionId()));
+						}
 					}
 				}
 			}
@@ -802,9 +816,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					if (ValidateUtil.isValid(examRule.getScores())) {
 						throw new MyException("参数错误：examRules.scores");
 					}
-				}
-				
-				if (examRule.getType() == 2) {// 如果是规则
+				} else if (examRule.getType() == 2) {// 如果是规则
 					if (ValidateUtil.isValid(examRule.getChapterName())) {
 						throw new MyException("参数错误：examQuestions.chapterName");
 					}
@@ -879,6 +891,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					ruleNo++;
 					int validQuestionNum = 0;// 符合当前抽题规则的有效题数
 					for (Question question : questionListCache.get(examRule.getQuestionTypeId())) {
+						if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+							throw new MyException(String.format("试题无权限，编号：%s", question.getId()));
+						}
+						
 						if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
 							continue;
 						}
@@ -1041,7 +1057,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			for (ExamQuestionEx examQuestion : examInfo.getExamQuestions()) {
 				if (ExamUtil.hasQuestion(examQuestion)) {// 如果是试题
 					if (ValidateUtil.isValid(examQuestion.getQuestionId())) {// 如果是从题库抽的题
-						Question question = questionService.getEntity(examQuestion.getQuestionId());
+						Question question = QuestionCache.getQuestion(examQuestion.getQuestionId());
 						examQuestion.setQuestionType(question.getType());// 试题类型等重新查一遍数据库，不要依赖前端
 						examQuestion.setMarkType(question.getMarkType());
 						// examQuestion.setTitle(question.getTitle());
