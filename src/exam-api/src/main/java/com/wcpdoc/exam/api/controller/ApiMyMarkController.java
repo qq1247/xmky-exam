@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -66,7 +67,23 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
+			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
+				
+			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
+				pageIn.addAttr("subAdminUserId", getCurUser().getId());
+			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看（管理或子管理）分配的
+				pageIn.addAttr("markUserId", getCurUser().getId());
+			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有权限
+				throw new MyException("无权限");
+			}
 			PageOut pageOut = myMarkService.getListpage(pageIn);
+			for (Map<String, Object> map : pageOut.getList()) {
+				if (map.get("examSxes") == null) {
+					map.put("examSxes", new Integer[0]);
+				} else {
+					map.put("examSxes", ((String)map.get("examSxes")).split(","));
+				}
+			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
@@ -234,6 +251,34 @@ public class ApiMyMarkController extends BaseController {
 		} catch (Exception e) {
 			log.error("获取用户试卷错误：", e);
 			return PageResult.err(); 
+		}
+	}
+	
+	/**
+	 * 分配试卷
+	 * 
+	 * v1.0 zhanghc 2023年2月23日下午2:31:16
+	 * @param examId 考试ID
+	 * @param num 分配份数
+	 * @return PageResult
+	 */
+	@RequestMapping("/assign")
+	@ResponseBody
+	public PageResult assign(Integer examId, Integer num) {
+		try {
+			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
+				throw new MyException("尝试加读锁失败");
+			}
+			myMarkService.assign(examId, num);
+			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("分配试卷错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("分配试卷错误：", e);
+			return PageResult.err();
+		} finally {
+			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 	

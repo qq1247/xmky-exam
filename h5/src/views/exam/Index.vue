@@ -9,13 +9,8 @@
                     <Iconfont icon="icon-search" color="white">&nbsp;查询</Iconfont>
                 </el-button>
             </el-form-item>
-            <!-- <el-form-item style="float: right;">
-                <el-button type="success" @click="$router.push('/exam/add')">
-                    <Iconfont icon="icon-plus" color="white">&nbsp;添加</Iconfont>
-                </el-button>
-            </el-form-item> -->
         </el-form>
-        <div class="list">
+        <div class="list"> 
             <Gridadd name="考试添加" @click="$router.push('/exam/add')"/>
             <Griddata 
                 v-for="exam in listpage.list" 
@@ -36,16 +31,16 @@
                         阅卷时间：{{ exam.markStartTime }} - {{ exam.markEndTime }}
                     </div>
                     <el-row style="margin-bottom: 5px;">
-                        <el-col :span="12">
+                        <el-col :span="8">
                             及格分数：{{ exam.passScore || '-' }} / {{ exam.totalScore }}
                         </el-col>
-                        <el-col :span="12">
+                        <el-col :span="8">
                             <!-- 待批试卷：6 / 79 -->
-                            考试人数：{{ exam.userNum }}人
+                            考试人数：{{ exam.userNum }}
                         </el-col>
-                        <!-- <el-col :span="8">
-                            协助批阅：0人
-                        </el-col> -->
+                        <el-col :span="8">
+                            协助批阅：{{ exam.markUserNum || '无'}}
+                        </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="10">
@@ -151,16 +146,17 @@ function generateMenu(exam: any) {
     if (exam.markState === 3) {// 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）
         return menu
     }
-
     
     let startTime = dayjs(exam.startTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     let endTime = dayjs(exam.endTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     if (startTime.getTime() > curTime.value.getTime()) {
         menu.push({ name: '立即开始考试', icon: 'icon-count-down', event: () => setTime(exam, 1) }) 
+        menu.push({ name: '协助阅卷', icon: 'icon-persons', event: () => router.push(`/exam/markUser/${exam.id}`) }) 
         return menu
     }
     if (endTime.getTime() > curTime.value.getTime()) {
         menu.push({ name: '立即完成考试', icon: 'icon-count-down', event: () => setTime(exam, 2) }) 
+        menu.push({ name: '协助阅卷', icon: 'icon-persons', event: () => router.push(`/exam/markUser/${exam.id}`) }) 
         return menu
     }
 
@@ -169,10 +165,12 @@ function generateMenu(exam: any) {
         let markEndTime = dayjs(exam.markEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
         if (markStartTime.getTime() > curTime.value.getTime()) {
             menu.push({ name: '立即开始阅卷', icon: 'icon-count-down', event: () => setTime(exam, 3) }) 
+            menu.push({ name: '协助阅卷', icon: 'icon-persons', event: () => router.push(`/exam/markUser/${exam.id}`) }) 
             return menu
         }
         if (markEndTime.getTime() > curTime.value.getTime()) {
             menu.push({ name: '立即完成阅卷', icon: 'icon-count-down', event: () => setTime(exam, 4) }) 
+            menu.push({ name: '协助阅卷', icon: 'icon-persons', event: () => router.push(`/exam/markUser/${exam.id}`) }) 
             return menu
         }
     }

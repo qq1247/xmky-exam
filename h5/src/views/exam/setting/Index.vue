@@ -56,6 +56,12 @@ onMounted(() => {
         icon: 'icon-time',
         url: `/exam/time/${route.params.id}`,
     })
+    tabs.push({
+        title: '协助阅卷',
+        desc: '协助阅卷',
+        icon: 'icon-persons',
+        url: `/exam/markUser/${route.params.id}`,
+    })
 })
 
 /**

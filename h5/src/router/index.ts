@@ -156,6 +156,13 @@ const router = createRouter({
                     ]
                 },
                 {
+                    path: 'examUser',
+                    component: () => import('../views/examUser/Index.vue'),
+                    meta: { title: '考试用户' },
+                    children: [
+                    ]
+                },
+                {
                     path: 'dict',
                     component: () => import('../views/dict/Index.vue'),
                     meta: { title: '数据字典' },
@@ -378,6 +385,11 @@ const router = createRouter({
                                     component: () => import('../views/exam/setting/Time.vue'),
                                     meta: { title: '时间变更' },
                                 },
+                                {
+                                    path: 'markUser/:id',
+                                    component: () => import('../views/exam/setting/MarkUser.vue'),
+                                    meta: { title: '时间变更' },
+                                },
                             ]
                         },
                         {
@@ -411,6 +423,18 @@ const router = createRouter({
                             path: 'paper/:examId',
                             component: () => import('../views/myExam/Paper.vue'),
                             meta: { title: '试卷' },
+                        },
+                    ]
+                },
+                {
+                    path: 'myMark',
+                    component: () => import('../views/myMark/Index.vue'),
+                    meta: { title: '我的阅卷' },
+                    children: [
+                        {
+                            path: 'paper/:examId',
+                            component: () => import('../views/myMark/Paper.vue'),
+                            meta: { title: '批阅' },
                         },
                     ]
                 },

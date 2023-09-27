@@ -184,6 +184,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		myQuestion.setUserScore(userScore);
 		myQuestion.setMarkTime(new Date());
+		myQuestion.setMarkUserId(getCurUser().getId());
 		myQuestionService.update(myQuestion);
 	}
 

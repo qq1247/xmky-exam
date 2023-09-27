@@ -83,4 +83,10 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		String sql = "SELECT * FROM SYS_USER WHERE STATE != 0";
 		return getList(sql);
 	}
+
+	@Override
+	public List<User> getMarkUserlist(Integer parentId) {
+		String sql = "SELECT * FROM SYS_USER WHERE TYPE = 3 AND STATE != 0 AND PARENT_ID = :PARENT_ID";
+		return getList(sql, new Object[] { parentId });
+	}
 }

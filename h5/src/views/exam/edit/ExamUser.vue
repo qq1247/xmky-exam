@@ -49,7 +49,6 @@ onMounted(async () => {
         while (true) {
             let { data: { data } } = await http.post("user/listpage", { 
                 ids: form.examUserIds.join(),
-                //state: 1, 只查询1就丢了2的数据
                 curPage: curPage++,
                 pageSize: pageSize,
             })

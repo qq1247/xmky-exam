@@ -64,6 +64,8 @@ public class ApiUserController extends BaseController {
 			if (getCurUser().getType() == 0) {// 如果是管理员
 				if (!ValidateUtil.isValid(pageIn.get("type"))) {// 默认查询考试用户
 					pageIn.addAttr("type", "1");
+				} else /*if (pageIn.get("type").equals("3"))*/ {
+					pageIn.addAttr("parentId", getCurUser().getId());
 				}
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.get("type")) || pageIn.get("type").equals("1")) {// 默认查询考试用户

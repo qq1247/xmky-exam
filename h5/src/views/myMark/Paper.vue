@@ -235,7 +235,7 @@ watch(curUserId, async () => {// 切换试卷
 // 组件挂载完成后，执行如下方法
 onMounted(async () => {
     // 获取考试信息
-    form.examId = parseInt(route.params.id as string)
+    form.examId = parseInt(route.params.examId as string)
     let { data: { data } } = await http.post("exam/get", {id: form.examId})
     exam.id = form.examId
     exam.markType = data.markType

@@ -88,6 +88,26 @@ public class ApiReportController extends BaseController{
         }
     }
     
+    /**
+     * 阅卷用户首页
+     * 
+     * v1.0 chenyun 2021年12月10日上午10:14:34
+     * @return PageResult
+     */
+    @RequestMapping("/markUser/home")
+    @ResponseBody
+    public PageResult markUserHome() {
+    	try {
+    		return PageResultEx.ok().data(reportService.markUserHome());
+    	} catch (MyException e) {
+    		log.error("阅卷用户首页错误：{}", e.getMessage());
+    		return PageResult.err().msg(e.getMessage());
+    	} catch (Exception e) {
+    		log.error("阅卷用户首页错误：", e);
+    		return PageResult.err();
+    	}
+    }
+    
 //    /**
 //     * 服务器参数 // 第三方dll有bug
 //     * 

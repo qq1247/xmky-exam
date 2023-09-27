@@ -37,6 +37,7 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -530,7 +531,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			MyExam myExam = new MyExam();// 生成我的考试信息
 			myExam.setExamId(examInfo.getId());
 			myExam.setUserId(examUserId);
-			myExam.setMarkUserId(1);// 由子管理员自己分配
+			//myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
 			myExam.setState(1);// 未考试
 			myExam.setMarkState(1);// 未阅卷
 			myExam.setUpdateTime(new Date());
@@ -1119,7 +1120,43 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public List<Question> getPaper(Integer id) {
-		return null;
+	public void assist(Integer id, Integer[] markUserIds) {
+		// 数据校验
+		if (markUserIds == null) {
+			markUserIds = new Integer[0];
+		}
+		if (!(CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin())) {
+			throw new MyException("无操作权限");
+		}
+		List<User> markUserList = userService.getMarkUserList(getCurUser().getId());
+		Set<Integer> markUserIdsOfDb = new HashSet<>();
+		for (User markUser : markUserList) {
+			markUserIdsOfDb.add(markUser.getId());
+		}
+		if (!markUserIdsOfDb.containsAll(CollectionUtil.toSet(markUserIds))) {
+			throw new MyException("无用户操作权限");
+		}
+		Exam exam = getEntity(id);
+		if (exam.getMarkType() == 1) {
+			throw new MyException("无需阅卷");
+		}
+		if (exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {
+			throw new MyException("阅卷已结束");
+		}
+		
+		// 阅卷用户添加
+		List<MyMark> myMarkList = myMarkService.getList(id);
+		for (MyMark myMark : myMarkList) {
+			myMarkService.del(myMark.getId());
+		}
+		
+		for (Integer markUserId : markUserIds) {
+			MyMark myMark = new MyMark();
+			myMark.setExamId(id);
+			myMark.setMarkUserId(markUserId);
+			myMark.setUpdateTime(new Date());
+			myMark.setUpdateUserId(getCurUser().getId());
+			myMarkService.add(myMark);
+		}
 	}
 }

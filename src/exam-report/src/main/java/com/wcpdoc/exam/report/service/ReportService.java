@@ -38,6 +38,14 @@ public interface ReportService {
 	Map<String, Object> subAdminHome();
 	
 	/**
+	 * 阅卷用户首页
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> markUserHome();
+	
+	/**
 	 * 慢接口日志
 	 * 
 	 * v1.0 chenyun 2021年12月10日上午10:14:11
@@ -89,5 +97,5 @@ public interface ReportService {
 	 * @return Map<String,Object>
 	 */
 	Map<String, Object> count(Integer examId);
-	
+
 }

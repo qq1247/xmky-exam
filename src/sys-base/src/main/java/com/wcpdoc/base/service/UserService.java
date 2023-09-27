@@ -111,5 +111,14 @@ public interface UserService extends BaseService<User> {
 	 */
 	List<User> getList();
 
+	
+	/**
+	 * 获取阅卷用户列表
+	 * 
+	 * v1.0 zhanghc 2023年9月22日下午4:56:04
+	 * @param parentId
+	 * @return List<User>
+	 */
+	List<User> getMarkUserList(Integer parentId);
 
 }

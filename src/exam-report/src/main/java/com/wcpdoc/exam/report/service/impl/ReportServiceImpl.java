@@ -98,6 +98,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	}
 	
 	@Override
+	public Map<String, Object> markUserHome() {
+		return reportDao.markUserHome(getCurUser().getId());
+	}
+	
+	@Override
 	public List<String> serverLog() throws Exception {
 		if (getCurUser().getId().intValue() != 1) {
 			throw new MyException("登录用户角色错误");

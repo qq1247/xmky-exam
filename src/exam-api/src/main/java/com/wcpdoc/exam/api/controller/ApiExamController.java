@@ -21,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.context.UserContext;
@@ -41,6 +42,7 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -98,9 +100,16 @@ public class ApiExamController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
-				pageIn.addAttr("curUserId", getCurUser().getId());
+			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
+				
+			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
+				pageIn.addAttr("subAdminUserId", getCurUser().getId());
+			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看（管理或子管理）分配的
+				pageIn.addAttr("markUserId", getCurUser().getId());
+			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有权限
+				throw new MyException("无权限");
 			}
+			
 			PageOut pageOut = examService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("sxes") == null) {
@@ -316,10 +325,6 @@ public class ApiExamController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
-			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-				throw new MyException("无操作权限");
-			}
-			
 			return PageResultEx.ok()
 					.addAttr("id", exam.getId())
 					.addAttr("name", exam.getName())
@@ -376,4 +381,65 @@ public class ApiExamController extends BaseController {
 			AutoMarkCache.releaseWriteLock(id);
 		}
 	}
+	
+	/**
+	 * 阅卷协助
+	 * 
+	 * v1.0 zhanghc 2023年9月22日下午4:15:24
+	 * @param id
+	 * @param markUserIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/assist")
+	@ResponseBody
+	public PageResult assist(Integer id, Integer[] markUserIds) {
+		try {
+			examService.assist(id, markUserIds);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("阅卷协助错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("阅卷协助错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 阅卷用户列表
+	 * 
+	 * v1.0 zhanghc 2023年9月26日下午5:12:17
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/markUserList")
+	@ResponseBody
+	public PageResult markUserList(Integer id) {
+		try {
+			// 数据校验
+			Exam exam = examService.getEntity(id);
+			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			
+			// 获取阅卷用户列表
+			List<MyMark> myMarkList = myMarkService.getList(id);
+			List<Map<String, Object>> resultList = new ArrayList<>();
+			for (MyMark myMark : myMarkList) {
+				Map<String, Object> result = new HashMap<>();
+				User markUser = userService.getEntity(myMark.getMarkUserId());
+				result.put("id", markUser.getId());
+				result.put("name", markUser.getName());
+				resultList.add(result);
+			}
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("阅卷用户列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("阅卷用户列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 }

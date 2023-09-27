@@ -69,12 +69,20 @@ public class ShiroCfg {
 		filterChainMap.put("/api/questionType/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/question/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/exer/*", "jwt,anyRolesEx[0,2]");// 练习
+		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[0,2,3]");// 考试详情
 		filterChainMap.put("/api/exam/*", "jwt,anyRolesEx[0,2]");// 考试
+		filterChainMap.put("/api/myMark/*", "jwt,anyRolesEx[0,2,3]");// 我的阅卷（管理员、子管理员、阅卷用户都有权限，只是数据权限不一样）
+		filterChainMap.put("/api/report/subAdmin/home", "jwt,anyRolesEx[2]");// 考试
+		filterChainMap.put("/api/report/exam/rankListpage", "jwt,anyRolesEx[0,2]");// 报表相关
+		filterChainMap.put("/api/report/exam/statis", "jwt,anyRolesEx[0,2]");// 报表相关
 		
 		// 考试用户权限
 		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[1]");// 我的考试
 		filterChainMap.put("/api/myExer/*", "jwt,anyRolesEx[1]");// 我的练习
 		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[1]");// 用户首页
+		
+		// 阅卷用户权限
+		filterChainMap.put("/api/report/markUser/home", "jwt,anyRolesEx[3]");// 阅卷用户首页
 		
 		// 管理员权限
 		filterChainMap.put("/api/**", "jwt,anyRolesEx[0]");// 剩余都是

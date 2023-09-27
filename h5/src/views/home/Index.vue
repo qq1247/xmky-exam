@@ -6,7 +6,7 @@
                     <span>考试概览</span>
                 </template>
                 <div class="home-left-top-content">
-                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/exam')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-left-top-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-diannao" :size="24" color="#09c8bd;" :width="48" :height="48"
                             background-color="#e5faf8" />
                         <div>
@@ -14,7 +14,7 @@
                             <div class="home-left-top-content-item-desc">创建考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/questionType')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-left-top-content-item" @click="$router.push('/questionType')">
                         <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
                             background-color="#fff4e7" />
                         <div>
@@ -22,7 +22,7 @@
                             <div class="home-left-top-content-item-desc">创建试题（道）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/exer')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-left-top-content-item" @click="$router.push('/exer')">
                         <Iconfont icon="icon-mark-paper" :size="27" color="#0094e5;" :width="48" :height="48"
                             background-color="#e5f4fd" />
                         <div>
@@ -30,12 +30,12 @@
                             <div class="home-left-top-content-item-desc">创建练习（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.type === 0" class="home-left-top-content-item" @click="$router.push('/user')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-left-top-content-item" @click="$router.push('/user')">
                         <Iconfont icon="icon-ai-users" :size="29" color="#eb5b5b;" :width="48" :height="48"
                             background-color="#fdeeee" />
                         <div>
                             <div class="home-left-top-content-item-num">{{ statis.userNum }}</div>
-                            <div class="home-left-top-content-item-desc">创建用户（个）</div>
+                            <div class="home-left-top-content-item-desc">{{ userStore.type === 0 ? '创建' : '管理' }}用户（个）</div>
                         </div>
                     </div>
 
@@ -69,6 +69,22 @@
                         <div>
                             <div class="home-left-top-content-item-num">{{ statis.topRank }}</div>
                             <div class="home-left-top-content-item-desc">最高排名（名）</div>
+                        </div>
+                    </div>
+                    <div v-if="userStore.type === 3" class="home-left-top-content-item" @click="$router.push('/myMark')">
+                        <Iconfont icon="icon-diannao" :size="24" color="#09c8bd;" :width="48" :height="48"
+                            background-color="#e5faf8" />
+                        <div>
+                            <div class="home-left-top-content-item-num">{{ statis.examNum }}</div>
+                            <div class="home-left-top-content-item-desc">总阅考试（场）</div>
+                        </div>
+                    </div>
+                    <div v-if="userStore.type === 3" class="home-left-top-content-item" @click="$router.push('/myMark')">
+                        <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
+                            background-color="#fff4e7" />
+                        <div>
+                            <div class="home-left-top-content-item-num">{{ statis.unMarkNum }}</div>
+                            <div class="home-left-top-content-item-desc">待阅考试（场）</div>
                         </div>
                     </div>
                 </div>
@@ -134,7 +150,7 @@
                                     <el-text type="info" size="small">{{ todoExam.examStartTime }} - {{ todoExam.examEndTime }}</el-text>
                                     <el-text v-if="todoExam.examMarkType === 2" type="info" size="small"><br/>{{ todoExam.examMarkStartTime }} - {{ todoExam.examMarkEndTime }}（阅卷时间）</el-text>
                                 </div>
-                                <el-button v-if="userStore.type === 0 && todoExam.examMarkType === 2" type="primary" plain @click="toMark(todoExam)">开始阅卷</el-button>
+                                <el-button v-if="(userStore.type === 0 || userStore.type === 2 || userStore.type === 3 ) && todoExam.examMarkType === 2" type="primary" plain @click="toMark(todoExam)">开始阅卷</el-button>
                                 <el-button v-else-if="userStore.type === 1" type="primary" plain @click="toExam(todoExam)">开始考试</el-button>
                             </div>
                             <el-empty v-if="!todoExamList.length" description="暂无考试"/>
@@ -247,6 +263,7 @@ const statis = reactive({// 首页统计
     exerNum: 0,// 练习数量
     userNum: 0,// 用户数量
     unExamNum: 0,// 待考数量
+    unMarkNum: 0,// 待阅数量
     passExamNum: 0,// 及格次数
     topRank: 0,// 最高排名
 })
@@ -289,6 +306,19 @@ onMounted(async () => {
         let { data: { data: data3 } } = await http.post("exer/listpage", { pageSize: 100, todo: true })// 未完成的练习列表
         todoExerList.value.push(...data3.list) 
     }
+    if (userStore.type === 2) {// 如果是子管理员登录
+        let { data: { data } } = await http.post("report/subAdmin/home", {  })// 首页统计
+        statis.examNum = data.examNum
+        statis.questionNum = data.questionNum
+        statis.exerNum = data.exerNum
+        statis.userNum = data.userNum
+
+        let { data: { data: data2 } } = await http.post("myMark/listpage", { pageSize: 100, todo: true })// 未完成的考试列表
+        todoExamList.value.push(...data2.list) 
+
+        let { data: { data: data3 } } = await http.post("exer/listpage", { pageSize: 100, todo: true })// 未完成的练习列表
+        todoExerList.value.push(...data3.list) 
+    }
     if (userStore.type === 1) {// 如果是用户登录
         let { data: { data } } = await http.post("report/user/home", {  })// 首页统计
         statis.examNum = data.examNum
@@ -301,6 +331,14 @@ onMounted(async () => {
 
         let { data: { data: data3 } } = await http.post("myExer/listpage", { pageSize: 100, todo: true })// 未完成的练习列表
         todoExerList.value.push(...data3.list)
+    }
+    if (userStore.type === 3) {// 如果是阅卷用户登录
+        let { data: { data } } = await http.post("report/markUser/home", {  })// 首页统计
+        statis.examNum = data.examNum
+        statis.unMarkNum = data.unMarkNum
+
+        let { data: { data: data2 } } = await http.post("myMark/listpage", { pageSize: 100, todo: true })// 未完成的考试列表
+        todoExamList.value.push(...data2.list) 
     }
 
     // 公告查询
@@ -421,7 +459,11 @@ async function toMark(myMark: any) {
         return
     }
 
-    router.push(`/exam/mark/${ myMark.examId }`)
+    if (userStore.type === 3) {
+        router.push(`/myMark/paper/${ myMark.examId }`)
+    } else {
+        router.push(`/exam/mark/${ myMark.examId }`)
+    }
 }
 
 // 去练习

@@ -57,4 +57,13 @@ public interface UserDao extends RBaseDao<User> {
 	 * @return List<User>
 	 */
 	List<User> getList();
+
+	/**
+	 * 获取阅卷用户列表
+	 * 
+	 * v1.0 zhanghc 2023年9月22日下午3:58:47
+	 * @param parentId
+	 * @return List<User>
+	 */
+	List<User> getMarkUserlist(Integer parentId);
 }

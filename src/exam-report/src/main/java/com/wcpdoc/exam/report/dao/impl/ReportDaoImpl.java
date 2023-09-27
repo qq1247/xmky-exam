@@ -64,6 +64,16 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	}
 	
 	@Override
+	public Map<String, Object> markUserHome(Integer userId) {
+		String sql = "SELECT COUNT(CASE EXAM.MARK_STATE WHEN 3 THEN 0  ELSE 1  END) AS UN_MARK_NUM, "// 未阅卷场数
+				+ "COUNT(*) AS EXAM_NUM "// 总考试场数
+				+ "FROM EXM_EXAM EXAM "
+				+ "WHERE EXAM.STATE = 1 "
+				+ "	AND EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_ID = EXAM.ID )";
+		return getMapList(sql, new Object[]{ userId }).get(0);
+	}
+	
+	@Override
 	public PageOut examRankListpage(PageIn pageIn) {
 		String sql = "SELECT MY_EXAM.NO AS MY_EXAM_NO, " // 排名
 				+ "USER.ID AS USER_ID, USER.NAME AS USER_NAME, ORG.NAME AS ORG_NAME, "// 用户机构信息

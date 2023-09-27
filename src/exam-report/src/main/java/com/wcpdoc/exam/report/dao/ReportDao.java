@@ -41,6 +41,15 @@ public interface ReportDao extends RBaseDao<Object> {
 	Map<String, Object> subAdminHome(Integer userId);
 	
 	/**
+	 * 阅卷用户首页
+	 * 
+	 * v1.0 zhanghc 2023年9月26日下午2:09:05
+	 * @param userId 阅卷用户ID
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> markUserHome(Integer user);
+	
+	/**
 	 * 我的考试列表
 	 * 
 	 * v1.0 chenyun 2021年12月15日下午1:47:12

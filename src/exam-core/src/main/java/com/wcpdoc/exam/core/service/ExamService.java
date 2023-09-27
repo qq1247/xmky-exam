@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 /**
  * 考试服务层接口
@@ -90,13 +89,14 @@ public interface ExamService extends BaseService<Exam>{
 	 * void
 	 */
 	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
-	
+
 	/**
-	 * 获取试卷
+	 * 协助阅卷
 	 * 
-	 * v1.0 zhanghc 2022年5月24日下午4:25:06
-	 * @param id
-	 * @return List<Question>
+	 * v1.0 zhanghc 2023年9月22日下午4:16:34
+	 * @param id 
+	 * @param markUserIds 
+	 * void
 	 */
-	List<Question> getPaper(Integer id);
+	void assist(Integer id, Integer[] markUserIds);
 }

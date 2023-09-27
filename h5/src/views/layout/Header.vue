@@ -11,14 +11,18 @@
                 <el-menu-item v-if="userStore.type === 0 || userStore.type === 2" index="/exer">练习</el-menu-item>
                 <el-menu-item v-if="userStore.type === 1" index="/myExer">练习</el-menu-item>
                 <el-menu-item v-if="userStore.type === 0 || userStore.type === 2" index="/exam">考试</el-menu-item>
+                <el-menu-item v-if="userStore.type === 3" index="/myMark">阅卷</el-menu-item>
+                <el-menu-item v-if="userStore.type === 1" index="/myExam">考试</el-menu-item>
                 <el-sub-menu v-if="userStore.type === 0" index="/user">
                     <template #title>用户</template>
                     <el-menu-item index="/org">机构管理</el-menu-item>
-                    <el-menu-item index="/user">用户管理</el-menu-item>
+                    <el-menu-item index="/user">考试用户</el-menu-item>
                     <el-menu-item index="/subAdmin">子管理员</el-menu-item>
+                    <el-menu-item index="/markUser">阅卷用户</el-menu-item>
                 </el-sub-menu>
                 <el-sub-menu v-if="userStore.type === 2" index="/user">
                     <template #title>用户</template>
+                    <el-menu-item index="/examUser">考试用户</el-menu-item>
                     <el-menu-item index="/markUser">阅卷用户</el-menu-item>
                 </el-sub-menu>
                 <el-sub-menu v-if="userStore.type === 0" index="/sys">
@@ -28,7 +32,6 @@
                     <el-menu-item index="/cron">定时任务</el-menu-item>
                     <el-menu-item index="/dict">数据字典</el-menu-item>
                 </el-sub-menu>
-                <el-menu-item v-if="userStore.type === 1" index="/myExam">考试</el-menu-item>
             </el-menu>
             <el-dropdown @command="dropdownCmd" :teleported="false" class="header-top-username">
                 <span class="el-dropdown-link">

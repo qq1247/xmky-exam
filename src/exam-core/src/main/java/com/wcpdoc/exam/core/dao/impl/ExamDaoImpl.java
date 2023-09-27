@@ -36,7 +36,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, "
 				+ "EXAM.PASS_SCORE, EXAM.TOTAL_SCORE, EXAM.STATE, EXAM.MARK_STATE, EXAM.SCORE_STATE, EXAM.RANK_STATE, "
 				+ "EXAM.GEN_TYPE, EXAM.MARK_TYPE, EXAM.SXES, EXAM.ANON_STATE, "
-				+ "(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM "
+				+ "(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM, "
+				+ "(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = EXAM.ID) AS MARK_USER_NUM "
 				+ "FROM EXM_EXAM EXAM ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil
@@ -44,7 +45,12 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 			.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询已暂停和已发布
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = :STATE", pageIn.get("state"))
-			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.CREATE_USER_ID = :CREATE_USER_ID", pageIn.get("curUserId", Integer.class))
+			.addWhere(ValidateUtil.isValid(pageIn.get("subAdminUserId", Integer.class)), // 子管理员看自己
+					"EXAM.CREATE_USER_ID = :CREATE_USER_ID", 
+					pageIn.get("subAdminUserId", Integer.class))
+			.addWhere(ValidateUtil.isValid(pageIn.get("markUserId", Integer.class)), // 阅卷用户看（管理或子管理）分配的
+					"EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_ID = EXAM.ID )", 
+					pageIn.get("markUserId", Integer.class))
 			.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(),

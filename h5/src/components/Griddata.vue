@@ -19,7 +19,7 @@
                 </span>
             </template>
             <template v-else>
-                <span v-for="i in 5" :data-name="menu[i - 1].name" @click="emit('callback', menu[i - 1].event)">
+                <span v-for="i in 5" :data-name="menu[i - 1].name" @click="menu[i - 1].event">
                     <i :class="`iconfont ${menu[i - 1].icon}`"></i>
                 </span>
                 <span data-name="更多" class="last-span">
@@ -154,6 +154,7 @@ defineProps<{
                 transform: translateY(-50%);
                 opacity: 0;
                 transition: all .3s ease-in-out;
+                z-index: 1;
 
                 &::before {
                     content: "";

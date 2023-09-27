@@ -61,6 +61,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		} else if (getCurUser().getType() == 0 && user.getType() == 2) {// 如果是管理员添加子管理员
 			user.setOrgId(0);// 不属于任何机构
 			user.setParentId(getCurUser().getId());// 子管理员归管理员管
+		}  else if (getCurUser().getType() == 0 && user.getType() == 3) {// 如果是管理员添加阅卷用户
+			user.setOrgId(0);// 不属于任何机构
+			user.setParentId(getCurUser().getId());// 阅卷用户归管理员管
 		} else if (getCurUser().getType() == 2) {// 如果是子管理员添加阅卷用户
 			user.setOrgId(0);// 不属于任何机构
 			user.setParentId(getCurUser().getId());// 阅卷用户归子管理员管
@@ -124,6 +127,17 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());
 		update(user);
+		
+		// 删除管理员或子管理创建的阅卷用户
+		if (user.getType() == 0 || user.getType() == 2) {
+			List<User> markUserList = userDao.getMarkUserlist(user.getId());
+			for (User markUser : markUserList) {
+				markUser.setState(0);
+				markUser.setUpdateTime(new Date());
+				markUser.setUpdateUserId(getCurUser().getId());
+				update(user);
+			}
+		}
 	}
 	
 	@Override
@@ -150,9 +164,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			if (user.getType() == 0) {
 				throw new MyException("管理员不能初始化管理员密码");
 			}
-			if (user.getType() == 3) {
-				throw new MyException("管理员不能初始化阅卷用户密码");
-			}
+			//if (user.getType() == 3) {
+			//	throw new MyException("管理员不能初始化阅卷用户密码");
+			//}
 		}
 		if (getCurUser().getType() == 2) {
 			if (user.getType() == 0) {
@@ -251,9 +265,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (!(user.getType() >= 1 && user.getType() <= 3)) {//类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
 			throw new MyException("参数错误：type");
 		}
-		if (getCurUser().getType() == 0 && (user.getType() == 3)) {// 当前用户是管理员，不能直接添加阅卷用户
-			throw new MyException("管理员不能直接添加阅卷用户");
-		}
+		//if (getCurUser().getType() == 0 && (user.getType() == 3)) {// 当前用户是管理员，不能直接添加阅卷用户
+		//	throw new MyException("管理员不能直接添加阅卷用户");// 相对简单不启动子管理的情况下，管理员也能添加
+		//}
 		if (getCurUser().getType() == 1 || getCurUser().getType() == 3) {// 当前用户是考试用户或阅卷用户，不能添加用户
 			throw new MyException("无权限");
 		}
@@ -271,5 +285,10 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (existLoginName(user)) {
 			throw new MyException("登录账号已存在");
 		}
+	}
+
+	@Override
+	public List<User> getMarkUserList(Integer parentId) {
+		return userDao.getMarkUserlist(parentId);
 	}
 }

@@ -132,6 +132,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 				.createToken(newTokenId.toString(), oldJwtResult.getClaims().getSubject(), newExpTime)
 				.addAttr("userId", oldJwtResult.getClaims().get("userId"))
 				.addAttr("loginName", oldJwtResult.getClaims().get("loginName"))
+				.addAttr("type", oldJwtResult.getClaims().get("type"))
 				.build();
 			
 			// 缓存刷新令牌

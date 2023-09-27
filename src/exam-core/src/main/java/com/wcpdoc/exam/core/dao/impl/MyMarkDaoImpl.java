@@ -25,11 +25,14 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, "// 考试相关字段
-				+ "EXAM.MARK_TYPE AS EXAM_MARK_TYPE, "// 考试相关字段
-				+ "EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "// 考试相关字段
-				+ "EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, "// 考试相关字段
-				+ "EXAM.MARK_STATE AS EXAM_MARK_STATE "// 考试相关字段
+		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "
+				+ "EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, "
+				+ "EXAM.PASS_SCORE AS EXAM_PASS_SCORE, EXAM.TOTAL_SCORE AS EXAM_TOTAL_SCORE, EXAM.STATE AS EXAM_STATE, "
+				+ "EXAM.MARK_STATE AS EXAM_MARK_STATE, EXAM.SCORE_STATE AS EXAM_SCORE_STATE, "
+				+ "EXAM.RANK_STATE AS EXAM_RANK_STATE, EXAM.GEN_TYPE AS EXAM_GEN_TYPE, EXAM.MARK_TYPE AS EXAM_MARK_TYPE, "
+				+ "EXAM.SXES AS EXAM_SXES, EXAM.ANON_STATE AS EXAM_ANON_STATE, "
+				+ "(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS EXAM_USER_NUM, "
+				+ "(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = EXAM.ID) AS EXAM_MARK_USER_NUM "
 				+ "FROM EXM_EXAM EXAM ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("examName")))
@@ -42,6 +45,12 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 						pageIn.get("startTime"), pageIn.get("endTime")
 						)
 				.addWhere("true".equals(pageIn.get("todo")), "EXAM.MARK_STATE != 3")// 查找我的未完成的考试列表
+				.addWhere(ValidateUtil.isValid(pageIn.get("subAdminUserId", Integer.class)), // 子管理员看自己
+						"EXAM.CREATE_USER_ID = :CREATE_USER_ID", 
+						pageIn.get("subAdminUserId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("markUserId", Integer.class)), // 阅卷用户看（管理或子管理）分配的
+						"EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_ID = EXAM.ID )", 
+						pageIn.get("markUserId", Integer.class))
 				.addWhere("EXAM.STATE = 1") // 已发布（不含冻结）
 				.addOrder("EXAM.START_TIME", Order.DESC);// 按考试开始时间倒序排列
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
