@@ -63,4 +63,5 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * void
 	 */
 	void finish(Integer examId, Integer userId);
+	
 }

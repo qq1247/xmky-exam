@@ -39,10 +39,10 @@
                         <span class="paper-right-score-value">{{form.totalScore}}</span>
                         <span class="iconfont icon-fenshudixian"></span>
                     </div>
-                    <!-- 试卷名称 -->
+                    <!-- 试卷名称
                     <div class="paper-right-title">
                         <el-input v-model="form.paperName" :maxlength="16" placeholder="请输入试卷名称" />
-                    </div>
+                    </div> -->
                     <!-- 试题列表 -->
                     <template v-for="(examQuestion, index) in form.examQuestions" :key="index">
                         <div v-if="examQuestion.type === 1" class="paper-right-chapter">
@@ -74,7 +74,7 @@
                                         v-model="examQuestion.score" 
                                         :min="0.5" 
                                         :max="20" 
-                                        :precision="1"
+                                        :precision="2"
                                         controls-position="right"
                                         @blur="() => scoreUpdate(examQuestion)"/>分<!-- 用blur事件，输入字母或删除数字不触发change事件 -->
                                 </template>

@@ -90,10 +90,13 @@
     <el-drawer title="密码修改" v-model="form.show" :size="550" @close="form.oldPwd = ''; form.newPwd = '';">
         <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large">
             <el-form-item label="旧密码" prop="oldPwd">
-                <el-input v-model.trim="form.oldPwd" type="password" show-password placeholder="请输入旧密码"/>
+                <el-input v-model.trim="form.oldPwd" type="password"  placeholder="请输入旧密码"/>
             </el-form-item>
             <el-form-item label="新密码" prop="newPwd">
-                <el-input v-model.trim="form.newPwd" type="password" show-password placeholder="请输入新密码"/>
+                <el-input v-model.trim="form.newPwd" type="password"  placeholder="请输入新密码"/>
+            </el-form-item>
+            <el-form-item label="再次确认" prop="newPwd2">
+                <el-input v-model.trim="form.newPwd2" type="password"  placeholder="请输入新密码"/>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="pwdUpdate">修改</el-button>
@@ -121,6 +124,7 @@ const form = reactive({// 密码修改表单
     show: false,
     oldPwd: '',
     newPwd: '',
+    newPwd2: '',
 })
 const formRules = reactive<FormRules>({// 密码修改表单校验规则
     oldPwd: [
@@ -130,6 +134,18 @@ const formRules = reactive<FormRules>({// 密码修改表单校验规则
         { required: true, message: '请输入新密码', trigger: 'blur' },
         { min: 6, max: 20, message: '长度介于6-20', trigger: 'blur' },
     ],
+    newPwd2: [{
+        trigger: 'blur',
+        validator: (rule: any, value: any, callback: any) => {
+            if (!value) {
+                return callback(new Error('请输入新密码'))
+            }
+            if (form.newPwd != form.newPwd2) {
+                return callback(new Error('两次密码不一致'))
+            }
+            return callback()
+        }
+    }],
 })
 
 // 组件挂载完成后，执行如下方法

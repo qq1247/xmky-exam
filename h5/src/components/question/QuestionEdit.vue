@@ -62,7 +62,7 @@
             <el-col :span="12">
                 <el-form-item label="分值" prop="score">
                     <el-input-number v-model="form.score" :min="0.5" :step="0.5" controls-position="right"
-                    :precision="1" :disabled="form.type === 3 || (form.type === 5 && form.markType === 1)" />
+                    :precision="2" :disabled="form.type === 3 || (form.type === 5 && form.markType === 1)" />
                 </el-form-item>
             </el-col>
             <el-col v-if="form.type === 2" :span="12">
@@ -208,9 +208,13 @@ const formRules = reactive<FormRules>({// 表单校验规则
             if (value.length === 0) {
                 return callback(new Error('请输入答案'))
             }
-            value.forEach(cur => {
+            if (form.type === 2 && value.length < 2) {// 多选最少两个答案
+                return callback(new Error('最少两个答案'))
+            }
+
+            value.forEach(cur => {// 主观问答，值为空字符串会通过校验，特殊处理一下
                 if (cur.length === 0) {
-                    return callback(new Error('请输入答案')) // 主观问答，值为空字符串会通过校验，特殊处理一下
+                    return callback(new Error('请输入答案')) 
                 }
             });
             return callback()

@@ -6,10 +6,10 @@
         </template>
         <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large">
             <el-form-item label="子管理姓名" prop="name">
-                <el-input v-model="form.name" placeholder="请输入子管理姓名"/>
+                <el-input v-model.trim="form.name" placeholder="请输入子管理姓名"/>
             </el-form-item>
             <el-form-item label="登录账号" prop="loginName">
-                <el-input v-model="form.loginName" placeholder="请输入登录账号"/>
+                <el-input v-model.trim="form.loginName" placeholder="请输入登录账号"/>
             </el-form-item>
             <el-form-item label="拥有权限" prop="">
                 <el-tag size="small">组织考试</el-tag>&nbsp;

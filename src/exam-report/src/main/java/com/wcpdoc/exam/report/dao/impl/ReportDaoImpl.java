@@ -65,7 +65,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	
 	@Override
 	public Map<String, Object> markUserHome(Integer userId) {
-		String sql = "SELECT COUNT(CASE EXAM.MARK_STATE WHEN 3 THEN 0  ELSE 1  END) AS UN_MARK_NUM, "// 未阅卷场数
+		String sql = "SELECT SUM(CASE EXAM.MARK_STATE WHEN 3 THEN 0  ELSE 1  END) AS UN_MARK_NUM, "// 未阅卷场数
 				+ "COUNT(*) AS EXAM_NUM "// 总考试场数
 				+ "FROM EXM_EXAM EXAM "
 				+ "WHERE EXAM.STATE = 1 "
@@ -80,8 +80,10 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "MY_EXAM.STATE AS MY_EXAM_STATE, MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE, MY_EXAM.ANSWER_STATE AS MY_EXAM_ANSWER_STATE, "// 考试状态信息
 				+ "MY_EXAM.ANSWER_START_TIME AS MY_EXAM_START_TIME, MY_EXAM.ANSWER_END_TIME AS MY_EXAM_END_TIME, "// 答题时间
 				+ "MY_EXAM.MARK_START_TIME AS MY_EXAM_MARK_START_TIME, MY_EXAM.MARK_END_TIME AS MY_EXAM_MARK_END_TIME, "//阅卷时间  
-				+ "MY_EXAM.TOTAL_SCORE AS MY_EXAM_TOTAL_SCORE "// 用户分数
+				+ "MY_EXAM.TOTAL_SCORE AS MY_EXAM_TOTAL_SCORE, "// 用户分数
+				+ "EXAM.MARK_TYPE AS EXAM_MARK_TYPE, EXAM.MARK_STATE AS EXAM_MARK_STATE "// 考试信息，用于判断如果是主观题试卷，分数应该考试结束才显示
 				+ "FROM EXM_MY_EXAM MY_EXAM "// 我的考试
+				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "// 考试
 				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID "// 考试用户
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID "// 阅卷用户
 				+ "LEFT JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";// 机构名称

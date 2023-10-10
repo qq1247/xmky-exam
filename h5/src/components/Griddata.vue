@@ -55,7 +55,7 @@ defineProps<{
     padding: 30px 30px 20px 30px;
     background-color: white;
     width: 380px;
-    height: 180px;
+    height: 200px;
     position: relative;
     .grid-tag {
         position: absolute;
@@ -68,7 +68,7 @@ defineProps<{
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        margin: 10px;
+        margin: 8px;
         font-weight: bold;
         color: var(--el-text-color-regular);
     }

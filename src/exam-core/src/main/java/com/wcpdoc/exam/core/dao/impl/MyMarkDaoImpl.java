@@ -76,8 +76,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 			.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "USER.NAME LIKE :USER_NAME", String.format("%%%s%%", pageIn.get("userName")))
 			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "MY_EXAM.MARK_USER_ID = :MARK_USER_ID", pageIn.get("curUserId", Integer.class))
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")), "MY_EXAM.STATE = :STATE", pageIn.get("state"))
-			.addWhere("EXAM.STATE = 1")
-			.addOrder("EXAM.START_TIME", Order.DESC);
+			.addWhere("EXAM.STATE = 1");
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}

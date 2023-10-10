@@ -49,7 +49,12 @@
             </el-form-item> -->
             <el-form-item label="成绩查询：" prop="scoreState">
                 <el-radio-group v-model="form.scoreState">
-                    <el-radio v-for="(option, index) in dictStore.getList('SCORE_STATE')" :key="index" :label="parseInt(option.dictKey)">
+                    <el-radio 
+                        v-for="(option, index) in dictStore.getList('SCORE_STATE')" 
+                        :key="index" 
+                        :label="parseInt(option.dictKey)"
+                        :disabled="(form.markType === 2 && option.dictKey === '3') ? true : false"
+                        >
                         {{ option.dictValue }}
                     </el-radio>
                 </el-radio-group>
@@ -71,6 +76,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { useExamStore, type ExamQuestion } from '@/stores/exam';
 import { useDictStore } from '@/stores/dict';
 import dayjs from 'dayjs';
+import { fromPairs } from 'lodash';
 
 // 定义变量
 defineExpose({ next });
@@ -134,6 +140,10 @@ onMounted(async () => {
     // 如果是随机组卷，去掉随机选项
     if (form.genType === 2) {
         form.sxes = []
+    }
+
+    if (form.markType === 2 && form.scoreState === 3) {// 第一次是客观试卷，后添加主观题，如果选的交卷后，改为考试后
+        form.scoreState = 1
     }
 })
 

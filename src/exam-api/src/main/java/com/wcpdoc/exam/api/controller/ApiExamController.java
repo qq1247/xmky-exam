@@ -21,7 +21,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.context.UserContext;
@@ -87,6 +89,8 @@ public class ApiExamController extends BaseController {
 	private QuestionAnswerService questionAnswerService;
 	@Resource
 	private ExamRuleService examRuleService;
+	@Resource
+	private OrgService orgService;
 
 	/**
 	 * 考试列表
@@ -438,6 +442,61 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("阅卷用户列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 考试用户列表
+	 * 
+	 * v1.0 zhanghc 2023年9月26日下午5:12:17
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/examUserList")
+	@ResponseBody
+	public PageResult examUserList(Integer id) {
+		try {
+			// 数据校验
+			Exam exam = examService.getEntity(id);
+			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			
+			// 获取阅卷用户列表
+			List<MyExam> myExamList = myExamService.getList(id);
+			Integer[] userIds = new Integer[myExamList.size()];
+			for (int i = 0; i < myExamList.size(); i++) {
+				userIds[i] = myExamList.get(i).getUserId();
+			}
+			List<User> userList = userService.getList(userIds);
+			Map<Integer, User> userCache = new HashMap<>();
+			for (User user : userList) {
+				userCache.put(user.getId(), user);
+			}
+			List<Org> orgList = orgService.getList();
+			Map<Integer, Org> orgCache = new HashMap<>();
+			for (Org org : orgList) {
+				orgCache.put(org.getId(), org);
+			}
+			
+			List<Map<String, Object>> resultList = new ArrayList<>();
+			for (MyExam myExam : myExamList) {
+				Map<String, Object> result = new HashMap<>();
+				result.put("userId", myExam.getUserId());
+				result.put("userName", userCache.get(myExam.getUserId()).getName());
+				result.put("orgId", userCache.get(myExam.getUserId()).getOrgId());
+				result.put("orgName", orgCache.get(userCache.get(myExam.getUserId()).getOrgId()).getName());
+				result.put("myExamState", myExam.getState());
+				result.put("myExamMarkState", myExam.getMarkState());
+				resultList.add(result);
+			}
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("考试用户列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试用户列表错误：", e);
 			return PageResult.err();
 		}
 	}

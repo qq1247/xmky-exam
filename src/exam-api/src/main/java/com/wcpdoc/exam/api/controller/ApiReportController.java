@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.api.controller;
  
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -201,7 +204,15 @@ public class ApiReportController extends BaseController{
     @ResponseBody
     public PageResult examRankListpage() {
         try {// 不校验，任何时候都能查询
-            return PageResultEx.ok().data(reportService.examRankListpage(new PageIn(request)));
+        	PageOut pageOut = reportService.examRankListpage(new PageIn(request));
+        	for (Map<String, Object> map : pageOut.getList()) {
+        		Integer examMarkType = (Integer) map.get("examMarkType");
+        		Integer examMarkState = (Integer) map.get("examMarkState");
+        		if (examMarkType == 2 && examMarkState != 3) {// 如果是主观题试卷，且考试未结束，不显示分数
+        			map.put("myExamTotalScore", null);// 阅完一张会打分，但是会二次修改分数，不应该显示中间状态
+        		}
+        	}
+            return PageResultEx.ok().data(pageOut);
         } catch (MyException e) {
             log.error("考试排名错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());

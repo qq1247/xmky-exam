@@ -5,8 +5,8 @@
                 <template #header>基础信息</template>
                 <p>考试名称：<span>{{exam.name}}</span></p>
                 <p>试卷类型：<span>{{dictStore.getValue('PAPER_GEN_TYPE', exam.genType)}} / {{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType) }}</span></p>
-                <p>考试时间：<span>{{dayjs(exam.startTime).format('YYYY-MM-DD HH:mm')}}（{{ examMinutes }}分钟）</span></p>
-                <p>阅卷时间：<span>{{exam.markType === 2 ? dayjs(exam.markStartTime).format('YYYY-MM-DD HH:mm') : '-'}} （{{ markMinutes }}分钟）</span></p>
+                <p>考试时间：<span>{{dayjs(exam.startTime).format('YY-MM-DD HH:mm')}}（{{ examMinutes }}分钟）</span></p>
+                <p>阅卷时间：<span>{{exam.markType === 2 ? dayjs(exam.markStartTime).format('YY-MM-DD HH:mm') : '-'}} （{{ markMinutes }}分钟）</span></p>
                 <p>及格分数：<span>{{exam.passScore}}分 / {{exam.totalScore}}分</span></p>
             </el-card>
             <el-card class="statis-top-statis" shadow="never">

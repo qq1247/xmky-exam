@@ -33,10 +33,10 @@
                         <span class="paper-rule-right-score-value">{{ form.totalScore }}</span>
                         <span class="iconfont icon-fenshudixian"></span>
                     </div>
-                    <!-- 试卷名称 -->
+                    <!-- 试卷名称
                     <div class="paper-rule-right-title">
                         <el-input v-model="form.paperName" :maxlength="16" placeholder="请输入试卷名称" />
-                    </div>
+                    </div> -->
                     <!-- 抽题规则 -->
                     <template v-for="(examRule, index) in form.examRules" :key="index">
                         <!-- 章节 -->

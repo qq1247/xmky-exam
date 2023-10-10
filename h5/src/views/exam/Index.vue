@@ -31,14 +31,14 @@
                         阅卷时间：{{ exam.markStartTime }} - {{ exam.markEndTime }}
                     </div>
                     <el-row style="margin-bottom: 5px;">
-                        <el-col :span="8">
+                        <el-col :span="10">
                             及格分数：{{ exam.passScore || '-' }} / {{ exam.totalScore }}
                         </el-col>
-                        <el-col :span="8">
+                        <el-col :span="7">
                             <!-- 待批试卷：6 / 79 -->
                             考试人数：{{ exam.userNum }}
                         </el-col>
-                        <el-col :span="8">
+                        <el-col :span="7">
                             协助批阅：{{ exam.markUserNum || '无'}}
                         </el-col>
                     </el-row>

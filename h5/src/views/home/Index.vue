@@ -141,7 +141,7 @@
                 <div class="home-left-bottom-right">
                     <el-card shadow="never">
                         <template #header>
-                            <span>考试任务</span>
+                            <span>{{ userStore.type === 1 ? '考试任务' : '阅卷任务' }}</span>
                         </template>
                         <el-scrollbar max-height="calc((100vh - 380px) / 2)">
                             <div v-for="todoExam in todoExamList" class="home-left-bottom-right-row">
@@ -156,7 +156,7 @@
                             <el-empty v-if="!todoExamList.length" description="暂无考试"/>
                         </el-scrollbar>
                     </el-card>
-                    <el-card shadow="never">
+                    <el-card v-if="userStore.type !== 3" shadow="never">
                         <template #header>
                             <span>练习任务</span>
                         </template>
@@ -195,17 +195,17 @@
                             background-color="#eb5b5b" />
                         <span>公告管理</span>
                     </div>
-                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/exam')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-right-menu-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-diannao" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#09c8bd" />
                         <span>考试管理</span>
                     </div>
-                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/questionType')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-right-menu-content-item" @click="$router.push('/questionType')">
                         <Iconfont icon="icon-shiti" :size="22" color="white" :width="40" :height="40" :radius="10"
                             background-color="#fb901b" />
                         <span>题库管理</span>
                     </div>
-                    <div v-if="userStore.type === 0" class="home-right-menu-content-item" @click="$router.push('/exer')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-right-menu-content-item" @click="$router.push('/exer')">
                         <Iconfont icon="icon-piyue" :size="22" color="white" :width="40" :height="40" :radius="10"
                             background-color="#67C23A" />
                         <span>模拟练习</span>
@@ -219,6 +219,11 @@
                         <Iconfont icon="icon-piyue" :size="22" color="white" :width="40" :height="40" :radius="10"
                             background-color="#67C23A" />
                         <span>我的练习</span>
+                    </div>
+                    <div v-if="userStore.type === 3" class="home-right-menu-content-item" @click="$router.push('/myMark')">
+                        <Iconfont icon="icon-diannao" :size="20" color="white" :width="40" :height="40" :radius="10"
+                            background-color="#09c8bd" />
+                        <span>我的阅卷</span>
                     </div>
                 </div>
             </el-card>

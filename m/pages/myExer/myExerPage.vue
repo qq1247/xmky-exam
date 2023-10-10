@@ -352,7 +352,7 @@
 		
 		uni.showModal({
 			title: '提示消息',
-			content: '模拟已结束',
+			content: '模拟已完成',
 			showCancel: false,
 			success: function (res) {
 				uni.navigateTo({url: `/pages/myExer/myExerResult?total=${total}&trueNum=${trueNum}&falseNum=${falseNum}&diffMinute=${diffMinute.value}`});

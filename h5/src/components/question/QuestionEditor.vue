@@ -202,7 +202,7 @@ function parseQuestion(questionTxt: string[]) {
     let subjective = false // 是否主观题
     answerGroup.forEach((answer) => {
         answer = answer.substring(1, answer.length - 1)
-        if (/^([0-9]{1}|^[1-9]{1}\d{1,15})(\.\d{1,2})?分$/.test(answer)) {
+        if (/^([0-9]{1}|^[1-9]{1}\d{1,15})(\.\d{1,2})?分$/.test(answer)) {// 最多1到2位小数，超过不识别
             let s = parseFloat(answer.replace('分', ''))
             scores.push(s > 20 ? 20 : s) // 最大20分
         } else if (/^答案无顺序$/.test(answer)) {

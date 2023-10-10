@@ -145,7 +145,7 @@ const curQuestion = reactive({// 当前试题
     question: {} as Question,// 内容
     cache: {} as { [questionId: number]: Question }// 缓存
 })
-const user = reactive({// 用户信息
+const user = reactive({// 用户信息 
     name: '',// 姓名
     orgName: '',// 机构名称
 })
@@ -435,6 +435,14 @@ async function rmkQuery() {
     }
 
     rmkListpage.list.push(...data.list.filter((cur: any) => {// 过滤重复数据
+        cur.content = cur.content.replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&apos;', "'")
+            .replaceAll('&ldquo;', "“")
+            .replaceAll('&rdquo;', "”")
+
         if(rmkListpage.cache.includes(cur.id)) {
             return false
         }

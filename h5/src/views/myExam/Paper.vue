@@ -57,7 +57,7 @@
                 </div>
                 <!-- 试卷名称 -->
                 <div class="paper-right-title">
-                    <el-input :value="exam.paperName" :maxlength="16" placeholder="请输入试卷名称" :readonly="true"/>
+                    <el-input :value="exam.name" :maxlength="16" placeholder="" :readonly="true"/>
                 </div>
                 <!-- 试题列表 -->
                 <template v-for="(examQuestion, index) in examQuestions" :key="index">
@@ -82,7 +82,7 @@
                         :errShow="scoreShow"
                         >
                         <template #bottom-right v-if="myExam.state === 3 || (myExam.state === 1 && myExam.markState === 3)"><!-- 已交卷或（未考试已阅卷） -->
-                            <el-tooltip placement="top" effect="light" :content="answerShow(examQuestion)" popper-class="popper-class">
+                            <el-tooltip placement="top" effect="light" :content="answerShow(examQuestion)" popper-class="popper-class" raw-content>
                                 <el-button type="success" size="small">标准答案</el-button>
                             </el-tooltip>
                         </template>
@@ -111,7 +111,7 @@ const dictStore = useDictStore() // 字典缓存
 const examQuestions = ref([] as ExamQuestion[])// 试卷信息
 const exam = reactive({// 考试信息
     id: 0, // 考试ID
-    paperName: '',// 试卷名称
+    name: '',// 试卷名称
     color: '', // 倒计时颜色
     markState: 0, // 阅卷状态
     scoreState: 0, // 分数状态
@@ -148,7 +148,7 @@ onMounted(async () => {
     // 获取我的考试信息
     exam.id = parseInt(route.params.examId as string)
     let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
-    exam.paperName = data.examPaperName
+    exam.name = data.examName
     exam.markState = data.examMarkState
     exam.scoreState = data.examScoreState
     exam.rankState = data.examRankState
@@ -213,13 +213,13 @@ async function finish() {
 
 // 考试结束
 function examEnd() {
-    ElMessageBox.alert('考试已结束', '提示消息', {
+    ElMessageBox.alert('考试成功', '提示消息', {
         confirmButtonText: '确定',
         callback: async (action: Action) => {
             // 获取我的考试信息
             exam.id = parseInt(route.params.examId as string)
             let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
-            exam.paperName = data.examPaperName
+            exam.name = data.examName
             exam.markState = data.examMarkState
             exam.scoreState = data.examScoreState
             exam.rankState = data.examRankState
