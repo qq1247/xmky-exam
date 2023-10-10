@@ -135,6 +135,7 @@ http请求头需添加Authorization字段，
 | examName | String (32) | 考试名称   | 否   |
 | startTime | Date | 阅卷开始时间   | 否   |
 | endTime | Date | 阅卷结束时间  | 否   |
+| todo | Integer | 查找我的未完成的考试列表  | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
 
@@ -146,9 +147,22 @@ http请求头需添加Authorization字段，
 | data.list[]                 | arr[]   | 分页列表   |
 | data.list[].examId        | Integer | 考试Id  |
 | data.list[].examName        | String  | 考试名称  |
+| data.list[].examStartTime   | Date    | 考试开始时间 |
+| data.list[].examEndTime     | Date    | 考试结束时间  |
 | data.list[].examMarkStartTime   | Date    | 阅卷开始时间 |
 | data.list[].examMarkEndTime     | Date    | 阅卷结束时间  |
-| data.list[].examMarkState     | Date    | 考试阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
+| data.list[].examPassScore     | Double   | 及格分数  |
+| data.list[].examTotalScore     | Double   | 考试总分  |
+| data.list[].examState     | Integer   | 考试状态（0：删除；1：发布）  |
+| data.list[].examMarkState     | Integer    | 考试阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
+| data.list[].examScoreState     | Integer    | 成绩查询状态（1：考试结束后；2：不公布；3：交卷后） |
+| data.list[].examRankState     | Integer    | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
+| data.list[].examGenType     | Integer    | 组卷方式（1：人工组卷；2：随机组卷） |
+| data.list[].examMarkType     | Integer    | 阅卷方式（1：客观题；2：主观题；） |
+| data.list[].examSxes     | Integer    | 反作弊（1：试题乱序；2：选项乱序；） |
+| data.list[].examAnonState     | Integer    | 匿名阅卷状态（1：是；2：否） |
+| data.list[].examUserNum     | Integer    | 考试用户数量 |
+| data.list[].examMarkUserNum     | Integer    | 考试阅卷用户数量 |
 
 ### 我的阅卷用户列表：myMark/userListpage
 | 请求参数| 类型        | 描述       | 必填 |
@@ -202,6 +216,12 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | ----- |
 参考myExam/paper
 
+### 我的阅卷分配试卷：myMark/assign
+| 请求参数| 类型    | 描述           | 必填 |
+| -------------- | ------- | -------------- | ---- |
+| examId| Integer| 考试ID| 是   |
+| num | Integer| 分配数量| 是   |
+
 
 ### 我的阅卷打分：myMark/score
 | 请求参数| 类型    | 描述           | 必填 |
@@ -239,6 +259,7 @@ http请求头需添加Authorization字段，
 | data.list[].startTime   | Date  | 开始时间    |
 | data.list[].endTime   | Date  | 结束时间    |
 | data.list[].rmkState  | Integer  | 允许评论（1：是；2：否）    |
+| data.list[].questionTypeName  | String  | 题库名称    |
 
 ### 我的练习获取：myExer/get
 | 请求参数| 类型        | 描述       | 必填 |

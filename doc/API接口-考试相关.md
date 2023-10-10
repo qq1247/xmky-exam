@@ -113,6 +113,7 @@ http请求头需添加Authorization字段，
 | data.list[].options[]        | Object[]  | 单多选选项（type=1,2时有效） |
 | data.list[].answers[]        | String[]   | 答案（如果是填空或智能问答，会有多个答案） |
 | data.list[].scores[]   | Double[] | 答案分值（如果是填空或智能问答，表示每空分值；如果是多选，表示漏选分值）  |
+| data.list[].updateUserName         | String | 更新用户名称    |
 
 ### 试题添加：question/add
 | 请求参数| 类型  | 描述    | 必填 |
@@ -197,6 +198,7 @@ http请求头需添加Authorization字段，
 | data.list[].sxes  | Integer[] | 反作弊（1：试题乱序；2：选项乱序；） |
 | data.list[].anonState | Integer[] | 匿名阅卷（1：是；2：否） |
 | data.list[].userNum  | Integer | 用户数量 |
+| data.list[].markUserNum  | Integer | 阅卷用户数量 |
 
 ### 考试发布：exam/publish
 | 请求参数| 类型        | 描述                   | 必填 |
@@ -314,6 +316,7 @@ http请求头需添加Authorization字段，
 | data.markType| Integer| 阅卷方式（1：客观题；2：主观题；）  |
 | data.genType| Integer| 组卷方式（1：人工组卷；2：随机组卷）  |
 | data.sxes| Integer[]| 反作弊（1：试题乱序；2：选项乱序；）  |
+| data.state| Integer| 状态（0：删除；1：发布；）  |
 
 ### 考试变更时间：exam/time
 | 请求参数| 类型      | 描述        | 必填 |
@@ -345,6 +348,7 @@ http请求头需添加Authorization字段，
 | data.list[].endTime   | Date  | 结束时间    |
 | data.list[].rmkState  | Integer  | 允许评论（1：是；2：否）    |
 | data.list[].userIds  | Integer[]  | 用户IDS  |
+| data.list[].questionTypeName  | String  | 题库名称 |
 
 ### 练习添加：exer/add
 | 请求参数| 类型      | 描述        | 必填 |

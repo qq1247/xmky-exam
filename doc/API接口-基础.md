@@ -41,7 +41,7 @@ http请求头需添加Authorization字段，
 |data.accessToken     | String  | 访问令牌 |
 |data.userId     | Integer  | 用户ID |
 |data.userName     | String  | 用户名称 |
-|data.roles | String[]  | 角色 |
+|data.type | Integer  | 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户） |
 
 ### 登陆退出：login/out
 

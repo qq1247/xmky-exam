@@ -26,7 +26,7 @@ http请求头需添加Authorization字段，
 带前缀描述，表达前缀业务+字段的意思。如user/add?orgId=1，orgId表示机构ID=1
 
 ## 统计相关
-### 用户首页：report/user/home
+### 考试用户首页：report/user/home
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
@@ -45,6 +45,24 @@ http请求头需添加Authorization字段，
 | data.questionNum        | Integer | 试题数量  |
 | data.exerNum  | Integer | 练习数量 |
 | data.userNum     | Integer | 用户数量 |
+
+### 子管理员首页：report/subAdmin/home
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | ----- |
+| code                      | Integer | 响应码    |
+| msg                       | String  | 响应消息 |
+| data.examNum        | Integer | 考试数量 |
+| data.questionNum        | Integer | 试题数量  |
+| data.exerNum  | Integer | 练习数量 |
+| data.userNum     | Integer | 用户数量 |
+
+### 阅卷用户首页：report/markUser/home
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | ----- |
+| code                      | Integer | 响应码    |
+| msg                       | String  | 响应消息 |
+| data.unMarkNum       | Integer | 总考试场数 |
+| data.examNum        | Integer | 试题数量  |
 
 ### 试题统计：report/question/statis
 | 请求参数| 类型        | 描述       | 必填 |
