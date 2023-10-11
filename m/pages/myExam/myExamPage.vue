@@ -112,7 +112,7 @@
 	const examQuestions = ref([] as ExamQuestion[])// 试卷信息
 	const exam = reactive({// 考试信息
 		id: 0, // 考试ID
-		paperName: '',// 试卷名称
+		name: '',// 考试名称
 		color: '', // 倒计时颜色
 		markState: 0, // 阅卷状态
 		scoreState: 0, // 分数状态
@@ -150,14 +150,14 @@
 		// 获取我的考试信息
 		exam.id = option.examId
 		let { data: _exam } = await http.post("myExam/get", { examId: exam.id })
-		exam.paperName = _exam.examPaperName
+		exam.name = _exam.examName
 		exam.markState = _exam.examMarkState
 		exam.scoreState = _exam.examScoreState
 		exam.rankState = _exam.examRankState
 		examEndTime.value = new Date(_exam.examEndTime.replaceAll("-", '/'))
 		
 		uni.setNavigationBarTitle({
-			title: exam.paperName
+			title: exam.name
 		});
 
 		myExam.totalScore = _exam.totalScore

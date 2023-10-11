@@ -21,10 +21,10 @@ const props = withDefaults(defineProps<{
     flex-direction: column;
     align-items: center;
     margin: 0px 20px 20px 0px;
-    padding: 30px 30px 20px 30px;
+    padding: 40px 30px 20px 30px;
     background-color: white;
     width: 380px;
-    height: 180px;
+    height: 200px;
     cursor: pointer;
 
     &:hover {

@@ -25,7 +25,7 @@
 	const dictStore = useDictStore()
 	const exam = reactive({// 考试信息
 		id: 0, // 考试ID
-		paperName: '',// 试卷名称
+		name: '',// 试卷名称
 		color: '', // 倒计时颜色
 		markState: 0, // 阅卷状态
 		scoreState: 0, // 分数状态
@@ -57,7 +57,7 @@
 			
 			exam.id = option.examId
 			let { data: _exam } = await http.post("myExam/get", { examId: exam.id })
-			exam.paperName = _exam.examPaperName
+			exam.name = _exam.examName
 			exam.markState = _exam.examMarkState
 			exam.scoreState = _exam.examScoreState
 			exam.rankState = _exam.examRankState
@@ -65,7 +65,7 @@
 			exam.markEndTime = _exam.examMarkEndTime
 
 			uni.setNavigationBarTitle({
-				title: exam.paperName
+				title: exam.name
 			});
 
 			myExam.totalScore = _exam.totalScore
@@ -114,7 +114,7 @@
 				details.value = []
 				details.value.push({
 					label: '考试名称',
-					value: exam.paperName,
+					value: exam.name,
 					bold: true,
 				})
 				details.value.push({
@@ -173,7 +173,7 @@
 				description.value = '查询成功'
 				details.value.push({
 					label: '考试名称',
-					value: exam.paperName,
+					value: exam.name,
 					bold: true,
 				})
 				details.value.push({
