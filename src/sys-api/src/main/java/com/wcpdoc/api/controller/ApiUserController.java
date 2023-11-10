@@ -251,6 +251,9 @@ public class ApiUserController extends BaseController {
 		try {
 			userService.frozen(id);
 			return PageResult.ok();
+		}  catch (MyException e) {
+			log.error("账户冻结错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("账户冻结错误：", e);
 			return PageResult.err();

@@ -202,9 +202,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			if (user.getType() == 0) {
 				throw new MyException("管理员不能冻结管理员");
 			}
-			if (user.getType() == 3) {
-				throw new MyException("管理员不能冻结阅卷用户");
-			}
+			//if (user.getType() == 3) {
+			//	throw new MyException("管理员不能冻结阅卷用户");
+			//}
 		}
 		if (getCurUser().getType() == 2) {
 			if (user.getType() == 0) {
