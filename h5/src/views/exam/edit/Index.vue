@@ -14,7 +14,7 @@
         <ExamUser ref="examUser" v-if="active === 3"></ExamUser>
         <ExamPublish v-if="active === 4"></ExamPublish>
         <div class="edit-bottom">
-            <div v-if="progressBar.percent > 0" class="edit-bottom-percent">
+            <div v-if="progressBar.percent > 0 && active >= 4" class="edit-bottom-percent">
                 <el-progress :percentage="progressBar.percent">{{ progressBar.msg }}</el-progress>
             </div>
             <el-button v-if="active >= 1 && paperShow != 'editor' && btnShow" type="primary" @click="active--">上一步</el-button>
