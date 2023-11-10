@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 		}
 		
 		if (se instanceof UnauthorizedException) {
-			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("未授权");
+			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("无访问权限");
 		}
 		if (se instanceof UnauthenticatedException) {
 			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("未登陆");

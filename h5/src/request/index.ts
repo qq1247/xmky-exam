@@ -38,10 +38,7 @@ http.interceptors.request.use(function (config) {
 http.interceptors.response.use(
     response => {
         if (response.data.code === 401) {// 鉴权失败，跳转到登录页
-            ElMessage.error(response.data.msg)
-            setTimeout(() => {
-                window.location.href = "/login"
-            }, 2000);
+            window.location.href = "/login"
         } else if (response.data.code === 500) {// 接口错误，提示错误
             ElMessage.error(response.data.msg)
         } else if (response.headers.authorization) {// 携带刷新令牌，替代当前令牌

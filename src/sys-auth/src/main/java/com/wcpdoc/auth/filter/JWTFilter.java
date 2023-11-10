@@ -91,7 +91,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		String tokenKey = String.format("TOKEN_%s", oldUserId);
 		String curToken = TokenCache.get(oldUserId);
 		if (curToken == null) {//缓存中没有令牌（过期清理或人工清理）
-			throw new AuthenticationException(String.format("用户【%s】令牌不存在", oldLoginName));
+			throw new AuthenticationException(String.format("已强制下线，请重新登录"));
 		}
 		
 		try {
@@ -112,7 +112,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 					return;
 				}
 				
-				throw new AuthenticationException(String.format("用户【%s】令牌过期【%s - %s】", oldLoginName, oldTokenId, curTokenId));
+				throw new AuthenticationException(String.format("已在别处登录，请重新登录"));
 			}
 			
 			Date curTime = new Date();
