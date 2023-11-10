@@ -459,7 +459,7 @@ async function next() {
                 .el-button {
                     position: absolute;
                     bottom: 5px;
-                    right: 5px;
+                    right: 100px;
                     display: none;
                 }
 

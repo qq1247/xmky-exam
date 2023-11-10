@@ -483,7 +483,7 @@ async function next() {
                 .el-button {
                     position: absolute;
                     bottom: 5px;
-                    right: 5px;
+                    right: 100px;
                     display: none;
                 }
                 .el-form-item {// 校验通过时，恢复和章节描述的距离
