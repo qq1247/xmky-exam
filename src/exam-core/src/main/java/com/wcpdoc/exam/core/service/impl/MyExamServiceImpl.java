@@ -547,12 +547,13 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myQuestion.setUserScore(BigDecimal.ZERO);// 先初始化用户分数为0，防止多次累加
 		boolean caseSensitive = !Arrays.asList(myQuestion.getMarkOptions()).contains(3);// 区分大小写
 		String myAnswer = caseSensitive ? myQuestion.getUserAnswer() : myQuestion.getUserAnswer().toLowerCase();// 获取用户答案
-		for (QuestionAnswer questionAnswer : questionAnswerList) {// 获取试题每个关键词
+		for (int i = 0; i < questionAnswerList.size(); i++) {// 获取试题每个关键词
+			QuestionAnswer questionAnswer = questionAnswerList.get(i);
 			String[] synonymAnswers = caseSensitive 
 					? questionAnswer.getAnswer().split("\n") 
 					: questionAnswer.getAnswer().toLowerCase().split("\n");
-			for (int i = 0; i < synonymAnswers.length; i++) {// 获取关键词的每个同义词
-				if (myAnswer.contains(synonymAnswers[i])) {// 用户答案和同义词对比，如果找到（对比条件不要反，用户答案是大段文字）
+			for (int j = 0; j < synonymAnswers.length; j++) {// 获取关键词的每个同义词
+				if (myAnswer.contains(synonymAnswers[j])) {// 用户答案和同义词对比，如果找到（对比条件不要反，用户答案是大段文字）
 					myQuestion.setUserScore(// 累计该同义词对应关键词的分数（从我的试题中取分数，因为组卷可能会修改分数）
 							BigDecimalUtil.newInstance(myQuestion.getUserScore()).add(myQuestion.getScores()[i]).getResult());
 					break;// 匹配到一个同义词就结束，继续对比下一个关键词
