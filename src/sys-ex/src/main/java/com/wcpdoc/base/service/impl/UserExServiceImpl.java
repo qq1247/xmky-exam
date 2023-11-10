@@ -70,7 +70,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 		EasyExcel.read(fileEx.getFile(), UserRowData.class, new PageReadListener<UserRowData>(userRowList -> {
 			for (UserRowData userRowData : userRowList) {
 				if (!ValidateUtil.isValid(userRowData.getName())) {
-					continue;// 添加后删除，excel还是能解析到。处理方式为姓名为空，直接处理下一行
+					continue;// excel添加名称后删除，还是能解析到。处理方式为姓名为空，直接处理下一行
 //					throw new MyException(String.format("姓名为必填项"));
 				}
 				if (!ValidateUtil.isValid(userRowData.getLoginName())) {
@@ -127,6 +127,8 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 				user.setUpdateTime(curTime);
 				user.setUpdateUserId(getCurUser().getId());
 				user.setState(1);
+				user.setType(1);
+				user.setParentId(getCurUser().getId());// 该接口只有admin可访问
 				userService.add(user);
 			}
 		})).sheet().doRead();
