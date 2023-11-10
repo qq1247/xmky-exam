@@ -79,7 +79,7 @@
         <!-- 问答题答案 -->
         <el-input 
             v-if="type === 5" 
-            :modelValue="userAnswerShow ? (userAnswers[0] || '') : (answers[0] || '')"
+            :modelValue="qaAnswer"
             @update:modelValue="(value: string) => userAnswers[0] = value"
             :rows="2" 
             placeholder="请输入答案"
@@ -139,21 +139,24 @@ const qaAnswer = computed({// 问答答案
     get() {
         // 如果是显示用户答案，返回用户答案
         if (userAnswerShow.value) {
-            return props.userAnswers[0] || ''
+            if (!props.userAnswers || !props.userAnswers[0]) {
+                return ''
+            }
+            return escape2Html(props.userAnswers[0])
         }
         
         // 否则返回标准答案
         if (props.type === 5 && props.markType === 1) {
             let answer = ''
             props.answers?.forEach((cur: string, index: number) => {
-                answer += `关键词${index + 1}：${cur.replaceAll('\n', '、')}\n`
+                answer += `关键词${index + 1}：${(escape2Html(cur) as string).replaceAll('\n', '、')}\n`
             })
     
             return answer
         }
     
         if (props.type === 5 && props.markType === 2) {
-            return props.answers[0] || ''
+            return escape2Html(props.answers[0])
         }
     
         return null
@@ -187,6 +190,28 @@ function errColor(curAnswer: string) {
             return 'var(--el-color-error)'
         }  
     }
+}
+
+function escape2Html(txt: string|string[]) {
+    if (typeof txt === 'string') {
+        return txt.replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&apos;', "'")
+            .replaceAll('&ldquo;', "“")
+            .replaceAll('&rdquo;', "”")
+    }
+
+    return (txt as string[]).map((t: string) => {
+        return t.replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&apos;', "'")
+            .replaceAll('&ldquo;', "“")
+            .replaceAll('&rdquo;', "”")
+    })
 }
 </script>
   
