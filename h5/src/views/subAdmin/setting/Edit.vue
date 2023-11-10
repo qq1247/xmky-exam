@@ -124,7 +124,6 @@ async function add() {
         ElMessage({
             message: `密码初始化：${data.initPwd}`,
             type: 'success',
-            duration: 0,
             showClose: true
         })
         router.push("/subAdmin")
@@ -147,7 +146,6 @@ async function edit() {
             ElMessage({
                 message: `密码初始化：${data.initPwd}`,
                 type: 'success',
-                duration: 0,
                 showClose: true
             })
         }

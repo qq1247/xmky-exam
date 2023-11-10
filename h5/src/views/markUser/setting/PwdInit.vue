@@ -41,7 +41,6 @@ async function pwdInit() {
     ElMessage({
         message: `密码初始化：${data.initPwd}`,
         type: 'success',
-        duration: 0,
         showClose: true
     })
 
