@@ -39,7 +39,8 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("ids")), "USER.ID IN ("+pageIn.get("ids")+")")
 				.addWhere(ValidateUtil.isValid(pageIn.get("parentId", Integer.class)), "USER.PARENT_ID = :PARENT_ID", pageIn.get("parentId", Integer.class))
 				.addWhere("USER.STATE != 0")
-				.addOrder("USER.UPDATE_TIME", Order.DESC);
+				.addOrder("USER.UPDATE_TIME", Order.DESC)// bug：导入用户时间一致，分页错误
+				.addOrder("USER.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "registTime", DateUtil.FORMAT_DATE_TIME, "lastLoginTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
