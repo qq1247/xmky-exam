@@ -1,47 +1,29 @@
 server:
   port: 8000
-  servlet:
-    context-path: /
-    jsp:
-      init-parameters:
-        development: development
 
 spring:
-  mvc:
-    view:
-      prefix: /WEB-INF/jsp/
-      suffix: .jsp
-    servlet:
-      load-on-startup: 1
   resources:
     static-locations: pc:./h5/;mobile:./m/
-  profiles:
-    active: dev
   servlet:
     multipart:
-      max-file-size: 100MB
+      max-file-size: 10MB
       max-request-size: 100MB
   datasource:
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    #url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    url: jdbc:p6spy:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
 
-hibernate:
-  naming:
-    physical-strategy: com.wcpdoc.core.hibernate.UpperCaseStrategy
-    
 runtime:
   monitor: true
   timeout: 1000
   exUrl: /api/report/server/parm
   
-logging:
-  config: config/log4j2.xml
-      
 token:
-    expireMinute: 1440
-    refreshMinute: 60
+  expireMinute: 1440
+  refreshMinute: 60
     
 sys:
   ver: 4.3.1

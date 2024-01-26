@@ -7,27 +7,29 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.IdUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.dao.FileDao;
 import com.wcpdoc.file.entity.File;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileExService;
 import com.wcpdoc.file.service.FileService;
+import com.wcpdoc.file.util.IdUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 附件服务层实现
@@ -35,17 +37,20 @@ import com.wcpdoc.file.service.FileService;
  * v1.0 zhanghc 2016-11-16下午10:13:48
  */
 @Service
+@Slf4j
 public class FileServiceImpl extends BaseServiceImp<File> implements FileService {
-	private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 	@Resource
 	private FileDao fileDao;
 	@Resource
 	private FileExService fileExService;
+	@Resource
+	protected HttpServletRequest request;
+	@Resource
+	protected HttpServletResponse response;
 
 	@Override
-	@Resource(name = "fileDaoImpl")
-	public void setDao(BaseDao<File> dao) {
-		super.dao = dao;
+	public RBaseDao<File> getDao() {
+		return null;
 	}
 
 	@Override
@@ -71,7 +76,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		String baseDir = getFileUploadDir();
 		String tempPath = "/temp";
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4), 
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
 				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
 		java.io.File tempUploadDir = new java.io.File(baseDir + tempPath + ymdPath);
 		if (!tempUploadDir.exists()) {
@@ -82,7 +87,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
 			String fileId = IdUtil.getInstance().nextId() + "";
-			java.io.File destFile = new java.io.File(String.format("%s%s%s", tempUploadDir.getAbsolutePath(), java.io.File.separator, fileId));
+			java.io.File destFile = new java.io.File(
+					String.format("%s%s%s", tempUploadDir.getAbsolutePath(), java.io.File.separator, fileId));
 			try {
 				multipartFile.transferTo(destFile);
 			} catch (Exception e) {
@@ -99,15 +105,15 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setState(0);
 			file.setUpdateUserId(getCurUser().getId());
 			file.setUpdateTime(new Date());
-			add(file);
+			save(file);
 
 			if (fileIds.length() > 0) {
 				fileIds.append(",");
 			}
 			fileIds.append(file.getId());
-			
+
 		}
-		
+
 		return fileIds.toString();
 	}
 
@@ -117,7 +123,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
-		File file = getEntity(id);
+		File file = getById(id);
 		if (file.getState() == 1) {
 			return;
 		}
@@ -126,8 +132,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		String baseDir = getFileUploadDir();
 		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, file.getPath()));
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4), java.io.File.separator, 
-				timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
+				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
 		file.setState(1);
 		file.setPath(String.format("%s%s%s", ymdPath, java.io.File.separator, tempFile.getName()));
 		file.setIp(request.getRemoteHost());
@@ -150,12 +156,13 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new MyException("参数错误：id");
 		}
 
-		File entity = getEntity(id);
+		File entity = getById(id);
 		if (entity == null) {
 			throw new MyException("id不存在");// 测试切换数据库时，文件找不到，报错太多，转成自定义异常，log打印一行就可以。
 		}
 		String baseDir = getFileUploadDir();
-		java.io.File file = new java.io.File(String.format("%s%s%s", baseDir, java.io.File.separator, entity.getPath()));
+		java.io.File file = new java.io.File(
+				String.format("%s%s%s", baseDir, java.io.File.separator, entity.getPath()));
 		if (!file.exists()) {
 			throw new MyException("附件不存在");
 		}
@@ -172,8 +179,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public void exportTemplate(String templateName){
-		try(InputStream input = this.getClass().getResourceAsStream("/res/"+templateName)) {
+	public void exportTemplate(String templateName) {
+		try (InputStream input = this.getClass().getResourceAsStream("/res/" + templateName)) {
 			String fileName = new String((templateName).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");
@@ -183,7 +190,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new MyException("读取文件错误");
 		}
 	}
-	
+
 	@Override
 	public String getFileUploadDir() {
 		java.io.File dbBakDir = new java.io.File(fileExService.getFileUploadDir());
@@ -196,11 +203,11 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
-		File fileOld = fileDao.getEntity(id);
+		File fileOld = getById(id);
 		if (fileOld == null) {
 			throw new MyException("参数错误：id");
 		}
-		
+
 		// 保存记录
 		File fileNew = new File();
 		try {
@@ -213,24 +220,24 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, fileOld.getPath()));
 		String fileId = IdUtil.getInstance().nextId() + "";
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4), java.io.File.separator, 
-				timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
+				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
 		fileNew.setState(1);
 		fileNew.setPath(String.format("%s%s%s", ymdPath, java.io.File.separator, fileId));
 		fileNew.setIp(request.getRemoteHost());
 		fileNew.setUpdateUserId(getCurUser().getId());
 		fileNew.setUpdateTime(new Date());
-		add(fileNew);
-		
+		save(fileNew);
+
 		// 复制文件
-		java.io.File destDir = new java.io.File(String.format("%s%s",  baseDir, fileNew.getPath()));
+		java.io.File destDir = new java.io.File(String.format("%s%s", baseDir, fileNew.getPath()));
 		try {
 			FileUtils.copyFile(tempFile, destDir);
 		} catch (Exception e) {
 			log.error("拷贝附件失败：{} 到 {}", tempFile.getAbsolutePath(), destDir.getAbsolutePath());
 			throw new MyException("拷贝附件失败");
 		}
-		
+
 		return fileNew.getId();
 	}
 }

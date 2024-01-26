@@ -20,18 +20,18 @@ import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.quartz.spi.OperableTrigger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.wcpdoc.quartz.exception.QuartzException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 定时任务工具类
  * 
  * v1.0 zhanghc 2019年7月5日上午10:31:15
  */
+@Slf4j
 public class QuartzUtil {
-	private static final Logger log = LoggerFactory.getLogger(QuartzUtil.class);
 	/** 作业名称前缀 */
 	private final static String JOB_NAME_PRE = "TASK_";
 	private static Scheduler scheduler;
@@ -57,16 +57,14 @@ public class QuartzUtil {
 	 * 
 	 * @param jobClass
 	 * @param jobId
-	 * @param cronExp
-	 * void
-	 * @throws QuartzException 
+	 * @param cronExp  void
+	 * @throws QuartzException
 	 */
 	public static void addJob(Class<? extends Job> jobClass, Integer jobId, String cronExp) throws QuartzException {
 		try {
 			JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(getJobKey(jobId)).build();
 
-			CronTrigger trigger = TriggerBuilder.newTrigger()
-					.withIdentity(getTriggerKey(jobId))
+			CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(jobId))
 					.withSchedule(CronScheduleBuilder.cronSchedule(cronExp).withMisfireHandlingInstructionDoNothing())
 					.build();
 
@@ -86,9 +84,8 @@ public class QuartzUtil {
 	 * v1.0 zhanghc 2019年7月5日上午11:48:32
 	 * 
 	 * @param jobId
-	 * @param cronExp
-	 * void
-	 * @throws QuartzException 
+	 * @param cronExp void
+	 * @throws QuartzException
 	 */
 	public static void updateJob(Class<? extends Job> jobClass, Integer jobId, String cronExp) throws QuartzException {
 		deleteJob(jobId);
@@ -100,9 +97,8 @@ public class QuartzUtil {
 	 * 
 	 * v1.0 zhanghc 2019年7月5日上午11:50:26
 	 * 
-	 * @param jobId
-	 * void
-	 * @throws QuartzException 
+	 * @param jobId void
+	 * @throws QuartzException
 	 */
 	public static void executeOnceJob(Integer jobId) throws QuartzException {
 		try {
@@ -121,9 +117,8 @@ public class QuartzUtil {
 	 * 
 	 * v1.0 zhanghc 2019年7月5日上午11:50:26
 	 * 
-	 * @param jobId
-	 * void
-	 * @throws QuartzException 
+	 * @param jobId void
+	 * @throws QuartzException
 	 */
 	public static void pauseJob(Integer jobId) throws QuartzException {
 		try {
@@ -142,9 +137,8 @@ public class QuartzUtil {
 	 * 
 	 * v1.0 zhanghc 2019年7月5日上午11:50:26
 	 * 
-	 * @param jobId
-	 * void
-	 * @throws QuartzException 
+	 * @param jobId void
+	 * @throws QuartzException
 	 */
 	public static void resumeJob(Integer jobId) throws QuartzException {
 		try {
@@ -163,9 +157,8 @@ public class QuartzUtil {
 	 * 
 	 * v1.0 zhanghc 2019年7月5日上午11:50:26
 	 * 
-	 * @param jobId
-	 * void
-	 * @throws QuartzException 
+	 * @param jobId void
+	 * @throws QuartzException
 	 */
 	public static void deleteJob(Integer jobId) throws QuartzException {
 		try {
@@ -200,7 +193,7 @@ public class QuartzUtil {
 	 * @param cronExp
 	 * @param num
 	 * @return List<Date>
-	 * @throws QuartzException 
+	 * @throws QuartzException
 	 */
 	public static List<Date> getRecentTriggerTime(String cronExp, int num) throws QuartzException {
 		CronTriggerImpl cronTrigger = new CronTriggerImpl();
@@ -221,7 +214,7 @@ public class QuartzUtil {
 	 * 
 	 * @param jobId
 	 * @return Trigger
-	 * @throws QuartzException 
+	 * @throws QuartzException
 	 */
 	public static Trigger getTrigger(Integer jobId) throws QuartzException {
 		try {
@@ -269,9 +262,8 @@ public class QuartzUtil {
 	 * 
 	 * v1.0 zhanghc 2019年7月6日上午10:01:52
 	 * 
-	 * @param scheduler
-	 * void
-	 * @throws QuartzException 
+	 * @param scheduler void
+	 * @throws QuartzException
 	 */
 	public static void setScheduler(Scheduler scheduler) throws QuartzException {
 		if (scheduler.equals(QuartzUtil.scheduler)) {
@@ -298,11 +290,12 @@ public class QuartzUtil {
 
 		QuartzUtil.scheduler = scheduler;
 	}
-	
+
 	/**
 	 * 校验cron表达式
 	 * 
 	 * v1.0 zhanghc 2019年9月13日下午6:30:30
+	 * 
 	 * @param cron
 	 * @return boolean
 	 */

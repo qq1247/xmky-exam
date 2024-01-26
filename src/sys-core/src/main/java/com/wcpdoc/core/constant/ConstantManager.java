@@ -10,5 +10,5 @@ public class ConstantManager {
 	public static final String ADMIN_LOGIN_NAME = "admin";
 	/** 子管理员登陆名称 */
 	public static final String SUB_ADMIN_LOGIN_NAME = "subAdmin";
-	
+
 }

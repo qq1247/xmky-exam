@@ -22,7 +22,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param scores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void addEx(Question question, String[] options, String[] answers, BigDecimal[] scores);
+	void addEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores);
 
 	/**
 	 * 试题修改
@@ -34,7 +34,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param scores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void updateEx(Question question, String[] options, String[] answers, BigDecimal[] scores);
+	void updateEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores);
 	
 	/**
 	 * 试题删除

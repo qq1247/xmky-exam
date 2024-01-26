@@ -35,5 +35,5 @@ public interface ExamQuestionService extends BaseService<ExamQuestion>{
 	 * @param questionId
 	 * @return List<ExamQuestion>
 	 */
-	List<ExamQuestion> getQuestionList(Integer questionId);
+	List<ExamQuestion> getList1(Integer questionId);
 }

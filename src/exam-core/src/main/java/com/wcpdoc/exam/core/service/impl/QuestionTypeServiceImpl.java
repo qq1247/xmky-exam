@@ -5,13 +5,14 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+
 /**
  * 题库服务层实现
  * 
@@ -25,23 +26,22 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private QuestionTypeExService questionTypeExService;
 
 	@Override
-	@Resource(name = "questionTypeDaoImpl")
-	public void setDao(BaseDao<QuestionType> dao) {
-		super.dao = dao;
+	public RBaseDao<QuestionType> getDao() {
+		return questionTypeDao;
 	}
-	
+
 	@Override
 	public void delEx(Integer id) {
 		// 数据校验
-		QuestionType entity = getEntity(id);
+		QuestionType entity = getById(id);
 		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-				throw new MyException("无操作权限");
+			throw new MyException("无操作权限");
 		}
 		// 删除题库
-		//entity.setUpdateTime(new Date());// 物理删除，不需要再记录
-		//entity.setUpdateUserId(getCurUser().getId());
-		del(entity.getId());
-		
+		// entity.setUpdateTime(new Date());// 物理删除，不需要再记录
+		// entity.setUpdateUserId(getCurUser().getId());
+		removeById(entity.getId());
+
 		// 删除题库扩展
 		questionTypeExService.delEx(entity);
 	}

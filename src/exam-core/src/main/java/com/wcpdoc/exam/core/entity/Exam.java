@@ -2,278 +2,45 @@ package com.wcpdoc.exam.core.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.wcpdoc.core.mybatis.IntTypeHandler;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.wcpdoc.core.util.StringUtil;
-import com.wcpdoc.core.util.ValidateUtil;
+import lombok.Data;
 
 /**
  * 考试实体
  * 
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
-@Entity
-@Table(name = "EXM_EXAM")
+@Data
+@TableName(value = "EXM_EXAM", autoResultMap = true)
 public class Exam {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID")
+	@TableId(type = IdType.AUTO)
 	private Integer id;
-	@Column(name = "NAME")
 	private String name;
-	@Column(name = "PAPER_NAME")
 	private String paperName;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "START_TIME")
 	private Date startTime;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "END_TIME")
 	private Date endTime;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_START_TIME")
 	private Date markStartTime;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_END_TIME")
 	private Date markEndTime;
-	@Column(name = "MARK_STATE")
 	private Integer markState;
-	@Column(name = "SCORE_STATE")
 	private Integer scoreState;
-	@Column(name = "RANK_STATE")
 	private Integer rankState;
-	@Column(name = "ANON_STATE")
 	private Integer anonState;
-	@Column(name = "PASS_SCORE")
 	private BigDecimal passScore;
-	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
-	@Column(name = "MARK_TYPE")
 	private Integer markType;
-	@Column(name = "SHOW_TYPE")
 	private Integer showType;
-	@Column(name = "GEN_TYPE")
 	private Integer genType;
-	@Column(name = "SXES")
-	private String sxes;
-	@Column(name = "STATE")
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> sxes;
 	private Integer state;
-	@Column(name = "CREATE_USER_ID")
 	private Integer createUserId;
-	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
-
-	public Date getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
-
-	public Date getMarkStartTime() {
-		return markStartTime;
-	}
-
-	public void setMarkStartTime(Date markStartTime) {
-		this.markStartTime = markStartTime;
-	}
-
-	public Date getMarkEndTime() {
-		return markEndTime;
-	}
-
-	public void setMarkEndTime(Date markEndTime) {
-		this.markEndTime = markEndTime;
-	}
-
-	/** 成绩查询（1：考试结束后；2：不公布；3：交卷后） */
-	public Integer getScoreState() {
-		return scoreState;
-	}
-
-	/** 成绩查询（1：考试结束后；2：不公布；3：交卷后） */
-	public void setScoreState(Integer scoreState) {
-		this.scoreState = scoreState;
-	}
-
-	/** 排名状态（1：公开；2：不公开） */
-	public Integer getRankState() {
-		return rankState;
-	}
-
-	/** 排名状态（1：公开；2：不公开） */
-	public void setRankState(Integer rankState) {
-		this.rankState = rankState;
-	}
-
-	public Integer getUpdateUserId() {
-		return updateUserId;
-	}
-
-	public void setUpdateUserId(Integer updateUserId) {
-		this.updateUserId = updateUserId;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	/** 0：删除；1：发布；2：暂停； */
-	public Integer getState() {
-		return state;
-	}
-
-	/** 0：删除；1：发布；2：暂停；*/
-	public void setState(Integer state) {
-		this.state = state;
-	}
-
-	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
-	public Integer getMarkState() {
-		return markState;
-	}
-
-	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
-	public void setMarkState(Integer markState) {
-		this.markState = markState;
-	}
-
-	/** 1：公开；2：不公开 */
-	public Integer getAnonState() {
-		return anonState;
-	}
-
-	/** 1：公开；2：不公开 */
-	public void setAnonState(Integer anonState) {
-		this.anonState = anonState;
-	}
-	
-	public Integer getShowType() {
-		return showType;
-	}
-
-	public void setShowType(Integer showType) {
-		this.showType = showType;
-	}
-
-	/** 1：人工组卷；2：随机组卷 */
-	public Integer getGenType() {
-		return genType;
-	}
-
-	/** 1：人工组卷；2：随机组卷 */
-	public void setGenType(Integer genType) {
-		this.genType = genType;
-	}
-
-	public BigDecimal getTotalScore() {
-		return totalScore;
-	}
-
-	public void setTotalScore(BigDecimal totalScore) {
-		this.totalScore = totalScore;
-	}
-
-	public BigDecimal getPassScore() {
-		return passScore;
-	}
-
-	public void setPassScore(BigDecimal passScore) {
-		this.passScore = passScore;
-	}
-
-	/** 1：客观题；2：主观题； */
-	public Integer getMarkType() {
-		return markType;
-	}
-
-	/** 1：客观题；2：主观题； */
-	public void setMarkType(Integer markType) {
-		this.markType = markType;
-	}
-
-	/** 选项（1：试题乱序；2：选项乱序；） */
-	public Integer[] getSxes() {
-		if (!ValidateUtil.isValid(sxes)) {
-			return new Integer[0];
-		}
-	
-		String[] markOptionStrArr = sxes.split(",");
-		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
-		for (int i = 0; i < markOptionStrArr.length; i++) {
-			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
-		}
-		return markOptionArr;
-	}
-
-	/** 选项（1：试题乱序；2：选项乱序；） */
-	public void setSxes(Integer[] sxes) {
-		if (!ValidateUtil.isValid(sxes)) {
-			this.sxes = null;
-			return;
-		}
-		
-		this.sxes = StringUtil.join(sxes);
-	}
-
-	public String getPaperName() {
-		return paperName;
-	}
-
-	public void setPaperName(String paperName) {
-		this.paperName = paperName;
-	}
-
-	public Integer getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(Integer createUserId) {
-		this.createUserId = createUserId;
-	}
 }

@@ -2,7 +2,8 @@ package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 
 /**
@@ -10,31 +11,41 @@ import com.wcpdoc.exam.core.entity.ExamQuestion;
  * 
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
-public interface ExamQuestionDao extends BaseDao<ExamQuestion>{
+public interface ExamQuestionDao extends RBaseDao<ExamQuestion> {
 
 	/**
-	 * 获取考试试题列表
+	 * 考试试题列表
 	 * 
 	 * v1.0 zhanghc 2022年5月25日下午5:29:52
+	 * 
 	 * @param examId
 	 * @return List<ExamQuestion>
 	 */
-	List<ExamQuestion> getList(Integer examId);
+	default List<ExamQuestion> getList(Integer examId) {
+		return selectList(new LambdaQueryWrapper<ExamQuestion>().eq(ExamQuestion::getExamId, examId)
+				.orderByAsc(ExamQuestion::getNo));
+	}
 
 	/**
-	 * 清空试卷
+	 * 试卷清空
 	 * 
 	 * v1.0 zhanghc 2023年3月23日上午11:03:15
+	 * 
 	 * @param examId void
 	 */
-	void clear(Integer examId);
+	default void paperClear(Integer examId) {
+		delete(new LambdaQueryWrapper<ExamQuestion>().eq(ExamQuestion::getExamId, examId));
+	}
 
 	/**
-	 * 获取试题列表
+	 * 考试试题列表
 	 * 
 	 * v1.0 zhanghc 2023年3月31日下午3:51:41
+	 * 
 	 * @param questionId
 	 * @return List<ExamQuestion>
 	 */
-	List<ExamQuestion> getQuestionList(Integer questionId);
+	default List<ExamQuestion> getList1(Integer questionId) {
+		return selectList(new LambdaQueryWrapper<ExamQuestion>().eq(ExamQuestion::getQuestionId, questionId));
+	}
 }

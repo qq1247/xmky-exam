@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.entity.ex;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 
 /**
@@ -11,16 +13,16 @@ public class ExamQuestionEx extends ExamQuestion {
 	private Integer questionType;
 	private Integer markType;
 	private String title;
-	private String[] options;
-	private String[] answers;
+	private List<String> options;
+	private List<String> answers;
 	private String analysis;
 
-	/** 类型（1：单选；2：多选；3：填空；4：判断；5：问答）*/
+	/** 类型（1：单选；2：多选；3：填空；4：判断；5：问答） */
 	public Integer getQuestionType() {
 		return questionType;
 	}
 
-	/** 类型（1：单选；2：多选；3：填空；4：判断；5：问答）*/
+	/** 类型（1：单选；2：多选；3：填空；4：判断；5：问答） */
 	public void setQuestionType(Integer questionType) {
 		this.questionType = questionType;
 	}
@@ -43,27 +45,27 @@ public class ExamQuestionEx extends ExamQuestion {
 		this.title = title;
 	}
 
-	public String[] getOptions() {
-		return options;
-	}
-
-	public void setOptions(String[] options) {
-		this.options = options;
-	}
-
-	public String[] getAnswers() {
-		return answers;
-	}
-
-	public void setAnswers(String[] answers) {
-		this.answers = answers;
-	}
-
 	public String getAnalysis() {
 		return analysis;
 	}
 
 	public void setAnalysis(String analysis) {
 		this.analysis = analysis;
+	}
+
+	public List<String> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<String> options) {
+		this.options = options;
+	}
+
+	public List<String> getAnswers() {
+		return answers;
+	}
+
+	public void setAnswers(List<String> answers) {
+		this.answers = answers;
 	}
 }

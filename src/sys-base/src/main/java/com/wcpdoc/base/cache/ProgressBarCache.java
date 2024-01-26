@@ -1,19 +1,19 @@
 package com.wcpdoc.base.cache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 
 import com.wcpdoc.base.entity.ProgressBar;
 import com.wcpdoc.cache.BaseEhCache;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 进度条缓冲
  * 
  * v1.0 zhanghc 2017年7月5日下午4:22:50
  */
+@Slf4j
 public class ProgressBarCache extends BaseEhCache {
-	private static final Logger log = LoggerFactory.getLogger(ProgressBarCache.class);
 	private static final String CACHE_NAME = "PROGRESS_BAR_CACHE";
 	
 	/**

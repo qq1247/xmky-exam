@@ -16,7 +16,7 @@ public class OnlineUser implements Serializable {
 	private Date updateTime;
 
 	public OnlineUser() {
-		
+
 	}
 
 	public OnlineUser(Integer id, String loginName, String ip) {
@@ -25,17 +25,17 @@ public class OnlineUser implements Serializable {
 		this.ip = ip;
 		this.updateTime = new Date();
 	}
-	
+
 	public OnlineUser(Integer id, String loginName, String ip, Date updateTime) {
 		this.id = id;
 		this.loginName = loginName;
 		this.ip = ip;
 		this.updateTime = updateTime;
 	}
-	
+
 	/**
-	 * 获取在线状态
-	 * 正常情况下，前端每隔30秒会请求一次服务器，如果半分钟内没有接受到请求，表示离线
+	 * 获取在线状态<br/>
+	 * 正常情况下，前端每隔30秒会请求一次服务器，如果半分钟内没有接受到请求，表示离线<br/>
 	 * 加5秒用于请求延时用
 	 * 
 	 * v1.0 zhanghc 2021年10月18日下午4:31:33 void

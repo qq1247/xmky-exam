@@ -23,14 +23,15 @@ import com.wcpdoc.core.service.OnlineUserService;
 public class OnlineUserInterceptor implements HandlerInterceptor {
 	@Resource
 	private OnlineUserService onlineUserService;
-	
+
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		LoginUser loginUser = UserContext.get();
 		if (loginUser == null) {
 			return true;
 		}
-		
+
 		OnlineUser onlineUser = onlineUserService.getEntity(loginUser.getId());
 		if (onlineUser != null) {
 			onlineUser.setIp(request.getRemoteHost());
@@ -39,7 +40,7 @@ public class OnlineUserInterceptor implements HandlerInterceptor {
 			onlineUserService.update(onlineUser);
 			return true;
 		}
-		
+
 		onlineUser = new OnlineUser();
 		onlineUser.setIp(request.getRemoteHost());
 		onlineUser.setUpdateTime(new Date());

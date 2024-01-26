@@ -48,11 +48,11 @@ public class TreeUtil {
 //		研发部	研发2组	导致相互上下级：左侧唯一
 //		研发3组	山西总部	没有上级：需要在左侧存在
 //		List<Tree> list = new ArrayList<>();
-//		list.add(new MyTree("研发2组", "研发部"));
-//		list.add(new MyTree("研发1组", "研发部"));
-//		list.add(new MyTree("软件部", null));
-//		list.add(new MyTree("研发部", "软件部"));
-//		list.add(new MyTree("测试部", "软件部"));
+//		list.save(new MyTree("研发2组", "研发部"));
+//		list.save(new MyTree("研发1组", "研发部"));
+//		list.save(new MyTree("软件部", null));
+//		list.save(new MyTree("研发部", "软件部"));
+//		list.save(new MyTree("测试部", "软件部"));
 //		
 //		List<Tree> tree = TreeUtil.getTree(list);
 	}

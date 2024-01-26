@@ -10,8 +10,6 @@ import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 
@@ -24,13 +22,15 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * jwt过滤器
  * 
  * v1.0 zhanghc 2021年3月2日上午9:52:04
  */
+@Slf4j
 public class JWTFilter extends BasicHttpAuthenticationFilter {
-	private static final Logger log = LoggerFactory.getLogger(JWTFilter.class);
 	
 	/**
 	 * 是否允许访问

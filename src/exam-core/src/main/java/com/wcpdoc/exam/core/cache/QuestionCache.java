@@ -40,7 +40,7 @@ public class QuestionCache extends BaseEhCache {
 			return question;
 		}
 		QuestionService questionService = SpringUtil.getBean(QuestionService.class);
-		question = questionService.getEntity(id);
+		question = questionService.getById(id);
 		if (question != null) {
 			cache.put(key, question);
 			return question;

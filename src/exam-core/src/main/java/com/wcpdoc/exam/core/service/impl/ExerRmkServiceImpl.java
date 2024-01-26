@@ -3,13 +3,15 @@ package com.wcpdoc.exam.core.service.impl;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -33,14 +35,14 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 	@Resource
 	private QuestionService questionService;
 	@Resource
+	@Lazy
 	private ExerService exerService;
 
 	@Override
-	@Resource(name = "exerRmkDaoImpl")
-	public void setDao(BaseDao<ExerRmk> dao) {
-		super.dao = dao;
+	public RBaseDao<ExerRmk> getDao() {
+		return exerRmkDao;
 	}
-	
+
 	@Override
 	public void rmk(ExerRmk exerRmk, Boolean anon) {
 		// 数据有效性校验
@@ -56,7 +58,7 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 		if (!ValidateUtil.isValid(anon)) {
 			throw new MyException("参数错误：anon");
 		}
-		Exer exer = exerService.getEntity(exerRmk.getExerId());
+		Exer exer = exerService.getById(exerRmk.getExerId());
 		if (exer.getState() == 0) {
 			throw new MyException("无权限");
 		}
@@ -69,14 +71,14 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 		if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
 			throw new MyException("无权限");
 		}
-		Question question = questionService.getEntity(exerRmk.getQuestionId());
+		Question question = questionService.getById(exerRmk.getQuestionId());
 		if (question.getQuestionTypeId().intValue() != exer.getQuestionTypeId().intValue()) {
 			throw new MyException("无权限");
 		}
 		if (exer.getRmkState() == 2) {
 			throw new MyException("评论已关闭");
 		}
-		
+
 		// 评论添加
 		exerRmk.setLikeNum(0);
 		exerRmk.setState(1);
@@ -85,21 +87,21 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 			exerRmk.setUpdateUserId(getCurUser().getId());
 		}
 		exerRmk.setUpdateTime(new Date());
-		add(exerRmk);
+		save(exerRmk);
 	}
 
 	@Override
 	public void like(Integer id) {
-		ExerRmk exerRmk = getEntity(id);
-		Set<Integer> likeUserIdSet = new HashSet<Integer>(Arrays.asList(exerRmk.getLikeUserIds()));
-		if (likeUserIdSet.contains(getCurUser().getId())) {// 点过赞，取消
-			likeUserIdSet.remove(getCurUser().getId());
+		ExerRmk exerRmk = getById(id);
+		List<Integer> likeUserIdList = exerRmk.getLikeUserIds();
+		if (likeUserIdList.contains(getCurUser().getId())) {// 点过赞，取消
+			likeUserIdList.remove(getCurUser().getId());
 		} else {// 没点赞，添加
-			likeUserIdSet.add(getCurUser().getId());
+			likeUserIdList.add(getCurUser().getId());
 		}
-		
-		exerRmk.setLikeUserIds(likeUserIdSet.toArray(new Integer[likeUserIdSet.size()]));
-		exerRmk.setLikeNum(likeUserIdSet.size());// 点赞影响页面排序，可能漏数据，因为只是评论，不影响整体效果，不在做定时任务延时处理
-		update(exerRmk);
+
+		exerRmk.setLikeUserIds(likeUserIdList);
+		exerRmk.setLikeNum(likeUserIdList.size());// 点赞影响页面排序，可能漏数据，因为只是评论，不影响整体效果，不在做定时任务延时处理
+		updateById(exerRmk);
 	}
 }

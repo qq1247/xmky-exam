@@ -2,6 +2,7 @@ package com.wcpdoc.sys.service.impl;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.cache.ParmCache;
@@ -20,17 +21,18 @@ import com.wcpdoc.notify.service.EmailExService;
 @Service
 public class EmailExServiceImpl implements EmailExService {
 	@Resource
+	@Lazy
 	private ParmService parmService;
 
 	@Override
 	public Email getEmail() throws EmailException {
 		Parm parm = ParmCache.get();
-		if (!ValidateUtil.isValid(parm.getEmailHost()) || !ValidateUtil.isValid(parm.getEmailUserName()) || 
-				!ValidateUtil.isValid(parm.getEmailPwd()) || !ValidateUtil.isValid(parm.getEmailProtocol()) || 
-				!ValidateUtil.isValid(parm.getEmailEncode())) {
+		if (!ValidateUtil.isValid(parm.getEmailHost()) || !ValidateUtil.isValid(parm.getEmailUserName())
+				|| !ValidateUtil.isValid(parm.getEmailPwd()) || !ValidateUtil.isValid(parm.getEmailProtocol())
+				|| !ValidateUtil.isValid(parm.getEmailEncode())) {
 			throw new EmailException("请配置系统参数：邮件相关");
 		}
-		
+
 		Email email = new Email();
 		email.setHost(parm.getEmailHost());
 		email.setUserName(parm.getEmailUserName());

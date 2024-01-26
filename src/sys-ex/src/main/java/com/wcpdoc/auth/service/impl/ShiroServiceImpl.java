@@ -31,17 +31,17 @@ public class ShiroServiceImpl implements ShiroService {
 	public AuthUser getUser(String loginName) {
 		User user = userService.getUser(loginName);
 		return new AuthUser() {
-			
+
 			@Override
 			public String getName() {
 				return user.getName();
 			}
-			
+
 			@Override
 			public String getLoginName() {
 				return user.getLoginName();
 			}
-			
+
 			@Override
 			public Integer getId() {
 				return user.getId();
@@ -57,7 +57,7 @@ public class ShiroServiceImpl implements ShiroService {
 	@Override
 	public List<String> getRoleList(String roles) {
 		List<String> roleList = new ArrayList<String>();
-		if(ValidateUtil.isValid(roles)){
+		if (ValidateUtil.isValid(roles)) {
 			String[] split = roles.split(",");
 			for (String role : split) {
 				roleList.add(role);

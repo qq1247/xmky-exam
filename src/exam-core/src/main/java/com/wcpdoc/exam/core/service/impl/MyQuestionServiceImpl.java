@@ -4,9 +4,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.MyQuestionDao;
 import com.wcpdoc.exam.core.entity.MyQuestion;
@@ -26,12 +27,12 @@ public class MyQuestionServiceImpl extends BaseServiceImp<MyQuestion> implements
 	@Resource
 	private ExamQuestionService examQuestionService;
 	@Resource
+	@Lazy
 	private MyExamService myExamService;
-	
+
 	@Override
-	@Resource(name = "myQuestionDaoImpl")
-	public void setDao(BaseDao<MyQuestion> dao) {
-		super.dao = dao;
+	public RBaseDao<MyQuestion> getDao() {
+		return myQuestionDao;
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class MyQuestionServiceImpl extends BaseServiceImp<MyQuestion> implements
 
 	@Override
 	public void clear(Integer examId) {
-		myQuestionDao.clear(examId);
+		myQuestionDao.paperClear(examId);
 	}
 
 }

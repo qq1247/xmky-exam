@@ -16,7 +16,7 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgExService;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.TreeUtil;
@@ -38,6 +38,11 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 	private OrgService orgService;
 	@Resource
 	private FileService fileService;
+	
+	@Override
+	public RBaseDao<Object> getDao() {
+		return null;
+	}
 
 	@Override
 	public void delEx(Org org) {
@@ -45,11 +50,6 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 		if (ValidateUtil.isValid(userList)) {
 			throw new MyException("当前机构下存在用户");
 		}
-	}
-
-	@Override
-	public void setDao(BaseDao<Object> dao) {
-		
 	}
 
 	/**
@@ -124,4 +124,5 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 			}
 		}
 	}
+
 }

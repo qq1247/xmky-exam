@@ -3,8 +3,6 @@ package com.wcpdoc.core.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -13,14 +11,16 @@ import org.springframework.web.servlet.ModelAndView;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 耗时拦截器
  * 
  * v1.0 zhanghc 2021年10月15日上午9:33:58
  */
 @Component
+@Slf4j
 public class RunTimeInterceptor implements HandlerInterceptor {
-	private static final Logger log = LoggerFactory.getLogger(RunTimeInterceptor.class);
 	private static final ThreadLocal<Long> context = new ThreadLocal<>();
 	@Value("${runtime.timeout}")
 	private Integer TIME_OUT;// 超时时间
@@ -66,7 +66,8 @@ public class RunTimeInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
 		context.remove();// postHandle抛异常也能保证该代码执行，断点往上翻代码查阅。
 	}
 }

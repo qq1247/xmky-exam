@@ -21,28 +21,31 @@ import com.wcpdoc.core.service.UserContextService;
 public class UserContextInterceptor implements HandlerInterceptor {
 	@Resource
 	private UserContextService userContextService;
+
 	/**
 	 * 请求开始前，解析当前登录用户，绑定到当前线程上
 	 * 
 	 */
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		LoginUser user = userContextService.getUser(request, response, handler);
 		if (!userContextService.valide(user)) { // 解决后台强制退出后，前台访问任意接口携带令牌，导致再次被解析，显示用户在线的问题
 			return true;
 		}
-		
+
 		UserContext.set(user);
 		return true;
 	}
-	
+
 	/**
 	 * 请求完成时，不处理
 	 * 
 	 */
 	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-		
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+
 	}
 
 	/**
@@ -50,7 +53,8 @@ public class UserContextInterceptor implements HandlerInterceptor {
 	 * 
 	 */
 	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
 		UserContext.remove();
 	}
 }

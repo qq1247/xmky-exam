@@ -7,9 +7,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
@@ -38,23 +39,24 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	@Resource
 	private MyMarkDao myMarkDao;
 	@Resource
+	@Lazy
 	private MyExamService myExamService;
 	@Resource
+	@Lazy
 	private ExamService examService;
 	@Resource
 	private MyQuestionService myQuestionService;
 
 	@Override
-	@Resource(name = "myMarkDaoImpl")
-	public void setDao(BaseDao<MyMark> dao) {
-		super.dao = dao;
+	public RBaseDao<MyMark> getDao() {
+		return myMarkDao;
 	}
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		return myMarkDao.getListpage(pageIn);
 	}
-	
+
 	@Override
 	public PageOut getUserListpage(PageIn pageIn) {
 		return myMarkDao.getUserListpage(pageIn);
@@ -74,8 +76,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (!ValidateUtil.isValid(num) || num < 1 || num > 100) {
 			throw new MyException("参数错误：num");
 		}
-		
-		Exam exam = examService.getEntity(examId);
+
+		Exam exam = examService.getById(examId);
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
 		}
@@ -95,22 +97,22 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (exam.getMarkState() == 3) {
 			throw new MyException("阅卷已结束");
 		}
-		
+
 		// 随机分配试卷
 		List<MyExam> myExamList = myExamService.getList(examId);
 		Collections.shuffle(myExamList);
 		for (MyExam myExam : myExamList) {
 			if (!ValidateUtil.isValid(myExam.getMarkUserId())) {
 				myExam.setMarkUserId(getCurUser().getId());
-				myExamService.update(myExam);
-				
+				myExamService.updateById(myExam);
+
 				if (--num < 1) {
 					break;
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void scoreUpdate(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
 		// 校验数据有效性
@@ -133,12 +135,12 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("未参与考试");
 		}
-		
+
 		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
 		if (myQuestion == null) {
 			throw new MyException("未参与考试");
 		}
-		Exam exam = examService.getEntity(examId);
+		Exam exam = examService.getById(examId);
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
 		}
@@ -157,7 +159,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		if (exam.getMarkState() == 1) {
 			throw new MyException("正在处理自动阅卷部分，请稍后");
-		} 
+		}
 		if (exam.getMarkState() == 3) {
 			throw new MyException("阅卷已结束");
 		}
@@ -174,7 +176,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (myExam.getState() == 1) {
 			throw new MyException("未参与考试，阅卷无效");
 		}
-		
+
 		// 打分
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
 			myExam.setMarkStartTime(new Date());
@@ -185,7 +187,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myQuestion.setUserScore(userScore);
 		myQuestion.setMarkTime(new Date());
 		myQuestion.setMarkUserId(getCurUser().getId());
-		myQuestionService.update(myQuestion);
+		myQuestionService.updateById(myQuestion);
 	}
 
 	@Override
@@ -204,8 +206,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("未参与考试");
 		}
-		
-		Exam exam = examService.getEntity(examId);
+
+		Exam exam = examService.getById(examId);
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
 		}
@@ -224,7 +226,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		if (exam.getMarkState() == 1) {
 			throw new MyException("正在处理自动阅卷部分，请稍后");
-		} 
+		}
 		if (exam.getMarkState() == 3) {
 			throw new MyException("阅卷已结束");
 		}
@@ -238,7 +240,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (unMarkNum > 0) {
 			throw new MyException(String.format("剩余%s道未阅", unMarkNum));
 		}
-		
+
 		// 阅卷
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		for (MyQuestion myQuestion : myQuestionList) {
@@ -246,10 +248,10 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 				totalScore.add(myQuestion.getUserScore());
 			}
 		}
-		
+
 		myExam.setTotalScore(totalScore.getResult());
 		myExam.setMarkState(3);
 		myExam.setAnswerState(exam.getPassScore().doubleValue() <= myExam.getTotalScore().doubleValue() ? 1 : 2);
-		myExamService.update(myExam);
+		myExamService.updateById(myExam);
 	}
 }

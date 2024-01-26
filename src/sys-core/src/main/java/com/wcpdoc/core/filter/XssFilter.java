@@ -15,10 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * xss过滤器
@@ -27,41 +23,34 @@ import com.alibaba.fastjson.JSONObject;
  */
 @WebFilter
 public class XssFilter implements Filter {
-	private static final Logger log = LoggerFactory.getLogger(XssFilter.class);
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        
-    }
-	
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
- 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-// 		if (httpServletRequest.getRequestURI().equals("/api/question/add") 
-// 				|| httpServletRequest.getRequestURI().equals("/api/question/edit")
-// 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/add") 
-// 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/edit")
-// 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") 
-// 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit")
-// 				|| httpServletRequest.getRequestURI().startsWith("/doc")) {
-// 			chain.doFilter(httpServletRequest, response);
-// 			return;
-// 		}
- 		
-		if (log.isDebugEnabled()) {
-			log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
-		}
-		XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
-		chain.doFilter(xssHttpServletRequestWrapper, response);
-		if (log.isDebugEnabled()) {
-			log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
-		}
+	public void init(FilterConfig filterConfig) throws ServletException {
+
 	}
-	
+
 	@Override
-    public void destroy() {
- 
-    }
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+
+//		if (log.isDebugEnabled()) {
+//			log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(),
+//					JSONObject.toJSONString(httpServletRequest.getParameterMap()));
+//		}
+		XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(
+				httpServletRequest);
+		chain.doFilter(xssHttpServletRequestWrapper, response);
+//		if (log.isDebugEnabled()) {
+//			log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(),
+//					JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
+//		}
+	}
+
+	@Override
+	public void destroy() {
+
+	}
 }
 
 /**
@@ -95,7 +84,7 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 		if (values == null) {
 			return null;
 		}
-		
+
 		int count = values.length;
 		String[] encodedValues = new String[count];
 		for (int i = 0; i < count; i++) {
@@ -125,8 +114,8 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * 覆盖getHeader方法，将参数名和参数值都做xss过滤。 如果需要获得原始的值，则通过super.getHeaders(name)来获取
-	 * getHeaderNames 也可能需要覆盖
+	 * 覆盖getHeader方法，将参数名和参数值都做xss过滤。 <br/>
+	 * 如果需要获得原始的值，则通过super.getHeaders(name)来获取 getHeaderNames 也可能需要覆盖
 	 */
 	@Override
 	public String getHeader(String name) {
@@ -138,7 +127,7 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	private String cleanXSS(String valueP) {
-		//String ssString = "<alert>(123)ni你我wo(*&^%$#@!)</alert>";
+		// String ssString = "<alert>(123)ni你我wo(*&^%$#@!)</alert>";
 		return StringEscapeUtils.escapeHtml3(valueP);
 	}
 }

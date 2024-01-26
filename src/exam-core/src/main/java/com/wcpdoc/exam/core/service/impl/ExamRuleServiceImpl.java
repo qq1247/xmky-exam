@@ -4,9 +4,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.ExamRuleDao;
 import com.wcpdoc.exam.core.entity.ExamRule;
@@ -30,16 +31,16 @@ public class ExamRuleServiceImpl extends BaseServiceImp<ExamRule> implements Exa
 	@Resource
 	private QuestionService questionService;
 	@Resource
+	@Lazy
 	private ExamService examService;
 	@Resource
 	private ExamQuestionService examQuestionService;
-	
+
 	@Override
-	@Resource(name = "examRuleDaoImpl")
-	public void setDao(BaseDao<ExamRule> dao) {
-		super.dao = dao;
+	public RBaseDao<ExamRule> getDao() {
+		return examRuleDao;
 	}
-	
+
 	@Override
 	public List<ExamRule> getList(Integer examId) {
 		return examRuleDao.getList(examId);
@@ -47,6 +48,6 @@ public class ExamRuleServiceImpl extends BaseServiceImp<ExamRule> implements Exa
 
 	@Override
 	public void clear(Integer examId) {
-		examRuleDao.clear(examId);
+		examRuleDao.paperClear(examId);
 	}
 }

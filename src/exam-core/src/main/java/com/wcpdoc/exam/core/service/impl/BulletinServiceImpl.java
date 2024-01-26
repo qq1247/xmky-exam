@@ -4,7 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.BulletinDao;
 import com.wcpdoc.exam.core.entity.Bulletin;
@@ -21,8 +21,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	private BulletinDao bulletinDao;
 
 	@Override
-	@Resource(name = "bulletinDaoImpl")
-	public void setDao(BaseDao<Bulletin> dao) {
-		super.dao = dao;
+	public RBaseDao<Bulletin> getDao() {
+		return bulletinDao;
 	}
 }

@@ -2,8 +2,7 @@ package com.wcpdoc.notify.service.impl;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
@@ -13,16 +12,19 @@ import com.wcpdoc.notify.exception.EmailException;
 import com.wcpdoc.notify.service.EmailExService;
 import com.wcpdoc.notify.service.EmailService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 资源扩展服务层实现
  * 
  * v1.0 zhanghc 2016-6-11下午8:57:40
  */
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
-	private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 	private JavaMailSender javaMailSender;
 	@Resource
+	@Lazy
 	private EmailService emailService;
 	@Resource
 	private EmailExService emailExService;
@@ -41,7 +43,8 @@ public class EmailServiceImpl implements EmailService {
 					javaMailSenderImpl.setProtocol(email.getProtocol());
 					javaMailSenderImpl.setDefaultEncoding(email.getEncode());
 					javaMailSender = javaMailSenderImpl;
-					log.info("初始化邮件服务成功：{},{},{},{}", email.getHost(), email.getUserName(), email.getProtocol(), email.getEncode());
+					log.info("初始化邮件服务成功：{},{},{},{}", email.getHost(), email.getUserName(), email.getProtocol(),
+							email.getEncode());
 				}
 			}
 		}

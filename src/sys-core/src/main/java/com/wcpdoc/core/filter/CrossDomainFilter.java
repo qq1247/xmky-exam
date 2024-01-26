@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 public class CrossDomainFilter implements Filter {
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		request.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=utf-8");
 		HttpServletResponse httpServletResponse = (HttpServletResponse) response;

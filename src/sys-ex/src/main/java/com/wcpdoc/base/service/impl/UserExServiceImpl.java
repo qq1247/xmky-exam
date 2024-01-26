@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.excel.EasyExcel;
@@ -18,7 +19,7 @@ import com.wcpdoc.base.entity.UserRowData;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -39,18 +40,24 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 	@Resource
 	private OrgService orgService;
 	@Resource
+	@Lazy
 	private UserService userService;
 
+	@Override
+	public RBaseDao<Object> getDao() {
+		return null;
+	}
+
 	/**
-	 * 用户导入表结构
-	 * 						用户导入
-	 * 				说明：密码不填，默认为111111	
-	 * 姓名*	登录账号*	机构名称*	密码		邮箱			手机号
-	 * 张三	zs		山西分部	s36852	xm@qq.com	13000000000
-	 * 李四	ls		山西软件部			
-	 * 王五	ww		山西运维部		
-	 * 赵六	zl		山西研发组		
-	 * 田七	tq		山西测试组		
+	 * 用户导入表结构<br/>
+	 * 用户导入<br/>
+	 * 说明：密码不填，默认为111111 <br/>
+	 * 姓名* 登录账号* 机构名称* 密码 邮箱 手机号<br/>
+	 * 张三 zs 山西分部 s36852 xm@qq.com 13000000000<br/>
+	 * 李四 ls 山西软件部 <br/>
+	 * 王五 ww 山西运维部 <br/>
+	 * 赵六 zl 山西研发组 <br/>
+	 * 田七 tq 山西测试组 <br/>
 	 */
 	@Override
 	public void xlsImport(Integer fileId) {
@@ -65,7 +72,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 		for (User user : userList) {
 			userCache.put(user.getLoginName(), user);
 		}
-		
+
 		FileEx fileEx = fileService.getFileEx(fileId);
 		EasyExcel.read(fileEx.getFile(), UserRowData.class, new PageReadListener<UserRowData>(userRowList -> {
 			for (UserRowData userRowData : userRowList) {
@@ -83,7 +90,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 					throw new MyException(String.format("机构不存在：%s", userRowData.getOrgName()));
 				}
 			}
-			
+
 			// 如果存在则更新
 			Date curTime = new Date();
 			for (UserRowData userRowData : userRowList) {
@@ -105,10 +112,10 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 					}
 					user.setUpdateTime(curTime);
 					user.setUpdateUserId(getCurUser().getId());
-					userService.update(user);
+					userService.updateById(user);
 					continue;
 				}
-				
+
 				// 如果不存在则添加
 				user = new User();
 				user.setLoginName(userRowData.getLoginName());
@@ -120,22 +127,18 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 				if (ValidateUtil.isValid(userRowData.getPhone())) {
 					user.setPhone(userRowData.getPhone());
 				}
-				user.setPwd(userService.getEncryptPwd(user.getLoginName(), 
+				user.setPwd(userService.getEncryptPwd(user.getLoginName(),
 						ValidateUtil.isValid(userRowData.getPwd()) ? userRowData.getPwd() : "111111"));// 初始化密码
-				
+
 				user.setRegistTime(curTime);
 				user.setUpdateTime(curTime);
 				user.setUpdateUserId(getCurUser().getId());
 				user.setState(1);
 				user.setType(1);
 				user.setParentId(getCurUser().getId());// 该接口只有admin可访问
-				userService.add(user);
+				userService.save(user);
 			}
 		})).sheet().doRead();
 	}
 
-	@Override
-	public void setDao(BaseDao<Object> dao) {
-		
-	}
 }

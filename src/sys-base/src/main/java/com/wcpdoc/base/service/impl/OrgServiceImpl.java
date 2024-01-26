@@ -9,9 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.dao.OrgDao;
 import com.wcpdoc.base.entity.Org;
-import com.wcpdoc.base.service.OrgExService;
 import com.wcpdoc.base.service.OrgService;
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -25,13 +24,12 @@ import com.wcpdoc.core.util.ValidateUtil;
 public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	@Resource
 	private OrgDao orgDao;
-	@Resource
-	private OrgExService orgExService;
+//	@Resource
+//	private OrgExService orgExService;
 
 	@Override
-	@Resource(name = "orgDaoImpl")
-	public void setDao(BaseDao<Org> dao) {
-		super.dao = dao;
+	public RBaseDao<Org> getDao() {
+		return orgDao;
 	}
 
 	@Override
@@ -49,39 +47,39 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		if (existCode(org)) {
 			throw new MyException("编码已存在");
 		}
-		
+
 		// 添加机构
 		org.setUpdateUserId(getCurUser().getId());
 		org.setUpdateTime(new Date());
 		org.setState(1);
-		add(org);
-		
+		save(org);
+
 		// 更新父子关系
-		Org parentOrg = orgDao.getEntity(org.getParentId());
+		Org parentOrg = getById(org.getParentId());
 		org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
 		org.setLevel(org.getParentIds().split("_").length - 1);
-		update(org);
+		updateById(org);
 	}
 
 	@Override
 	public void delEx(Integer id) {
 		// 校验数据有效性
-		if (id == 1) { //不包括根机构
+		if (id == 1) { // 不包括根机构
 			return;
 		}
 		List<Org> orgList = orgDao.getList(id);
 		if (ValidateUtil.isValid(orgList)) {
 			throw new MyException("存在子机构，不允许删除");
 		}
-		
+
 		// 删除机构
-		Org org = getEntity(id);
-		orgExService.delEx(org);
-		
+		Org org = getById(id);
+		// orgExService.delEx(org);
+
 		org.setState(0);
 		org.setUpdateTime(new Date());
 		org.setUpdateUserId(getCurUser().getId());
-		update(org);
+		updateById(org);
 	}
 
 	@Override
@@ -97,9 +95,9 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 			throw new MyException("源机构和目标机构一致");
 		}
 
-		Org source = getEntity(sourceId);
-		Org target = getEntity(targetId);
-		
+		Org source = getById(sourceId);
+		Org target = getById(targetId);
+
 		if (target.getParentIds().contains(source.getParentIds())) {
 			throw new MyException("父机构不能移动到子机构下");
 		}
@@ -108,19 +106,19 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		source.setParentId(target.getId());
 		source.setParentIds(String.format("%s%s_", target.getParentIds(), source.getId()));
 		source.setLevel(source.getParentIds().split("_").length - 1);
-		update(source);
-		
+		updateById(source);
+
 		List<Org> subSourceList = orgDao.getList(source.getId());
 		doMove(source, subSourceList);
 	}
-	
+
 	private void doMove(Org target, List<Org> subTargetList) {
 		for (Org subTarget : subTargetList) {
 			subTarget.setParentId(target.getId());
 			subTarget.setParentIds(String.format("%s%s_", target.getParentIds(), subTarget.getId()));
 			subTarget.setLevel(subTarget.getParentIds().split("_").length - 1);
-			update(subTarget);
-			
+			orgDao.updateById(subTarget);
+
 			List<Org> subSubTargetList = orgDao.getList(subTarget.getId());
 			if (ValidateUtil.isValid(subSubTargetList)) {
 				doMove(subTarget, subSubTargetList);
@@ -128,27 +126,11 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		}
 	}
 
-	/**
-	 * 名称是否已存在
-	 * 
-	 * v1.0 zhanghc 2016年7月9日下午11:48:30
-	 * 
-	 * @param org
-	 * @return boolean
-	 */
 	@Override
 	public boolean existName(Org org) {
 		return orgDao.existName(org.getName(), org.getId());
 	}
-	
-	/**
-	 * 编码是否已存在
-	 * 
-	 * v1.0 zhanghc 2016年7月9日下午11:48:30
-	 * 
-	 * @param org
-	 * @return boolean
-	 */
+
 	@Override
 	public boolean existCode(Org org) {
 		return orgDao.existCode(org.getCode(), org.getId());

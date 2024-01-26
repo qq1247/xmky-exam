@@ -46,7 +46,7 @@ public class PageResultEx extends PageResult {
 		if (this.data == null) {
 			this.data = new HashMap<>();
 		}
-		((Map<String, Object>)this.data).put(key, value);
+		((Map<String, Object>) this.data).put(key, value);
 		return this;
 	}
 }

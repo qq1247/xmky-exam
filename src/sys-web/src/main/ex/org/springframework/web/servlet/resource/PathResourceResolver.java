@@ -172,7 +172,7 @@ public class PathResourceResolver extends AbstractResourceResolver {
 			if (!request.getRequestURI().startsWith("/script/markdown")) {
 				List<Resource> myLocations = new ArrayList<>();
 				Device device = deviceResolver.resolveDevice(request);
-				myLocations.add(new FileUrlResource(LOCATIONS_CACHE.get(device.isNormal() ? "pc" : "mobile")));
+				myLocations.save(new FileUrlResource(LOCATIONS_CACHE.get(device.isNormal() ? "pc" : "mobile")));
 				locations = myLocations;
 			}
 		} catch (MalformedURLException e) {

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.base.dao.DictDao;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.service.DictService;
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 
 /**
@@ -22,14 +22,12 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 	@Resource
 	private DictDao dictDao;
 
-	@Override
-	@Resource(name = "dictDaoImpl")
-	public void setDao(BaseDao<Dict> dao) {
-		super.dao = dao;
+	public RBaseDao<Dict> getDao() {
+		return dictDao;
 	}
 
 	@Override
 	public List<Dict> getList(String index) {
-		return dictDao.getListByIndex(index);
+		return dictDao.getList(index);
 	}
 }

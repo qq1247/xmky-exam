@@ -5,7 +5,7 @@ import java.io.File;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.cache.ParmCache;
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.file.service.FileExService;
 
@@ -17,8 +17,10 @@ import com.wcpdoc.file.service.FileExService;
 @Service
 public class FileExServiceImpl extends BaseServiceImp<File> implements FileExService {
 	@Override
-	public void setDao(BaseDao<File> dao) {}
-	
+	public RBaseDao<File> getDao() {
+		return null;
+	}
+
 	@Override
 	public String getFileUploadDir() {
 		return ParmCache.get().getFileUploadDir();

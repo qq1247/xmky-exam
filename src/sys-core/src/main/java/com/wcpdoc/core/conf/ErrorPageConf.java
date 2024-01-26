@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
  * v1.0 zhanghc 2022年1月28日下午6:05:47
  */
 @Configuration
-public class ErrorPageConf implements ErrorPageRegistrar{
+public class ErrorPageConf implements ErrorPageRegistrar {
 
 	@Override
 	public void registerErrorPages(ErrorPageRegistry registry) {

@@ -8,11 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
@@ -21,6 +18,8 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.CollectionUtil;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -30,15 +29,17 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 试题控制层
  * 
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
-@Controller
+@RestController
 @RequestMapping("/api/question")
+@Slf4j
 public class ApiQuestionController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiQuestionController.class);
 
 	@Resource
 	private QuestionService questionService;
@@ -56,12 +57,10 @@ public class ApiQuestionController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
 			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
-				pageIn.addAttr("curUserId", getCurUser().getId());
+				pageIn.addParm("curUserId", getCurUser().getId());
 			}
 			PageOut pageout = questionService.getListpage(pageIn);
 			List<Map<String, Object>> resultList = pageout.getList();
@@ -71,12 +70,7 @@ public class ApiQuestionController extends BaseController {
 				Integer markType = (Integer) result.get("markType");
 				
 				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
-					String[] _markOptions = result.get("markOptions").toString().split(",");
-					Integer[] markOptions = new Integer[_markOptions.length]; 
-					for (int i = 0; i < _markOptions.length; i++) {
-						markOptions[i] = Integer.parseInt(_markOptions[i]);
-					}
-					result.put("markOptions", markOptions);
+					result.put("markOptions", StringUtil.toList((String)result.get("markOptions")));
 				} else {
 					result.put("markOptions", new Integer[0]);
 				}
@@ -126,10 +120,9 @@ public class ApiQuestionController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
-	@ResponseBody
 	public PageResult add(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.addEx(question, options, answers, scores);
+			questionService.addEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers), CollectionUtil.toList(scores));
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题添加错误：{}", e.getMessage());
@@ -150,10 +143,9 @@ public class ApiQuestionController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
-	@ResponseBody
 	public PageResult edit(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.updateEx(question, options, answers, scores);
+			questionService.updateEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers), CollectionUtil.toList(scores));
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题修改错误：{}", e.getMessage());
@@ -172,7 +164,6 @@ public class ApiQuestionController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer[] ids) {
 		try {
 			questionService.delEx(ids);
@@ -194,11 +185,10 @@ public class ApiQuestionController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
 			// 数据校验
-			Question question = questionService.getEntity(id);
+			Question question = questionService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -261,7 +251,6 @@ public class ApiQuestionController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/copy")
-	@ResponseBody
 	public PageResult copy(Integer id) {
 		try {
 			questionService.copy(id);

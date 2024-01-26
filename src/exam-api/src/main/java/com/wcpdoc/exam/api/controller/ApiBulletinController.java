@@ -4,11 +4,8 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
@@ -16,20 +13,21 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.service.BulletinService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 公告控制层
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
-@Controller
+@RestController
 @RequestMapping("/api/bulletin")
+@Slf4j
 public class ApiBulletinController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiBulletinController.class);
 	
 	@Resource
 	private BulletinService bulletinService;
@@ -43,11 +41,9 @@ public class ApiBulletinController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			pageIn.addParm("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(bulletinService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("公告列表错误：", e);
@@ -62,7 +58,6 @@ public class ApiBulletinController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
-	@ResponseBody
 	public PageResult add(Bulletin bulletin) {
 		try {
 			// 校验数据有效性
@@ -80,7 +75,7 @@ public class ApiBulletinController extends BaseController {
 			bulletin.setState(1);
 			bulletin.setUpdateTime(new Date());
 			bulletin.setUpdateUserId(getCurUser().getId());
-			bulletinService.add(bulletin);
+			bulletinService.save(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加公告错误：{}", e.getMessage());
@@ -98,7 +93,6 @@ public class ApiBulletinController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/edit")
-	@ResponseBody
 	public PageResult edit(Bulletin bulletin) {
 		try {
 			// 校验数据有效性
@@ -116,7 +110,7 @@ public class ApiBulletinController extends BaseController {
 			bulletin.setState(1);
 			bulletin.setUpdateTime(new Date());
 			bulletin.setUpdateUserId(getCurUser().getId());
-			bulletinService.update(bulletin);
+			bulletinService.updateById(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改公告错误：{}", e.getMessage());
@@ -134,12 +128,11 @@ public class ApiBulletinController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			Bulletin bulletin = bulletinService.getEntity(id);
+			Bulletin bulletin = bulletinService.getById(id);
 			bulletin.setState(0);
-			bulletinService.update(bulletin);
+			bulletinService.updateById(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除公告错误：{}", e.getMessage());
@@ -157,14 +150,13 @@ public class ApiBulletinController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer id) {		
 		try {
-			Bulletin bulletin = bulletinService.getEntity(id);
+			Bulletin bulletin = bulletinService.getById(id);
 			return PageResultEx.ok()
 					.addAttr("id", bulletin.getId())
-					.addAttr("startTime", DateUtil.formatDateTime(bulletin.getStartTime()))
-					.addAttr("endTime", DateUtil.formatDateTime(bulletin.getEndTime()))
+					.addAttr("startTime", bulletin.getStartTime())
+					.addAttr("endTime", bulletin.getEndTime())
 					.addAttr("title", bulletin.getTitle())
 					.addAttr("content", bulletin.getContent());
 		} catch (MyException e) {

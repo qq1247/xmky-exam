@@ -15,6 +15,7 @@ public interface DictService extends BaseService<Dict> {
 	 * 获取数据字典列表
 	 * 
 	 * v1.0 zhanghc 2022年2月24日下午5:31:31
+	 * 
 	 * @param index
 	 * @return List<Dict>
 	 */

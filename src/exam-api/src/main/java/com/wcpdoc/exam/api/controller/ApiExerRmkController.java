@@ -5,11 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -21,15 +18,17 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 练习评论控制层
  * 
  * v1.0 chenyun 2021年8月31日上午9:54:28
  */
-@Controller
+@RestController
 @RequestMapping("/api/exerRmk")
+@Slf4j
 public class ApiExerRmkController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiExerRmkController.class);
 
 	@Resource
 	private ExerRmkService exerRmkService;
@@ -43,10 +42,9 @@ public class ApiExerRmkController extends BaseController {
 	 * @return PageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageOut pageOut = exerRmkService.getListpage(new PageIn(request));
+			PageOut pageOut = exerRmkService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (!ValidateUtil.isValid(map.get("likeUserIds").toString())) {
 					map.put("likeUserIds", new Integer[0]);
@@ -77,15 +75,14 @@ public class ApiExerRmkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
 			// 练习评论删除
-			ExerRmk exerRmk = exerRmkService.getEntity(id);
+			ExerRmk exerRmk = exerRmkService.getById(id);
 			exerRmk.setState(0);
 			exerRmk.setUpdateTime(new Date());
 			exerRmk.setUpdateUserId(getCurUser().getId());
-			exerRmkService.update(exerRmk);
+			exerRmkService.updateById(exerRmk);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("练习评论删除错误：{}", e.getMessage());

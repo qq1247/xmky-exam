@@ -80,22 +80,14 @@ public interface ReportService {
 	 */
 	PageOut examRankListpage(PageIn pageIn);
 	
-	/**
-	 * 错题分析
-	 * 
-	 * v1.0 chenyun 2021年12月16日下午1:45:11
-	 * @param examId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> questionErrList(Integer examId);
+//	/**
+//	 * 错题分析
+//	 * 
+//	 * v1.0 chenyun 2021年12月16日下午1:45:11
+//	 * @param examId
+//	 * @return List<Map<String, Object>>
+//	 */
+//	List<Map<String, Object>> questionErrList(Integer examId);
 	
-	/**
-	 * 分数统计
-	 * 
-	 * v1.0 chenyun 2021年3月24日上午10:04:05
-	 * @param examId
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> count(Integer examId);
 
 }

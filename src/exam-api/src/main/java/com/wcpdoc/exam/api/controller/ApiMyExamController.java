@@ -8,11 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -20,7 +17,6 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.cache.QuestionCache;
@@ -35,15 +31,17 @@ import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 我的考试控制层
  * 
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
-@Controller
+@RestController
 @RequestMapping("/api/myExam")
+@Slf4j
 public class ApiMyExamController extends BaseController{
-	private static final Logger log = LoggerFactory.getLogger(ApiMyExamController.class);
 	
 	@Resource
 	private MyExamService myExamService;
@@ -59,11 +57,9 @@ public class ApiMyExamController extends BaseController{
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			pageIn.addParm("curUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				Exam exam = new Exam();
@@ -96,27 +92,26 @@ public class ApiMyExamController extends BaseController{
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer examId) {
 		try {
 			MyExam myExam = myExamService.getMyExam(examId, getCurUser().getId());
 			if (myExam == null) {
 				throw new MyException("无查阅权限");
 			}
-			Exam exam = examService.getEntity(examId);
+			Exam exam = examService.getById(examId);
 			return PageResultEx.ok()
 				.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
 				.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
 				.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
-				.addAttr("examStartTime", DateUtil.formatDateTime(exam.getStartTime()))
-				.addAttr("examEndTime", DateUtil.formatDateTime(exam.getEndTime()))// 考试结束时间（进入我的试卷使用）
-				.addAttr("examMarkStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
-				.addAttr("examMarkEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)// 如果是交卷后公布，但试卷是主观题试卷，页面提示几点之后查询
+				.addAttr("examStartTime", exam.getStartTime())
+				.addAttr("examEndTime", exam.getEndTime())// 考试结束时间（进入我的试卷使用）
+				.addAttr("examMarkStartTime", exam.getMarkStartTime())
+				.addAttr("examMarkEndTime", exam.getMarkEndTime())// 如果是交卷后公布，但试卷是主观题试卷，页面提示几点之后查询
 				.addAttr("examName", exam.getName())// 考试名称
-				.addAttr("answerStartTime", ValidateUtil.isValid(myExam.getAnswerStartTime()) ? DateUtil.formatDateTime(myExam.getAnswerStartTime()) : null)
-				.addAttr("answerEndTime", ValidateUtil.isValid(myExam.getAnswerEndTime()) ? DateUtil.formatDateTime(myExam.getAnswerEndTime()) : null)
-				.addAttr("markStartTime", ValidateUtil.isValid(myExam.getMarkStartTime()) ? DateUtil.formatDateTime(myExam.getMarkStartTime()) : null)
-				.addAttr("markEndTime", ValidateUtil.isValid(myExam.getMarkEndTime()) ? DateUtil.formatDateTime(myExam.getMarkEndTime()) : null)
+				.addAttr("answerStartTime", myExam.getAnswerStartTime())
+				.addAttr("answerEndTime", myExam.getAnswerEndTime())
+				.addAttr("markStartTime", myExam.getMarkStartTime())
+				.addAttr("markEndTime", myExam.getMarkEndTime())
 				.addAttr("objectiveScore", myExam.getObjectiveScore())
 				.addAttr("totalScore", scoreShow(exam, myExam) ? myExam.getTotalScore() : null)
 				.addAttr("answerState", scoreShow(exam, myExam) ? myExam.getAnswerState() : null)
@@ -141,7 +136,6 @@ public class ApiMyExamController extends BaseController{
 	 * @return PageResult
 	 */
 	@RequestMapping("/paper")
-	@ResponseBody
 	public PageResult paper(Integer examId) {
 		try {
 			// 校验数据有效性
@@ -153,7 +147,7 @@ public class ApiMyExamController extends BaseController{
 			if (_myExam == null) {
 				throw new MyException("无查阅权限");
 			}
-			Exam exam = examService.getEntity(examId);
+			Exam exam = examService.getById(examId);
 			if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
 				throw new MyException("考试未开始");
 			}
@@ -282,7 +276,6 @@ public class ApiMyExamController extends BaseController{
 	 * @return PageResult
 	 */
 	@RequestMapping("/answer")
-	@ResponseBody
 	public PageResult answer(Integer examId, Integer questionId, String[] answers) {
 		try {
 			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
@@ -309,7 +302,6 @@ public class ApiMyExamController extends BaseController{
 	 * @return PageResult
 	 */
 	@RequestMapping("/finish")
-	@ResponseBody
 	public PageResult finish(Integer examId) {
 		try {
 			if (!AutoMarkCache.tryReadLock(examId, 2000)) {

@@ -13,36 +13,33 @@ import com.wcpdoc.core.service.BaseService;
 public interface OrgService extends BaseService<Org> {
 
 	/**
-	 * 添加机构 
+	 * 添加机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
 	 * @param org
 	 * @param phone
-	 * @param pwd
-	 * void
+	 * @param pwd   void
 	 */
 	void addEx(Org org);
 
 	/**
-	 * 删除机构 
+	 * 删除机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
-	 * @param id
-	 * void
+	 * @param id void
 	 */
 	void delEx(Integer id);
-	
+
 	/**
-	 * 移动机构 
+	 * 移动机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
 	 * @param sourceId
 	 * @param targetId
-	 * @param saasId
-	 * void
+	 * @param saasId   void
 	 */
 	void doMove(Integer sourceId, Integer targetId);
 
@@ -50,6 +47,7 @@ public interface OrgService extends BaseService<Org> {
 	 * 名称是否重复
 	 * 
 	 * v1.0 zhanghc 2020年8月24日下午1:53:35
+	 * 
 	 * @param org
 	 * @return boolean
 	 */
@@ -59,19 +57,21 @@ public interface OrgService extends BaseService<Org> {
 	 * 编码是否重复
 	 * 
 	 * v1.0 zhanghc 2020年8月24日下午1:53:35
+	 * 
 	 * @param org
 	 * @return boolean
 	 */
 	boolean existCode(Org org);
-	
+
 	/**
 	 * 获取机构列表
 	 * 
 	 * v1.0 chenyun 2021年3月5日上午10:41:51
+	 * 
 	 * @return Org
 	 */
 	Org getOrg(String name);
-	
+
 	/**
 	 * 获取机构列表
 	 * 
@@ -82,11 +82,12 @@ public interface OrgService extends BaseService<Org> {
 	 * @return boolean
 	 */
 	List<Org> getList(Integer parentId);
-	
+
 	/**
 	 * 获取机构列表
 	 * 
 	 * v1.0 zhanghc 2022年5月10日上午11:32:07
+	 * 
 	 * @return List<Org>
 	 */
 	List<Org> getList();

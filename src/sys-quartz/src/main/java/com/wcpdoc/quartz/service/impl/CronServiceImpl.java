@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import org.quartz.Job;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -29,9 +29,8 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 	private CronDao cronDao;
 
 	@Override
-	@Resource(name = "cronDaoImpl")
-	public void setDao(BaseDao<Cron> dao) {
-		super.dao = dao;
+	public RBaseDao<Cron> getDao() {
+		return cronDao;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -62,7 +61,7 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 		cron.setUpdateUserId(getCurUser().getId());
 		cron.setUpdateTime(new Date());
 		cron.setState(2);
-		cronDao.update(cron);
+		updateById(cron);
 
 		// 删除作业
 		try {
@@ -80,9 +79,9 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 		} catch (QuartzException e) {
 			throw new MyException(e.getMessage());
 		}
-		
+
 		// 删除实体
-		del(id);
+		removeById(id);
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 	@Override
 	public void startTask(Integer id) {
 		// 启动任务
-		Cron cron = getEntity(id);
+		Cron cron = getById(id);
 		if (cron.getState() == 1) {
 			throw new MyException("服务已启动");
 		}
@@ -115,34 +114,34 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 		cron.setState(1);
 		cron.setUpdateTime(new Date());
 		cron.setUpdateUserId(getCurUser().getId());
-		update(cron);
+		updateById(cron);
 	}
 
 	@Override
 	public void stopTask(Integer id) {
 		// 停止任务
-		Cron cron = getEntity(id);
+		Cron cron = getById(id);
 		if (cron.getState() == 2) {
 			throw new MyException("服务已停止");
 		}
-		
+
 		try {
 			QuartzUtil.deleteJob(cron.getId());
 		} catch (QuartzException e) {
 			throw new MyException(e.getMessage());
 		}
-		
+
 		// 变更定时任务状态
 		cron.setState(2);
 		cron.setUpdateTime(new Date());
 		cron.setUpdateUserId(getCurUser().getId());
-		update(cron);
+		updateById(cron);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void runOnceTask(Integer id) {
-		Cron cron = getEntity(id);
+		Cron cron = getById(id);
 		Class<Job> jobClass = null;
 		try {
 			jobClass = (Class<Job>) Class.forName(cron.getJobClass());

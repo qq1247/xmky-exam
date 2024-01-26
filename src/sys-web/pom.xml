@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -15,26 +16,10 @@
 	</properties>
 
 	<dependencies>
-		<!-- 集成web容器 -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-jasper</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- 集成系统基础 -->
+		<!-- 集成系统API -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-base</artifactId>
+			<artifactId>sys-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成系统扩展 -->
@@ -43,41 +28,23 @@
 			<artifactId>sys-ex</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成系统定时任务 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-quartz</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成系统附件 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-file</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成系统日志 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-log</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成考试核心 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>exam-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成考试API -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成基础API -->
+		<!-- 集成考试扩展 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-api</artifactId>
+			<artifactId>exam-ex</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<!-- 集成多端适配 -->
+		<dependency>
+			<groupId>org.springframework.mobile</groupId>
+			<artifactId>spring-mobile-device</artifactId>
+			<version>1.1.5.RELEASE</version>
 		</dependency>
 	</dependencies>
 	<!--maven打包插件-->
@@ -94,7 +61,7 @@
 		<finalName>exam-4.3.1</finalName><!-- 打包后文件名称: 项目名-版本 -->
 		<resources>
 			<resource>
-				<directory></directory><!-- 从根目录开始 -->
+				<directory>/</directory><!-- 从根目录开始 -->
 				<includes>
 					<include>dll/**</include><!-- 查找dll文件夹 -->
 					<include>config/**</include>
@@ -102,18 +69,22 @@
 				<excludes>
 					<exclude>config/jwtSecret.txt</exclude><!-- 排除秘钥文件 -->
 				</excludes>
-				<targetPath>${project.build.directory}</targetPath><!-- 放入war包的同级目录 -->
+				<targetPath>${project.build.directory}</targetPath><!--
+				放入war包的同级目录 -->
 			</resource>
 			<resource>
-				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
+				<directory>src/main/resources</directory><!--
+				从src/main/resources目录开始 -->
 				<includes>
 					<include>application.yml</include><!-- 查找application.yml文件 -->
 				</includes>
 				<targetPath>${project.build.directory}/config</targetPath><!--放入war包的同级目录的config目录 -->
 			</resource>
 			<resource>
-				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
-				<targetPath>${project.build.outputDirectory}</targetPath><!-- 放入classes目录下 -->
+				<directory>src/main/resources</directory><!--
+				从src/main/resources目录开始 -->
+				<targetPath>${project.build.outputDirectory}</targetPath><!--
+				放入classes目录下 -->
 			</resource>
 		</resources>
 	</build>

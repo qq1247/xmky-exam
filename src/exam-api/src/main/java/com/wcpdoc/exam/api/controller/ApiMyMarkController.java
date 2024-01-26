@@ -9,11 +9,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
@@ -37,15 +34,17 @@ import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 我的阅卷控制层
  * 
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
-@Controller
+@RestController
 @RequestMapping("/api/myMark")
+@Slf4j
 public class ApiMyMarkController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiMyMarkController.class);
 	
 	@Resource
 	private MyMarkService myMarkService;
@@ -63,16 +62,14 @@ public class ApiMyMarkController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
 			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
 				
 			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
-				pageIn.addAttr("subAdminUserId", getCurUser().getId());
+				pageIn.addParm("subAdminUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看（管理或子管理）分配的
-				pageIn.addAttr("markUserId", getCurUser().getId());
+				pageIn.addParm("markUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有权限
 				throw new MyException("无权限");
 			}
@@ -98,11 +95,9 @@ public class ApiMyMarkController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/userListpage")
-	@ResponseBody
-	public PageResult userListpage() {
+	public PageResult userListpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			pageIn.addParm("curUserId", getCurUser().getId());
 			PageOut pageOut = myMarkService.getUserListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
@@ -119,7 +114,6 @@ public class ApiMyMarkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer examId, Integer userId) {
 		try {
 			MyExam myExam = myExamService.getMyExam(examId, userId);
@@ -151,7 +145,6 @@ public class ApiMyMarkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/paper")
-	@ResponseBody
 	public PageResult paper(Integer examId, Integer userId) {
 		try {
 			// 校验数据有效性
@@ -169,7 +162,7 @@ public class ApiMyMarkController extends BaseController {
 			if (_myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
 				throw new MyException("无查阅权限");
 			}
-			Exam exam = examService.getEntity(examId);
+			Exam exam = examService.getById(examId);
 			if (exam.getMarkType() == 2) {
 				if (exam.getMarkStartTime().getTime() > System.currentTimeMillis()) {
 					throw new MyException("阅卷未开始");
@@ -263,7 +256,6 @@ public class ApiMyMarkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/assign")
-	@ResponseBody
 	public PageResult assign(Integer examId, Integer num) {
 		try {
 			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
@@ -293,7 +285,6 @@ public class ApiMyMarkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/score")
-	@ResponseBody
 	public PageResult score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
 		try {
 			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
@@ -320,7 +311,6 @@ public class ApiMyMarkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/finish")
-	@ResponseBody
 	public PageResult finish(Integer examId, Integer userId) {
 		try {
 			if (!AutoMarkCache.tryReadLock(examId, 2000)) {

@@ -3,8 +3,6 @@ package com.wcpdoc.notify.service.impl;
 import javax.annotation.Resource;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
@@ -13,14 +11,16 @@ import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 通知服务实现
  * 
  * v1.0 zhanghc 2019年10月15日下午15:51:27
  */
 @Component
+@Slf4j
 public class NotifyServiceImpl implements NotifyService {
-	private static final Logger log = LoggerFactory.getLogger(NotifyServiceImpl.class);
 	@Resource
 	private EmailService emailService;
 
@@ -52,21 +52,21 @@ public class NotifyServiceImpl implements NotifyService {
 	@Override
 	public void SMSPush(String phone, String code) throws NotifyException {
 		try {
-			//极光短信
-			//String appkey = "";
-			//String masterSecret = "";
-			//SMSClient client = new SMSClient(masterSecret, appkey);
-	        //SMSPayload payload = SMSPayload.newBuilder()
-	        //		.setMobileNumber(phone)
-			//		.setSignId(10756)    // 签名
-			//		.setTempId(171442)   // 短信模板
-			//		.addTempPara("code", code)  // 验证码
-			//		.addTempPara("time", "3")   // 时间
-			//		.build();
-	        //@SuppressWarnings("unused")
-			//SendSMSResult  res = client.sendTemplateSMS(payload);
-	        
-	        //阿里云短信
+			// 极光短信
+			// String appkey = "";
+			// String masterSecret = "";
+			// SMSClient client = new SMSClient(masterSecret, appkey);
+			// SMSPayload payload = SMSPayload.newBuilder()
+			// .setMobileNumber(phone)
+			// .setSignId(10756) // 签名
+			// .setTempId(171442) // 短信模板
+			// .addTempPara("code", code) // 验证码
+			// .addTempPara("time", "3") // 时间
+			// .build();
+			// @SuppressWarnings("unused")
+			// SendSMSResult res = client.sendTemplateSMS(payload);
+
+			// 阿里云短信
 //	        String appkey = "";
 //		    String accessKeySecret = "";
 //	        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", appkey, accessKeySecret);

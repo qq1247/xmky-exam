@@ -23,13 +23,7 @@ public class ApplicationConf implements WebMvcConfigurer {
 	private RunTimeInterceptor runTimeInterceptor;
 	@Resource
 	private OnlineUserInterceptor onlineUserInterceptor;
-	
 
-//	@Override
-//	public void addViewControllers(ViewControllerRegistry registry) {
-//		registry.addRedirectViewController("/", "index.html");
-//	}
-	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(userContextInterceptor).addPathPatterns("/api/**");

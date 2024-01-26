@@ -8,21 +8,21 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.file.entity.File;
 import com.wcpdoc.file.service.FileService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 清理临时附件任务
  * 
  * v1.0 zhanghc 2016-11-16下午10:13:48
  */
+@Slf4j
 public class ClearFileJob implements Job {
-	private static final Logger log = LoggerFactory.getLogger(ClearFileJob.class);
 	private static final FileService fileService = SpringUtil.getBean(FileService.class);
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -33,7 +33,8 @@ public class ClearFileJob implements Job {
 			log.info("清理临时附件：{}不存在", dirFile.getAbsolutePath());
 			return;
 		}
-		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(dirFile, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(dirFile, TrueFileFilter.INSTANCE,
+				TrueFileFilter.INSTANCE);
 		Date beforTime = DateUtil.getNextDay(new Date(), -7);
 
 		for (int i = 0; i < fileList.size() - 1; i++) {
@@ -52,14 +53,15 @@ public class ClearFileJob implements Job {
 		// 清理标记为删除的附件
 		List<File> delFileList = fileService.getDelList();
 		for (File fileEntity : delFileList) {
-			java.io.File delFile = new java.io.File(String.format("%s%s%s", baseDir, java.io.File.separator, fileEntity.getPath()));
+			java.io.File delFile = new java.io.File(
+					String.format("%s%s%s", baseDir, java.io.File.separator, fileEntity.getPath()));
 			log.info("清理标记为删除的附件：{}", delFile.getAbsolutePath());
 			try {
 				delFile.delete();
 			} catch (Exception e) {
 				log.error("清理标记为删除的附件失败：", e);
 			}
-			fileService.del(fileEntity.getId());
+			fileService.removeById(fileEntity.getId());
 		}
 	}
 }

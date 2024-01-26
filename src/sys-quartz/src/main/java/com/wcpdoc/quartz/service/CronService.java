@@ -16,8 +16,8 @@ public interface CronService extends BaseService<Cron> {
 	 * 修改定时任务
 	 * 
 	 * v1.0 zhanghc 2019年9月11日下午4:38:46
-	 * @param cron 
-	 * void
+	 * 
+	 * @param cron void
 	 */
 	void updateEx(Cron cron);
 
@@ -25,8 +25,8 @@ public interface CronService extends BaseService<Cron> {
 	 * 删除定时任务
 	 * 
 	 * v1.0 zhanghc 2019年9月11日下午4:38:46
-	 * @param id 
-	 * void
+	 * 
+	 * @param id void
 	 */
 	void delEx(Integer id);
 
@@ -34,6 +34,7 @@ public interface CronService extends BaseService<Cron> {
 	 * 获取定时任务列表
 	 * 
 	 * v1.0 zhanghc 2019年9月13日下午7:10:39
+	 * 
 	 * @return List<Cron>
 	 */
 	List<Cron> getList();
@@ -42,6 +43,7 @@ public interface CronService extends BaseService<Cron> {
 	 * 启动任务
 	 * 
 	 * v1.0 zhanghc 2020年8月25日下午4:01:47
+	 * 
 	 * @param id void
 	 */
 	void startTask(Integer id);
@@ -50,6 +52,7 @@ public interface CronService extends BaseService<Cron> {
 	 * 停止任务
 	 * 
 	 * v1.0 zhanghc 2020年8月25日下午4:08:24
+	 * 
 	 * @param id void
 	 */
 	void stopTask(Integer id);
@@ -58,6 +61,7 @@ public interface CronService extends BaseService<Cron> {
 	 * 执行一次
 	 * 
 	 * v1.0 zhanghc 2020年8月25日下午4:10:49
+	 * 
 	 * @param id void
 	 */
 	void runOnceTask(Integer id);

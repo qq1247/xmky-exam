@@ -24,15 +24,6 @@ public interface MyExamService extends BaseService<MyExam>{
 	/**
 	 * 获取我的考试列表
 	 * 
-	 * v1.0 zhanghc 2022年6月2日上午9:50:13
-	 * @param userId
-	 * @return List<MyExam>
-	 */
-	List<MyExam> getListForUser(Integer userId);
-	
-	/**
-	 * 获取我的考试列表
-	 * 
 	 * v1.0 chenyun 2021年7月30日下午3:49:53
 	 * @param examId
 	 * @param userId
@@ -102,6 +93,6 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * v1.0 zhanghc 2023年3月22日下午5:38:23
 	 * @param id void
 	 */
-	void clear(Integer examId);
+	void paperClear(Integer examId);
 
 }

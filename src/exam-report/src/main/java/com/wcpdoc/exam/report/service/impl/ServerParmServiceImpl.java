@@ -1,8 +1,5 @@
 package com.wcpdoc.exam.report.service.impl;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-
 import org.apache.catalina.util.ServerInfo;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +15,7 @@ import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.report.service.ServerPramService;
 
+import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
@@ -35,18 +27,15 @@ import oshi.software.os.OSFileStore;
  * v1.0 zhanghc 2021年12月14日上午11:15:01
  */
 @Service
+@Slf4j
 public class ServerParmServiceImpl implements ServerPramService {
-	private static final Logger log = LoggerFactory.getLogger(ServerParmServiceImpl.class);
 	@Value("${spring.datasource.url}")
 	private String dbUrl;
-	@Resource
-	private EntityManager entityManager;
 	private static final SystemInfo systemInfo = new SystemInfo();
 	
 	@Override
 	public List<Map<String, Object>> getList() {
 		List<Map<String, Object>> result = new ArrayList<Map<String,Object>>();
-		Connection connection = null;
 		try {
 			// 获取操作系统信息
 			Map<String, Object> data = new HashMap<String, Object>();
@@ -123,13 +112,13 @@ public class ServerParmServiceImpl implements ServerPramService {
 			data.put("value", ServerInfo.getServerInfo());
 			result.add(data);
 			
-			SessionImplementor sessionImp = (SessionImplementor) entityManager.getDelegate();
-			connection = sessionImp.connection();
-			DatabaseMetaData metaData = connection.getMetaData();
-			data = new HashMap<String, Object>();
-			data.put("name", "数据库");
-			data.put("value", String.format("%s%s%s", metaData.getDatabaseProductName(), File.separator, metaData.getDatabaseProductVersion()));
-			result.add(data);
+//			SessionImplementor sessionImp = (SessionImplementor) entityManager.getDelegate();
+//			connection = sessionImp.connection();
+//			DatabaseMetaData metaData = connection.getMetaData();
+//			data = new HashMap<String, Object>();
+//			data.put("name", "数据库");
+//			data.put("value", String.format("%s%s%s", metaData.getDatabaseProductName(), File.separator, metaData.getDatabaseProductVersion()));
+//			result.add(data);
 			
 			// 其他信息
 			data = new HashMap<String, Object>();

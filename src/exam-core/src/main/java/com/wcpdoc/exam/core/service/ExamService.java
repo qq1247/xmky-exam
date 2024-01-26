@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -30,25 +29,6 @@ public interface ExamService extends BaseService<Exam>{
 	 * void
 	 */
 	void publish(ExamInfo examInfo, String processBarId);
-	
-	/**
-	 * 获取考试用户列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param id
-	 * @return PageOut
-	 */
-	List<Map<String, Object>> getExamUserList(Integer id);
-	
-	/**
-	 * 获取考试用户列表
-	 * 
-	 * v1.0 zhanghc 2021年6月25日下午2:49:33
-	 * @param id
-	 * @param markUserId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId);
 	
 	/**
 	 * 获取考试列表

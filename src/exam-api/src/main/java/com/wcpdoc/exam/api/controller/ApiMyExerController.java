@@ -12,11 +12,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -24,8 +21,6 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.CollectionUtil;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exer;
@@ -39,15 +34,17 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 我的练习控制层
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
-@Controller
+@RestController
 @RequestMapping("/api/myExer")
+@Slf4j
 public class ApiMyExerController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiMyExerController.class);
 	
 	@Resource
 	private ExerService exerService;
@@ -65,11 +62,9 @@ public class ApiMyExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("examUserId", getCurUser().getId());
+			pageIn.addParm("examUserId", getCurUser().getId());
 			PageOut pageOut = exerService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				map.remove("userIds");// 我的练习不需要该字段
@@ -88,20 +83,19 @@ public class ApiMyExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer exerId) {
 		try {
-			Exer exer = exerService.getEntity(exerId);
-			if (!CollectionUtil.toSet(exer.getUserIds()).contains(getCurUser().getId())) {
+			Exer exer = exerService.getById(exerId);
+			if (!exer.getUserIds().contains(getCurUser().getId())) {
 				throw new MyException("无操作权限");
 			}
 			return PageResultEx.ok()
 					.addAttr("id", exer.getId())
 					.addAttr("name", exer.getName())
 					.addAttr("questionTypeId", exer.getQuestionTypeId())
-					.addAttr("questionTypeName", questionTypeService.getEntity(exer.getQuestionTypeId()).getName())
-					.addAttr("startTime", DateUtil.formatDateTime(exer.getStartTime()))
-					.addAttr("endTime", DateUtil.formatDateTime(exer.getEndTime()))
+					.addAttr("questionTypeName", questionTypeService.getById(exer.getQuestionTypeId()).getName())
+					.addAttr("startTime", exer.getStartTime())
+					.addAttr("endTime", exer.getEndTime())
 					.addAttr("rmkState", exer.getRmkState())
 					;
 		} catch (MyException e) {
@@ -122,11 +116,10 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/question")
-	@ResponseBody
 	public PageResult question(Integer exerId, Integer questionId) {
 		try {
 			// 数据校验
-			Exer exer = exerService.getEntity(exerId);
+			Exer exer = exerService.getById(exerId);
 			if (exer.getState() == 0) {
 				throw new MyException("已删除");
 			}
@@ -134,9 +127,7 @@ public class ApiMyExerController extends BaseController {
 			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
 				throw new MyException("时间已过期");
 			}
-			Set<Integer> userIdSet = new HashSet<>();
-			userIdSet.addAll(Arrays.asList(exer.getUserIds()));
-			if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
+			if (ValidateUtil.isValid(exer.getUserIds()) && !exer.getUserIds().contains(getCurUser().getId())) {
 				throw new MyException("无权限");
 			}
 			
@@ -199,11 +190,10 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionList")
-	@ResponseBody
 	public PageResult questionList(Integer exerId) {
 		try {
 			// 数据有效性校验
-			Exer exer = exerService.getEntity(exerId);
+			Exer exer = exerService.getById(exerId);
 			if (exer.getState() == 0) {
 				throw new MyException("无权限");
 			}
@@ -238,10 +228,9 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageOut
 	 */
 	@RequestMapping("/rmkListpage")
-	@ResponseBody
-	public PageResult rmkListpage() {
+	public PageResult rmkListpage(PageIn pageIn) {
 		try {
-			PageOut pageOut = exerRmkService.getListpage(new PageIn(request));
+			PageOut pageOut = exerRmkService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("likeUserIds") != null 
 						&& map.get("likeUserIds").toString().contains(String.format(",%s,", getCurUser().getId()))) {
@@ -266,7 +255,6 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/rmk")
-	@ResponseBody
 	public PageResult rmk(ExerRmk exerRmk, Boolean anon) {
 		try {
 			exerRmkService.rmk(exerRmk, anon);
@@ -288,7 +276,6 @@ public class ApiMyExerController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/rmkLike")
-	@ResponseBody
 	public PageResult rmkLike(Integer exerRmkId) {
 		try {
 			exerRmkService.like(exerRmkId);

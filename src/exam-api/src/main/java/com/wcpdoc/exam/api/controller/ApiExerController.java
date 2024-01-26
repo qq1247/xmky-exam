@@ -5,11 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
@@ -18,21 +15,23 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 练习控制层
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
-@Controller
+@RestController
 @RequestMapping("/api/exer")
+@Slf4j
 public class ApiExerController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiExerController.class);
 	
 	@Resource
 	private ExerService exerService;
@@ -48,21 +47,17 @@ public class ApiExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
 			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
-				pageIn.addAttr("curUserId", getCurUser().getId());
+				pageIn.addParm("curUserId", getCurUser().getId());
 			}
 			PageOut pageOut = exerService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("userIds") == null) {
 					map.put("userIds", new Integer[0]);
 				} else {
-					Exer exer = new Exer();
-					exer.setUserIds(map.get("userIds").toString());
-					map.put("userIds", exer.getUserIds());
+					map.put("userIds", StringUtil.toList(map.get("userIds").toString()));
 				}
 			}
 			return PageResultEx.ok().data(pageOut);
@@ -79,7 +74,6 @@ public class ApiExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
-	@ResponseBody
 	public PageResult add(Exer exer) {
 		try {
 			exerService.addEx(exer);
@@ -100,7 +94,6 @@ public class ApiExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/edit")
-	@ResponseBody
 	public PageResult edit(Exer exer) {
 		try {
 			exerService.updateEx(exer);
@@ -121,11 +114,10 @@ public class ApiExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
 			// 数据校验
-			Exer exer = exerService.getEntity(id);
+			Exer exer = exerService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -134,7 +126,7 @@ public class ApiExerController extends BaseController {
 			exer.setState(0);
 			exer.setUpdateTime(new Date());
 			exer.setUpdateUserId(getCurUser().getId());
-			exerService.update(exer);
+			exerService.updateById(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("练习删除错误：{}", e.getMessage());
@@ -152,10 +144,9 @@ public class ApiExerController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			Exer exer = exerService.getEntity(id);
+			Exer exer = exerService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -163,9 +154,9 @@ public class ApiExerController extends BaseController {
 					.addAttr("id", exer.getId())
 					.addAttr("name", exer.getName())
 					.addAttr("questionTypeId", exer.getQuestionTypeId())
-					.addAttr("questionTypeName", questionTypeService.getEntity(exer.getQuestionTypeId()).getName())
-					.addAttr("startTime", DateUtil.formatDateTime(exer.getStartTime()))
-					.addAttr("endTime", DateUtil.formatDateTime(exer.getEndTime()))
+					.addAttr("questionTypeName", questionTypeService.getById(exer.getQuestionTypeId()).getName())
+					.addAttr("startTime", exer.getStartTime())
+					.addAttr("endTime", exer.getEndTime())
 					.addAttr("userIds", exer.getUserIds())
 					.addAttr("rmkState", exer.getRmkState())
 					;

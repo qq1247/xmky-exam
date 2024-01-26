@@ -10,13 +10,10 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -35,9 +32,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -59,15 +54,17 @@ import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 考试控制层
  * 
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
-@Controller
+@RestController
 @RequestMapping("/api/exam")
+@Slf4j
 public class ApiExamController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiExamController.class);
 
 	@Resource
 	private ExamService examService;
@@ -100,16 +97,14 @@ public class ApiExamController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
 			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
 				
 			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
-				pageIn.addAttr("subAdminUserId", getCurUser().getId());
+				pageIn.addParm("subAdminUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看（管理或子管理）分配的
-				pageIn.addAttr("markUserId", getCurUser().getId());
+				pageIn.addParm("markUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有权限
 				throw new MyException("无权限");
 			}
@@ -138,15 +133,13 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/publish")
-	@ResponseBody
 	public PageResult publish(@RequestBody ExamInfo examInfo) {
-		try {
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		try {			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
 			
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
 			ProgressBarCache.setProgressBar(processBarId, 0.0, 1.0, "发布开始", HttpStatus.OK.value());// 放在前面，可能的问题为下面的线程执行慢，没有进度数据，前端显示空
-			Double processLen = (examInfo.getExamUserIds().length + 5) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+userNum
+			Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+userNum
 			LoginUser loginUser = getCurUser();
 			new Thread(new Runnable() {
 				public void run() {
@@ -184,10 +177,9 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/paper")
-	@ResponseBody
 	public PageResult paper(Integer id) {
 		try {
-			Exam exam = examService.getEntity(id);
+			Exam exam = examService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -271,10 +263,10 @@ public class ApiExamController extends BaseController {
 					.addAttr("name", exam.getName())
 					.addAttr("paperName", exam.getPaperName())
 					.addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
-					.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
-					.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
-					.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
-					.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
+					.addAttr("startTime", exam.getStartTime())
+					.addAttr("endTime", exam.getEndTime())
+					.addAttr("markStartTime", exam.getMarkStartTime())
+					.addAttr("markEndTime", exam.getMarkEndTime())
 					.addAttr("genType", exam.getGenType())
 					.addAttr("showType", exam.getShowType())
 					.addAttr("passScore", exam.getPassScore())
@@ -303,7 +295,6 @@ public class ApiExamController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
 			examService.delEx(id);
@@ -325,18 +316,17 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			Exam exam = examService.getEntity(id);
+			Exam exam = examService.getById(id);
 			return PageResultEx.ok()
 					.addAttr("id", exam.getId())
 					.addAttr("name", exam.getName())
 					.addAttr("paperName", exam.getPaperName())
-					.addAttr("startTime", ValidateUtil.isValid(exam.getStartTime()) ? DateUtil.formatDateTime(exam.getStartTime()) : null)
-					.addAttr("endTime", ValidateUtil.isValid(exam.getEndTime()) ? DateUtil.formatDateTime(exam.getEndTime()) : null)
-					.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
-					.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
+					.addAttr("startTime", exam.getStartTime())
+					.addAttr("endTime", exam.getEndTime())
+					.addAttr("markStartTime", exam.getMarkStartTime())
+					.addAttr("markEndTime", exam.getMarkEndTime())
 					.addAttr("markState", exam.getMarkState())
 					.addAttr("scoreState", exam.getScoreState())
 					.addAttr("rankState", exam.getRankState())
@@ -367,7 +357,6 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/time")
-	@ResponseBody
 	public PageResult time(Integer id, Integer timeType, Integer minute) {
 		try {
 			if (!AutoMarkCache.tryWriteLock(id, 2000)) {
@@ -395,7 +384,6 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/assist")
-	@ResponseBody
 	public PageResult assist(Integer id, Integer[] markUserIds) {
 		try {
 			examService.assist(id, markUserIds);
@@ -417,11 +405,10 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/markUserList")
-	@ResponseBody
 	public PageResult markUserList(Integer id) {
 		try {
 			// 数据校验
-			Exam exam = examService.getEntity(id);
+			Exam exam = examService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -431,7 +418,7 @@ public class ApiExamController extends BaseController {
 			List<Map<String, Object>> resultList = new ArrayList<>();
 			for (MyMark myMark : myMarkList) {
 				Map<String, Object> result = new HashMap<>();
-				User markUser = userService.getEntity(myMark.getMarkUserId());
+				User markUser = userService.getById(myMark.getMarkUserId());
 				result.put("id", markUser.getId());
 				result.put("name", markUser.getName());
 				resultList.add(result);
@@ -454,11 +441,10 @@ public class ApiExamController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/examUserList")
-	@ResponseBody
 	public PageResult examUserList(Integer id) {
 		try {
 			// 数据校验
-			Exam exam = examService.getEntity(id);
+			Exam exam = examService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}

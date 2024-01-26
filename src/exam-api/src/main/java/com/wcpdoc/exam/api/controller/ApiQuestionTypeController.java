@@ -4,11 +4,8 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
@@ -21,15 +18,17 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 题库控制层
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
-@Controller
+@RestController
 @RequestMapping("/api/questionType")
+@Slf4j
 public class ApiQuestionTypeController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiQuestionTypeController.class);
 	
 	@Resource
 	private QuestionTypeService questionTypeService;
@@ -41,12 +40,10 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageIn pageIn = new PageIn(request);
 			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
-				pageIn.addAttr("curUserId", getCurUser().getId());
+				pageIn.addParm("curUserId", getCurUser().getId());
 			}
 			PageOut pageOut = questionTypeService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
@@ -63,7 +60,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
-	@ResponseBody
 	public PageResult add(QuestionType questionType) {
 		try {
 			// 数据校验
@@ -78,7 +74,7 @@ public class ApiQuestionTypeController extends BaseController {
 			questionType.setCreateUserId(getCurUser().getId());
 			questionType.setUpdateTime(new Date());
 			questionType.setUpdateUserId(getCurUser().getId());
-			questionTypeService.add(questionType);
+			questionTypeService.save(questionType);
 			
 			return PageResultEx.ok().data(questionType.getId());
 		} catch (MyException e) {
@@ -97,14 +93,13 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/edit")
-	@ResponseBody
 	public PageResult edit(QuestionType questionType) {
 		try {
 			//校验数据有效性
 			if(!ValidateUtil.isValid(questionType.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			QuestionType entity = questionTypeService.getEntity(questionType.getId());
+			QuestionType entity = questionTypeService.getById(questionType.getId());
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 				throw new MyException("无操作权限");
 			}
@@ -113,7 +108,7 @@ public class ApiQuestionTypeController extends BaseController {
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
-			questionTypeService.update(entity);
+			questionTypeService.updateById(entity);
 			
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -132,7 +127,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delEx(id);
@@ -153,10 +147,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			QuestionType entity = questionTypeService.getEntity(id);
+			QuestionType entity = questionTypeService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -180,7 +173,6 @@ public class ApiQuestionTypeController extends BaseController {
 //	 * @return pageOut
 //	 */
 //	@RequestMapping("/move")
-//	@ResponseBody
 //	public PageResult move(Integer sourceId, Integer targetId) {
 //		try {
 //			questionTypeService.move(sourceId, targetId);
@@ -202,7 +194,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/clear")
-	@ResponseBody
 	public PageResult clear(Integer id) {
 		try {
 			questionTypeService.clear(id);

@@ -2,8 +2,6 @@ package com.wcpdoc.auth.util;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import com.wcpdoc.auth.cache.JwtSecretCache;
@@ -17,14 +15,15 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 令牌工具类
  * 
  * v1.0 zhanghc 2019年10月17日下午5:11:12
  */
+@Slf4j
 public class JwtUtil {
-	private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 	private static JwtBuilder builder = null; 
 
 	private JwtUtil() {

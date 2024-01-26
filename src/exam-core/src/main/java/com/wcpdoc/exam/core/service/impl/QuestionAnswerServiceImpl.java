@@ -6,7 +6,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.QuestionAnswerDao;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -23,9 +23,8 @@ public class QuestionAnswerServiceImpl extends BaseServiceImp<QuestionAnswer> im
 	private QuestionAnswerDao questionAnswerDao;
 
 	@Override
-	@Resource(name = "questionAnswerDaoImpl")
-	public void setDao(BaseDao<QuestionAnswer> dao) {
-		super.dao = dao;
+	public RBaseDao<QuestionAnswer> getDao() {
+		return questionAnswerDao;
 	}
 
 	@Override

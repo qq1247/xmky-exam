@@ -6,7 +6,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.ExamQuestionDao;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
@@ -23,9 +23,8 @@ public class ExamQuestionServiceImpl extends BaseServiceImp<ExamQuestion> implem
 	private ExamQuestionDao examQuestionDao;
 
 	@Override
-	@Resource(name = "examQuestionDaoImpl")
-	public void setDao(BaseDao<ExamQuestion> dao) {
-		super.dao = dao;
+	public RBaseDao<ExamQuestion> getDao() {
+		return examQuestionDao;
 	}
 
 	@Override
@@ -35,11 +34,11 @@ public class ExamQuestionServiceImpl extends BaseServiceImp<ExamQuestion> implem
 
 	@Override
 	public void clear(Integer examId) {
-		examQuestionDao.clear(examId);
+		examQuestionDao.paperClear(examId);
 	}
 
 	@Override
-	public List<ExamQuestion> getQuestionList(Integer questionId) {
-		return examQuestionDao.getQuestionList(questionId);
+	public List<ExamQuestion> getList1(Integer questionId) {
+		return examQuestionDao.getList1(questionId);
 	}
 }

@@ -10,11 +10,11 @@ import com.wcpdoc.base.entity.Org;
 public interface OrgExService {
 
 	/**
-	 * 删除机构
+	 * 删除机构<br/>
+	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
-	 * @param org
-	 * void
+	 * @param org void
 	 */
 	void delEx(Org org);
 
@@ -22,8 +22,8 @@ public interface OrgExService {
 	 * 导入机构（涉及到附件，不能直接用orgService）
 	 * 
 	 * v1.0 zhanghc 2022年5月10日上午11:17:52
-	 * @param fileId 
-	 * void
+	 * 
+	 * @param fileId void
 	 */
 	void xlsImport(Integer fileId);
 }
