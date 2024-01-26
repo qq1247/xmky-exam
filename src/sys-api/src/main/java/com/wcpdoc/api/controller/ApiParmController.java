@@ -2,11 +2,8 @@ package com.wcpdoc.api.controller;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmService;
@@ -14,29 +11,32 @@ import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 参数控制层
  * 
  * v1.0 chenyun 2021-03-04 15:02:18
  */
-@Controller
+@RestController
 @RequestMapping("/api/parm")
+@Slf4j
 public class ApiParmController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiParmController.class);
-	
+
 	@Resource
 	private ParmService parmService;
-	
+
 	/**
 	 * 企业修改
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
+	 * 
 	 * @param logoFileId
 	 * @param name
 	 * @return PageResult
 	 */
 	@RequestMapping("/ent")
-	@ResponseBody
 	public PageResult ent(Integer logoFileId, String name) {
 		try {
 			parmService.entUpdate(logoFileId, name);
@@ -49,7 +49,7 @@ public class ApiParmController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 邮件修改
 	 * 
@@ -59,7 +59,6 @@ public class ApiParmController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/email")
-	@ResponseBody
 	public PageResult email(String host, String userName, String pwd, String protocol, String encode) {
 		try {
 			parmService.emailUpdate(host, userName, pwd, protocol, encode);
@@ -82,7 +81,6 @@ public class ApiParmController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/file")
-	@ResponseBody
 	public PageResult file(String uploadDir) {
 		try {
 			parmService.fileUpdate(uploadDir);
@@ -105,7 +103,6 @@ public class ApiParmController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/db")
-	@ResponseBody
 	public PageResult db(String bakDir) {
 		try {
 			parmService.dbUpdate(bakDir);
@@ -118,7 +115,7 @@ public class ApiParmController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 默认密码修改
 	 * 
@@ -129,7 +126,6 @@ public class ApiParmController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/pwd")
-	@ResponseBody
 	public PageResult pwd(Integer type, String value) {
 		try {
 			parmService.pwdUpdate(type, value);
@@ -142,17 +138,17 @@ public class ApiParmController extends BaseController {
 			return PageResult.err();
 		}
 	}
-		
+
 	/**
 	 * 自定义信息修改
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午9:22:54
+	 * 
 	 * @param title
 	 * @param content
 	 * @return PageResult
 	 */
 	@RequestMapping("/custom")
-	@ResponseBody
 	public PageResult custom(String title, String content) {
 		try {
 			parmService.customUpdate(title, content);
@@ -165,26 +161,22 @@ public class ApiParmController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
-	 *  获取参数
+	 * 获取参数
 	 * 
 	 * v1.0 chenyun 2021年11月12日下午3:38:42
+	 * 
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get() {
 		try {
-			Parm parm = parmService.getEntity(1);
-			return PageResultEx.ok()
-					.addAttr("entName", parm.getEntName())
-					.addAttr("fileUploadDir", parm.getFileUploadDir())
-					.addAttr("dbBakDir", parm.getDbBakDir())
-					.addAttr("pwdType", parm.getPwdType())
-					.addAttr("pwdValue", parm.getPwdValue())
-					.addAttr("customTitle", parm.getCustomTitle())
-					.addAttr("customContent", parm.getCustomContent());
+			Parm parm = parmService.getById(1);
+			return PageResultEx.ok().addAttr("entName", parm.getEntName())
+					.addAttr("fileUploadDir", parm.getFileUploadDir()).addAttr("dbBakDir", parm.getDbBakDir())
+					.addAttr("pwdType", parm.getPwdType()).addAttr("pwdValue", parm.getPwdValue())
+					.addAttr("customTitle", parm.getCustomTitle()).addAttr("customContent", parm.getCustomContent());
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

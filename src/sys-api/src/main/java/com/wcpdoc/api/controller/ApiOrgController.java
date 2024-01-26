@@ -4,11 +4,8 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.cache.UserCache;
 import com.wcpdoc.base.entity.Org;
@@ -22,15 +19,17 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 机构控制层
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
-@Controller
+@RestController
 @RequestMapping("/api/org")
+@Slf4j
 public class ApiOrgController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiOrgController.class);
 
 	@Resource
 	private OrgService orgService;
@@ -48,10 +47,9 @@ public class ApiOrgController extends BaseController {
 	 * @return PageOut
 	 */
 	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
+	public PageResult listpage(PageIn pageIn) {
 		try {
-			return PageResultEx.ok().data(orgService.getListpage(new PageIn(request)));
+			return PageResultEx.ok().data(orgService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("机构列表错误：", e);
 			return PageResult.err();
@@ -67,7 +65,6 @@ public class ApiOrgController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
-	@ResponseBody
 	public PageResult add(Org org) {
 		try {
 			UserCache.tryWriteLock("orgAdd", 5000);
@@ -93,7 +90,6 @@ public class ApiOrgController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
-	@ResponseBody
 	public PageResult edit(Org org) {
 		try {
 			// 校验数据有效性
@@ -108,13 +104,13 @@ public class ApiOrgController extends BaseController {
 			}
 
 			// 修改机构
-			Org entity = orgService.getEntity(org.getId());
+			Org entity = orgService.getById(org.getId());
 			entity.setName(org.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setNo(org.getNo());
 			entity.setCode(org.getCode());
-			orgService.update(entity);
+			orgService.updateById(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改机构错误：{}", e.getMessage());
@@ -134,7 +130,6 @@ public class ApiOrgController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/del")
-	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
 			orgService.delEx(id);
@@ -147,7 +142,7 @@ public class ApiOrgController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 获取机构
 	 * 
@@ -157,15 +152,13 @@ public class ApiOrgController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			Org org = orgService.getEntity(id);
-			return PageResultEx.ok()
-					.addAttr("id", org.getId())
-					.addAttr("name", org.getName())
+			Org org = orgService.getById(id);
+			return PageResultEx.ok().addAttr("id", org.getId()).addAttr("name", org.getName())
 					.addAttr("parentId", org.getParentId())
-					.addAttr("parentName", (org.getParentId() == null || org.getParentId() == 0) ? null : orgService.getEntity(org.getParentId()).getName())
+					.addAttr("parentName", (org.getParentId() == null || org.getParentId() == 0) ? null
+							: orgService.getById(org.getParentId()).getName())
 					.addAttr("no", org.getNo());
 		} catch (MyException e) {
 			log.error("获取机构错误：{}", e.getMessage());
@@ -186,7 +179,6 @@ public class ApiOrgController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/move")
-	@ResponseBody
 	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
 			orgService.doMove(sourceId, targetId);
@@ -199,15 +191,15 @@ public class ApiOrgController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 导入机构
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
+	 * 
 	 * @return PageResult
 	 */
 	@RequestMapping("/import")
-	@ResponseBody
 	public PageResult xlsImport(Integer fileId) {
 		try {
 			orgExService.xlsImport(fileId);
@@ -220,15 +212,15 @@ public class ApiOrgController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 导出模板
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
+	 * 
 	 * @return PageResult
 	 */
 	@RequestMapping("/template")
-	@ResponseBody
 	public void template() {
 		try {
 			fileService.exportTemplate("机构.xlsx");
