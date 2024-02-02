@@ -37,7 +37,7 @@ public interface ExamDao extends RBaseDao<Exam> {
 								pageIn.getParm("state"))
 						.eq(pageIn.hasParm("subAdminUserId"), "EXAM.CREATE_USER_ID", pageIn.getParm("subAdminUserId"))
 						.exists(pageIn.hasParm("markUserId"),
-								"SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_ID = EXAM.ID",
+								"SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = {0} AND Z.EXAM_ID = EXAM.ID",
 								pageIn.getParm("markUserId")) // 阅卷用户看（管理或子管理）分配的
 						.orderByDesc("EXAM.UPDATE_TIME"));
 		return new PageOut(page.getRecords(), page.getTotal());
@@ -69,7 +69,7 @@ public interface ExamDao extends RBaseDao<Exam> {
 						.ne(pageIn.hasParm("todo"), "EXAM.MARK_STATE", 3)// 查找我的未完成的考试列表
 						.eq(pageIn.hasParm("subAdminUserId"), "EXAM.CREATE_USER_ID", pageIn.hasParm("subAdminUserId"))// 子管理员看自己
 						.exists(pageIn.hasParm("markUserId"),
-								"SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_ID = EXAM.ID",
+								"SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = {0} AND Z.EXAM_ID = EXAM.ID",
 								pageIn.getParm("markUserId")) // 阅卷用户看（管理或子管理）分配的
 						.eq("EXAM.STATE", 1)// 已发布（不含冻结）
 						.orderByDesc("EXAM.START_TIME"));// 按考试开始时间倒序排列

@@ -3,7 +3,6 @@ package com.wcpdoc.exam.core.dao;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -43,7 +42,7 @@ public interface QuestionDao extends RBaseDao<Question> {
 						.eq(pageIn.hasParm("score"), "QUESTION.SCORE", pageIn.getParm("score"))//
 						.eq(pageIn.hasParm("markType"), "QUESTION.MARK_TYPE", pageIn.getParm("markType"))//
 						.notIn(pageIn.hasParm("exIds"), "QUESTION.ID",
-								StringUtil.toList(pageIn.getParm("exIds", String.class)))//
+								StringUtil.toIntList(pageIn.getParm("exIds", String.class)))//
 						.eq(!pageIn.hasParm("state"), "QUESTION.STATE", 1)// 默认查询发布和草稿状态
 						.and(pageIn.hasParm("state") && "0".equals(pageIn.getParm("state")),
 								i -> i.eq("QUESTION.STATE", 0).gt("QUESTION.UPDATE_TIME",
@@ -64,7 +63,8 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 * @return List<Question>
 	 */
 	default List<Question> getList(List<Integer> ids) {
-		return selectList(new LambdaQueryWrapper<Question>().in(Question::getId, ids));
+		return selectList(new LambdaQueryWrapper<Question>()//
+				.in(Question::getId, ids));
 	}
 
 	/**
@@ -76,9 +76,9 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 * @return List<Integer>
 	 */
 	default List<Integer> getIds(Integer questionTypeId) {
-		return selectObjs(new LambdaQueryWrapper<Question>().select(Question::getId).eq(Question::getState, 1)
-				.eq(Question::getQuestionTypeId, questionTypeId)).stream().map(o -> ((Question) o).getId())
-				.collect(Collectors.toList());
+		return selectObjs(new LambdaQueryWrapper<Question>()//
+				.select(Question::getId).eq(Question::getState, 1)//
+				.eq(Question::getQuestionTypeId, questionTypeId));
 	}
 
 	/**
@@ -90,8 +90,9 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 * @return List<Integer>
 	 */
 	default List<Question> getList(Integer questionTypeId) {
-		return selectList(new LambdaQueryWrapper<Question>().eq(Question::getState, 1).eq(Question::getQuestionTypeId,
-				questionTypeId));
+		return selectList(new LambdaQueryWrapper<Question>()//
+				.eq(Question::getState, 1)//
+				.eq(Question::getQuestionTypeId, questionTypeId));
 	}
 
 	/**
@@ -114,7 +115,9 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 * @return int
 	 */
 	default int getNum(Integer questionTypeId) {
-		return selectCount(new LambdaQueryWrapper<Question>().eq(Question::getState, 1).eq(Question::getQuestionTypeId,
-				questionTypeId)).intValue();
+		return selectCount(new LambdaQueryWrapper<Question>()//
+				.eq(Question::getState, 1)//
+				.eq(Question::getQuestionTypeId, questionTypeId))//
+				.intValue();
 	}
 }

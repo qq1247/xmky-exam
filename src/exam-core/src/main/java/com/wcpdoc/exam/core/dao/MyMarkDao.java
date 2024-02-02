@@ -11,6 +11,7 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 
 /**
@@ -46,7 +47,7 @@ public interface MyMarkDao extends RBaseDao<MyMark> {
 						.ne(pageIn.hasParm("todo"), "EXAM.MARK_STATE", 3)// 查找我的未完成的考试列表
 						.eq(pageIn.hasParm("subAdminUserId"), "EXAM.CREATE_USER_ID", pageIn.getParm("subAdminUserId"))//
 						.exists(pageIn.hasParm("markUserId"),
-								"SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_ID = EXAM.ID",
+								"SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = {0} AND Z.EXAM_ID = EXAM.ID",
 								pageIn.getParm("markUserId")) // 阅卷用户看（管理或子管理）分配的
 						.eq("EXAM.STATE", 1)//
 						.orderByDesc("EXAM.START_TIME"));
@@ -62,8 +63,9 @@ public interface MyMarkDao extends RBaseDao<MyMark> {
 	 * @return PageOut
 	 */
 	default PageOut getUserListpage(PageIn pageIn) {
-		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
-				new MPJQueryWrapper<MyMark>().setAlias("MY_EXAM")//
+		
+		Page<Map<String, Object>> page = SpringUtil.getBean(MyExamDao.class).selectJoinMapsPage(pageIn.toPage(), //
+				new MPJQueryWrapper<MyExam>().setAlias("MY_EXAM")//
 						.select("USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "ORG.ID AS ORG_ID",
 								"ORG.NAME AS ORG_NAME", "MY_EXAM.STATE AS MY_EXAM_STATE",
 								"MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE")//

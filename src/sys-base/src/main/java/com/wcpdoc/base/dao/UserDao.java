@@ -32,10 +32,11 @@ public interface UserDao extends RBaseDao<User> {
 										pageIn.getParm("name")))//
 						.eq(pageIn.hasParm("state"), "USER.STATE", pageIn.getParm("state"))//
 						.eq(pageIn.hasParm("type"), "USER.TYPE", pageIn.getParm("type"))//
-						.in(pageIn.hasParm("ids"), "USER.ID", StringUtil.toList(pageIn.getParm("ids", String.class)))//
+						.in(pageIn.hasParm("ids"), "USER.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))//
+						.in(pageIn.hasParm("examUserIds"), "USER.ID", pageIn.getParm("examUserIds", List.class))//
 						.eq(pageIn.hasParm("parentId"), "USER.PARENT_ID", pageIn.getParm("parentId"))//
 						.ne("USER.STATE", 0)//
-						.orderByDesc("USER.ID"));// bug：导入用户时间一致，分页错误
+						.orderByDesc("USER.ID"));// bug：导入用户时，按时间倒序，分页错误
 		return new PageOut(page.getRecords(), page.getTotal());
 	}
 

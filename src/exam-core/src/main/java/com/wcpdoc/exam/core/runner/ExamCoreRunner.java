@@ -63,6 +63,12 @@ public class ExamCoreRunner implements ApplicationRunner {
 						}
 						
 						try {
+							TimeUnit.SECONDS.sleep(5);// 时间到在等5秒，等所有人都交卷。临时，下一版改成队列24.02.02
+						} catch (InterruptedException e) {
+							log.error("自动阅卷错误：", e);
+						}
+						
+						try {
 							if (!AutoMarkCache.tryWriteLock(unMarkExam.getId(), 10000)) {// 尝试加写锁，答题，交卷，变更时间等功能暂停
 								log.info("自动阅卷错误：【{}-{}】尝试加写锁失败，耗时10秒，等待下一次运行", unMarkExam.getId(), unMarkExam.getName());
 								continue;

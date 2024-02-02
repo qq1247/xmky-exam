@@ -57,7 +57,7 @@ public class ApiExerController extends BaseController {
 				if (map.get("userIds") == null) {
 					map.put("userIds", new Integer[0]);
 				} else {
-					map.put("userIds", StringUtil.toList(map.get("userIds").toString()));
+					map.put("userIds", StringUtil.toIntList(map.get("userIds").toString()));
 				}
 			}
 			return PageResultEx.ok().data(pageOut);

@@ -206,6 +206,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		Question questionNew = new Question();
 		BeanUtils.copyProperties(questionNew, question);
 		// questionOfCopy.setState(2);
+		questionNew.setId(null);
 		questionNew.setUpdateTime(new Date());
 		questionNew.setUpdateUserId(getCurUser().getId());
 		List<Integer> fileIdList = html2FileIds(questionNew.getTitle());
@@ -227,6 +228,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		for (QuestionAnswer questionAnswer : questionAnswerList) {
 			QuestionAnswer questionAnswerNew = new QuestionAnswer();
 			BeanUtils.copyProperties(questionAnswerNew, questionAnswer);
+			questionAnswerNew.setId(null);
 			questionAnswerNew.setQuestionId(questionNew.getId());
 			fileIdList = html2FileIds(questionAnswer.getAnswer());
 			for (Integer fileId : fileIdList) {
@@ -242,6 +244,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		for (QuestionOption questionOption : questionOptionList) {
 			QuestionOption questionOptionNew = new QuestionOption();
 			BeanUtils.copyProperties(questionOptionNew, questionOption);
+			questionOptionNew.setId(null);
 			questionOptionNew.setQuestionId(questionNew.getId());
 			fileIdList = html2FileIds(questionOption.getOptions());
 			for (Integer fileId : fileIdList) {

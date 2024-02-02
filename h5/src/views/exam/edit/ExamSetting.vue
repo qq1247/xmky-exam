@@ -11,6 +11,8 @@
                     start-placeholder="开始时间"
                     end-placeholder="结束时间"
                     value-format="YYYY-MM-DD HH:mm:ss"
+                    format="YYYY-MM-DD HH:mm"
+                    @change="() => {form.maxTimeM = form.examTimeDiff}"
                     />
             </el-form-item>
             <el-form-item v-if="form.markType === 2" label="阅卷时间：" prop="markTimes">
@@ -20,9 +22,21 @@
                     start-placeholder="开始时间"
                     end-placeholder="结束时间"
                     value-format="YYYY-MM-DD HH:mm:ss"
+                    format="YYYY-MM-DD HH:mm"
                     >
                 </el-date-picker>
                 <el-alert :title="`需要阅卷题号：${markQuestions}`" type="warning" :closable="false"/>
+            </el-form-item>
+            <el-form-item label="考试时长：" prop="maxTimeM">
+                <el-input-number 
+                    v-model="form.maxTimeM" 
+                    controls-position="right" 
+                    :min="1" 
+                    :max="form.examTimeDiff"
+                    :step="10"
+                    :precision="0"
+                    />&nbsp;/ {{form.examTimeDiff}}分钟
+            <el-alert :title="`从第一次打开试卷开始计时，最长${form.maxTimeM}分钟`" type="warning" :closable="false"/>
             </el-form-item>
             <el-form-item label="及格分数：" prop="passScore">
                 <el-input-number 

@@ -70,7 +70,7 @@ public class ApiQuestionController extends BaseController {
 				Integer markType = (Integer) result.get("markType");
 				
 				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
-					result.put("markOptions", StringUtil.toList((String)result.get("markOptions")));
+					result.put("markOptions", StringUtil.toIntList((String)result.get("markOptions")));
 				} else {
 					result.put("markOptions", new Integer[0]);
 				}

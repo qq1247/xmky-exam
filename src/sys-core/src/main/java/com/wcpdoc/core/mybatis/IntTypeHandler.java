@@ -31,18 +31,18 @@ public class IntTypeHandler extends BaseTypeHandler<List<Integer>> {
 	@Override
 	public List<Integer> getNullableResult(ResultSet resultSet, String s) throws SQLException {
 		String value = resultSet.getString(s);
-		return StringUtil.toList(value);
+		return StringUtil.toIntList(value);
 	}
 
 	@Override
 	public List<Integer> getNullableResult(ResultSet resultSet, int i) throws SQLException {
 		String value = resultSet.getString(i);
-		return StringUtil.toList(value);
+		return StringUtil.toIntList(value);
 	}
 
 	@Override
 	public List<Integer> getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
 		String value = callableStatement.getString(i);
-		return StringUtil.toList(value);
+		return StringUtil.toIntList(value);
 	}
 }

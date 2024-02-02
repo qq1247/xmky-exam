@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -45,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/myMark")
 @Slf4j
 public class ApiMyMarkController extends BaseController {
-	
+
 	@Resource
 	private MyMarkService myMarkService;
 	@Resource
@@ -54,18 +55,21 @@ public class ApiMyMarkController extends BaseController {
 	private MyQuestionService myQuestionService;
 	@Resource
 	private ExamService examService;
-	
+	@Resource
+	private UserService userService;
+
 	/**
 	 * 我的阅卷列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
+	 * 
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
-				
+
 			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
 				pageIn.addParm("subAdminUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看（管理或子管理）分配的
@@ -78,7 +82,7 @@ public class ApiMyMarkController extends BaseController {
 				if (map.get("examSxes") == null) {
 					map.put("examSxes", new Integer[0]);
 				} else {
-					map.put("examSxes", ((String)map.get("examSxes")).split(","));
+					map.put("examSxes", ((String) map.get("examSxes")).split(","));
 				}
 			}
 			return PageResultEx.ok().data(pageOut);
@@ -87,11 +91,12 @@ public class ApiMyMarkController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 我的阅卷用户列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
+	 * 
 	 * @return pageOut
 	 */
 	@RequestMapping("/userListpage")
@@ -105,11 +110,12 @@ public class ApiMyMarkController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 获取我的考试
 	 * 
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
+	 * 
 	 * @param examId
 	 * @return PageResult
 	 */
@@ -117,16 +123,23 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult get(Integer examId, Integer userId) {
 		try {
 			MyExam myExam = myExamService.getMyExam(examId, userId);
-			return PageResultEx.ok()
-					.addAttr("answerStartTime", myExam.getAnswerStartTime())
-					.addAttr("answerEndTime", myExam.getAnswerEndTime())
-					.addAttr("markStartTime", myExam.getMarkStartTime())
-					.addAttr("markEndTime", myExam.getMarkEndTime())
-					.addAttr("objectiveScore", myExam.getObjectiveScore())
-					.addAttr("totalScore", myExam.getTotalScore())
-					.addAttr("state", myExam.getState())
-					.addAttr("markState", myExam.getMarkState())
-					.addAttr("answerState", myExam.getAnswerState());
+			Exam exam = examService.getById(examId);
+			return PageResultEx.ok()//
+					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
+					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
+					.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
+					.addAttr("answerStartTime", myExam.getAnswerStartTime())//
+					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
+					.addAttr("markStartTime", myExam.getMarkStartTime())//
+					.addAttr("markEndTime", myExam.getMarkEndTime())//
+					.addAttr("objectiveScore", myExam.getObjectiveScore())//
+					.addAttr("totalScore", myExam.getTotalScore())//
+					.addAttr("state", myExam.getState())//
+					.addAttr("markState", myExam.getMarkState())//
+					.addAttr("answerState", myExam.getAnswerState())//
+					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
+					.addAttr("userNum", exam.getRankState() == 1 ? myExamService.getList(examId).size() : null)
+					;
 		} catch (MyException e) {
 			log.error("获取我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -135,11 +148,12 @@ public class ApiMyMarkController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 获取用户试卷
 	 * 
 	 * v1.0 zhanghc 2022年5月18日下午1:21:07
+	 * 
 	 * @param examId
 	 * @param userId
 	 * @return PageResult
@@ -154,25 +168,42 @@ public class ApiMyMarkController extends BaseController {
 			if (!ValidateUtil.isValid(userId)) {
 				throw new MyException("参数错误：userId");
 			}
-			
+
 			MyExam _myExam = myExamService.getMyExam(examId, userId);
 			if (_myExam == null) {
+				throw new MyException("试卷不存在");
+			}
+			if (CurLoginUserUtil.isAdmin()) {// 管理员看全部
+
+			}
+			if (CurLoginUserUtil.isSubAdmin()) {// 子管理看自己的人
+				if (!userService.getById(getCurUser().getId()).getUserIds().contains(userId)) {
+					throw new MyException("无查阅权限");
+				}
+			}
+			if (CurLoginUserUtil.isMarkUser()) {// 协助阅卷只看自己阅过的
+				if (_myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
+					throw new MyException("无查阅权限");
+				}
+			}
+			if (CurLoginUserUtil.isExamUser()) {// 考试用户不能看
 				throw new MyException("无查阅权限");
 			}
-			if (_myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
-				throw new MyException("无查阅权限");
-			}
+
 			Exam exam = examService.getById(examId);
+			if (exam.getState() == 2) {
+				throw new MyException("考试已暂停");
+			}
 			if (exam.getMarkType() == 2) {
 				if (exam.getMarkStartTime().getTime() > System.currentTimeMillis()) {
 					throw new MyException("阅卷未开始");
 				}
 			}
-			
+
 			// 组装试卷
 			List<Map<String, Object>> paper = new ArrayList<>();
 			List<MyQuestion> myQuestionList = myQuestionService.getList(examId, userId);
-			
+
 			for (MyQuestion _myQuestion : myQuestionList) {
 				Map<String, Object> myQuestion = new HashMap<>();
 				if (_myQuestion.getType() == 1) {
@@ -182,7 +213,7 @@ public class ApiMyMarkController extends BaseController {
 				} else {
 					myQuestion.put("type", _myQuestion.getType());
 					myQuestion.put("questionId", _myQuestion.getQuestionId());
-			
+
 					Question question = QuestionCache.getQuestion(_myQuestion.getQuestionId());// 已关联考试的试题不会改变，缓存起来加速查询。
 					myQuestion.put("questionType", question.getType());
 					myQuestion.put("markType", question.getMarkType());
@@ -194,21 +225,22 @@ public class ApiMyMarkController extends BaseController {
 					{// 选项
 						List<String> options = new ArrayList<>();
 						if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
-							List<QuestionOption> questionOptionList = QuestionCache.getOption(_myQuestion.getQuestionId());
+							List<QuestionOption> questionOptionList = QuestionCache
+									.getOption(_myQuestion.getQuestionId());
 							for (QuestionOption questionOption : questionOptionList) {
 								options.add(questionOption.getOptions());
 							}
 						}
 						myQuestion.put("options", options);
 					}
-			
+
 					{// 用户答案
 						List<String> userAnswerList = new ArrayList<>();
 						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
-							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) 
+							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)
 									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {// 单选、判断、问答
 								userAnswerList.add(_myQuestion.getUserAnswer());
-							} else if (QuestionUtil.hasMultipleChoice(question)) {//多选
+							} else if (QuestionUtil.hasMultipleChoice(question)) {// 多选
 								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split(","));
 							} else if (QuestionUtil.hasFillBlank(question)) {// 填空
 								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split("\n", -1));
@@ -216,18 +248,18 @@ public class ApiMyMarkController extends BaseController {
 						}
 						myQuestion.put("userAnswers", userAnswerList);
 					}
-					
+
 					{// 标准答案（前面校验是是否阅卷已开始，可以显示答案）
 						List<String> answerList = new ArrayList<>();
 						List<QuestionAnswer> questionAnswerList = QuestionCache.getAnswer(_myQuestion.getQuestionId());
-						for(QuestionAnswer answer : questionAnswerList){
-							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) 
+						for (QuestionAnswer answer : questionAnswerList) {
+							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)
 									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 								answerList.add(answer.getAnswer());
 							} else if (QuestionUtil.hasMultipleChoice(question)) {
 								Collections.addAll(answerList, answer.getAnswer().split(","));
-							} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) 
-									&& QuestionUtil.hasObjective(question))) {
+							} else if (QuestionUtil.hasFillBlank(question)
+									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
 								answerList.add(answer.getAnswer());
 							}
 						}
@@ -236,23 +268,24 @@ public class ApiMyMarkController extends BaseController {
 				}
 				paper.add(myQuestion);
 			}
-			
+
 			return PageResultEx.ok().data(paper);
 		} catch (MyException e) {
 			log.error("获取用户试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取用户试卷错误：", e);
-			return PageResult.err(); 
+			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 分配试卷
 	 * 
 	 * v1.0 zhanghc 2023年2月23日下午2:31:16
+	 * 
 	 * @param examId 考试ID
-	 * @param num 分配份数
+	 * @param num    分配份数
 	 * @return PageResult
 	 */
 	@RequestMapping("/assign")
@@ -273,15 +306,16 @@ public class ApiMyMarkController extends BaseController {
 			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
-	
+
 	/**
 	 * 打分
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param examId 考试ID
-	 * @param userId 考试用户ID
+	 * 
+	 * @param examId     考试ID
+	 * @param userId     考试用户ID
 	 * @param questionId 试题ID
-	 * @param userScore 用户得分
+	 * @param userScore  用户得分
 	 * @return PageResult
 	 */
 	@RequestMapping("/score")
@@ -302,11 +336,12 @@ public class ApiMyMarkController extends BaseController {
 			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
-	
+
 	/**
 	 * 阅卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
+	 * 
 	 * @param examId
 	 * @return PageResult
 	 */

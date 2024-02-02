@@ -368,6 +368,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setGenType(examInfo.getGenType());
 		exam.setSxes(examInfo.getSxes());
 		exam.setState(examInfo.getState());
+		exam.setMaxTimeM(examInfo.getMaxTimeM());
+		;
 		exam.setMarkState(1);// 标记为未阅卷
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
@@ -934,6 +936,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			if (examInfo.getEndTime().getTime() <= System.currentTimeMillis()) {
 				throw new MyException("考试结束时间必须大于当前时间");
 			}
+
+			if (!ValidateUtil.isValid(examInfo.getMaxTimeM())) {
+				throw new MyException("参数错误：maxTimeM");
+			}
+			if (examInfo.getMaxTimeM() <= 0
+					|| examInfo.getMaxTimeM() > DateUtil.diffMinute(examInfo.getStartTime(), examInfo.getEndTime())) {
+				throw new MyException("参数错误：maxTimeM");
+			}
+
 			if (containSubjectiveQuesiton) {// 如果包含主观题，阅卷时间不能缺失
 				if (!ValidateUtil.isValid(examInfo.getMarkStartTime())) {
 					throw new MyException("参数错误：markStartTime");

@@ -22,6 +22,8 @@ public class MyExam {
 	private Integer examId;
 	private Integer userId;
 	private Integer markUserId;
+	private Date examStartTime;
+	private Date examEndTime;
 	private Date answerStartTime;
 	private Date answerEndTime;
 	private Date markStartTime;

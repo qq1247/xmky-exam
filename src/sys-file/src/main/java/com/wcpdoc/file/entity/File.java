@@ -2,6 +2,8 @@ package com.wcpdoc.file.entity;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
@@ -14,6 +16,7 @@ import lombok.Data;
 @Data
 @TableName(value = "SYS_FILE", autoResultMap = true)
 public class File {
+	@TableId(type = IdType.AUTO)
 	private Integer id;
 	private String name;
 	private String extName;

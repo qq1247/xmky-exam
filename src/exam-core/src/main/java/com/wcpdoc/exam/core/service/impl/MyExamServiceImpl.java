@@ -109,14 +109,14 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (exam.getState() == 2) {
 			throw new MyException("考试已暂停");
 		}
+		MyExam myExam = getMyExam(examId, userId);// 先打开试卷（myExam/paper）后答题（myExam/answer）。第一次打开试卷时，更新了当前用户的考试开始结束时间
 		long curTime = System.currentTimeMillis();
-		if (exam.getStartTime().getTime() > curTime) {
+		if (myExam.getExamStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
+		if (curTime - myExam.getExamEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("考试已结束");
 		}
-		MyExam myExam = getMyExam(examId, userId);
 		if (myExam.getState() == 3) {
 			throw new MyException("已交卷");
 		}
@@ -185,10 +185,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			throw new MyException("考试已暂停");
 		}
 		long curTime = System.currentTimeMillis();
-		if (exam.getStartTime().getTime() > curTime) {
+		if (myExam.getExamStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
+		if (curTime - myExam.getExamEndTime().getTime() > 5000) {// 预留5秒网络延时
 			throw new MyException("考试已结束");
 		}
 

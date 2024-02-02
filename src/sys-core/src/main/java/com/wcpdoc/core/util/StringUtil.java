@@ -256,18 +256,19 @@ public class StringUtil {
 	 * 字符串连接
 	 * 
 	 * v1.0 zhanghc 2019年9月7日上午10:32:40
+	 * @param <T>
 	 * 
 	 * @param list
 	 * @param separator
 	 * @return String
 	 */
-	public static String join(Collection<String> collection, String separator) {
+	public static <T> String join(Collection<T> collection, String separator) {
 		if (!ValidateUtil.isValid(collection)) {
 			throw new MyException("参数错误：collection");
 		}
 
 		StringBuilder sb = new StringBuilder();
-		for (String str : collection) {
+		for (Object str : collection) {
 			if (sb.length() > 0) {
 				sb.append(separator);
 			}
@@ -357,7 +358,7 @@ public class StringUtil {
 	 * @param strArr
 	 * @return List<Integer>
 	 */
-	public static List<Integer> toList(String str) {
+	public static List<Integer> toIntList(String str) {
 		if (!ValidateUtil.isValid(str)) {
 			return new ArrayList<Integer>(0);
 		}

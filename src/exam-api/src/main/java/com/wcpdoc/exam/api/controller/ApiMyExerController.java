@@ -2,13 +2,10 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -195,15 +192,13 @@ public class ApiMyExerController extends BaseController {
 			// 数据有效性校验
 			Exer exer = exerService.getById(exerId);
 			if (exer.getState() == 0) {
-				throw new MyException("无权限");
+				throw new MyException("练习已删除");
 			}
 			long curTime = System.currentTimeMillis();
 			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
 				throw new MyException("时间已过期");
 			}
-			Set<Object> userIdSet = new HashSet<>();
-			userIdSet.addAll(Arrays.asList(exer.getUserIds()));
-			if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
+			if (!exer.getUserIds().contains(getCurUser().getId())) {
 				throw new MyException("无权限");
 			}
 			

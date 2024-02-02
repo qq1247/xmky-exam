@@ -10,6 +10,7 @@ import com.github.yulichang.query.MPJQueryWrapper;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.entity.Exer;
 
 /**
@@ -28,8 +29,8 @@ public interface ExerDao extends RBaseDao<Exer> {
 						.leftJoin("EXM_QUESTION_TYPE QUESTION_TYPE ON EXER.QUESTION_TYPE_ID = QUESTION_TYPE.ID")//
 						.eq(pageIn.hasParm("questionTypeId"), "EXER.QUESTION_TYPE_ID", pageIn.getParm("questionTypeId"))//
 						.like(pageIn.hasParm("name"), "EXER.NAME", pageIn.getParm("name"))//
-						.ge(pageIn.hasParm("todo"), "EXER.END_TIME", new Date())// 查找我的未完成的练习列表
-						.ge(pageIn.hasParm("curUserId"), "EXER.CREATE_USER_ID", pageIn.getParm("curUserId"))// 子管理员登录，各看各的
+						.ge(pageIn.hasParm("todo"), "EXER.END_TIME", DateUtil.formatDateTime(new Date()))// 查找我的未完成的练习列表
+						.eq(pageIn.hasParm("curUserId"), "EXER.CREATE_USER_ID", pageIn.getParm("curUserId"))// 子管理员登录，各看各的
 						.like(pageIn.hasParm("examUserId"), "EXER.USER_IDS", String.format("%%,%s,%%", pageIn.getParm("examUserId")))//
 						.eq("EXER.STATE", 1)//
 						.and(pageIn.hasParm("startTime") && pageIn.hasParm("endTime"),

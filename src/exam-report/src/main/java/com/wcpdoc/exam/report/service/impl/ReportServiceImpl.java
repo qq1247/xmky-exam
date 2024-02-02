@@ -125,7 +125,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("examNum", myExamList.size());
 		result.put("exerNum", exerList.size());
 		result.put("passExamNum", myExamOfPassList.size());
-		result.put("topRank", myExamOfTopRank.getNo());
+		result.put("topRank", myExamOfTopRank == null ? 0 : myExamOfTopRank.getNo());
 		return result;
 	}
 
@@ -453,7 +453,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 						.innerJoin("SYS_USER USER ON MY_EXAM.USER_ID = USER.ID")// 考试用户
 						.leftJoin("SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID")// 阅卷用户
 						.leftJoin("SYS_ORG ORG ON USER.ORG_ID = ORG.ID")// 机构名称
-						.select("MY_EXAM.NO AS MY_EXAM_NO", // 排名
+						.select("MY_EXAM.EXAM_ID, MY_EXAM.NO AS MY_EXAM_NO", // 排名
 								"USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "ORG.NAME AS ORG_NAME", // 用户机构信息
 								"MY_EXAM.STATE AS MY_EXAM_STATE", "MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE",
 								"MY_EXAM.ANSWER_STATE AS MY_EXAM_ANSWER_STATE", // 考试状态信息

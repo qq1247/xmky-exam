@@ -1,10 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -66,9 +63,7 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 		if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
 			throw new MyException("时间已过期");
 		}
-		Set<Object> userIdSet = new HashSet<>();
-		userIdSet.addAll(Arrays.asList(exer.getUserIds()));
-		if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
+		if (!exer.getUserIds().contains(getCurUser().getId())) {
 			throw new MyException("无权限");
 		}
 		Question question = questionService.getById(exerRmk.getQuestionId());

@@ -60,15 +60,14 @@ public class ApiUserController extends BaseController {
 			if (getCurUser().getType() == 0) {// 如果是管理员
 				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class))) {// 默认查询考试用户
 					pageIn.addParm("type", "1");
-				} else /* if (pageIn.get("type").equals("3")) */ {
+				} else {
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
-				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class))
-						|| pageIn.getParm("type").equals("1")) {// 默认查询考试用户
+				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
 					User user = userService.getById(getCurUser().getId());
-					pageIn.addParm("ids", user.getUserIds());
-				} else /* if (pageIn.get("type").equals("3")) */ {// 查看阅卷用户
+					pageIn.addParm("examUserIds", user.getUserIds());
+				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
 			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限

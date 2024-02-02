@@ -100,7 +100,7 @@ public class ApiExamController extends BaseController {
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
-				
+
 			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员看自己
 				pageIn.addParm("subAdminUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看（管理或子管理）分配的
@@ -108,16 +108,16 @@ public class ApiExamController extends BaseController {
 			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有权限
 				throw new MyException("无权限");
 			}
-			
+
 			PageOut pageOut = examService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("sxes") == null) {
 					map.put("sxes", new Integer[0]);
 				} else {
-					map.put("sxes", ((String)map.get("sxes")).split(","));
+					map.put("sxes", ((String) map.get("sxes")).split(","));
 				}
 			}
-			
+
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);
@@ -129,14 +129,17 @@ public class ApiExamController extends BaseController {
 	 * 考试发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * 
 	 * @param examInfo
 	 * @return PageResult
 	 */
 	@RequestMapping("/publish")
 	public PageResult publish(@RequestBody ExamInfo examInfo) {
-		try {			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		try {
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+					.getRequestAttributes();
 			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
-			
+
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
 			ProgressBarCache.setProgressBar(processBarId, 0.0, 1.0, "发布开始", HttpStatus.OK.value());// 放在前面，可能的问题为下面的线程执行慢，没有进度数据，前端显示空
 			Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+userNum
@@ -146,13 +149,16 @@ public class ApiExamController extends BaseController {
 					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
 					try {
 						SpringUtil.getBean(ExamService.class).publish(examInfo, processBarId);
-						ProgressBarCache.setProgressBar(processBarId, processLen, processLen, "发布成功", HttpStatus.OK.value());// 放在业务层最后一行，进度已经100%，数据还没有完全插入，这时查询数据库时为空
+						ProgressBarCache.setProgressBar(processBarId, processLen, processLen, "发布成功",
+								HttpStatus.OK.value());// 放在业务层最后一行，进度已经100%，数据还没有完全插入，这时查询数据库时为空
 					} catch (MyException e) {
-						ProgressBarCache.setProgressBar(processBarId, 99.0, 100.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						ProgressBarCache.setProgressBar(processBarId, 99.0, 100.0, e.getMessage(),
+								HttpStatus.INTERNAL_SERVER_ERROR.value());
 						log.error("发布考试错误：{}", e.getMessage());
 						UserContext.remove();
 					} catch (Exception e) {
-						ProgressBarCache.setProgressBar(processBarId, 99.0, 100.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						ProgressBarCache.setProgressBar(processBarId, 99.0, 100.0, e.getMessage(),
+								HttpStatus.INTERNAL_SERVER_ERROR.value());
 						log.error("发布考试错误：", e);
 						UserContext.remove();
 					}
@@ -168,11 +174,12 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 考试试卷
 	 * 
 	 * v1.0 zhanghc 2022年10月25日下午3:30:55
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
@@ -183,7 +190,7 @@ public class ApiExamController extends BaseController {
 			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			
+
 			List<Map<String, Object>> examQuestions = new ArrayList<>();
 			List<Map<String, Object>> examRules = new ArrayList<>();
 			if (exam.getGenType() == 1) {// 人工组卷
@@ -204,7 +211,7 @@ public class ApiExamController extends BaseController {
 						examQuestion.put("score", _examQuestion.getScore());
 						examQuestion.put("scores", _examQuestion.getScores());
 						examQuestion.put("analysis", _question.getAnalysis());
-						
+
 						List<String> _options = new ArrayList<>();
 						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasMultipleChoice(_question)) {// 如果是单选或多选，添加选项字段
 							List<QuestionOption> questionOptionList = QuestionCache.getOption(_question.getId());
@@ -213,17 +220,17 @@ public class ApiExamController extends BaseController {
 							}
 							examQuestion.put("options", _options);
 						}
-						
+
 						List<QuestionAnswer> _questionAnswerList = QuestionCache.getAnswer(_question.getId());
 						List<Object> _answers = new ArrayList<>();
-						for(QuestionAnswer answer : _questionAnswerList){
-							if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
+						for (QuestionAnswer answer : _questionAnswerList) {
+							if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question)
 									|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasSubjective(_question))) {
 								_answers.add(answer.getAnswer());
 							} else if (QuestionUtil.hasMultipleChoice(_question)) {
 								Collections.addAll(_answers, answer.getAnswer().split(","));
-							} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
-									&& QuestionUtil.hasObjective(_question))) {
+							} else if (QuestionUtil.hasFillBlank(_question)
+									|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasObjective(_question))) {
 								_answers.add(answer.getAnswer());
 							}
 						}
@@ -246,37 +253,28 @@ public class ApiExamController extends BaseController {
 						examRule.put("markOptions", _examRule.getMarkOptions());
 						examRule.put("num", _examRule.getNum());
 						examRule.put("score", _examRule.getScore());
-						examRule.put("scores", _examRule.getQuestionType() == 2 ? _examRule.getScores() : new BigDecimal[0]);// 客观填空等不需要页面处理
+						examRule.put("scores",
+								_examRule.getQuestionType() == 2 ? _examRule.getScores() : new BigDecimal[0]);// 客观填空等不需要页面处理
 					}
 					examRules.add(examRule);
 				}
 			}
-			
+
 			List<MyExam> _myExamList = myExamService.getList(id);
 			List<Integer> examUserIdList = new ArrayList<>();
 			for (MyExam myExam : _myExamList) {
 				examUserIdList.add(myExam.getUserId());
 			}
-			
-			return PageResultEx.ok()
-					.addAttr("id", exam.getId())
-					.addAttr("name", exam.getName())
-					.addAttr("paperName", exam.getPaperName())
-					.addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
-					.addAttr("startTime", exam.getStartTime())
-					.addAttr("endTime", exam.getEndTime())
-					.addAttr("markStartTime", exam.getMarkStartTime())
-					.addAttr("markEndTime", exam.getMarkEndTime())
-					.addAttr("genType", exam.getGenType())
-					.addAttr("showType", exam.getShowType())
-					.addAttr("passScore", exam.getPassScore())
-					.addAttr("anonState", exam.getAnonState())
-					.addAttr("scoreState", exam.getScoreState())
-					.addAttr("rankState", exam.getRankState())
-					.addAttr("sxes", exam.getSxes())
-					.addAttr("state", exam.getState())
-					.addAttr("examQuestions", examQuestions)
-					.addAttr("examRules", examRules)
+
+			return PageResultEx.ok().addAttr("id", exam.getId()).addAttr("name", exam.getName())
+					.addAttr("paperName", exam.getPaperName()).addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
+					.addAttr("startTime", exam.getStartTime()).addAttr("endTime", exam.getEndTime())
+					.addAttr("markStartTime", exam.getMarkStartTime()).addAttr("markEndTime", exam.getMarkEndTime())
+					.addAttr("genType", exam.getGenType()).addAttr("showType", exam.getShowType())
+					.addAttr("passScore", exam.getPassScore()).addAttr("anonState", exam.getAnonState())
+					.addAttr("scoreState", exam.getScoreState()).addAttr("rankState", exam.getRankState())
+					.addAttr("sxes", exam.getSxes()).addAttr("state", exam.getState())
+					.addAttr("examQuestions", examQuestions).addAttr("examRules", examRules)
 					.addAttr("examUserIds", examUserIdList);
 		} catch (MyException e) {
 			log.error("考试获取错误：{}", e.getMessage());
@@ -286,7 +284,7 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 考试删除
 	 * 
@@ -307,11 +305,12 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 考试获取
 	 * 
 	 * v1.0 zhanghc 2021年12月21日下午4:36:14
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
@@ -319,25 +318,15 @@ public class ApiExamController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exam exam = examService.getById(id);
-			return PageResultEx.ok()
-					.addAttr("id", exam.getId())
-					.addAttr("name", exam.getName())
-					.addAttr("paperName", exam.getPaperName())
-					.addAttr("startTime", exam.getStartTime())
-					.addAttr("endTime", exam.getEndTime())
-					.addAttr("markStartTime", exam.getMarkStartTime())
-					.addAttr("markEndTime", exam.getMarkEndTime())
-					.addAttr("markState", exam.getMarkState())
-					.addAttr("scoreState", exam.getScoreState())
-					.addAttr("rankState", exam.getRankState())
-					.addAttr("anonState", exam.getAnonState())
-					.addAttr("passScore", exam.getPassScore())
-					.addAttr("totalScore", exam.getTotalScore())
-					.addAttr("markType", exam.getMarkType())
-					.addAttr("genType", exam.getGenType())
-					.addAttr("sxes", exam.getSxes())
-					.addAttr("state", exam.getState())
-					;
+			return PageResultEx.ok().addAttr("id", exam.getId()).addAttr("name", exam.getName())
+					.addAttr("paperName", exam.getPaperName()).addAttr("startTime", exam.getStartTime())
+					.addAttr("endTime", exam.getEndTime()).addAttr("markStartTime", exam.getMarkStartTime())
+					.addAttr("markEndTime", exam.getMarkEndTime()).addAttr("markState", exam.getMarkState())
+					.addAttr("scoreState", exam.getScoreState()).addAttr("rankState", exam.getRankState())
+					.addAttr("anonState", exam.getAnonState()).addAttr("passScore", exam.getPassScore())
+					.addAttr("totalScore", exam.getTotalScore()).addAttr("markType", exam.getMarkType())
+					.addAttr("genType", exam.getGenType()).addAttr("sxes", exam.getSxes())
+					.addAttr("state", exam.getState());
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -351,9 +340,10 @@ public class ApiExamController extends BaseController {
 	 * 考试变更时间
 	 * 
 	 * v1.0 zhanghc 2022年4月17日下午6:52:08
-	 * @param id 考试ID
+	 * 
+	 * @param id       考试ID
 	 * @param timeType 时间类型：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
-	 * @param minute 分钟数
+	 * @param minute   分钟数
 	 * @return PageResult
 	 */
 	@RequestMapping("/time")
@@ -374,11 +364,12 @@ public class ApiExamController extends BaseController {
 			AutoMarkCache.releaseWriteLock(id);
 		}
 	}
-	
+
 	/**
 	 * 阅卷协助
 	 * 
 	 * v1.0 zhanghc 2023年9月22日下午4:15:24
+	 * 
 	 * @param id
 	 * @param markUserIds
 	 * @return PageResult
@@ -396,11 +387,12 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 阅卷用户列表
 	 * 
 	 * v1.0 zhanghc 2023年9月26日下午5:12:17
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
@@ -412,7 +404,7 @@ public class ApiExamController extends BaseController {
 			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			
+
 			// 获取阅卷用户列表
 			List<MyMark> myMarkList = myMarkService.getList(id);
 			List<Map<String, Object>> resultList = new ArrayList<>();
@@ -432,11 +424,12 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 考试用户列表
 	 * 
 	 * v1.0 zhanghc 2023年9月26日下午5:12:17
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
@@ -448,7 +441,7 @@ public class ApiExamController extends BaseController {
 			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			
+
 			// 获取阅卷用户列表
 			List<MyExam> myExamList = myExamService.getList(id);
 			Integer[] userIds = new Integer[myExamList.size()];
@@ -465,7 +458,7 @@ public class ApiExamController extends BaseController {
 			for (Org org : orgList) {
 				orgCache.put(org.getId(), org);
 			}
-			
+
 			List<Map<String, Object>> resultList = new ArrayList<>();
 			for (MyExam myExam : myExamList) {
 				Map<String, Object> result = new HashMap<>();
@@ -486,5 +479,50 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
+	/**
+	 * 考试暂停
+	 * 
+	 * v1.0 zhanghc 2024年1月31日下午1:36:20
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/pause")
+	public PageResult pause(Integer id) {
+		try {
+			Exam exam = examService.getById(id);
+			if (exam.getState() == 0) {
+				throw new MyException("考试已删除");
+			}
+			if (exam.getMarkState() == 3) {
+				throw new MyException("考试已结束");
+			}
+			if (exam.getMarkType() == 1) {
+				if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
+					throw new MyException("考试已结束");
+				}
+			}
+			if (exam.getMarkType() == 2) {
+				if (exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {
+					throw new MyException("阅卷已结束");
+				}
+			}
+			
+			if(exam.getState() == 1) {
+				exam.setState(2);
+			} else {
+				exam.setState(1);
+			}
+			
+			examService.updateById(exam);
+			return PageResultEx.ok().data(exam.getState());
+		} catch (MyException e) {
+			log.error("考试暂停错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试暂停错误：", e);
+			return PageResult.err();
+		}
+	}
 }

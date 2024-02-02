@@ -108,9 +108,9 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		if (entity.getEndTime().getTime() <= System.currentTimeMillis()) {
 			throw new MyException("练习已结束");
 		}
-		if (entity.getStartTime().getTime() <= System.currentTimeMillis()) {
-			throw new MyException("练习已开始");// 考试结束放在考试开始前校验，可能的问题为考试已结束，提示的是考试已开始。
-		}
+//		if (entity.getStartTime().getTime() <= System.currentTimeMillis()) {
+//			throw new MyException("练习已开始");// 考试结束放在考试开始前校验，可能的问题为考试已结束，提示的是考试已开始。
+//		}
 		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
