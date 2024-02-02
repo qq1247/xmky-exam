@@ -200,6 +200,7 @@ async function publish() {
             markType: form.markType,
             startTime: form.examTimes[0],
             endTime: form.examTimes[1],
+            maxTimeM: form.maxTimeM,
             markStartTime: form.markType === 2 ? form?.markTimes[0] : '',
             markEndTime: form.markType === 2 ? form?.markTimes[1] : '',
         }), 

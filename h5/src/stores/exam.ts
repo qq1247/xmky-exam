@@ -11,13 +11,14 @@ export const useExamStore = defineStore('exam', () => {
     const name = ref(`考试-${dayjs().add(0, 'day').format('YYYY-MM-DD')}`)// 考试名称
     const paperName = ref(`试卷-${dayjs().add(0, 'day').format('YYYY-MM-DD')}`)// 试卷名称
     const examTimes = ref([
-            dayjs().add(0, 'day').hour(8).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
-            dayjs().add(0, 'day').hour(10).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
-        ])// 考试时间
+        dayjs().add(0, 'day').hour(8).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+        dayjs().add(0, 'day').hour(10).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+    ])// 考试时间
+    
     const markTimes = ref([
-            dayjs().add(0, 'day').hour(14).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
-            dayjs().add(0, 'day').hour(18).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
-        ])// 阅卷时间
+        dayjs().add(0, 'day').hour(14).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+        dayjs().add(0, 'day').hour(18).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+    ])// 阅卷时间
     const genType = ref(1) // 组卷方式（1：人工组卷；2：随机组卷）
     const passScore = ref(0) // 及格分数
     const sxes = ref([] as number[]) // 防作弊
@@ -40,7 +41,7 @@ export const useExamStore = defineStore('exam', () => {
         } else {// 随机组卷
             return parseFloat(examRules.value.reduce((total, cur) => {// 题数*分数
                 return cur.type === 1 ? total : ((cur.score as number) * (cur.num as number)) + total
-            }, 0).toFixed(2)) 
+            }, 0).toFixed(2))
         }
     })
     const markQuestions = computed(() => {// 阅卷试题
@@ -75,8 +76,17 @@ export const useExamStore = defineStore('exam', () => {
         }
     })
     const markType = computed(() => {// 阅卷类型
-        return subjectiveQuestionNum.value > 0 ? 2: 1
+        return subjectiveQuestionNum.value > 0 ? 2 : 1
     })
+    const examTimeDiff = computed(() => {// 考试时间差（分钟）
+        if(!examTimes.value[0] || !examTimes.value[1]) {
+            return 0
+        }
+
+        return dayjs(examTimes.value[1], 'YYYY-MM-DD HH:mm:ss').diff(dayjs(examTimes.value[0], 'YYYY-MM-DD HH:mm:ss'), 'minute')
+    })
+
+    const maxTimeM = examTimeDiff.value // 考试时长（分钟）
 
     // 序号更新
     function noUpdate() {
@@ -102,9 +112,9 @@ export const useExamStore = defineStore('exam', () => {
     }
     return {
         // 属性
-        id, name, paperName, examTimes, markTimes, genType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds, 
+        id, name, paperName, examTimes, markTimes, maxTimeM, genType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds,
         // 计算属性
-        totalScore, markQuestions, markType, examUserNum, markUserNum, objectiveQuestionNum, subjectiveQuestionNum,
+        totalScore, markQuestions, markType, examUserNum, markUserNum, objectiveQuestionNum, subjectiveQuestionNum, examTimeDiff,
         // 方法
         noUpdate
     }

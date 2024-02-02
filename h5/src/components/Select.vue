@@ -1,33 +1,19 @@
 <template>
     <!-- 下拉选择 -->
-    <el-select 
-        v-model="selectedValue" 
-        :multiple="multiple"
-        filterable 
-        remote 
-        :teleported="false"
-        :automatic-dropdown="true"
-        :placeholder="placeholder"
-        collapse-tags
-        collapse-tags-tooltip
-        :max-collapse-tags="8"
+    <el-select v-model="selectedValue" :multiple="multiple" filterable remote :automatic-dropdown="true"
+        :placeholder="placeholder" collapse-tags collapse-tags-tooltip :max-collapse-tags="8"
         @visible-change="(visible: Boolean) => { if (visible) { query() } }"
-        @change="emit('update:modelValue', selectedValue)"
-        >
+        @change="emit('update:modelValue', selectedValue)" popper-class="my-select">
 
         <!-- 搜索框 -->
-        <el-input
-            v-model="listpage.searchParmValue" 
-            @click.stop="" 
-            @input="() => {listpage.curPage = 1; query()}"
-            :placeholder="searchPlaceholder" 
-            >
+        <el-input v-model="listpage.searchParmValue" @click.stop="" @input="() => { listpage.curPage = 1; query() }"
+            :placeholder="searchPlaceholder">
             <template #prefix>
                 <span class="iconfont icon-search"></span>
             </template>
         </el-input>
 
-        <div style="display: flex;justify-content: space-between;">
+        <div style="display: flex;justify-content: space-between;margin: 5px 15px;">
             <!-- 工具条 -->
             <div>
                 <el-button v-if="multiple" type="info" link @click="selectAll">
@@ -38,34 +24,19 @@
                 </el-button>
             </div>
             <!-- 分页条件 -->
-            <el-pagination small
-                v-model:current-page="listpage.curPage" 
-                v-model:page-size="listpage.pageSize" 
-                :total="listpage.total" 
-                background
-                layout="prev, pager, next, sizes" 
-                :page-sizes="[5, 10, 100]" 
-                @size-change="listpage.curPage = 1; query()"
-                @current-change="query"
-                @prev-click="query"
-                @next-click="query"
-            />
+            <el-pagination small v-model:current-page="listpage.curPage" v-model:page-size="listpage.pageSize"
+                :total="listpage.total" background layout="prev, pager, next, sizes" :page-sizes="[5, 10, 100]"
+                @size-change="listpage.curPage = 1; query()" @current-change="query" @prev-click="query"
+                @next-click="query" />
         </div>
 
         <!-- 选项 -->
-        <el-option v-for="option in listpage.options" 
-            :key="option[optionValue]" 
-            :label="option[optionLabel]" 
+        <el-option v-for="option in listpage.options" :key="option[optionValue]" :label="option[optionLabel]"
             :value="option[optionValue]">
             <slot :option="option"></slot>
         </el-option>
         <!-- 无选项时显示 -->
-        <el-option 
-            v-if="listpage.options.length === 0" 
-            key="" 
-            lable="" 
-            value="暂无数据"
-            disabled>
+        <el-option v-if="listpage.options.length === 0" key="" lable="" value="暂无数据" disabled>
         </el-option>
     </el-select>
 </template>
@@ -85,8 +56,8 @@ const props = defineProps({
     multiple: { type: [Boolean], required: false, default: true },// 是否多选，默认多选
     modelValue: { type: [String, Number, Array], required: true, default: '' }, // 该组件上v-model的值
     options: { type: [Array], required: false, default: () => [] },// 用于解决回显数据时，只显示option-value的值的问题。解决方式为本地先缓存一份数据
-    placeholder:{ type: [String], required: false, default: '请选择' },
-    searchPlaceholder:{ type: [String], required: false, default: '请输入查询条件' },
+    placeholder: { type: [String], required: false, default: '请选择' },
+    searchPlaceholder: { type: [String], required: false, default: '请输入查询条件' },
 })
 const selectedValue = ref(props.modelValue)// 单选为字符串或数字，多选为列表数据
 const listpage = reactive({// 分页列表
@@ -145,33 +116,21 @@ function invertAll() {
             (selectedValue.value as any[]).splice(index, 1)
         }
     })
-    
+
     emit('update:modelValue', selectedValue.value)
 }
 
 </script>
 
 <style lang="scss" scoped>
-.el-select {
-    flex: 1;
-
-    .el-button {
-        margin-left: 10px;
-
-        span {
-            font-size: 14px;
-            color: var(--el-text-color-regular);
-        }
-
-        &:hover {
-            span {
-                color: var(--el-color-primary);
-            }
-        }
+.my-select {
+    .iconfont {
+        font-size: 14px;
+        color: var(--el-text-color-regular);
     }
-
     .el-input {
         margin-bottom: 5px;
+
         .el-select__caret {
             color: red !important;
         }
@@ -193,9 +152,30 @@ function invertAll() {
             }
         }
     }
+}
+
+.el-select {
+    flex: 1;
+
+    .el-button {
+        margin-left: 10px;
+
+        span {
+            font-size: 14px;
+            color: var(--el-text-color-regular);
+        }
+
+        &:hover {
+            span {
+                color: var(--el-color-primary);
+            }
+        }
+    }
+
+    
 
     :deep(.el-select-dropdown__wrap) {
-        max-height: 435px;// 当分页是100，数据超过10个的时候，显示10个半，表示下面还有数据
+        max-height: 435px; // 当分页是100，数据超过10个的时候，显示10个半，表示下面还有数据
     }
 
     :deep(.el-pagination) {
@@ -205,7 +185,7 @@ function invertAll() {
 </style>
 
 <style lang="scss">
-    .el-select .el-input .el-select__caret {
-        color: var(--el-color-primary);
-    }
+.el-select .el-input .el-select__caret {
+    color: var(--el-color-primary);
+}
 </style>

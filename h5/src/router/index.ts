@@ -15,26 +15,26 @@ const router = createRouter({
                 },
                 {
                     path: 'org',
-                    component: () => import('../views/org/Index.vue'),
+                    component: () => import('../views/user/org/Index.vue'),
                     meta: { title: '机构' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/org/setting/Index.vue'),
+                            component: () => import('../views/user/org/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add/:parentId',
-                                    component: () => import('../views/org/setting/Edit.vue'),
+                                    component: () => import('../views/user/org/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/org/setting/Edit.vue'),
+                                    component: () => import('../views/user/org/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/org/setting/Del.vue'),
+                                    component: () => import('../views/user/org/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]
@@ -43,36 +43,36 @@ const router = createRouter({
                 },
                 {
                     path: 'user',
-                    component: () => import('../views/user/Index.vue'),
+                    component: () => import('../views/user/user/Index.vue'),
                     meta: { title: '用户' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/user/setting/Index.vue'),
+                            component: () => import('../views/user/user/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add',
-                                    component: () => import('../views/user/setting/Edit.vue'),
+                                    component: () => import('../views/user/user/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/user/setting/Edit.vue'),
+                                    component: () => import('../views/user/user/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'pwdInit/:id',
-                                    component: () => import('../views/user/setting/PwdInit.vue'),
+                                    component: () => import('../views/user/user/setting/PwdInit.vue'),
                                     meta: { title: '密码初始化' },
                                 },
                                 {
                                     path: 'frozen/:id',
-                                    component: () => import('../views/user/setting/Frozen.vue'),
+                                    component: () => import('../views/user/user/setting/Frozen.vue'),
                                     meta: { title: '冻结' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/user/setting/Del.vue'),
+                                    component: () => import('../views/user/user/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]
@@ -81,36 +81,36 @@ const router = createRouter({
                 },
                 {
                     path: 'subAdmin',
-                    component: () => import('../views/subAdmin/Index.vue'),
+                    component: () => import('../views/user/subAdmin/Index.vue'),
                     meta: { title: '子管理员' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/subAdmin/setting/Index.vue'),
+                            component: () => import('../views/user/subAdmin/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add',
-                                    component: () => import('../views/subAdmin/setting/Edit.vue'),
+                                    component: () => import('../views/user/subAdmin/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/subAdmin/setting/Edit.vue'),
+                                    component: () => import('../views/user/subAdmin/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'pwdInit/:id',
-                                    component: () => import('../views/subAdmin/setting/PwdInit.vue'),
+                                    component: () => import('../views/user/subAdmin/setting/PwdInit.vue'),
                                     meta: { title: '密码初始化' },
                                 },
                                 {
                                     path: 'frozen/:id',
-                                    component: () => import('../views/subAdmin/setting/Frozen.vue'),
+                                    component: () => import('../views/user/subAdmin/setting/Frozen.vue'),
                                     meta: { title: '冻结' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/subAdmin/setting/Del.vue'),
+                                    component: () => import('../views/user/subAdmin/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]
@@ -119,36 +119,36 @@ const router = createRouter({
                 },
                 {
                     path: 'markUser',
-                    component: () => import('../views/markUser/Index.vue'),
+                    component: () => import('../views/user/markUser/Index.vue'),
                     meta: { title: '阅卷用户' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/markUser/setting/Index.vue'),
+                            component: () => import('../views/user/markUser/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add',
-                                    component: () => import('../views/markUser/setting/Edit.vue'),
+                                    component: () => import('../views/user/markUser/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/markUser/setting/Edit.vue'),
+                                    component: () => import('../views/user/markUser/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'pwdInit/:id',
-                                    component: () => import('../views/markUser/setting/PwdInit.vue'),
+                                    component: () => import('../views/user/markUser/setting/PwdInit.vue'),
                                     meta: { title: '密码初始化' },
                                 },
                                 {
                                     path: 'frozen/:id',
-                                    component: () => import('../views/markUser/setting/Frozen.vue'),
+                                    component: () => import('../views/user/markUser/setting/Frozen.vue'),
                                     meta: { title: '冻结' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/markUser/setting/Del.vue'),
+                                    component: () => import('../views/user/markUser/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]
@@ -157,33 +157,33 @@ const router = createRouter({
                 },
                 {
                     path: 'examUser',
-                    component: () => import('../views/examUser/Index.vue'),
+                    component: () => import('../views/user/examUser/Index.vue'),
                     meta: { title: '考试用户' },
                     children: [
                     ]
                 },
                 {
                     path: 'dict',
-                    component: () => import('../views/dict/Index.vue'),
+                    component: () => import('../views/base/dict/Index.vue'),
                     meta: { title: '数据字典' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/dict/setting/Index.vue'),
+                            component: () => import('../views/base/dict/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add',
-                                    component: () => import('../views/dict/setting/Edit.vue'),
+                                    component: () => import('../views/base/dict/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/dict/setting/Edit.vue'),
+                                    component: () => import('../views/base/dict/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/dict/setting/Del.vue'),
+                                    component: () => import('../views/base/dict/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]
@@ -192,36 +192,36 @@ const router = createRouter({
                 },
                 {
                     path: 'cron',
-                    component: () => import('../views/cron/Index.vue'),
+                    component: () => import('../views/base/cron/Index.vue'),
                     meta: { title: '定时任务' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/cron/setting/Index.vue'),
+                            component: () => import('../views/base/cron/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add',
-                                    component: () => import('../views/cron/setting/Edit.vue'),
+                                    component: () => import('../views/base/cron/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/cron/setting/Edit.vue'),
+                                    component: () => import('../views/base/cron/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/cron/setting/Del.vue'),
+                                    component: () => import('../views/base/cron/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                                 {
                                     path: 'start/:id',
-                                    component: () => import('../views/cron/setting/Start.vue'),
+                                    component: () => import('../views/base/cron/setting/Start.vue'),
                                     meta: { title: '启动/停止' },
                                 },
                                 {
                                     path: 'runOnce/:id',
-                                    component: () => import('../views/cron/setting/RunOnce.vue'),
+                                    component: () => import('../views/base/cron/setting/RunOnce.vue'),
                                     meta: { title: '执行一次' },
                                 },
                             ]
@@ -230,26 +230,26 @@ const router = createRouter({
                 },
                 {
                     path: 'bulletin',
-                    component: () => import('../views/bulletin/Index.vue'),
+                    component: () => import('../views/base/bulletin/Index.vue'),
                     meta: { title: '公告' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/bulletin/setting/Index.vue'),
+                            component: () => import('../views/base/bulletin/setting/Index.vue'),
                             children: [
                                 {
                                     path: 'add',
-                                    component: () => import('../views/bulletin/setting/Edit.vue'),
+                                    component: () => import('../views/base/bulletin/setting/Edit.vue'),
                                     meta: { title: '添加' },
                                 },
                                 {
                                     path: 'edit/:id',
-                                    component: () => import('../views/bulletin/setting/Edit.vue'),
+                                    component: () => import('../views/base/bulletin/setting/Edit.vue'),
                                     meta: { title: '修改' },
                                 },
                                 {
                                     path: 'del/:id',
-                                    component: () => import('../views/bulletin/setting/Del.vue'),
+                                    component: () => import('../views/base/bulletin/setting/Del.vue'),
                                     meta: { title: '删除' },
                                 },
                             ]
@@ -258,42 +258,42 @@ const router = createRouter({
                 },
                 {
                     path: 'parm',
-                    component: () => import('../views/parm/Index.vue'),
+                    component: () => import('../views/base/parm/Index.vue'),
                     meta: { title: '系统配置' },
                     children: [
                         {
                             path: '',
-                            component: () => import('../views/parm/setting/Index.vue'),
+                            component: () => import('../views/base/parm/setting/Index.vue'),
                             redirect: '/parm/pwd',
                             children: [
                                 {
                                     path: 'pwd',
-                                    component: () => import('../views/parm/setting/Pwd.vue'),
+                                    component: () => import('../views/base/parm/setting/Pwd.vue'),
                                     meta: { title: '默认密码' },
                                 },
                                 {
                                     path: 'ent',
-                                    component: () => import('../views/parm/setting/Ent.vue'),
+                                    component: () => import('../views/base/parm/setting/Ent.vue'),
                                     meta: { title: '企业信息' },
                                 },
                                 {
                                     path: 'custom',
-                                    component: () => import('../views/parm/setting/Custom.vue'),
+                                    component: () => import('../views/base/parm/setting/Custom.vue'),
                                     meta: { title: '自定义' },
                                 },
                                 // {
                                 //     path: 'email',
-                                //     component: () => import('../views/parm/setting/Email.vue'),
+                                //     component: () => import('../views/base/parm/setting/Email.vue'),
                                 //     meta: { title: '邮箱设置' },
                                 // },
                                 // {
                                 //     path: 'file',
-                                //     component: () => import('../views/parm/setting/File.vue'),
+                                //     component: () => import('../views/base/parm/setting/File.vue'),
                                 //     meta: { title: '上传目录' },
                                 // },
                                 // {
                                 //     path: 'db',
-                                //     component: () => import('../views/parm/setting/DB.vue'),
+                                //     component: () => import('../views/base/parm/setting/DB.vue'),
                                 //     meta: { title: '备份目录' },
                                 // },
                             ]
@@ -376,6 +376,11 @@ const router = createRouter({
                             component: () => import('../views/exam/setting/Index.vue'),
                             children: [
                                 {
+                                    path: 'pause/:id',
+                                    component: () => import('../views/exam/setting/Pause.vue'),
+                                    meta: { title: '暂停' },
+                                },
+                                {
                                     path: 'del/:id',
                                     component: () => import('../views/exam/setting/Del.vue'),
                                     meta: { title: '删除' },
@@ -388,7 +393,7 @@ const router = createRouter({
                                 {
                                     path: 'markUser/:id',
                                     component: () => import('../views/exam/setting/MarkUser.vue'),
-                                    meta: { title: '时间变更' },
+                                    meta: { title: '协助阅卷' },
                                 },
                             ]
                         },
@@ -412,40 +417,45 @@ const router = createRouter({
                             component: () => import('../views/exam/Statis.vue'),
                             meta: { title: '统计' },
                         },
+                        {
+                            path: 'paper/:id/:userId',
+                            component: () => import('../views/exam/Paper.vue'),
+                            meta: { title: '统计' },
+                        },
                     ]
                 },
                 {
                     path: 'myExam',
-                    component: () => import('../views/myExam/Index.vue'),
+                    component: () => import('../views/my/myExam/Index.vue'),
                     meta: { title: '我的考试' },
                     children: [
                         {
                             path: 'paper/:examId',
-                            component: () => import('../views/myExam/Paper.vue'),
+                            component: () => import('../views/my/myExam/Paper.vue'),
                             meta: { title: '试卷' },
                         },
                     ]
                 },
                 {
                     path: 'myMark',
-                    component: () => import('../views/myMark/Index.vue'),
+                    component: () => import('../views/my/myMark/Index.vue'),
                     meta: { title: '我的阅卷' },
                     children: [
                         {
                             path: 'paper/:examId',
-                            component: () => import('../views/myMark/Paper.vue'),
+                            component: () => import('../views/my/myMark/Paper.vue'),
                             meta: { title: '批阅' },
                         },
                     ]
                 },
                 {
                     path: 'myExer',
-                    component: () => import('../views/myExer/Index.vue'),
+                    component: () => import('../views/my/myExer/Index.vue'),
                     meta: { title: '我的练习' },
                     children: [
                         {
                             path: 'paper/:exerId',
-                            component: () => import('../views/myExer/Paper.vue'),
+                            component: () => import('../views/my/myExer/Paper.vue'),
                             meta: { title: '试题' },
                         },
                     ]

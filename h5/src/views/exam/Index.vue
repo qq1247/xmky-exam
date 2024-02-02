@@ -19,6 +19,7 @@
                 <template #tag>
                     <el-tag size="small">{{ dictStore.getValue("PAPER_GEN_TYPE", exam.genType) }}</el-tag>
                     &nbsp;<el-tag size="small">{{ dictStore.getValue("MARK_STATE", exam.markState) }}</el-tag>
+                    &nbsp;<el-tag size="small">{{ exam.state === 1 ? "发布" : "暂停" }}</el-tag>
                 </template>
                 <template #title>
                     {{ exam.name }}
@@ -137,6 +138,7 @@ async function query() {
 function generateMenu(exam: any) {
     let menu: Menu[] = [
         { name: '组卷', icon: 'icon-edit', event: () => router.push(`/exam/edit/${exam.id}`) },
+        { name: '暂停', icon: 'icon-end', event: () => router.push(`/exam/pause/${exam.id}`) },
         { name: '删除', icon: 'icon-delete', event: () => router.push(`/exam/del/${exam.id}`) },
         { name: '变更时间', icon: 'icon-time', event: () => router.push(`/exam/time/${exam.id}`) },
         { name: '阅卷', icon: 'icon-peixunkaoshi', event: () => router.push(`/exam/mark/${exam.id}`) },

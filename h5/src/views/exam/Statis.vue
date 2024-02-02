@@ -84,12 +84,12 @@
                             </template>
                         </el-table-column>
                         <el-table-column prop="" label="操作" align="center" width="300">
-                            <!-- <template #default="scope">
-                                <el-tooltip ffect="dark" content="修改">
-                                    <Iconfont icon="icon-edit" :size="18" color="#409eff"
-                                        @click="$router.push(`/dict/edit/${scope.row.id}`)"></Iconfont>
+                            <template #default="scope">
+                                <el-tooltip ffect="dark" content="预览">
+                                    <Iconfont icon="icon-search" :size="18" color="#409eff"
+                                        @click="$router.push(`/exam/paper/${scope.row.examId}/${scope.row.userId}`)"></Iconfont>
                                 </el-tooltip>
-                            </template> -->
+                            </template>
                         </el-table-column> 
                     </el-table>
                     <el-pagination 

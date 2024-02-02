@@ -45,6 +45,12 @@ const curTab = computed({// 当前标签页
 // 组件挂载完成后，执行如下方法
 onMounted(() => {
     tabs.push({
+        title: '暂停',
+        desc: '暂停考试',
+        icon: 'icon-delete',
+        url: `/exam/pause/${route.params.id}`,
+    })
+    tabs.push({
         title: '删除',
         desc: '删除考试',
         icon: 'icon-delete',
