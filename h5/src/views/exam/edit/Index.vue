@@ -82,6 +82,7 @@ onMounted(async () => {
         form.examRules = [] as ExamRule[]
         form.examUserIds = [] as number[]
         form.markUserIds = [] as number[]
+        form.limitMinute = 0
     }
     // 如果是修改，回显数据
     else if (route.path.indexOf('/exam/edit/') >= 0 && route.params.id) {
@@ -107,6 +108,7 @@ onMounted(async () => {
         form.examRules = data.examRules
         form.examUserIds = data.examUserIds
         form.markUserIds = data.markUserIds
+        form.limitMinute = data.limitMinute
         form.noUpdate()
 
         if (form.genType === 1) {// 根据组卷类型自动跳到下一步
@@ -200,7 +202,7 @@ async function publish() {
             markType: form.markType,
             startTime: form.examTimes[0],
             endTime: form.examTimes[1],
-            maxTimeM: form.maxTimeM,
+            limitMinute: form.limitMinute,
             markStartTime: form.markType === 2 ? form?.markTimes[0] : '',
             markEndTime: form.markType === 2 ? form?.markTimes[1] : '',
         }), 
