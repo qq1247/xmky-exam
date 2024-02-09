@@ -93,6 +93,6 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * v1.0 zhanghc 2023年3月22日下午5:38:23
 	 * @param id void
 	 */
-	void paperClear(Integer examId);
+	void clear(Integer examId);
 
 }

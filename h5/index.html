@@ -11,6 +11,13 @@
 
 <body>
     <div id="app"></div>
+    <script>
+        if (typeof String.prototype.replaceAll === "undefined") {
+            String.prototype.replaceAll = function (match, replace) {
+                return this.replace(new RegExp(match, 'g'), () => replace);
+            }
+        }
+    </script>
     <script type="module" src="/src/main.ts"></script>
 </body>
 

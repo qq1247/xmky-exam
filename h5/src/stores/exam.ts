@@ -31,6 +31,7 @@ export const useExamStore = defineStore('exam', () => {
     const examRules = ref([] as ExamRule[])// 试卷规则
     const examUserIds = ref([] as number[])// 考试用户
     const markUserIds = ref([] as number[])// 阅卷用户
+    const limitMinute = 0 // 限制分钟
 
     // 计算属性
     const totalScore = computed(() => {// 总分
@@ -86,8 +87,6 @@ export const useExamStore = defineStore('exam', () => {
         return dayjs(examTimes.value[1], 'YYYY-MM-DD HH:mm:ss').diff(dayjs(examTimes.value[0], 'YYYY-MM-DD HH:mm:ss'), 'minute')
     })
 
-    const maxTimeM = examTimeDiff.value // 考试时长（分钟）
-
     // 序号更新
     function noUpdate() {
         let no = 1
@@ -112,7 +111,7 @@ export const useExamStore = defineStore('exam', () => {
     }
     return {
         // 属性
-        id, name, paperName, examTimes, markTimes, maxTimeM, genType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds,
+        id, name, paperName, examTimes, markTimes, limitMinute, genType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds,
         // 计算属性
         totalScore, markQuestions, markType, examUserNum, markUserNum, objectiveQuestionNum, subjectiveQuestionNum, examTimeDiff,
         // 方法
@@ -180,7 +179,7 @@ export interface ExamRule {
     markOptions?: number[] //（2：答案无顺序；3：不区分大小写；)
     num?: number // 题数
     score?: number // 分数
-    scores?: number[] // 子分数，用于表示多选漏选分值，客观填空问答每空分值
+    scores?: number // 子分数，用于表示多选漏选分值，客观填空问答每空分值
 }
 
 /**

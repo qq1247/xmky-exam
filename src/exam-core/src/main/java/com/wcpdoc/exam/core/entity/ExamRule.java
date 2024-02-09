@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.wcpdoc.core.mybatis.BigDecimalTypeHandler;
 import com.wcpdoc.core.mybatis.IntTypeHandler;
 
 import lombok.Data;
@@ -33,8 +32,7 @@ public class ExamRule {
 	private List<Integer> markOptions;
 	private Integer num;
 	private BigDecimal score;
-	@TableField(typeHandler = BigDecimalTypeHandler.class)
-	private List<BigDecimal> scores;
+	private BigDecimal scores;
 	private Integer examId;
 	private Integer no;
 	private Integer updateUserId;

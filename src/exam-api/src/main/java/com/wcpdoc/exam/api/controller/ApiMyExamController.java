@@ -31,6 +31,7 @@ import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
+import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -110,8 +111,8 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("examMarkStartTime", exam.getMarkStartTime())
 					.addAttr("examMarkEndTime", exam.getMarkEndTime())// 如果是交卷后公布，但试卷是主观题试卷，页面提示几点之后查询
 					.addAttr("examName", exam.getName())// 考试名称
-					.addAttr("examStartTime", myExam.getExamStartTime())// 我的考试结束时间（进入我的试卷使用）
-					.addAttr("examEndTime", myExam.getExamEndTime())//
+					.addAttr("examStartTime", ExamUtil.hasTimeLimit(exam) ? myExam.getExamStartTime() : exam.getStartTime())// 我的考试结束时间（进入我的试卷使用）
+					.addAttr("examEndTime", ExamUtil.hasTimeLimit(exam) ? myExam.getExamEndTime() : exam.getEndTime())//
 					.addAttr("answerStartTime", myExam.getAnswerStartTime())//
 					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
@@ -159,20 +160,22 @@ public class ApiMyExamController extends BaseController {
 				throw new MyException("考试未开始");
 			}
 
-			// 生成用户考试时间
-			if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
-				if (!ValidateUtil.isValid(_myExam.getExamStartTime())) {// 考试时间为2024-01-01 00:00:00 - 2024-02-01
-																		// 00:00:00，单次考试时间为60分钟
-					_myExam.setExamStartTime(new Date());// 第一次打开试卷，时间为 2024-01-30 16:15:16
-					_myExam.setExamEndTime(DateUtil.getNextMinute(_myExam.getExamStartTime(), exam.getMaxTimeM()));// 考试结束时间为
-																													// 2024-01-30
-																													// 17:15:16
-				}
+			/*
+			 * 如果是限制考试，并且是第一次打开试卷，并且考试没结束，生成考试用户考试时间<br/>
+			 * 
+			 * 示例：考试时间为2024-01-01 00:00:00 - 2024-02-01 00:00:00，单次考试时间为60分钟<br/>
+			 * 第一次打开试卷，时间为2024-01-30 16:15:16；考试结束时间为 2024-01-30 17:15:16<br/>
+			 */
+			if (ExamUtil.hasTimeLimit(exam) //
+					&& !ValidateUtil.isValid(_myExam.getExamStartTime())//
+					&& exam.getEndTime().getTime() >= System.currentTimeMillis()) {
+				_myExam.setExamStartTime(new Date());
+				_myExam.setExamEndTime(DateUtil.getNextMinute(_myExam.getExamStartTime(), exam.getLimitMinute()));
 				if (_myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {
 					_myExam.setExamEndTime(exam.getEndTime());
 				}
+				myExamService.updateById(_myExam);
 			}
-			myExamService.updateById(_myExam);
 
 			// 组装试卷
 			List<Map<String, Object>> paper = new ArrayList<>();

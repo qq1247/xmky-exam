@@ -12,7 +12,11 @@
                     end-placeholder="结束时间"
                     value-format="YYYY-MM-DD HH:mm:ss"
                     format="YYYY-MM-DD HH:mm"
-                    @change="() => {form.maxTimeM = form.examTimeDiff}"
+                    @change="() => { 
+                        if (form.limitMinute >= form.examTimeDiff)  {
+                            form.limitMinute = form.examTimeDiff - 1
+                        }
+                    }"
                     />
             </el-form-item>
             <el-form-item v-if="form.markType === 2" label="阅卷时间：" prop="markTimes">
@@ -27,16 +31,16 @@
                 </el-date-picker>
                 <el-alert :title="`需要阅卷题号：${markQuestions}`" type="warning" :closable="false"/>
             </el-form-item>
-            <el-form-item label="考试时长：" prop="maxTimeM">
+            <el-form-item label="限制时长：" prop="limitMinute">
                 <el-input-number 
-                    v-model="form.maxTimeM" 
+                    v-model="form.limitMinute" 
                     controls-position="right" 
-                    :min="1" 
-                    :max="form.examTimeDiff"
+                    :min="0" 
+                    :max="form.examTimeDiff - 1"
                     :step="10"
                     :precision="0"
                     />&nbsp;/ {{form.examTimeDiff}}分钟
-            <el-alert :title="`从第一次打开试卷开始计时，最长${form.maxTimeM}分钟`" type="warning" :closable="false"/>
+            <el-alert :title="`从第一次打开试卷开始计时，最长能考几分钟，0代表不限制`" type="warning" :closable="false"/>
             </el-form-item>
             <el-form-item label="及格分数：" prop="passScore">
                 <el-input-number 
@@ -90,7 +94,6 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { useExamStore, type ExamQuestion } from '@/stores/exam';
 import { useDictStore } from '@/stores/dict';
 import dayjs from 'dayjs';
-import { fromPairs } from 'lodash';
 
 // 定义变量
 defineExpose({ next });
@@ -135,7 +138,7 @@ const formRules = reactive<FormRules>({// 表单校验规则
 })
 const markQuestions = computed(() => {// 阅卷题号
     let questionNums = ''
-    form.markQuestions.forEach((markQuestion: ExamQuestion) => {
+    form.markQuestions.forEach((markQuestion: any) => {
         if (questionNums) {
             questionNums += '、'
         }

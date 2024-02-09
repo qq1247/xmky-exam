@@ -61,9 +61,8 @@
 		<finalName>exam-4.3.1</finalName><!-- 打包后文件名称: 项目名-版本 -->
 		<resources>
 			<resource>
-				<directory>/</directory><!-- 从根目录开始 -->
+				<directory>${basedir}</directory><!-- 从根目录开始 -->
 				<includes>
-					<include>dll/**</include><!-- 查找dll文件夹 -->
 					<include>config/**</include>
 				</includes>
 				<excludes>

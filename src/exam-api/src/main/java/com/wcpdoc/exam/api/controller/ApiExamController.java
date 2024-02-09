@@ -266,16 +266,27 @@ public class ApiExamController extends BaseController {
 				examUserIdList.add(myExam.getUserId());
 			}
 
-			return PageResultEx.ok().addAttr("id", exam.getId()).addAttr("name", exam.getName())
-					.addAttr("paperName", exam.getPaperName()).addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
-					.addAttr("startTime", exam.getStartTime()).addAttr("endTime", exam.getEndTime())
-					.addAttr("markStartTime", exam.getMarkStartTime()).addAttr("markEndTime", exam.getMarkEndTime())
-					.addAttr("genType", exam.getGenType()).addAttr("showType", exam.getShowType())
-					.addAttr("passScore", exam.getPassScore()).addAttr("anonState", exam.getAnonState())
-					.addAttr("scoreState", exam.getScoreState()).addAttr("rankState", exam.getRankState())
-					.addAttr("sxes", exam.getSxes()).addAttr("state", exam.getState())
-					.addAttr("examQuestions", examQuestions).addAttr("examRules", examRules)
-					.addAttr("examUserIds", examUserIdList);
+			return PageResultEx.ok()//
+					.addAttr("id", exam.getId())//
+					.addAttr("name", exam.getName())//
+					.addAttr("paperName", exam.getPaperName())//
+					.addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
+					.addAttr("startTime", exam.getStartTime())//
+					.addAttr("endTime", exam.getEndTime())//
+					.addAttr("markStartTime", exam.getMarkStartTime())//
+					.addAttr("markEndTime", exam.getMarkEndTime())//
+					.addAttr("genType", exam.getGenType())//
+					.addAttr("showType", exam.getShowType())//
+					.addAttr("passScore", exam.getPassScore())//
+					.addAttr("anonState", exam.getAnonState())//
+					.addAttr("scoreState", exam.getScoreState())//
+					.addAttr("rankState", exam.getRankState())//
+					.addAttr("sxes", exam.getSxes())//
+					.addAttr("state", exam.getState())//
+					.addAttr("examQuestions", examQuestions)//
+					.addAttr("examRules", examRules)//
+					.addAttr("examUserIds", examUserIdList)
+					.addAttr("limitMinute", exam.getLimitMinute());
 		} catch (MyException e) {
 			log.error("考试获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -508,13 +519,13 @@ public class ApiExamController extends BaseController {
 					throw new MyException("阅卷已结束");
 				}
 			}
-			
-			if(exam.getState() == 1) {
+
+			if (exam.getState() == 1) {
 				exam.setState(2);
 			} else {
 				exam.setState(1);
 			}
-			
+
 			examService.updateById(exam);
 			return PageResultEx.ok().data(exam.getState());
 		} catch (MyException e) {

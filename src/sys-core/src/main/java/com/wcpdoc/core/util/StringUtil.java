@@ -392,7 +392,7 @@ public class StringUtil {
 		String[] strArr = str.split(",");
 		List<BigDecimal> list = new ArrayList<>(strArr.length);
 		for (int i = 0; i < strArr.length; i++) {
-			list.add(new BigDecimal(Integer.parseInt(strArr[i])));
+			list.add(new BigDecimal(strArr[i]));
 		}
 
 		return list;

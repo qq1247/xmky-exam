@@ -40,7 +40,7 @@ public class Exam {
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> sxes;
 	private Integer state;
-	private Integer maxTimeM;
+	private Integer limitMinute;
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;

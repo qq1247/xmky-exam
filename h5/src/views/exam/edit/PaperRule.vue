@@ -46,7 +46,7 @@
                             </el-form-item>
                             <el-input v-model="examRule.chapterTxt" type="textarea" maxlength="128"
                                 :autosize="{ minRows: 1 }" resize="none" placeholder="请输入章节描述" />
-                            <el-button type="danger" @click="chapterDel(examRule)" size="small" circle>
+                            <el-button type="danger" @click="chapterDel(examRule as ExamQuestion)" size="small" circle>
                                 <span class="iconfont icon-close" style="font-size:12px;font-weight: bold;"></span>
                             </el-button>
                         </div>
@@ -88,10 +88,10 @@
                                     @change="() => {
                                         if (examRule.questionType === 2) {// 如果是多选，设置漏选分数为分数一半
                                             if (examRule.scores && examRule.score) {
-                                                examRule.scores[0] = examRule.score / 2
+                                                examRule.scores = examRule.score / 2
                                             }
                                         } else {// 否则清空子分数
-                                            examRule.scores = []
+                                            examRule.scores = undefined
                                         }
                                         examRule.markOptions = [] // 清空阅卷选项
                                     }"
@@ -155,7 +155,7 @@
                                     @change="() => {// 如果是多选，修改时默认漏选分数为分数的一半
                                         if (examRule.questionType === 2) {
                                             if (examRule.scores && examRule.score) {
-                                                examRule.scores[0] = examRule.score / 2
+                                                examRule.scores = examRule.score / 2
                                             }
                                         }
                                     }"/>
@@ -169,8 +169,7 @@
                                 >
                                 漏选
                                 <el-input-number 
-                                    v-if="examRule.scores" 
-                                    v-model="examRule.scores[0]" 
+                                    v-model="examRule.scores" 
                                     :min="0" 
                                     :max="20" 
                                     :step="0.5" 
@@ -179,8 +178,8 @@
                                     @change="() => {// 如果漏选分数大于等于分数，漏选分数恢复成分数一半
                                         if (examRule.questionType === 2) {
                                             if (examRule.scores && examRule.score) {
-                                                if (examRule.scores[0] >= examRule.score) {
-                                                    examRule.scores[0] = examRule.score / 2
+                                                if (examRule.scores >= examRule.score) {
+                                                    examRule.scores = examRule.score / 2
                                                 }
                                             }
                                         }
@@ -188,7 +187,7 @@
                                 分
                             </el-form-item>
                             <el-form-item>
-                                <el-button v-if="index > 0" type="danger" @click="ruleDel(examRule)" size="small" text>
+                                <el-button v-if="index > 0" type="danger" @click="ruleDel(examRule as ExamQuestion)" size="small" text>
                                     <span class="iconfont icon-close" style="font-size: 12px;font-weight: bold;"></span>
                                 </el-button>
                             </el-form-item>
@@ -202,8 +201,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useDictStore } from '@/stores/dict';
-import { useExamStore, type ExamRule } from '@/stores/exam';
-import type { ExamQuestion } from '@/stores/exam';
+import { useExamStore, type ExamRule, type ExamQuestion } from '@/stores/exam';
 import draggable from 'vuedraggable'
 import type { FormInstance, FormRules } from 'element-plus';
 import Select from '@/components/Select.vue';
@@ -253,16 +251,16 @@ const formRules = reactive<FormRules>({// 表单校验规则
     scores: [{
         trigger: 'change',
         validator: (rule: any, value: ExamRule, callback: any) => {
-            if (!value.scores || !value.scores[0]) {
+            if (value.scores == null) {
                 return callback(new Error('请输入分数'))
             }
-            if (!/^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/.test(value.scores[0].toString())) {
+            if (!/^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/.test(value.scores.toString())) {
                 return callback(new Error('正数，最多两位小数'))
             }
-            if (value.score && value.score <= value.scores[0]) {
+            if (value.score && value.score <= value.scores) {
                 return callback(new Error('不能大于分数'))
             }
-            if (value.scores[0] > 20) {
+            if (value.scores > 20) {
                 return callback(new Error('最大20分'))
             }
             return callback()
@@ -323,7 +321,7 @@ function ruleAdd() {
         markOptions: [],
         num: 10,
         score: 1,
-        scores: [],
+        scores: undefined,
     })
     form.noUpdate()
 }

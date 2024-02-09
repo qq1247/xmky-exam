@@ -209,6 +209,7 @@ async function pwdUpdate() {
 
         .header-top-logo {
             height: 45px;
+            width: 45px;
         }
 
         .header-top-orgname {

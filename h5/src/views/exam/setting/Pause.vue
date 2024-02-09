@@ -5,7 +5,7 @@
             <div class="edit-desc">暂停考试</div>
         </template>
         <el-button :type="'warning'" @click="pause">
-            {{ form.state === 1 ? '暂停' : '公布' }}
+            {{ form.state === 1 ? '暂停' : '发布' }}
         </el-button>
     </el-card>
 </template>
