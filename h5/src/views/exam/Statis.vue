@@ -123,10 +123,6 @@
   
 <script lang="ts" setup>
 import * as echarts from 'echarts/core';
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
-import { BarChart, PieChart } from 'echarts/charts';
-import { LabelLayout } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
 import { computed, onMounted, reactive, ref } from 'vue';
 import http from '@/request';
 import { useRoute } from 'vue-router'
@@ -134,8 +130,6 @@ import dayjs from 'dayjs'
 import { useDictStore } from '@/stores/dict';
 
 // 定义变量
-echarts.use([TitleComponent, TooltipComponent, LegendComponent, PieChart, CanvasRenderer, LabelLayout]);
-echarts.use([TooltipComponent, GridComponent, BarChart, CanvasRenderer]);
 const route = useRoute()
 const dictStore = useDictStore()// 字典缓存
 const curTab = ref('examRank') // 当前标签页（默认考试排名）

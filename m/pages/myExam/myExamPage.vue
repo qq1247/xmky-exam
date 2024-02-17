@@ -34,7 +34,7 @@
 					:expireTime="examEndTime" 
 					preTxt="距结束：" 
 					:remind="300"
-					@end="examEnd" 
+					@end="finish1" 
 					@remind="exam.color='red'" 
 					:color="exam.color"
 					></XmCountDown>
@@ -147,8 +147,19 @@
 		user.name = _user.name
 		user.orgName = _user.orgName
 		
-		// 获取我的考试信息
+		
 		exam.id = option.examId
+		// 获取试卷信息（先获取试卷信息，因为后台检测到，当前用户如果是第一次打开试卷，才生成当前用户的考试和结束时间
+		let { data: _examQuestions } = await http.post("myExam/paper", { examId: exam.id })
+		let no = 1
+		examQuestions.value = _examQuestions.map((examQuestion: ExamQuestion) => {
+			if (examQuestion.type === 2) {// 处理题号
+				examQuestion.no = no++
+			}
+			return examQuestion
+		})
+		
+		// 获取我的考试信息
 		let { data: _exam } = await http.post("myExam/get", { examId: exam.id })
 		exam.name = _exam.examName
 		exam.markState = _exam.examMarkState
@@ -171,15 +182,6 @@
 		myExam.no = _exam.no
 		myExam.userNum = _exam.userNum
 		
-		// 获取试卷信息
-		let { data: _examQuestions } = await http.post("myExam/paper", { examId: exam.id })
-		let no = 1
-		examQuestions.value = _examQuestions.map((examQuestion: ExamQuestion) => {
-			if (examQuestion.type === 2) {// 处理题号
-				examQuestion.no = no++
-			}
-			return examQuestion
-		})
 		curQuestionIndex.value++
 	})
 
@@ -326,6 +328,15 @@
 			return
 		}
 
+		examEnd()
+	}
+	
+	async function finish1() {
+		let { code } = await http.post("myExam/finish", { examId: exam.id })
+		if (code !== 200) {
+			return
+		}
+		
 		examEnd()
 	}
 
