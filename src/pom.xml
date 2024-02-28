@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.wcpdoc.exam</groupId>
 	<artifactId>sys-parent</artifactId>
-	<version>4.4.1</version>
+	<version>4.4.2</version>
 	<name>parent</name>
 	<description>父模块</description>
 	<packaging>pom</packaging>
