@@ -141,7 +141,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		long exerNum = exerService.count(new LambdaQueryWrapper<Exer>()//
 				.eq(Exer::getState, 1));
 		// 首页展示考试用户数量，包括管理员和子管理员创建的考试用户
-		long examUserNum = userService.count(new LambdaQueryWrapper<User>()//
+		long userNum = userService.count(new LambdaQueryWrapper<User>()//
 				.in(User::getState, 1, 2)//
 				.eq(User::getType, 1));
 
@@ -149,7 +149,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("examNum", examNum);
 		result.put("questionNum", questionNum);
 		result.put("exerNum", exerNum);
-		result.put("examUserNum", examUserNum);
+		result.put("userNum", userNum);
 		return result;
 	}
 
