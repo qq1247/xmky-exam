@@ -22,6 +22,7 @@ public interface QuestionTypeDao extends RBaseDao<QuestionType> {
 						.leftJoin("SYS_USER CREATE_USER ON QUESTION_TYPE.CREATE_USER_ID = CREATE_USER.ID")
 						.select("QUESTION_TYPE.ID", "QUESTION_TYPE.NAME", "CREATE_USER.NAME AS CREATE_USER_NAME",
 								"(SELECT COUNT(*) FROM EXM_QUESTION Z WHERE Z.QUESTION_TYPE_ID = QUESTION_TYPE.ID AND Z.STATE = 1) AS QUESTION_NUM")//
+						.like(pageIn.hasParm("name"), "QUESTION_TYPE.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("id"), "QUESTION_TYPE.ID", pageIn.getParm("id"))//
 						.eq(pageIn.hasParm("curUserId"), "QUESTION_TYPE.CREATE_USER_ID", pageIn.getParm("curUserId"))//
 						.orderByDesc("QUESTION_TYPE.ID"));
