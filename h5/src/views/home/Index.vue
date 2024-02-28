@@ -30,7 +30,7 @@
                             <div class="home-left-top-content-item-desc">创建练习（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-left-top-content-item" @click="$router.push('/user')">
+                    <div v-if="userStore.type === 0 || userStore.type === 2" class="home-left-top-content-item" @click="$router.push(userStore.type === 0 ? '/user' : '/examUser')">
                         <Iconfont icon="icon-ai-users" :size="29" color="#eb5b5b;" :width="48" :height="48"
                             background-color="#fdeeee" />
                         <div>
