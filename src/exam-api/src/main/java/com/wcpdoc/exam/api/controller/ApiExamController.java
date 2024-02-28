@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -254,7 +253,7 @@ public class ApiExamController extends BaseController {
 						examRule.put("num", _examRule.getNum());
 						examRule.put("score", _examRule.getScore());
 						examRule.put("scores",
-								_examRule.getQuestionType() == 2 ? _examRule.getScores() : new BigDecimal[0]);// 客观填空等不需要页面处理
+								_examRule.getQuestionType() == 2 ? _examRule.getScores() : null);// 客观填空等不需要页面处理
 					}
 					examRules.add(examRule);
 				}
