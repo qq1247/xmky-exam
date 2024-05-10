@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.RBaseDao;
@@ -12,10 +11,9 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.service.ExamQuestionService;
-import com.wcpdoc.exam.core.service.ExamService;
+import com.wcpdoc.exam.core.service.ExamCacheService;
+import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.QuestionExService;
 
 /**
@@ -26,10 +24,9 @@ import com.wcpdoc.exam.core.service.QuestionExService;
 @Service
 public class QuestionExServiceImpl extends BaseServiceImp<Question> implements QuestionExService {
 	@Resource
-	private ExamQuestionService examQuestionService;
+	private MyQuestionService myQuestionService;
 	@Resource
-	@Lazy
-	private ExamService examService;
+	private ExamCacheService examCacheService;
 
 	@Override
 	public RBaseDao<Question> getDao() {
@@ -38,10 +35,10 @@ public class QuestionExServiceImpl extends BaseServiceImp<Question> implements Q
 
 	@Override
 	public void updateValid(Question question) {
-		List<ExamQuestion> examQuestionList = examQuestionService.getList1(question.getId());
-		if (ValidateUtil.isValid(examQuestionList)) {
-			Exam exam = examService.getById(examQuestionList.get(0).getExamId());
-			throw new MyException(String.format("试题已被【考试：%s】使用", exam.getName()));
+		List<Integer> examIdList = myQuestionService.getExamIdList(question.getId());
+		if (ValidateUtil.isValid(examIdList)) {
+			Exam exam = examCacheService.getExam(examIdList.get(0));
+			throw new MyException(String.format("试题已被【%s】考试使用", exam.getName()));
 		}
 	}
 }
