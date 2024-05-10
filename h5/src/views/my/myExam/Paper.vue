@@ -1,5 +1,5 @@
 <template>
-    <div class="paper">
+    <div class="paper" v-loading="loading" :element-loading-text="loadingText" element-loading-background="rgba(122, 122, 122, 0.8)">
         <!-- 答题卡 -->
         <div class="paper-left">
             <el-card shadow="never" class="paper-left-top">
@@ -18,7 +18,7 @@
                         <Iconfont icon="icon-shijianxuanzhong" :size="20" color="#F6961E;" :width="30" :height="30"
                             :radius="5" background-color="#FDF3E7" />
                         <span class="paper-left-top-statis-value">
-                            {{ myExam.state === 3 ? timeDiff(myExam.answerStartTime, myExam.answerEndTime) : '-' }}
+                            {{ myExam.state === 3 ? timeDiff(myExam.examStartTime, myExam.examEndTime) : '-' }}
                         </span><!-- 交卷就有 -->
                         <span class="paper-left-top-statis-txt">答题用时</span>
                     </div>
@@ -117,9 +117,10 @@ import dayjs from 'dayjs';
 import { ElMessageBox, type Action } from 'element-plus';
 import { useRoute } from 'vue-router'
 import { useDictStore } from '@/stores/dict';
-
+import { useRouter } from 'vue-router'
 // 定义变量
 const route = useRoute()
+const router = useRouter()
 const dictStore = useDictStore() // 字典缓存
 const examQuestions = ref([] as ExamQuestion[])// 试卷信息
 const exam = reactive({// 考试信息
@@ -133,8 +134,8 @@ const exam = reactive({// 考试信息
 const myExamEndTime = ref()// 我的考试结束时间（用reactive必须new Date()，会造成倒计时立即结束）
 const myExam = reactive({// 我的考试信息
     totalScore: 0, //总分
-    answerStartTime: new Date(),// 答题开始时间
-    answerEndTime: new Date(),// 答题结束时间
+    examStartTime: new Date(),// 答题开始时间
+    examEndTime: new Date(),// 答题结束时间
     state: 0, // 考试状态
     markState: 0, // 阅卷状态
     answerState: 0, // 答题状态
@@ -145,6 +146,10 @@ const user = reactive({// 用户信息
     name: '',// 姓名
     orgName: '',// 机构名称
 })
+
+const loading = ref(false) // 显示加载页面
+const loadingText = ref('')// 显示加载页面内容
+const loadingSecond = ref(6)// 倒计时秒数
 
 // 组件挂载完成后，执行如下方法
 onMounted(async () => {
@@ -176,8 +181,8 @@ onMounted(async () => {
 
     myExamEndTime.value = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     myExam.totalScore = data.totalScore
-    myExam.answerStartTime = dayjs(data.answerStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
-    myExam.answerEndTime = dayjs(data.answerEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    myExam.examStartTime = dayjs(data.examStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    myExam.examEndTime = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     myExam.state = data.state
     myExam.markState = data.markState
     myExam.answerState = data.answerState
@@ -206,6 +211,7 @@ const answerUpdate = _.debounce(async function (examQuestion, answers) {// _.deb
         answers: answers
     })
     if (code != 200) {// 答题失败也不要清空答案，比如问答题清空就尴尬了
+        window.location.reload()
         return
     }
 }, 500) // 延时一秒体验不好，填完直接返回没提交
@@ -214,6 +220,7 @@ const answerUpdate = _.debounce(async function (examQuestion, answers) {// _.deb
 async function finish() {
     let { data: { code, data } } = await http.post("myExam/finish", { examId: exam.id })
     if (code !== 200) {
+        window.location.reload()// 后台自动交卷时间早，这里会报错
         return
     }
 
@@ -221,7 +228,24 @@ async function finish() {
 }
 
 // 考试结束
-function examEnd() {
+async function examEnd() {
+    exam.id = parseInt(route.params.examId as string)
+    let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
+    if (data.state === 2) {
+        loading.value = true
+        loadingText.value = `正在交卷`
+        if (loadingSecond.value-- > 0) {
+            setTimeout(examEnd, 1000)
+            return
+        }
+
+        loadingText.value = `查询失败，请稍后在试`
+        loading.value = false
+        setTimeout(() => router.push("/home"), 1000)
+        return
+    }
+
+    loading.value = false
     ElMessageBox.alert('考试成功', '提示消息', {
         confirmButtonText: '确定',
         callback: async (action: Action) => {
@@ -235,8 +259,8 @@ function examEnd() {
 
             myExamEndTime.value = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
             myExam.totalScore = data.totalScore
-            myExam.answerStartTime = dayjs(data.answerStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
-            myExam.answerEndTime = dayjs(data.answerEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+            myExam.examStartTime = dayjs(data.examStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+            myExam.examEndTime = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
             myExam.state = data.state
             myExam.markState = data.markState
             myExam.answerState = data.answerState
