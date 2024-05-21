@@ -79,7 +79,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	 * @param response void
 	 */
 	private void refreshToken(ServletRequest request, ServletResponse response) {
-		// 校验数据有效性
+		// 数据校验
 		Integer tokenExpireMinute = SpringUtil.getBean(Environment.class).getProperty("token.expireMinute", Integer.class);
 		Integer tokenRefreshMinute = SpringUtil.getBean(Environment.class).getProperty("token.refreshMinute", Integer.class);
 		String oldJwtToken = WebUtils.toHttp(request).getHeader("Authorization");

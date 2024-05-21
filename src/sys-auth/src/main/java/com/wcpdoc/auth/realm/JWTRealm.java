@@ -45,7 +45,7 @@ public class JWTRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		// 校验数据有效性
+		// 数据校验
 		String jwt = (String) principals.getPrimaryPrincipal();
 		JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);
 		String loginName = jwtResult.getClaims().get("loginName", String.class);

@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class JwtUtil {
-	private static JwtBuilder builder = null; 
+	private JwtBuilder builder = null; 
 
 	private JwtUtil() {
 		
@@ -52,7 +52,7 @@ public class JwtUtil {
 	 * @return String
 	 */
 	public JwtUtil createToken(String id, String subject, Date expTime) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
@@ -84,7 +84,7 @@ public class JwtUtil {
 	 * @return JwtUtil
 	 */
 	public JwtUtil addAttr(String key, Object value) {
-		// 校验数据有效性
+		// 数据校验
 		if (Claims.ID.equals(key)) {
 			throw new MyException(String.format("key[%s]为jwt关键字", Claims.ID));
 		}
