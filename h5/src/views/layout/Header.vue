@@ -31,6 +31,7 @@
                     <el-menu-item index="/parm">系统配置</el-menu-item>
                     <el-menu-item index="/cron">定时任务</el-menu-item>
                     <el-menu-item index="/dict">数据字典</el-menu-item>
+                    <el-menu-item index="/cache">缓存服务</el-menu-item>
                 </el-sub-menu>
             </el-menu>
             <el-dropdown @command="dropdownCmd" :teleported="false" class="header-top-username">

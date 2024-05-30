@@ -301,6 +301,25 @@ const router = createRouter({
                     ]
                 },
                 {
+                    path: 'cache',
+                    component: () => import('../views/base/cache/Index.vue'),
+                    meta: { title: '缓存服务' },
+                    children: [
+                        {
+                            path: '',
+                            component: () => import('../views/base/cache/setting/Index.vue'),
+                            redirect: '/cache/cache',
+                            children: [
+                                {
+                                    path: 'cache',
+                                    component: () => import('../views/base/cache/setting/Cache.vue'),
+                                    meta: { title: '缓存服务' },
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
                     path: 'questionType',
                     component: () => import('../views/questionType/Index.vue'),
                     meta: { title: '题库' },
