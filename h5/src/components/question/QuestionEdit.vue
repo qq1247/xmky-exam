@@ -106,7 +106,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-button v-if="form.type === 5 && form.markType === 1" :disabled="form.answers.length >= 7" type="primary" @click="addKeyword" size="small" plain style="border: none; padding: 14px;">
+                <el-button v-if="form.type === 5 && form.markType === 1" :disabled="form.answers.length >= 100" type="primary" @click="addKeyword" size="small" plain style="border: none; padding: 14px;">
                     <span class="iconfont icon-plus" style="font-size: 12px;">&nbsp;添加关键词</span>
                 </el-button>
                 <el-button v-if="form.type === 5 && form.markType === 1" :disabled="form.answers.length <= 1" type="danger" @click="delKeyword" size="small" plain style="border: none; padding: 14px;">
