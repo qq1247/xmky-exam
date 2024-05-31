@@ -39,6 +39,7 @@ public class Exam {
 	private Integer genType;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> sxes;
+	private Integer userNum;
 	private Integer state;
 	private Integer limitMinute;
 	private Integer createUserId;

@@ -36,7 +36,7 @@ public class ShiroCfg {
 	 * @param securityManager
 	 * @return ShiroFilterFactoryBean
 	 */
-	
+
 	@Bean
 	public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
 		// 设置安全管理器
@@ -58,7 +58,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/bulletin/get", "jwt");// 公告详情列表需登录
 		filterChainMap.put("/api/user/get", "jwt");// 用户信息需登录
 		filterChainMap.put("/api/progressBar/*", "jwt");// 用户信息需登录
-		
+
 		// 子管理员权限
 		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[0,2]");// 用户添加
 		filterChainMap.put("/api/user/add", "jwt,anyRolesEx[0,2]");// 用户添加
@@ -75,25 +75,26 @@ public class ShiroCfg {
 		filterChainMap.put("/api/report/subAdmin/home", "jwt,anyRolesEx[2]");// 考试
 		filterChainMap.put("/api/report/exam/rankListpage", "jwt,anyRolesEx[0,2]");// 报表相关
 		filterChainMap.put("/api/report/exam/statis", "jwt,anyRolesEx[0,2]");// 报表相关
-		
+
 		// 考试用户权限
 		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[1]");// 我的考试
 		filterChainMap.put("/api/myExer/*", "jwt,anyRolesEx[1]");// 我的练习
 		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[1]");// 用户首页
-		
+
 		// 阅卷用户权限
 		filterChainMap.put("/api/report/markUser/home", "jwt,anyRolesEx[3]");// 阅卷用户首页
-		
+
 		// 管理员权限
 		filterChainMap.put("/api/**", "jwt,anyRolesEx[0]");// 剩余都是
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}
-	
+
 	/**
 	 * 配置安全管理器
 	 * 
 	 * v1.0 zhanghc 2021年3月3日下午3:45:07
+	 * 
 	 * @param jwtRealm
 	 * @param ehCacheManager
 	 * @return SecurityManager
@@ -136,9 +137,7 @@ public class ShiroCfg {
 	}
 
 	/**
-	 * 开启注解支持
-	 * 注解代码分布在各处，侵入代码严重。
-	 * 改成过滤器字符串匹配，可解耦，可随时替换成其他权限框架。
+	 * 开启注解支持 注解代码分布在各处，侵入代码严重。 改成过滤器字符串匹配，可解耦，可随时替换成其他权限框架。
 	 * 
 	 * v1.0 zhanghc 2021年3月2日上午11:29:58
 	 * 

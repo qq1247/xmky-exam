@@ -44,11 +44,12 @@ public class EncryptUtil {
 	public static String md52Base64(String key) {
 		return md52Base64(key, "utf-8");
 	}
-	
+
 	/**
 	 * md5加密
 	 * 
 	 * v1.0 zhanghc 2020年3月28日下午5:03:56
+	 * 
 	 * @param key
 	 * @param charset
 	 * @return String
@@ -62,11 +63,12 @@ public class EncryptUtil {
 			throw new MyException(e);
 		}
 	}
-	
+
 	/**
 	 * md5加密
 	 * 
 	 * v1.0 zhanghc 2020年3月28日下午5:03:56
+	 * 
 	 * @param key
 	 * @param charset
 	 * @return String
@@ -74,5 +76,5 @@ public class EncryptUtil {
 	public static String md52Hex(String key) {
 		return md52Hex(key, "utf-8");
 	}
-	
+
 }

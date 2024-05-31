@@ -47,7 +47,7 @@ public class ApiDictController extends BaseController {
 	}
 
 	/**
-	 * 添加数据字典
+	 * 数据字典添加
 	 * 
 	 * v1.0 zhanghc 2016-11-3下午9:03:40
 	 * 
@@ -60,16 +60,16 @@ public class ApiDictController extends BaseController {
 			dictService.save(dict);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加数据字典错误：{}", e.getMessage());
+			log.error("数据字典添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加数据字典错误：", e);
+			log.error("数据字典添加错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 修改数据字典
+	 * 数据字典修改
 	 * 
 	 * v1.0 zhanghc 2016-11-3下午9:03:40
 	 * 
@@ -87,16 +87,16 @@ public class ApiDictController extends BaseController {
 			dictService.updateById(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改数据字典错误：{}", e.getMessage());
+			log.error("数据字典修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改数据字典错误：", e);
+			log.error("数据字典修改错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 删除数据字典
+	 * 数据字典删除
 	 * 
 	 * v1.0 zhanghc 2016-11-3下午9:03:40
 	 * 
@@ -109,16 +109,16 @@ public class ApiDictController extends BaseController {
 			dictService.removeById(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除数据字典错误：{}", e.getMessage());
+			log.error("数据字典删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除数据字典错误：", e);
+			log.error("数据字典删除错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取数据字典
+	 * 数据字典获取
 	 * 
 	 * v1.0 zhanghc 2021年5月27日下午4:27:54
 	 * 
@@ -129,14 +129,17 @@ public class ApiDictController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Dict dict = dictService.getById(id);
-			return PageResultEx.ok().addAttr("id", dict.getId()).addAttr("dictIndex", dict.getDictIndex())
-					.addAttr("dictKey", dict.getDictKey()).addAttr("dictValue", dict.getDictValue())
+			return PageResultEx.ok()//
+					.addAttr("id", dict.getId())//
+					.addAttr("dictIndex", dict.getDictIndex())//
+					.addAttr("dictKey", dict.getDictKey())//
+					.addAttr("dictValue", dict.getDictValue())//
 					.addAttr("no", dict.getNo());
 		} catch (MyException e) {
-			log.error("删除数据字典错误：{}", e.getMessage());
+			log.error("数据字典获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除数据字典错误：", e);
+			log.error("数据字典获取错误：", e);
 			return PageResult.err();
 		}
 	}

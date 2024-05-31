@@ -77,14 +77,14 @@ public interface ExamDao extends RBaseDao<Exam> {
 	}
 
 	/**
-	 * 获取考试列表
+	 * 考试中列表
 	 * 
-	 * v1.0 chenyun 2022年3月9日下午4:37:56
+	 * v1.0 zhanghc 2024年5月12日下午8:50:27
 	 * 
 	 * @return List<Exam>
 	 */
-	default List<Exam> getList() {
-		return selectList(new LambdaQueryWrapper<Exam>().ne(Exam::getState, 0));
+	default List<Exam> getExamingList() {
+		return selectList(new LambdaQueryWrapper<Exam>().eq(Exam::getState, 1).in(Exam::getMarkState, 1, 2));
 	}
 
 }

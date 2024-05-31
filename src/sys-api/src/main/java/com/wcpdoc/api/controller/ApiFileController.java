@@ -35,7 +35,7 @@ public class ApiFileController extends BaseController {
 	private FileService fileService;
 
 	/**
-	 * 完成临时上传附件
+	 * 附件上传（临时）
 	 * 
 	 * v1.0 zhanghc 2017年3月6日下午11:51:18
 	 * 
@@ -51,19 +51,19 @@ public class ApiFileController extends BaseController {
 			data.put("fileIds", fileIds);
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
-			log.error("完成临时上传附件失败：{}", e.getMessage());
+			log.error("附件上传（临时）失败：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成临时上传附件失败：", e);
+			log.error("附件上传（临时）失败：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 完成下载附件
+	 * 附件下载
 	 * 
-	 * v1.0 zhanghc 2017年3月29日下午10:18:28 使用spring ResponseEntity
-	 * <byte[]>方式，附件大会造成内存溢出。
+	 * v1.0 zhanghc 2017年3月29日下午10:18:28 <br/>
+	 * 使用spring ResponseEntity <byte[]>方式，附件大会造成内存溢出。
 	 * 
 	 * @param id void
 	 */
@@ -82,9 +82,9 @@ public class ApiFileController extends BaseController {
 				throw new MyException("拷贝文件错误");
 			}
 		} catch (MyException e) {
-			log.error("完成下载附件失败：", e.getMessage());
+			log.error("附件下载失败：", e.getMessage());
 		} catch (Exception e) {
-			log.error("完成下载附件失败：", e);
+			log.error("附件下载失败：", e);
 		}
 	}
 }

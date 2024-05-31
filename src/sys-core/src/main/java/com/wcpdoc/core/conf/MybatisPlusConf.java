@@ -19,7 +19,7 @@ import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinPropertiesCons
  */
 @Configuration
 @MapperScan("com.wcpdoc.**.dao")
-public class MybatisPlusConfig {
+public class MybatisPlusConf {
 	@Bean
 	public MybatisPlusInterceptor mybatisPlusInterceptor() {
 		MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();

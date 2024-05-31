@@ -1,4 +1,4 @@
-package com.wcpdoc.cache;
+package com.wcpdoc.auth.cache;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
@@ -24,8 +24,8 @@ public class BaseEhCache {
 
 		return cache;
 	}
-	
+
 	protected static net.sf.ehcache.Cache getNativeCache(String cacheName) {
-		return (net.sf.ehcache.Cache)getCache(cacheName).getNativeCache();
+		return (net.sf.ehcache.Cache) getCache(cacheName).getNativeCache();
 	}
 }

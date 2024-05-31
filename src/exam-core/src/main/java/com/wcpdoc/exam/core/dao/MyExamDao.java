@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +30,8 @@ public interface MyExamDao extends RBaseDao<MyExam> {
 								"EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME", "EXAM.MARK_STATE AS EXAM_MARK_STATE",
 								"EXAM.SCORE_STATE AS EXAM_SCORE_STATE", "EXAM.RANK_STATE AS EXAM_RANK_STATE", // 考试相关字段（用于控制是否显示成绩和排名，控制层用）
 								"EXAM.PASS_SCORE AS EXAM_PASS_SCORE", "EXAM.TOTAL_SCORE AS EXAM_TOTAL_SCORE",
-								"USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "MY_EXAM.ANSWER_START_TIME",
-								"MY_EXAM.ANSWER_END_TIME", "MY_EXAM.TOTAL_SCORE", "MY_EXAM.STATE", "MY_EXAM.MARK_STATE",
+								"USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "MY_EXAM.EXAM_START_TIME",
+								"MY_EXAM.EXAM_END_TIME", "MY_EXAM.TOTAL_SCORE", "MY_EXAM.STATE", "MY_EXAM.MARK_STATE",
 								"MY_EXAM.ANSWER_STATE", "MY_EXAM.NO",
 								"(SELECT COUNT(1) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = MY_EXAM.EXAM_ID) AS USER_NUM")// 用户数量（排名使用）
 						.like(pageIn.hasParm("examName"), "EXAM.NAME", pageIn.getParm("examName"))//
@@ -89,14 +90,26 @@ public interface MyExamDao extends RBaseDao<MyExam> {
 	}
 
 	/**
-	 * 我的考试清空
+	 * 我的考试清理
 	 * 
 	 * v1.0 zhanghc 2023年3月22日下午5:38:23
 	 * 
 	 * @param id void
 	 */
-	default void paperClear(Integer examId) {
+	default void clear(Integer examId) {
 		delete(new LambdaQueryWrapper<MyExam>().eq(MyExam::getExamId, examId));
+	}
+
+	/**
+	 * 未阅卷列表
+	 * 
+	 * v1.0 zhanghc 2024年5月12日下午8:50:45
+	 * 
+	 * @return List<MyExam>
+	 */
+	default List<MyExam> getUnMarkList() {
+		return selectList(
+				new LambdaQueryWrapper<MyExam>().eq(MyExam::getState, 2).le(MyExam::getExamEndTime, new Date()));
 	}
 
 }

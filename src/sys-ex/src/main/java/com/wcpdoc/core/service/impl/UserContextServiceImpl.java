@@ -26,12 +26,12 @@ public class UserContextServiceImpl implements UserContextService {
 		if (!ValidateUtil.isValid(jwt)) {
 			return null;
 		}
-		
+
 		JwtResult oldJwtResult = JwtUtil.getInstance().parse(jwt);// 令牌解析失败，不处理
 		if (oldJwtResult.getCode() != 200) {
 			return null;
 		}
-		
+
 		return new LoginUser() {
 			@Override
 			public Integer getId() {

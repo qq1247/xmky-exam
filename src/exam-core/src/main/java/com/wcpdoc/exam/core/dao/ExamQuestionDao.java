@@ -27,25 +27,13 @@ public interface ExamQuestionDao extends RBaseDao<ExamQuestion> {
 	}
 
 	/**
-	 * 试卷清空
+	 * 试卷清理
 	 * 
 	 * v1.0 zhanghc 2023年3月23日上午11:03:15
 	 * 
 	 * @param examId void
 	 */
-	default void paperClear(Integer examId) {
+	default void clear(Integer examId) {
 		delete(new LambdaQueryWrapper<ExamQuestion>().eq(ExamQuestion::getExamId, examId));
-	}
-
-	/**
-	 * 考试试题列表
-	 * 
-	 * v1.0 zhanghc 2023年3月31日下午3:51:41
-	 * 
-	 * @param questionId
-	 * @return List<ExamQuestion>
-	 */
-	default List<ExamQuestion> getList1(Integer questionId) {
-		return selectList(new LambdaQueryWrapper<ExamQuestion>().eq(ExamQuestion::getQuestionId, questionId));
 	}
 }

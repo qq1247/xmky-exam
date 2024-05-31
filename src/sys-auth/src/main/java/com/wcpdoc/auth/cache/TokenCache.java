@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.springframework.cache.Cache;
 
-import com.wcpdoc.cache.BaseEhCache;
-
 /**
  * 令牌缓存
  * 

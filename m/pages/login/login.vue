@@ -1,7 +1,7 @@
 <template>
 	<view class="login">
 		<view class="login-logo">
-			<image :src="` /login/logo`"></image>
+			<image :src="`/login/logo`"></image>
 			<text>{{ entName }}</text>
 		</view>
 		<uni-forms ref="formRef" :model="form" :rules="formRules">

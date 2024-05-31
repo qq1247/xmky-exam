@@ -185,7 +185,7 @@ async function setTime(exam: any, timeType: number) {
     let { data: { code } } = await http.post("exam/time", {
         id: exam.id,
         timeType: timeType,
-        minute: -0x7fffffff, // int最小值
+        minute: -525600//-0x7fffffff int最小值边界有bug，后端时间计算错误，改成最多减一年
     })
 
     if (code !== 200) {

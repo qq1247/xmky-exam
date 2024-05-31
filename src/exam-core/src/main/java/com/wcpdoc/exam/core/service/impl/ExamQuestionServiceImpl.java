@@ -34,11 +34,6 @@ public class ExamQuestionServiceImpl extends BaseServiceImp<ExamQuestion> implem
 
 	@Override
 	public void clear(Integer examId) {
-		examQuestionDao.paperClear(examId);
-	}
-
-	@Override
-	public List<ExamQuestion> getList1(Integer questionId) {
-		return examQuestionDao.getList1(questionId);
+		examQuestionDao.clear(examId);
 	}
 }

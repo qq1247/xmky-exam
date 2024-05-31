@@ -14,6 +14,7 @@ public interface QuestionExService extends BaseService<Question> {
 	 * 试题校验
 	 * 
 	 * v1.0 zhanghc 2022年9月6日上午9:49:47
+	 * 
 	 * @param question void
 	 */
 	void updateValid(Question question);

@@ -1,10 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -12,7 +8,6 @@ import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -20,20 +15,10 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
-import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyExamService;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.service.MyQuestionService;
-import com.wcpdoc.exam.core.util.QuestionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,13 +35,7 @@ public class ApiMyMarkController extends BaseController {
 	@Resource
 	private MyMarkService myMarkService;
 	@Resource
-	private MyExamService myExamService;
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	private ExamService examService;
-	@Resource
-	private UserService userService;
+	private ExamCacheService examCacheService;
 
 	/**
 	 * 我的阅卷列表
@@ -93,7 +72,45 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 我的阅卷用户列表
+	 * 我的考试
+	 * 
+	 * v1.0 zhanghc 2022年11月2日下午2:38:55
+	 * 
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	public PageResult get(Integer examId, Integer userId) {
+		try {
+			MyExam myExam = examCacheService.getMyExam(examId, userId);
+			Exam exam = examCacheService.getExam(examId);
+			return PageResultEx.ok()//
+					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
+					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
+					.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
+					.addAttr("examStartTime", myExam.getExamStartTime())//
+					.addAttr("answerEndTime", myExam.getExamEndTime())//
+					.addAttr("markStartTime", myExam.getMarkStartTime())//
+					.addAttr("markEndTime", myExam.getMarkEndTime())//
+					.addAttr("objectiveScore", myExam.getObjectiveScore())//
+					.addAttr("totalScore", myExam.getTotalScore())//
+					.addAttr("state", myExam.getState())//
+					.addAttr("markState", myExam.getMarkState())//
+					.addAttr("answerState", myExam.getAnswerState())//
+					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
+					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null)//
+			;
+		} catch (MyException e) {
+			log.error("我的考试错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的考试错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 考试用户列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * 
@@ -112,39 +129,24 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 获取我的考试
+	 * 试卷分配
 	 * 
-	 * v1.0 zhanghc 2022年11月2日下午2:38:55
+	 * v1.0 zhanghc 2023年2月23日下午2:31:16
 	 * 
-	 * @param examId
+	 * @param examId 考试ID
+	 * @param num    分配份数
 	 * @return PageResult
 	 */
-	@RequestMapping("/get")
-	public PageResult get(Integer examId, Integer userId) {
+	@RequestMapping("/assign")
+	public PageResult assign(Integer examId, Integer num) {
 		try {
-			MyExam myExam = myExamService.getMyExam(examId, userId);
-			Exam exam = examService.getById(examId);
-			return PageResultEx.ok()//
-					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
-					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
-					.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
-					.addAttr("answerStartTime", myExam.getAnswerStartTime())//
-					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
-					.addAttr("markStartTime", myExam.getMarkStartTime())//
-					.addAttr("markEndTime", myExam.getMarkEndTime())//
-					.addAttr("objectiveScore", myExam.getObjectiveScore())//
-					.addAttr("totalScore", myExam.getTotalScore())//
-					.addAttr("state", myExam.getState())//
-					.addAttr("markState", myExam.getMarkState())//
-					.addAttr("answerState", myExam.getAnswerState())//
-					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getRankState() == 1 ? myExamService.getList(examId).size() : null)
-					;
+			myMarkService.assign(examId, num);
+			return PageResultEx.ok();
 		} catch (MyException e) {
-			log.error("获取我的考试错误：{}", e.getMessage());
+			log.error("试卷分配错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取我的考试错误：", e);
+			log.error("试卷分配错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -161,149 +163,13 @@ public class ApiMyMarkController extends BaseController {
 	@RequestMapping("/paper")
 	public PageResult paper(Integer examId, Integer userId) {
 		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(examId)) {
-				throw new MyException("参数错误：examId");
-			}
-			if (!ValidateUtil.isValid(userId)) {
-				throw new MyException("参数错误：userId");
-			}
-
-			MyExam _myExam = myExamService.getMyExam(examId, userId);
-			if (_myExam == null) {
-				throw new MyException("试卷不存在");
-			}
-			if (CurLoginUserUtil.isAdmin()) {// 管理员看全部
-
-			}
-			if (CurLoginUserUtil.isSubAdmin()) {// 子管理看自己的人
-				if (!userService.getById(getCurUser().getId()).getUserIds().contains(userId)) {
-					throw new MyException("无查阅权限");
-				}
-			}
-			if (CurLoginUserUtil.isMarkUser()) {// 协助阅卷只看自己阅过的
-				if (_myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
-					throw new MyException("无查阅权限");
-				}
-			}
-			if (CurLoginUserUtil.isExamUser()) {// 考试用户不能看
-				throw new MyException("无查阅权限");
-			}
-
-			Exam exam = examService.getById(examId);
-			if (exam.getState() == 2) {
-				throw new MyException("考试已暂停");
-			}
-			if (exam.getMarkType() == 2) {
-				if (exam.getMarkStartTime().getTime() > System.currentTimeMillis()) {
-					throw new MyException("阅卷未开始");
-				}
-			}
-
-			// 组装试卷
-			List<Map<String, Object>> paper = new ArrayList<>();
-			List<MyQuestion> myQuestionList = myQuestionService.getList(examId, userId);
-
-			for (MyQuestion _myQuestion : myQuestionList) {
-				Map<String, Object> myQuestion = new HashMap<>();
-				if (_myQuestion.getType() == 1) {
-					myQuestion.put("type", _myQuestion.getType());
-					myQuestion.put("chapterName", _myQuestion.getChapterName());
-					myQuestion.put("chapterTxt", _myQuestion.getChapterTxt());
-				} else {
-					myQuestion.put("type", _myQuestion.getType());
-					myQuestion.put("questionId", _myQuestion.getQuestionId());
-
-					Question question = QuestionCache.getQuestion(_myQuestion.getQuestionId());// 已关联考试的试题不会改变，缓存起来加速查询。
-					myQuestion.put("questionType", question.getType());
-					myQuestion.put("markType", question.getMarkType());
-					myQuestion.put("title", question.getTitle());
-					myQuestion.put("markOptions", _myQuestion.getMarkOptions());
-					myQuestion.put("score", _myQuestion.getScore());
-					myQuestion.put("analysis", question.getAnalysis());
-					myQuestion.put("userScore", _myQuestion.getUserScore());
-					{// 选项
-						List<String> options = new ArrayList<>();
-						if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
-							List<QuestionOption> questionOptionList = QuestionCache
-									.getOption(_myQuestion.getQuestionId());
-							for (QuestionOption questionOption : questionOptionList) {
-								options.add(questionOption.getOptions());
-							}
-						}
-						myQuestion.put("options", options);
-					}
-
-					{// 用户答案
-						List<String> userAnswerList = new ArrayList<>();
-						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
-							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)
-									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {// 单选、判断、问答
-								userAnswerList.add(_myQuestion.getUserAnswer());
-							} else if (QuestionUtil.hasMultipleChoice(question)) {// 多选
-								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split(","));
-							} else if (QuestionUtil.hasFillBlank(question)) {// 填空
-								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split("\n", -1));
-							}
-						}
-						myQuestion.put("userAnswers", userAnswerList);
-					}
-
-					{// 标准答案（前面校验是是否阅卷已开始，可以显示答案）
-						List<String> answerList = new ArrayList<>();
-						List<QuestionAnswer> questionAnswerList = QuestionCache.getAnswer(_myQuestion.getQuestionId());
-						for (QuestionAnswer answer : questionAnswerList) {
-							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)
-									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
-								answerList.add(answer.getAnswer());
-							} else if (QuestionUtil.hasMultipleChoice(question)) {
-								Collections.addAll(answerList, answer.getAnswer().split(","));
-							} else if (QuestionUtil.hasFillBlank(question)
-									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
-								answerList.add(answer.getAnswer());
-							}
-						}
-						myQuestion.put("answers", answerList);
-					}
-				}
-				paper.add(myQuestion);
-			}
-
-			return PageResultEx.ok().data(paper);
+			return PageResultEx.ok().data(myMarkService.paper(examId, userId));
 		} catch (MyException e) {
 			log.error("获取用户试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取用户试卷错误：", e);
 			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 分配试卷
-	 * 
-	 * v1.0 zhanghc 2023年2月23日下午2:31:16
-	 * 
-	 * @param examId 考试ID
-	 * @param num    分配份数
-	 * @return PageResult
-	 */
-	@RequestMapping("/assign")
-	public PageResult assign(Integer examId, Integer num) {
-		try {
-			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
-				throw new MyException("尝试加读锁失败");
-			}
-			myMarkService.assign(examId, num);
-			return PageResultEx.ok();
-		} catch (MyException e) {
-			log.error("分配试卷错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("分配试卷错误：", e);
-			return PageResult.err();
-		} finally {
-			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 
@@ -321,10 +187,7 @@ public class ApiMyMarkController extends BaseController {
 	@RequestMapping("/score")
 	public PageResult score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
 		try {
-			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
-				throw new MyException("尝试加读锁失败");
-			}
-			myMarkService.scoreUpdate(examId, userId, questionId, userScore);
+			myMarkService.score(examId, userId, questionId, userScore);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("打分错误：{}", e.getMessage());
@@ -332,8 +195,6 @@ public class ApiMyMarkController extends BaseController {
 		} catch (Exception e) {
 			log.error("打分错误：", e);
 			return PageResult.err();
-		} finally {
-			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 
@@ -348,9 +209,6 @@ public class ApiMyMarkController extends BaseController {
 	@RequestMapping("/finish")
 	public PageResult finish(Integer examId, Integer userId) {
 		try {
-			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
-				throw new MyException("尝试加读锁失败");
-			}
 			myMarkService.finish(examId, userId);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -359,8 +217,6 @@ public class ApiMyMarkController extends BaseController {
 		} catch (Exception e) {
 			log.error("阅卷错误：", e);
 			return PageResult.err();
-		} finally {
-			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 }

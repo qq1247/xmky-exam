@@ -95,7 +95,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/edit")
 	public PageResult edit(QuestionType questionType) {
 		try {
-			//校验数据有效性
+			//数据校验
 			if(!ValidateUtil.isValid(questionType.getName())) {
 				throw new MyException("参数错误：name");
 			}

@@ -10,7 +10,7 @@ public class MyP6SpyLogger implements MessageFormattingStrategy {
 		if (!ValidateUtil.isValid(sql)) {
 			return "";
 		}
-		
+
 		return String.format("%s; %s毫秒", sql.replaceAll("[\\s]+", " "), elapsed);
 	}
 }

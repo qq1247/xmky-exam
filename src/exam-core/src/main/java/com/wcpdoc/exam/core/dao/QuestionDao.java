@@ -68,7 +68,7 @@ public interface QuestionDao extends RBaseDao<Question> {
 	}
 
 	/**
-	 * 获取试题列表
+	 * 试题列表
 	 * 
 	 * v1.0 zhanghc 2021年12月28日下午2:56:17
 	 * 
@@ -77,12 +77,13 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 */
 	default List<Integer> getIds(Integer questionTypeId) {
 		return selectObjs(new LambdaQueryWrapper<Question>()//
-				.select(Question::getId).eq(Question::getState, 1)//
+				.select(Question::getId)//
+				.eq(Question::getState, 1)//
 				.eq(Question::getQuestionTypeId, questionTypeId));
 	}
 
 	/**
-	 * 获取试题列表
+	 * 试题列表
 	 * 
 	 * v1.0 zhanghc 2021年12月28日下午2:56:17
 	 * 
@@ -104,20 +105,5 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 */
 	default List<Question> getListByDel() {
 		throw new MyException("暂未实现");
-	}
-
-	/**
-	 * 试题数量获取
-	 * 
-	 * v1.0 zhanghc 2023年9月15日上午10:21:35
-	 * 
-	 * @param questionTypeId 题库ID
-	 * @return int
-	 */
-	default int getNum(Integer questionTypeId) {
-		return selectCount(new LambdaQueryWrapper<Question>()//
-				.eq(Question::getState, 1)//
-				.eq(Question::getQuestionTypeId, questionTypeId))//
-				.intValue();
 	}
 }

@@ -31,7 +31,6 @@ public class GlobalExceptionHandler {
 	 * @return PageOut
 	 */
 	@ExceptionHandler(ShiroException.class)
-
 	public PageResult exceptionHandler(Exception se) {
 		if (se instanceof IncorrectCredentialsException || se instanceof UnknownAccountException) {
 			return PageResult.err().msg(se.getMessage());

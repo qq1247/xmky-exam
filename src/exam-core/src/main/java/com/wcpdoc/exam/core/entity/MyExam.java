@@ -24,8 +24,6 @@ public class MyExam {
 	private Integer markUserId;
 	private Date examStartTime;
 	private Date examEndTime;
-	private Date answerStartTime;
-	private Date answerEndTime;
 	private Date markStartTime;
 	private Date markEndTime;
 	private BigDecimal objectiveScore;
@@ -46,9 +44,9 @@ public class MyExam {
 	 * @return Long 毫秒值
 	 */
 	public Long getAnswerMs() {
-		if (this.answerStartTime == null || this.answerEndTime == null) {
+		if (this.examStartTime == null || this.examEndTime == null) {
 			return Long.MAX_VALUE;
 		}
-		return this.answerEndTime.getTime() - this.answerStartTime.getTime();
+		return this.examEndTime.getTime() - this.examStartTime.getTime();
 	}
 }

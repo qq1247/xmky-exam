@@ -4,11 +4,13 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.MyQuestionDao;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
@@ -46,8 +48,13 @@ public class MyQuestionServiceImpl extends BaseServiceImp<MyQuestion> implements
 	}
 
 	@Override
+	@CacheEvict(value = ExamConstant.MYQUESTION_CACHE, allEntries = true)
 	public void clear(Integer examId) {
-		myQuestionDao.paperClear(examId);
+		myQuestionDao.clear(examId);
 	}
 
+	@Override
+	public List<Integer> getExamIdList(Integer questionId) {
+		return myQuestionDao.getExamIdList(questionId);
+	}
 }

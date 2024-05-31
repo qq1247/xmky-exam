@@ -63,7 +63,7 @@ public interface MyMarkDao extends RBaseDao<MyMark> {
 	 * @return PageOut
 	 */
 	default PageOut getUserListpage(PageIn pageIn) {
-		
+
 		Page<Map<String, Object>> page = SpringUtil.getBean(MyExamDao.class).selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<MyExam>().setAlias("MY_EXAM")//
 						.select("USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "ORG.ID AS ORG_ID",

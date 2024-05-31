@@ -1,8 +1,10 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 
@@ -48,7 +50,25 @@ public interface MyQuestionDao extends RBaseDao<MyQuestion> {
 	 * 
 	 * @param examId void
 	 */
-	default void paperClear(Integer examId) {
+	default void clear(Integer examId) {
 		delete(new LambdaQueryWrapper<MyQuestion>().eq(MyQuestion::getExamId, examId));
+	}
+
+	/**
+	 * 考试ID列表
+	 * 
+	 * v1.0 zhanghc 2024年5月12日下午9:07:09
+	 * 
+	 * @param questionId
+	 * @return List<Integer>
+	 */
+	default List<Integer> getExamIdList(Integer questionId) {
+		return selectList(new QueryWrapper<MyQuestion>()//
+				.select("DISTINCT EXAM_ID")//
+				.lambda()//
+				.eq(MyQuestion::getQuestionId, questionId))//
+				.stream()//
+				.map(MyQuestion::getExamId)//
+				.collect(Collectors.toList());
 	}
 }

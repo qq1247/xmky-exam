@@ -32,7 +32,7 @@ public class SysQuartzRunner implements ApplicationRunner {
 		List<Cron> cronList = cronService.getList();
 		for (Cron cron : cronList) {
 			if (cron.getState() != 1) {
-				log.info("系统定时任务启动：【{}】：默认关闭", cron.getName());
+				log.info("系统定时任务启动：【{}】未启动", cron.getName());
 				continue;
 			}
 

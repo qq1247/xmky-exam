@@ -39,7 +39,7 @@ public class JWTRealm extends AuthorizingRealm {
 	public boolean supports(AuthenticationToken token) {
 		return token instanceof JWTToken;
 	}
-	
+
 	/**
 	 * 授予角色权限
 	 */
@@ -59,7 +59,7 @@ public class JWTRealm extends AuthorizingRealm {
 		for (String role : user.getRoles()) {
 			simpleAuthorizationInfo.addRole(role);
 		}
-		
+
 		return simpleAuthorizationInfo;
 	}
 
@@ -73,14 +73,15 @@ public class JWTRealm extends AuthorizingRealm {
 		if (jwtResult.getCode() != HttpStatus.OK.value()) {
 			throw new AuthenticationException(jwtResult.getMsg());
 		}
-		
+
 		return new SimpleAuthenticationInfo(jwtToken, jwtToken, getName());
 	}
-	
+
 	/**
 	 * 清除授权
 	 * 
 	 * v1.0 zhanghc 2021年6月11日下午3:42:34
+	 * 
 	 * @param userId void
 	 */
 	public void clearAuth(Integer userId) {

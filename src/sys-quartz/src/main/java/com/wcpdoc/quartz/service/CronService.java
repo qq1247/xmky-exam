@@ -13,7 +13,7 @@ import com.wcpdoc.quartz.entity.Cron;
 public interface CronService extends BaseService<Cron> {
 
 	/**
-	 * 修改定时任务
+	 * 定时任务修改
 	 * 
 	 * v1.0 zhanghc 2019年9月11日下午4:38:46
 	 * 
@@ -22,7 +22,7 @@ public interface CronService extends BaseService<Cron> {
 	void updateEx(Cron cron);
 
 	/**
-	 * 删除定时任务
+	 * 定时任务删除
 	 * 
 	 * v1.0 zhanghc 2019年9月11日下午4:38:46
 	 * 
@@ -31,7 +31,7 @@ public interface CronService extends BaseService<Cron> {
 	void delEx(Integer id);
 
 	/**
-	 * 获取定时任务列表
+	 * 定时任务列表
 	 * 
 	 * v1.0 zhanghc 2019年9月13日下午7:10:39
 	 * 
@@ -40,7 +40,7 @@ public interface CronService extends BaseService<Cron> {
 	List<Cron> getList();
 
 	/**
-	 * 启动任务
+	 * 任务启动
 	 * 
 	 * v1.0 zhanghc 2020年8月25日下午4:01:47
 	 * 
@@ -49,7 +49,7 @@ public interface CronService extends BaseService<Cron> {
 	void startTask(Integer id);
 
 	/**
-	 * 停止任务
+	 * 任务停止
 	 * 
 	 * v1.0 zhanghc 2020年8月25日下午4:08:24
 	 * 

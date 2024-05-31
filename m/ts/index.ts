@@ -60,8 +60,6 @@ export interface MyExam {
 	examName : string // 考试名称
 	examStartTime : string// 考试开始时间
 	examEndTime : string// 考试结束时间
-	answerStartTime : string// 答题开始时间
-	answerEndTime : string// 答题结束时间
 	totalScore : string// 用户得分
 	examTotalScore : string// 考试总分
 	no : number// 考试排名

@@ -31,7 +31,8 @@ public interface ExerDao extends RBaseDao<Exer> {
 						.like(pageIn.hasParm("name"), "EXER.NAME", pageIn.getParm("name"))//
 						.ge(pageIn.hasParm("todo"), "EXER.END_TIME", DateUtil.formatDateTime(new Date()))// 查找我的未完成的练习列表
 						.eq(pageIn.hasParm("curUserId"), "EXER.CREATE_USER_ID", pageIn.getParm("curUserId"))// 子管理员登录，各看各的
-						.like(pageIn.hasParm("examUserId"), "EXER.USER_IDS", String.format("%%,%s,%%", pageIn.getParm("examUserId")))//
+						.like(pageIn.hasParm("examUserId"), "EXER.USER_IDS",
+								String.format("%%,%s,%%", pageIn.getParm("examUserId")))//
 						.eq("EXER.STATE", 1)//
 						.and(pageIn.hasParm("startTime") && pageIn.hasParm("endTime"),
 								i -> i.ge("EXER.START_TIME", pageIn.getParm("startTime"))

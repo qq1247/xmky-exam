@@ -36,7 +36,7 @@
 	const examEndTime = ref()// 考试结束时间（用reactive必须new Date()，会造成问题）
 	const myExam = reactive({// 我的考试信息
 		totalScore: 0, //总分
-		answerStartTime: new Date(),// 答题开始时间
+		examStartTime: new Date(),// 答题开始时间
 		answerEndTime: new Date(),// 答题结束时间
 		markStartTime: new Date(),// 阅卷开始时间
 		markEndTime: new Date(),// 阅卷结束时间
@@ -69,7 +69,7 @@
 			});
 
 			myExam.totalScore = _exam.totalScore
-			myExam.answerStartTime = _exam.answerStartTime ? new Date(_exam.answerStartTime.replaceAll("-", '/')) : null
+			myExam.examStartTime = _exam.examStartTime ? new Date(_exam.examStartTime.replaceAll("-", '/')) : null
 			myExam.answerEndTime = _exam.answerEndTime ? new Date(_exam.answerEndTime.replaceAll("-", '/')) : null
 			myExam.markStartTime = _exam.markStartTime ? new Date(_exam.markStartTime.replaceAll("-", '/')) : null
 			myExam.markEndTime = _exam.markEndTime ? new Date(_exam.markEndTime.replaceAll("-", '/')) : null
@@ -119,7 +119,7 @@
 				})
 				details.value.push({
 					label: '用时：',
-					value: myExam.state === 3 ? timeDiff(myExam.answerStartTime, myExam.answerEndTime) : '-',
+					value: myExam.state === 3 ? timeDiff(myExam.examStartTime, myExam.answerEndTime) : '-',
 					bold: true,
 				})
 				details.value.push({
@@ -178,7 +178,7 @@
 				})
 				details.value.push({
 					label: '用时：',
-					value: myExam.state === 3 ? timeDiff(myExam.answerStartTime, myExam.answerEndTime) : '-',
+					value: myExam.state === 3 ? timeDiff(myExam.examStartTime, myExam.answerEndTime) : '-',
 					bold: true,
 				})
 				details.value.push({

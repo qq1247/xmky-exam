@@ -154,16 +154,16 @@ public class ApiParmController extends BaseController {
 			parmService.customUpdate(title, content);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("设置参数密码初始化错误：{}", e.getMessage());
+			log.error("自定义信息修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("设置参数密码初始化错误：", e);
+			log.error("自定义信息修改错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取参数
+	 * 参数获取
 	 * 
 	 * v1.0 chenyun 2021年11月12日下午3:38:42
 	 * 
@@ -178,10 +178,10 @@ public class ApiParmController extends BaseController {
 					.addAttr("pwdType", parm.getPwdType()).addAttr("pwdValue", parm.getPwdValue())
 					.addAttr("customTitle", parm.getCustomTitle()).addAttr("customContent", parm.getCustomContent());
 		} catch (MyException e) {
-			log.error("获取参数错误：{}", e.getMessage());
+			log.error("参数获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取参数错误：", e);
+			log.error("参数获取错误：", e);
 			return PageResult.err();
 		}
 	}

@@ -27,7 +27,6 @@ import com.wcpdoc.file.entity.File;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileExService;
 import com.wcpdoc.file.service.FileService;
-import com.wcpdoc.file.util.IdUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,7 +54,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 
 	@Override
 	public String tempUpload(MultipartFile[] files, String[] allowTypes, String uuid) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(files)) {
 			throw new MyException("参数错误：files");
 		}
@@ -86,7 +85,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		// 保存临时上传附件（如果中间有失败，数据库事务会回滚，部分已上传的临时文件会采用定时任务清除）
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
-			String fileId = IdUtil.getInstance().nextId() + "";
+			Date curTime = new Date();
+			String fileId = curTime.getTime() + "";
 			java.io.File destFile = new java.io.File(
 					String.format("%s%s%s", tempUploadDir.getAbsolutePath(), java.io.File.separator, fileId));
 			try {
@@ -119,7 +119,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 
 	@Override
 	public void upload(Integer id) {
-		// 校验数据有效性
+		// 数据校验
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
@@ -199,7 +199,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 
 	@Override
 	public Integer copyFile(Integer id) {
-		// 校验数据有效性
+		// 数据校验
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
@@ -218,8 +218,9 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 		String baseDir = getFileUploadDir();
 		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, fileOld.getPath()));
-		String fileId = IdUtil.getInstance().nextId() + "";
-		String timeStr = DateUtil.formatDateTime(new Date());
+		Date curTime = new Date();
+		String fileId = curTime.getTime() + "";
+		String timeStr = DateUtil.formatDateTime(curTime);
 		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
 				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
 		fileNew.setState(1);

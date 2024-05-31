@@ -23,10 +23,8 @@ import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.service.QuestionAnswerService;
-import com.wcpdoc.exam.core.service.QuestionOptionService;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,16 +42,13 @@ public class ApiQuestionController extends BaseController {
 	@Resource
 	private QuestionService questionService;
 	@Resource
-	private QuestionTypeService questionTypeService;
-	@Resource
-	private QuestionOptionService questionOptionService;
-	@Resource
-	private QuestionAnswerService questionAnswerService;
-	
+	private ExamCacheService examCacheService;
+
 	/**
-	 * 试题列表 
+	 * 试题列表
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * 
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
@@ -68,26 +63,26 @@ public class ApiQuestionController extends BaseController {
 				Integer id = (Integer) result.get("id");
 				Integer type = (Integer) result.get("type");
 				Integer markType = (Integer) result.get("markType");
-				
+
 				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
-					result.put("markOptions", StringUtil.toIntList((String)result.get("markOptions")));
+					result.put("markOptions", StringUtil.toIntList((String) result.get("markOptions")));
 				} else {
 					result.put("markOptions", new Integer[0]);
 				}
-				
+
 				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段
-					List<QuestionOption> questionOptionList = questionOptionService.getList(id);
+					List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(id);
 					List<String> options = new ArrayList<>();
 					for (QuestionOption questionOption : questionOptionList) {
 						options.add(questionOption.getOptions());
 					}
 					result.put("options", options);
 				}
-				
-				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(id);
+
+				List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(id);
 				List<String> answers = new ArrayList<>();
 				List<BigDecimal> scores = new ArrayList<>();
-				for(QuestionAnswer answer : questionAnswerList){
+				for (QuestionAnswer answer : questionAnswerList) {
 					if (type == 1 || type == 4 || (type == 5 && markType == 2)) {
 						answers.add(answer.getAnswer());
 					} else if (type == 2) {
@@ -107,80 +102,87 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 试题添加
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param question
-	 * @param markOptions 阅卷选项
-	 * @param options 选项（单选多选时有效）
-	 * @param answers 答案
-	 * @param scores 答案分数（填空或智能问答有多项）
+	 * 
+	 * @param question 试题
+	 * @param options  选项（单选多选时有效）
+	 * @param answers  答案
+	 * @param scores   答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	public PageResult add(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.addEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers), CollectionUtil.toList(scores));
+			questionService.addEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers),
+					CollectionUtil.toList(scores));
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			log.error("试题添加错误：", e);
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 试题修改
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param question
-	 * @param answers
-	 * @param options
-	 * @return PageResult
+	 * 
+	 * @param question 试题
+	 * @param options  选项（单选多选时有效）
+	 * @param answers  答案
+	 * @param scores   答案分数（填空或智能问答有多项）
 	 */
 	@RequestMapping("/edit")
 	public PageResult edit(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.updateEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers), CollectionUtil.toList(scores));
+			questionService.updateEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers),
+					CollectionUtil.toList(scores));
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			log.error("试题修改错误：", e);
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 试题删除
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * 
 	 * @param ids
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
 	public PageResult del(Integer[] ids) {
 		try {
-			questionService.delEx(ids);
+			for (Integer id : ids) {
+				questionService.delEx(id);
+			}
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			log.error("试题删除错误：", e);
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 试题获取
 	 * 
 	 * v1.0 zhanghc 2021年7月1日下午2:18:05
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
@@ -188,65 +190,65 @@ public class ApiQuestionController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			// 数据校验
-			Question question = questionService.getById(id);
+			Question question = examCacheService.getQuestion(id);
 			if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			
+
 			// 试题获取
 			List<String> options = new ArrayList<>();
 			if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
-				List<QuestionOption> questionOptionList = questionOptionService.getList(id);
+				List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(id);
 				for (QuestionOption questionOption : questionOptionList) {
 					options.add(questionOption.getOptions());
 				}
 			}
-			
-			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+
+			List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(question.getId());
 			List<Object> answers = new ArrayList<>();
 			List<BigDecimal> scores = new ArrayList<>();
-			for(QuestionAnswer answer : questionAnswerList) {
-				if (QuestionUtil.hasSingleChoice(question) 
-						|| QuestionUtil.hasTrueFalse(question) 
+			for (QuestionAnswer answer : questionAnswerList) {
+				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)
 						|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 					answers.add(answer.getAnswer());
 				} else if (QuestionUtil.hasMultipleChoice(question)) {
 					Collections.addAll(answers, answer.getAnswer().split(","));
 					scores.add(answer.getScore());
-				} else if (QuestionUtil.hasFillBlank(question) 
+				} else if (QuestionUtil.hasFillBlank(question)
 						|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
 					answers.add(answer.getAnswer().split("\n"));
 					scores.add(answer.getScore());
 				}
 			}
-			
-			PageResultEx pageResult = PageResultEx.ok()
-					.addAttr("id", question.getId())
-					.addAttr("type", question.getType())
-					.addAttr("title", question.getTitle())
-					.addAttr("options", options)
-					.addAttr("markType", question.getMarkType())
-					.addAttr("analysis", question.getAnalysis())
-					.addAttr("questionTypeId", question.getQuestionTypeId())
-					.addAttr("score", question.getScore())
-					.addAttr("markOptions", question.getMarkOptions())
-					.addAttr("answers", answers)
-					.addAttr("scores", scores)
+
+			PageResultEx pageResult = PageResultEx.ok()//
+					.addAttr("id", question.getId())//
+					.addAttr("type", question.getType())//
+					.addAttr("title", question.getTitle())//
+					.addAttr("options", options)//
+					.addAttr("markType", question.getMarkType())//
+					.addAttr("analysis", question.getAnalysis())//
+					.addAttr("questionTypeId", question.getQuestionTypeId())//
+					.addAttr("score", question.getScore())//
+					.addAttr("markOptions", question.getMarkOptions())//
+					.addAttr("answers", answers)//
+					.addAttr("scores", scores)//
 					.addAttr("state", question.getState());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("试题获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			log.error("试题获取错误：", e);
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 试题复制
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
@@ -258,7 +260,7 @@ public class ApiQuestionController extends BaseController {
 		} catch (MyException e) {
 			log.error("试题复制错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			log.error("试题复制错误：", e);
 			return PageResult.err();
 		}

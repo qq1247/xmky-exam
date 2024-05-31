@@ -12,11 +12,11 @@ import java.util.Map;
  */
 public class TreeUtil {
 	public static List<Tree> getTree(List<? extends Tree> treeNodelist) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(treeNodelist)) {
 			throw new RuntimeException("无法获取参数：treeNodelist");
 		}
-		
+
 		// 生成树结构
 		Map<String, Tree> nodeCache = new HashMap<>();
 		for (Tree curNode : treeNodelist) {
@@ -29,7 +29,7 @@ public class TreeUtil {
 				treeList.add(curNode);
 				continue;
 			}
-			
+
 			Tree parentNode = nodeCache.get(curNode.getParentId());// 当前节点添加到父节点下
 			if (parentNode.getChildren() == null) {
 				parentNode.setChildren(new ArrayList<Tree>());
@@ -38,7 +38,7 @@ public class TreeUtil {
 		}
 		return treeList;
 	}
-	
+
 	public static void main(String[] args) {
 //		软件部	
 //		测试部	软件部
@@ -57,7 +57,6 @@ public class TreeUtil {
 //		List<Tree> tree = TreeUtil.getTree(list);
 	}
 
-
 	/**
 	 * 树
 	 * 
@@ -73,5 +72,5 @@ public class TreeUtil {
 
 		public List<Tree> getChildren();
 	}
-	
+
 }

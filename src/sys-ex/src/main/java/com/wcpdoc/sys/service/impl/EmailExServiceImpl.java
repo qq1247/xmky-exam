@@ -2,12 +2,10 @@ package com.wcpdoc.sys.service.impl;
 
 import javax.annotation.Resource;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
-import com.wcpdoc.base.service.ParmService;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.notify.entity.Email;
 import com.wcpdoc.notify.exception.EmailException;
@@ -21,12 +19,11 @@ import com.wcpdoc.notify.service.EmailExService;
 @Service
 public class EmailExServiceImpl implements EmailExService {
 	@Resource
-	@Lazy
-	private ParmService parmService;
+	private BaseCacheService baseCacheService;
 
 	@Override
 	public Email getEmail() throws EmailException {
-		Parm parm = ParmCache.get();
+		Parm parm = baseCacheService.getParm();
 		if (!ValidateUtil.isValid(parm.getEmailHost()) || !ValidateUtil.isValid(parm.getEmailUserName())
 				|| !ValidateUtil.isValid(parm.getEmailPwd()) || !ValidateUtil.isValid(parm.getEmailProtocol())
 				|| !ValidateUtil.isValid(parm.getEmailEncode())) {

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
-import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
@@ -40,11 +40,11 @@ public class ApiUserController extends BaseController {
 	@Resource
 	private UserExService userExService;
 	@Resource
-	private OrgService orgService;
-	@Resource
-	private OnlineUserService onlineUserService;
+	private BaseCacheService baseCacheService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private OnlineUserService onlineUserService;
 
 	/**
 	 * 用户列表
@@ -65,7 +65,7 @@ public class ApiUserController extends BaseController {
 				}
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
-					User user = userService.getById(getCurUser().getId());
+					User user = baseCacheService.getUser(getCurUser().getId());
 					pageIn.addParm("examUserIds", user.getUserIds());
 				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
@@ -123,7 +123,7 @@ public class ApiUserController extends BaseController {
 	public PageResult edit(User user) {
 		try {
 			// 用户修改
-			User entity = userService.getById(user.getId());
+			User entity = baseCacheService.getUser(user.getId());
 			String oldLoginName = entity.getLoginName();
 			userService.editEx(user);
 			String newLoginName = entity.getLoginName();
@@ -181,16 +181,21 @@ public class ApiUserController extends BaseController {
 			if (!ValidateUtil.isValid(id)) {
 				id = getCurUser().getId();
 			}
-			User user = userService.getById(id);
+			User user = baseCacheService.getUser(id);
 			Org org = null;
-			if (user.getOrgId() != null) {
-				org = orgService.getById(user.getOrgId());
+			if (ValidateUtil.isValid(user.getOrgId()) && user.getOrgId() != 0) {
+				org = baseCacheService.getOrg(user.getOrgId());
 			}
 
-			PageResultEx pageResult = PageResultEx.ok().addAttr("id", user.getId()).addAttr("name", user.getName())
-					.addAttr("loginName", user.getLoginName()).addAttr("orgId", user.getOrgId())
-					.addAttr("orgName", org == null ? null : org.getName()).addAttr("state", user.getState())
-					.addAttr("userIds", user.getUserIds()).addAttr("orgIds", user.getOrgIds());
+			PageResultEx pageResult = PageResultEx.ok()//
+					.addAttr("id", user.getId())//
+					.addAttr("name", user.getName())//
+					.addAttr("loginName", user.getLoginName())//
+					.addAttr("orgId", user.getOrgId())//
+					.addAttr("orgName", org == null ? null : org.getName())//
+					.addAttr("state", user.getState())//
+					.addAttr("userIds", user.getUserIds())//
+					.addAttr("orgIds", user.getOrgIds());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("用户获取错误：{}", e.getMessage());
@@ -239,10 +244,10 @@ public class ApiUserController extends BaseController {
 			userService.frozen(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("账户冻结错误：{}", e.getMessage());
+			log.error("用户冻结错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("账户冻结错误：", e);
+			log.error("用户冻结错误：", e);
 			return PageResult.err();
 		}
 	}

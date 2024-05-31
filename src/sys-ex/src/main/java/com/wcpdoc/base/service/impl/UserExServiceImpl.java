@@ -61,7 +61,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 	 */
 	@Override
 	public void xlsImport(Integer fileId) {
-		// 校验数据有效性
+		// 数据校验
 		List<Org> orgList = orgService.getList();
 		Map<String, Org> orgCache = new HashMap<>();
 		for (Org org : orgList) {

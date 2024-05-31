@@ -67,7 +67,7 @@ public class ApiCronController extends BaseController {
 	}
 
 	/**
-	 * 完成添加定时任务
+	 * 定时任务添加
 	 * 
 	 * v1.0 zhanghc 2019-07-29 10:38:17
 	 * 
@@ -80,7 +80,7 @@ public class ApiCronController extends BaseController {
 		try {
 			cron.setUpdateUserId(getCurUser().getId());
 			cron.setUpdateTime(new Date());
-			// 校验数据有效性
+			// 数据校验
 			if (!ValidateUtil.isValid(cron.getJobClass())) {
 				throw new MyException("参数错误：jobClass");
 			}
@@ -101,21 +101,21 @@ public class ApiCronController extends BaseController {
 				throw new MyException("cron表达式错误：" + cron.getCron());
 			}
 
-			// 添加定时任务，默认不启动
+			// 定时任务添加，默认不启动
 			cron.setState(2);
 			cronService.save(cron);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加定时任务错误：{}", e.getMessage());
+			log.error("定时任务添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加定时任务错误：", e);
+			log.error("定时任务添加错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 完成修改定时任务
+	 * 定时任务修改
 	 * 
 	 * v1.0 zhanghc 2019-07-29 10:38:17
 	 * 
@@ -128,16 +128,16 @@ public class ApiCronController extends BaseController {
 			cronService.updateEx(cron);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改定时任务错误：{}", e.getMessage());
+			log.error("定时任务修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改定时任务错误：", e);
+			log.error("定时任务修改错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 完成删除定时任务
+	 * 定时任务删除
 	 * 
 	 * v1.0 zhanghc 2019-07-29 10:38:17
 	 * 
@@ -150,16 +150,16 @@ public class ApiCronController extends BaseController {
 			cronService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除定时任务错误：{}", e.getMessage());
+			log.error("定时任务删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除定时任务错误：", e);
+			log.error("定时任务删除错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 启动任务
+	 * 任务启动
 	 * 
 	 * v1.0 zhanghc 2019年9月12日下午5:30:34
 	 * 
@@ -172,16 +172,16 @@ public class ApiCronController extends BaseController {
 			cronService.startTask(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("启动任务错误：{}", e.getMessage());
+			log.error("任务启动错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("启动任务错误：", e);
+			log.error("任务启动错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 停止任务
+	 * 任务停止
 	 * 
 	 * v1.0 zhanghc 2019年9月12日下午5:30:34
 	 * 
@@ -194,10 +194,10 @@ public class ApiCronController extends BaseController {
 			cronService.stopTask(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("停止任务错误：{}", e.getMessage());
+			log.error("任务停止错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("停止任务错误：", e);
+			log.error("任务停止错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -225,7 +225,7 @@ public class ApiCronController extends BaseController {
 	}
 
 	/**
-	 * 获取定时任务
+	 * 定时任务获取
 	 * 
 	 * v1.0 zhanghc 2021年5月27日下午4:27:54
 	 * 
@@ -242,14 +242,18 @@ public class ApiCronController extends BaseController {
 				triggerTimes[i] = DateUtil.formatDateTime(timeList.get(i));
 			}
 
-			return PageResultEx.ok().addAttr("id", cron.getId()).addAttr("name", cron.getName())
-					.addAttr("jobClass", cron.getJobClass()).addAttr("cron", cron.getCron())
-					.addAttr("triggerTimes", triggerTimes).addAttr("state", cron.getState());
+			return PageResultEx.ok()//
+					.addAttr("id", cron.getId())//
+					.addAttr("name", cron.getName())//
+					.addAttr("jobClass", cron.getJobClass())//
+					.addAttr("cron", cron.getCron())//
+					.addAttr("triggerTimes", triggerTimes)//
+					.addAttr("state", cron.getState());
 		} catch (MyException e) {
-			log.error("获取定时任务错误：{}", e.getMessage());
+			log.error("定时任务获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取定时任务错误：", e);
+			log.error("定时任务获取错误：", e);
 			return PageResult.err();
 		}
 	}

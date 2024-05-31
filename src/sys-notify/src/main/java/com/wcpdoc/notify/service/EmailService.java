@@ -13,8 +13,7 @@ public interface EmailService {
 	/**
 	 * 获取邮件服务
 	 * 
-	 * v1.0 zhanghc 2019年10月15日下午15:51:27
-	 * void
+	 * v1.0 zhanghc 2019年10月15日下午15:51:27 void
 	 */
 	public JavaMailSender getJavaMailSender() throws EmailException;
 }

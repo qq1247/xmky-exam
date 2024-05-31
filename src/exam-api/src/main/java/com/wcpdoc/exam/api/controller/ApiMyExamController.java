@@ -1,10 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -18,21 +13,14 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
-import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
-import com.wcpdoc.exam.core.util.QuestionUtil;
+import com.wcpdoc.exam.core.util.MyExamUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,6 +40,8 @@ public class ApiMyExamController extends BaseController {
 	private MyQuestionService myQuestionService;
 	@Resource
 	private ExamService examService;
+	@Resource
+	private ExamCacheService examCacheService;
 
 	/**
 	 * 我的考试列表
@@ -72,7 +62,7 @@ public class ApiMyExamController extends BaseController {
 				MyExam myExam = new MyExam();
 				myExam.setMarkState((Integer) map.get("markState"));
 
-				if (!scoreShow(exam, myExam)) {// 成绩查询状态（1：考试结束后；2：不公布；3：交卷后）
+				if (!MyExamUtil.scoreShow(exam, myExam)) {// 成绩查询状态（1：考试结束后；2：不公布；3：交卷后）
 					map.put("totalScore", null);// 不显示分数
 					map.put("answerState", null);// 不显示及格状态
 				}
@@ -89,7 +79,7 @@ public class ApiMyExamController extends BaseController {
 	}
 
 	/**
-	 * 获取我的考试
+	 * 我的考试
 	 * 
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
 	 * 
@@ -99,11 +89,11 @@ public class ApiMyExamController extends BaseController {
 	@RequestMapping("/get")
 	public PageResult get(Integer examId) {
 		try {
-			MyExam myExam = myExamService.getMyExam(examId, getCurUser().getId());
+			MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
 			if (myExam == null) {
 				throw new MyException("无查阅权限");
 			}
-			Exam exam = examService.getById(examId);
+			Exam exam = examCacheService.getExam(examId);
 			return PageResultEx.ok()// 考试用户没有exam/get权限，所以字段在这里回显
 					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
 					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
@@ -111,18 +101,20 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("examMarkStartTime", exam.getMarkStartTime())
 					.addAttr("examMarkEndTime", exam.getMarkEndTime())// 如果是交卷后公布，但试卷是主观题试卷，页面提示几点之后查询
 					.addAttr("examName", exam.getName())// 考试名称
-					.addAttr("examStartTime", ExamUtil.hasTimeLimit(exam) ? myExam.getExamStartTime() : exam.getStartTime())// 我的考试结束时间（进入我的试卷使用）
+					.addAttr("examStartTime",
+							ExamUtil.hasTimeLimit(exam) ? myExam.getExamStartTime() : exam.getStartTime())// 我的考试结束时间（进入我的试卷使用）
 					.addAttr("examEndTime", ExamUtil.hasTimeLimit(exam) ? myExam.getExamEndTime() : exam.getEndTime())//
-					.addAttr("answerStartTime", myExam.getAnswerStartTime())//
-					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
+					.addAttr("examStartTime", myExam.getExamStartTime())//
+					.addAttr("answerEndTime", myExam.getExamEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore", myExam.getObjectiveScore())//
-					.addAttr("totalScore", scoreShow(exam, myExam) ? myExam.getTotalScore() : null)//
-					.addAttr("answerState", scoreShow(exam, myExam) ? myExam.getAnswerState() : null)//
-					.addAttr("state", myExam.getState()).addAttr("markState", myExam.getMarkState())//
+					.addAttr("totalScore", MyExamUtil.scoreShow(exam, myExam) ? myExam.getTotalScore() : null)//
+					.addAttr("answerState", MyExamUtil.scoreShow(exam, myExam) ? myExam.getAnswerState() : null)//
+					.addAttr("state", myExam.getState())//
+					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getRankState() == 1 ? myExamService.getList(examId).size() : null);
+					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null);
 		} catch (MyException e) {
 			log.error("获取我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -143,148 +135,7 @@ public class ApiMyExamController extends BaseController {
 	@RequestMapping("/paper")
 	public PageResult paper(Integer examId) {
 		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(examId)) {
-				throw new MyException("参数错误：examId");
-			}
-
-			MyExam _myExam = myExamService.getMyExam(examId, getCurUser().getId());
-			if (_myExam == null) {
-				throw new MyException("无查阅权限");
-			}
-			Exam exam = examService.getById(examId);
-			if (exam.getState() == 2) {
-				throw new MyException("考试已暂停");
-			}
-			if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
-				throw new MyException("考试未开始");
-			}
-
-			/*
-			 * 如果是限制考试，并且是第一次打开试卷，并且考试没结束，生成考试用户考试时间<br/>
-			 * 
-			 * 示例：考试时间为2024-01-01 00:00:00 - 2024-02-01 00:00:00，单次考试时间为60分钟<br/>
-			 * 第一次打开试卷，时间为2024-01-30 16:15:16；考试结束时间为 2024-01-30 17:15:16<br/>
-			 */
-			if (ExamUtil.hasTimeLimit(exam) //
-					&& !ValidateUtil.isValid(_myExam.getExamStartTime())//
-					&& exam.getEndTime().getTime() >= System.currentTimeMillis()) {
-				_myExam.setExamStartTime(new Date());
-				_myExam.setExamEndTime(DateUtil.getNextMinute(_myExam.getExamStartTime(), exam.getLimitMinute()));
-				if (_myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {
-					_myExam.setExamEndTime(exam.getEndTime());
-				}
-				myExamService.updateById(_myExam);
-			}
-
-			// 组装试卷
-			List<Map<String, Object>> paper = new ArrayList<>();
-			List<MyQuestion> myQuestionList = myQuestionService.getList(examId, getCurUser().getId());
-
-			boolean showAnswer = answerShow(exam, _myExam);// 显示标准答案
-			for (MyQuestion _myQuestion : myQuestionList) {
-				Map<String, Object> myQuestion = new HashMap<>();
-				if (_myQuestion.getType() == 1) {
-					myQuestion.put("type", _myQuestion.getType());
-					myQuestion.put("chapterName", _myQuestion.getChapterName());
-					myQuestion.put("chapterTxt", _myQuestion.getChapterTxt());
-				} else {
-					myQuestion.put("type", _myQuestion.getType());
-					myQuestion.put("questionId", _myQuestion.getQuestionId());
-
-					Question question = QuestionCache.getQuestion(_myQuestion.getQuestionId());// 已关联考试的试题不会改变，缓存起来加速查询。
-					myQuestion.put("questionType", question.getType());
-					myQuestion.put("markType", question.getMarkType());
-					myQuestion.put("title", question.getTitle());
-					myQuestion.put("markOptions", _myQuestion.getMarkOptions());
-					myQuestion.put("score", _myQuestion.getScore());
-					myQuestion.put("analysis", question.getAnalysis());
-					myQuestion.put("userScore", scoreShow(exam, _myExam) ? _myQuestion.getUserScore() : null);
-					{// 选项
-						List<String> options = new ArrayList<>();
-						if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
-							List<QuestionOption> questionOptionList = QuestionCache
-									.getOption(_myQuestion.getQuestionId());
-							if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {// 选项乱序
-								for (int optionsNo : _myQuestion.getOptionsNo()) {// 4,1,2,3
-									QuestionOption questionOption = questionOptionList.get(optionsNo - 1);// 先放第4个
-									options.add(questionOption.getOptions());
-								}
-							} else {
-								for (QuestionOption questionOption : questionOptionList) {// 常规顺序
-									options.add(questionOption.getOptions());
-								}
-							}
-
-						}
-						myQuestion.put("options", options);
-					}
-
-					{// 用户答案
-						List<String> userAnswerList = new ArrayList<>();
-						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
-							if (QuestionUtil.hasTrueFalse(question) || QuestionUtil.hasQA(question)) {// 判断、问答
-								userAnswerList.add(_myQuestion.getUserAnswer());
-							} else if (QuestionUtil.hasSingleChoice(question)) {// 单选
-								if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {// 选项乱序：4,1,3,2 ，填写答案：B，回显：D
-									userAnswerList
-											.add(_myQuestion.getOptionsNoCache().get(_myQuestion.getUserAnswer()));
-								} else {
-									userAnswerList.add(_myQuestion.getUserAnswer());
-								}
-							} else if (QuestionUtil.hasMultipleChoice(question)) {// 多选
-								String[] userAnswers = _myQuestion.getUserAnswer().split(",");
-								if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {
-									for (String userAnswer : userAnswers) {
-										userAnswerList.add(_myQuestion.getOptionsNoCache().get(userAnswer));
-									}
-								} else {
-									Collections.addAll(userAnswerList, userAnswers);
-								}
-							} else if (QuestionUtil.hasFillBlank(question)) {// 填空
-								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split("\n", -1));
-							}
-						}
-						myQuestion.put("userAnswers", userAnswerList);
-					}
-
-					{// 标准答案
-						List<String> answerList = new ArrayList<>();
-						if (showAnswer) {
-							List<QuestionAnswer> questionAnswerList = QuestionCache
-									.getAnswer(_myQuestion.getQuestionId());
-							for (QuestionAnswer answer : questionAnswerList) {
-								if (QuestionUtil.hasTrueFalse(question)
-										|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
-									answerList.add(answer.getAnswer());
-								} else if (QuestionUtil.hasSingleChoice(question)) {
-									if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {
-										answerList.add(_myQuestion.getOptionsNoCache().get(answer.getAnswer()));
-									} else {
-										answerList.add(answer.getAnswer());
-									}
-								} else if (QuestionUtil.hasMultipleChoice(question)) {
-									String[] answers = answer.getAnswer().split(",");
-									if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {
-										for (String _answer : answers) {
-											answerList.add(_myQuestion.getOptionsNoCache().get(_answer));
-										}
-									} else {
-										Collections.addAll(answerList, answers);
-									}
-								} else if (QuestionUtil.hasFillBlank(question)
-										|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
-									answerList.add(answer.getAnswer());
-								}
-							}
-						}
-						myQuestion.put("answers", answerList);
-					}
-				}
-				paper.add(myQuestion);
-			}
-
-			return PageResultEx.ok().data(paper);
+			return PageResultEx.ok().data(myExamService.paper(examId, getCurUser().getId()));
 		} catch (MyException e) {
 			log.error("我的试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -307,10 +158,7 @@ public class ApiMyExamController extends BaseController {
 	@RequestMapping("/answer")
 	public PageResult answer(Integer examId, Integer questionId, String[] answers) {
 		try {
-			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
-				throw new MyException("尝试加读锁失败");
-			}
-			myExamService.answerUpdate(examId, getCurUser().getId(), questionId, answers);
+			myExamService.answer(examId, getCurUser().getId(), questionId, answers);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("答题错误：{}", e.getMessage());
@@ -318,13 +166,11 @@ public class ApiMyExamController extends BaseController {
 		} catch (Exception e) {
 			log.error("答题错误：", e);
 			return PageResult.err();
-		} finally {
-			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 
 	/**
-	 * 用户交卷
+	 * 交卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
@@ -334,63 +180,14 @@ public class ApiMyExamController extends BaseController {
 	@RequestMapping("/finish")
 	public PageResult finish(Integer examId) {
 		try {
-			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
-				throw new MyException("尝试加读锁失败");
-			}
 			myExamService.finish(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("用户交卷错误：{}", e.getMessage());
+			log.error("交卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("用户交卷错误：", e);
+			log.error("交卷错误：", e);
 			return PageResult.err();
-		} finally {
-			AutoMarkCache.releaseReadLock(examId);
 		}
-	}
-
-	/**
-	 * 标准答案显示
-	 * 
-	 * v1.0 zhanghc 2023年2月20日上午11:32:34
-	 * 
-	 * @param exam
-	 * @param myExam
-	 * @return boolean
-	 */
-	private boolean answerShow(Exam exam, MyExam myExam) {
-		if (exam.getScoreState() == 1) {// 如果是考试结束后公布答案
-			if (exam.getMarkType() == 1 && exam.getEndTime().getTime() < System.currentTimeMillis()) { // 如果是客观题试卷，考试结束后显示标准答案；
-																										// 10:00-12:00 <
-																										// 12:05
-				return true;
-			}
-			if (exam.getMarkType() == 2 && exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {// 如果是主观题试卷，阅卷结束后显示标准答案
-				return true;
-			}
-		}
-
-		if (exam.getScoreState() == 3) {// 如果是交卷后公布答案
-			if (myExam.getState() == 3) {// 如果用户已交卷，显示标准答案
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * 分数显示
-	 * 
-	 * v1.0 zhanghc 2023年3月2日上午11:07:27
-	 * 
-	 * @param exam
-	 * @param myExam
-	 * @return boolean
-	 */
-	private boolean scoreShow(Exam exam, MyExam myExam) {
-		return (exam.getScoreState() == 1 && exam.getMarkState() == 3) // 如果是考试结束后显示成绩，需要等到考试结束
-				|| (exam.getScoreState() == 3 && myExam.getMarkState() == 3);// 如果是交卷后显示成绩，需要等到该试卷阅卷完成。比如主观题没阅卷，得不到总分，得不到是否及格
 	}
 }

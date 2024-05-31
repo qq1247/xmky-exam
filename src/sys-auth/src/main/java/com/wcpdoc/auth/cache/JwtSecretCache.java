@@ -2,8 +2,6 @@ package com.wcpdoc.auth.cache;
 
 import org.springframework.cache.Cache;
 
-import com.wcpdoc.cache.BaseEhCache;
-
 /**
  * jwtSecret缓存
  * 

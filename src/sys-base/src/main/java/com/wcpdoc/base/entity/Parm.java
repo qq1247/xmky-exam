@@ -1,10 +1,12 @@
 package com.wcpdoc.base.entity;
 
+import java.io.File;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.wcpdoc.core.util.ValidateUtil;
 
 import lombok.Data;
 
@@ -33,4 +35,17 @@ public class Parm {
 	private String customTitle;
 	private String customContent;
 
+	public String getFileUploadDir() {
+		if (ValidateUtil.isValid(fileUploadDir)) {
+			return "";
+		}
+		return fileUploadDir.replace("\\", File.separator).replace("/", File.separator);
+	}
+
+	public String getDbBakDir() {
+		if (ValidateUtil.isValid(dbBakDir)) {
+			return "";
+		}
+		return dbBakDir.replace("\\", File.separator).replace("/", File.separator);
+	}
 }

@@ -7,14 +7,14 @@ import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.ExamRule;
 
 /**
- * 随机章节数据访问层接口
+ * 考试规则数据访问层接口
  * 
  * v1.0 chenyun 2022年2月11日 10:49:52
  */
 public interface ExamRuleDao extends RBaseDao<ExamRule> {
 
 	/**
-	 * 随机规则列表
+	 * 考试规则列表
 	 * 
 	 * v1.0 chenyun 2022年2月11日上午11:30:01
 	 * 
@@ -27,13 +27,13 @@ public interface ExamRuleDao extends RBaseDao<ExamRule> {
 	}
 
 	/**
-	 * 试卷清空
+	 * 考试规则清理
 	 * 
 	 * v1.0 zhanghc 2023年3月23日上午11:05:07
 	 * 
 	 * @param examId void
 	 */
-	default void paperClear(Integer examId) {
+	default void clear(Integer examId) {
 		delete(new LambdaQueryWrapper<ExamRule>().eq(ExamRule::getExamId, examId));
 	}
 }

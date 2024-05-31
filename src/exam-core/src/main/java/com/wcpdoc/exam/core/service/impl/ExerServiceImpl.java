@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.User;
-import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
@@ -44,7 +44,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 	@Resource
 	private QuestionTypeService questionTypeService;
 	@Resource
-	private UserService userService;
+	private BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<Exer> getDao() {
@@ -119,7 +119,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 			throw new MyException("无操作权限");
 		}
 		if (getCurUser().getType() != 0) {
-			User curUser = userService.getById(getCurUser().getId());
+			User curUser = baseCacheService.getUser(getCurUser().getId());
 			List<Integer> haveUsers = curUser.getUserIds();
 			List<Integer> exerUsers = exer.getUserIds();
 			if (!haveUsers.containsAll(exerUsers)) {// 只能练习自己的考试用户
@@ -170,7 +170,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 			throw new MyException("无操作权限");
 		}
 		if (getCurUser().getType() != 0) {
-			User curUser = userService.getById(getCurUser().getId());
+			User curUser = baseCacheService.getUser(getCurUser().getId());
 			List<Integer> haveUsers = curUser.getUserIds();
 			List<Integer> exerUsers = exer.getUserIds();
 			if (!haveUsers.containsAll(exerUsers)) {// 只能练习自己的考试用户

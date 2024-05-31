@@ -4,27 +4,25 @@
 	<appenders>
 		<Console name="console" target="SYSTEM_OUT">
 			<ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY" />
-			<PatternLayout pattern="%m {%d{yyyy-MM-dd HH:mm:ss,SSS} %F.%M()%L行}%n" />
+			<PatternLayout pattern="%m | %d{yyyy-MM-dd HH:mm:ss,SSS} | %t | %F.%M()%L行%n" />
 		</Console>
 		<RollingFile name="rollingFile" fileName="bak/log/exam/exam.log" filePattern="bak/log/exam/exam-%d{yyyy-MM-dd}.log">
-			<PatternLayout pattern="%m {%d{yyyy-MM-dd HH:mm:ss,SSS} %F.%M()%L行}%n" />
+			<PatternLayout pattern="%m | %d{yyyy-MM-dd HH:mm:ss,SSS} | %t | %F.%M()%L行%n" />
 			<TimeBasedTriggeringPolicy modulate="true" interval="1" />
 			<DefaultRolloverStrategy max="31" />
 		</RollingFile>
 	</appenders>
 	<loggers>
 		<!-- sql日志 -->
-		<Logger name="jdbc.sqlonly" level="off"></Logger>
-		<Logger name="jdbc.sqltiming" level="off"></Logger>
-		<Logger name="jdbc.audit" level="off"></Logger>
-		<Logger name="jdbc.resultset" level="off"></Logger>
-		<Logger name="jdbc.resultsettable" level="off"></Logger>
-		<Logger name="jdbc.connection" level="off"></Logger>
+		<Logger name="p6spy" level="error"></Logger>		
 		<!-- 打印令牌登陆、过期、刷新等日志 -->
 		<Logger name="com.wcpdoc.api.service.impl.LoginServiceImpl" level="info"></Logger>
 		<Logger name="com.wcpdoc.auth.filter.JWTFilter" level="info"></Logger>
 		<!-- 打印进度条 -->
-		<Logger name="com.wcpdoc.base.cache.ProgressBarCache" level="info"></Logger>
+		<Logger name="com.wcpdoc.base.service.impl.ProgressBarServiceImpl" level="info"></Logger>
+		<!-- 打印缓存信息 -->
+		<Logger name="com.wcpdoc.base.service.impl.BaseCacheServiceImpl" level="info"></Logger>
+		<Logger name="com.wcpdoc.exam.core.service.impl.ExamCacheServiceImpl" level="info"></Logger>
 		<root level="info">
 			<appender-ref ref="rollingFile" />
 			<appender-ref ref="console" />

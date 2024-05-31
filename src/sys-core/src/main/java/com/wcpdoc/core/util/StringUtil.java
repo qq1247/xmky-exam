@@ -36,7 +36,7 @@ public class StringUtil {
 	 * @return List<String>
 	 */
 	public static List<String> getString(File file, long startByte, long endByte, String charset) {
-		// 校验数据有效性
+		// 数据校验
 		if (!file.exists() || file.isDirectory() || !file.canRead()) {
 			throw new MyException("参数无效：file");
 		}
@@ -107,7 +107,7 @@ public class StringUtil {
 	 * @return List<String>
 	 */
 	public static List<String> getLastLine(File file, int readNum, String charset) {
-		// 校验数据有效性
+		// 数据校验
 		if (!file.exists() || file.isDirectory() || !file.canRead()) {
 			throw new MyException("参数无效：file");
 		}
@@ -237,7 +237,8 @@ public class StringUtil {
 	 * @return String
 	 */
 	public static String join(Object[] strArr, char separator) {
-		if (!ValidateUtil.isValid(strArr)) {
+//		if (!ValidateUtil.isValid(strArr)) {
+		if (strArr == null) {
 			throw new MyException("参数错误：strArr");
 		}
 
@@ -256,6 +257,7 @@ public class StringUtil {
 	 * 字符串连接
 	 * 
 	 * v1.0 zhanghc 2019年9月7日上午10:32:40
+	 * 
 	 * @param <T>
 	 * 
 	 * @param list
@@ -377,7 +379,7 @@ public class StringUtil {
 
 		return list;
 	}
-	
+
 	public static List<BigDecimal> toBigDecimalList(String str) {
 		if (!ValidateUtil.isValid(str)) {
 			return new ArrayList<BigDecimal>(0);
@@ -397,7 +399,7 @@ public class StringUtil {
 
 		return list;
 	}
-	
+
 	public static <T> String toStr(List<T> list) {
 		if (!ValidateUtil.isValid(list)) {
 			return null;

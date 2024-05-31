@@ -16,9 +16,9 @@ import com.wcpdoc.exam.core.dao.ExerRmkDao;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
-import com.wcpdoc.exam.core.service.QuestionService;
 
 /**
  * 练习评论服务层实现
@@ -30,7 +30,7 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 	@Resource
 	private ExerRmkDao exerRmkDao;
 	@Resource
-	private QuestionService questionService;
+	private ExamCacheService examCacheService;
 	@Resource
 	@Lazy
 	private ExerService exerService;
@@ -66,7 +66,7 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 		if (!exer.getUserIds().contains(getCurUser().getId())) {
 			throw new MyException("无权限");
 		}
-		Question question = questionService.getById(exerRmk.getQuestionId());
+		Question question = examCacheService.getQuestion(exerRmk.getQuestionId());
 		if (question.getQuestionTypeId().intValue() != exer.getQuestionTypeId().intValue()) {
 			throw new MyException("无权限");
 		}

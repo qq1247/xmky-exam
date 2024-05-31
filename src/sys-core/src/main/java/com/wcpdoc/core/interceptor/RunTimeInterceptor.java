@@ -28,39 +28,38 @@ public class RunTimeInterceptor implements HandlerInterceptor {
 	private String EX_URL;// 排除链接
 	@Value("${runtime.monitor}")
 	private boolean MONITOR;// 是否监听
-	
+
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		long startTime = System.currentTimeMillis();
 		context.set(startTime);
 		return true;
 	}
-	
+
 	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
 		if (!MONITOR) {
 			return;
 		}
-		
+
 		if (ValidateUtil.isValid(EX_URL) && EX_URL.contains(request.getRequestURI())) {
 			return;
 		}
-		
+
 		if (!ValidateUtil.isValid(TIME_OUT)) {
 			TIME_OUT = TIME_OUT == null ? 1 : TIME_OUT;
 			TIME_OUT = TIME_OUT < 1000 ? 1000 : TIME_OUT;
 			TIME_OUT = TIME_OUT > 3000 ? 3000 : TIME_OUT;// 初始值保证在1至3秒内
 		}
-		
+
 		long startTime = context.get();
 		long endTime = System.currentTimeMillis();
 		long runTime = endTime - startTime;
 		if (runTime > TIME_OUT) {
-			log.error("请求耗时异常：链接：{}， 耗时：{}毫秒，用户：{}，ip:{}，参数:{}", 
-					request.getRequestURI(),
-					runTime,
-					UserContext.get() != null ? UserContext.get().getLoginName() : "匿名",
-					request.getRemoteHost(), 
+			log.error("请求耗时异常：链接：{}， 耗时：{}毫秒，用户：{}，ip:{}，参数:{}", request.getRequestURI(), runTime,
+					UserContext.get() != null ? UserContext.get().getLoginName() : "匿名", request.getRemoteHost(),
 					request.getParameterMap());
 		}
 	}

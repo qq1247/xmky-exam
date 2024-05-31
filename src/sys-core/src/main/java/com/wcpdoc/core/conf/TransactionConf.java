@@ -16,14 +16,14 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 /**
  * 事务配置
  * 
- * 1.throw RuntimeException，事务回滚
- * 2.try {throw RuntimeException} catch{}，保存
- * 3.try {throw RuntimeException} catch{throw new RuntimeException}，事务回滚
+ * 1.throw RuntimeException，事务回滚 2.try {throw RuntimeException} catch{}，保存 3.try
+ * {throw RuntimeException} catch{throw new RuntimeException}，事务回滚
  * 
- * 4.try {throw Exception} catch{}，保存
- * 5.try {throw Exception} catch{throw new RuntimeException}，事务回滚
- * 6.try {throw Exception} catch{throw new Exception}  throws Exception，保存异常前的数据
- * 7.try {throw Exception} catch{TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); throw new Exception}  throws Exception，事务回滚
+ * 4.try {throw Exception} catch{}，保存 5.try {throw Exception} catch{throw new
+ * RuntimeException}，事务回滚 6.try {throw Exception} catch{throw new Exception}
+ * throws Exception，保存异常前的数据 7.try {throw Exception}
+ * catch{TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+ * throw new Exception} throws Exception，事务回滚
  * 
  * v1.0 zhanghc 2019年4月12日下午4:06:03
  */

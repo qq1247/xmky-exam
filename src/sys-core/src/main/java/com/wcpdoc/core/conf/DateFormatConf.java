@@ -20,7 +20,7 @@ import com.wcpdoc.core.util.DateUtil;
  * v1.0 zhanghc 2024年1月17日下午4:17:17
  */
 @Configuration
-public class DateFormatConfig implements WebMvcConfigurer {
+public class DateFormatConf implements WebMvcConfigurer {
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {

@@ -19,12 +19,12 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -51,6 +51,8 @@ public class ApiMyExerController extends BaseController {
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private ExerRmkService exerRmkService;
+	@Resource
+	private ExamCacheService examCacheService;
 	
 	/**
 	 * 我的练习列表
@@ -130,7 +132,7 @@ public class ApiMyExerController extends BaseController {
 			
 			// 试题获取
 			Map<String, Object> questionMap = new HashMap<>();
-			Question question = QuestionCache.getQuestion(questionId);
+			Question question = examCacheService.getQuestion(questionId);
 			questionMap.put("id", question.getId());
 			questionMap.put("type", question.getType());
 			questionMap.put("markType", question.getMarkType());
@@ -141,7 +143,7 @@ public class ApiMyExerController extends BaseController {
 			{// 试题选项
 				List<String> options = new ArrayList<>();
 				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
-					List<QuestionOption> questionOptionList = QuestionCache.getOption(question.getId());
+					List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(question.getId());
 					for (QuestionOption questionOption : questionOptionList) {
 						options.add(questionOption.getOptions());
 					}
@@ -149,7 +151,7 @@ public class ApiMyExerController extends BaseController {
 				questionMap.put("options", options);
 			}
 			{// 试题答案
-				List<QuestionAnswer> questionAnswerList = QuestionCache.getAnswer(question.getId());
+				List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(question.getId());
 				List<Object> answers = new ArrayList<>();
 				List<BigDecimal> scores = new ArrayList<>();
 				for(QuestionAnswer answer : questionAnswerList) {

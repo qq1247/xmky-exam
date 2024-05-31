@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.dao.OrgDao;
+import com.wcpdoc.base.dao.ParmDao;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.base.entity.Org;
+import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
-import com.wcpdoc.core.dao.RBaseDao;
-import com.wcpdoc.core.service.impl.BaseServiceImp;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,16 +23,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-public class BaseCacheServiceImpl extends BaseServiceImp<Object> implements BaseCacheService {
+public class BaseCacheServiceImpl implements BaseCacheService {
 	@Resource
 	private UserDao userDao;
 	@Resource
 	private OrgDao orgDao;
-
-	@Override
-	public RBaseDao<Object> getDao() {
-		return null;
-	}
+	@Resource
+	private ParmDao parmDao;
 
 	@Override
 	@Cacheable(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id", sync = true)
@@ -49,4 +46,13 @@ public class BaseCacheServiceImpl extends BaseServiceImp<Object> implements Base
 		log.debug("缓存机构：{id: {}, name: {}}", org.getId(), org.getName());
 		return org;
 	}
+
+	@Override
+	@Cacheable(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY, sync = true)
+	public Parm getParm() {
+		Parm parm = parmDao.selectById(1);
+		log.debug("缓存参数：{id: {}}", parm.getId());
+		return parm;
+	}
+
 }

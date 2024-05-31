@@ -15,15 +15,16 @@ public interface LoginUser {
 	 * @return Integer
 	 */
 	public Integer getId();
-	
+
 	/**
 	 * 登录账号
 	 * 
 	 * v1.0 zhanghc 2015-6-19下午08:30:16
+	 * 
 	 * @return String
 	 */
 	public String getLoginName();
-	
+
 	/**
 	 * 用户类型<br/>
 	 * 0：管理员；1：考试用户；2：子管理员；3：阅卷用户<br/>

@@ -69,16 +69,6 @@ public interface UserService extends BaseService<User> {
 	String getEncryptPwd(String loginName, String pwd);
 
 	/**
-	 * 登录账号是否存在
-	 * 
-	 * v1.0 zhanghc 2020年6月18日上午11:35:32
-	 * 
-	 * @param user
-	 * @return boolean
-	 */
-	boolean existLoginName(User user);
-
-	/**
 	 * 获取用户列表
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
@@ -87,16 +77,6 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getList(Integer orgId);
-
-	/**
-	 * 获取用户列表
-	 * 
-	 * v1.0 zhanghc 2021年11月5日上午10:38:37
-	 * 
-	 * @param ids
-	 * @return List<User>
-	 */
-	List<User> getList(Integer[] ids);
 
 	/**
 	 * 用户冻结

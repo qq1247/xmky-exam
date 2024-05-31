@@ -20,9 +20,10 @@ public interface FileDao extends RBaseDao<File> {
 
 	@Override
 	default PageOut getListpage(PageIn pageIn) {
-		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(),//
+		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<File>().setAlias("FILE")//
-						.select("FILE.ID", "FILE.NAME", "FILE.EXT_NAME", "FILE.IP", "USER.NAME AS USERNAME", "FILE.UPDATE_TIME")//
+						.select("FILE.ID", "FILE.NAME", "FILE.EXT_NAME", "FILE.IP", "USER.NAME AS USERNAME",
+								"FILE.UPDATE_TIME")//
 						.leftJoin("SYS_USER USER ON FILE.UPDATE_USER_ID = USER.ID")//
 						.like(pageIn.hasParm("name"), "FILE.NAME", pageIn.getParm("name"))//
 						.like(pageIn.hasParm("extName"), "FILE.EXT_NAME", pageIn.getParm("extName"))//

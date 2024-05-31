@@ -13,6 +13,7 @@ import com.wcpdoc.api.service.LoginService;
 import com.wcpdoc.auth.cache.TokenCache;
 import com.wcpdoc.auth.util.JwtUtil;
 import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.RBaseDao;
@@ -40,6 +41,8 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	private UserExService userExService;
 	@Resource
 	private OnlineUserService onlineUserService;
+	@Resource
+	private BaseCacheService baseCacheService;
 
 	@Value("${token.expireMinute}")
 	private Integer tokenExpireMinute;
@@ -105,14 +108,14 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 
 	@Override
 	public void pwdUpdate(String oldPwd, String newPwd) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(oldPwd)) {
 			throw new MyException("参数错误：oldPwd");
 		}
 		if (!ValidateUtil.isValid(newPwd)) {
 			throw new MyException("参数错误：newPwd");
 		}
-		User user = userService.getById(getCurUser().getId());
+		User user = baseCacheService.getUser(getCurUser().getId());
 		String oldEncryptPwd = userService.getEncryptPwd(user.getLoginName(), oldPwd);
 		if (!user.getPwd().equals(oldEncryptPwd)) {
 			throw new MyException("原始密码错误");

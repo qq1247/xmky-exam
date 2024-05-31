@@ -13,12 +13,12 @@
 	<description>系统缓存</description>
 
 	<dependencies>
-		<!-- 集成系统核心 -->
+		<!-- 集成系统核心
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>sys-core</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- 集成缓存 -->
 		<dependency>

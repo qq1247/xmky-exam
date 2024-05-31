@@ -1,13 +1,12 @@
 package com.wcpdoc.api.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.entity.ProgressBar;
+import com.wcpdoc.base.service.ProgressBarService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
@@ -24,9 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/progressBar")
 @Slf4j
 public class ApiProgressBarController extends BaseController {
+	@Resource
+	private ProgressBarService progressBarService;
 
 	/**
-	 * 获取进度条
+	 * 进度条获取
 	 * 
 	 * v1.0 zhanghc 2020年10月13日下午5:39:59
 	 * 
@@ -36,20 +37,18 @@ public class ApiProgressBarController extends BaseController {
 	@RequestMapping("/get")
 	public PageResult get(String id) {
 		try {
-			ProgressBar progressBar = ProgressBarCache.getProgressBar(id);
-			if (progressBar == null) {
-				throw new MyException(String.format("参数错误：id=%s", id));
-			}
-			Map<String, Object> result = new HashMap<>();
-			result.put("curNum", progressBar.getCurNum());
-			result.put("totalNum", progressBar.getTotalNum());
-			result.put("percent", progressBar.getPercent());
-			return PageResultEx.custom().data(result).code(progressBar.getCode()).msg(progressBar.getMsg());
+			ProgressBar progressBar = progressBarService.getProgressBar(id);
+			return PageResultEx.custom()//
+					.addAttr("curNum", progressBar.getCurNum())//
+					.addAttr("totalNum", progressBar.getTotalNum())//
+					.addAttr("percent", progressBar.getPercent())//
+					.code(progressBar.getCode())//
+					.msg(progressBar.getMsg());
 		} catch (MyException e) {
-			log.error("获取进度条错误：{}", e.getMessage());
+			log.error("进度条获取错误：{}", e.getMessage());
 			return PageResultEx.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取进度条错误：", e);
+			log.error("进度条获取错误：", e);
 			return PageResultEx.err();
 		}
 	}

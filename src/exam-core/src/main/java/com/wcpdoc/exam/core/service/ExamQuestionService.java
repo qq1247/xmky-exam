@@ -10,30 +10,23 @@ import com.wcpdoc.exam.core.entity.ExamQuestion;
  * 
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
-public interface ExamQuestionService extends BaseService<ExamQuestion>{
+public interface ExamQuestionService extends BaseService<ExamQuestion> {
 	/**
 	 * 获取考试试题列表
 	 * 
 	 * v1.0 zhanghc 2022年5月25日下午5:28:58
+	 * 
 	 * @param examId
 	 * @return List<ExamQuestion>
 	 */
 	List<ExamQuestion> getList(Integer examId);
 
 	/**
-	 * 清空试卷
+	 * 试卷清理
 	 * 
 	 * v1.0 zhanghc 2023年3月23日上午11:03:15
+	 * 
 	 * @param examId void
 	 */
 	void clear(Integer examId);
-
-	/**
-	 * 获取试题列表
-	 * 
-	 * v1.0 zhanghc 2023年3月31日下午3:51:41
-	 * @param questionId
-	 * @return List<ExamQuestion>
-	 */
-	List<ExamQuestion> getList1(Integer questionId);
 }

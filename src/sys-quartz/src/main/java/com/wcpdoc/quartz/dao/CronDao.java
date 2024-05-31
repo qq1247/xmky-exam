@@ -20,7 +20,7 @@ public interface CronDao extends RBaseDao<Cron> {
 
 	@Override
 	default PageOut getListpage(PageIn pageIn) {
-		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(),//
+		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<Cron>().setAlias("CRON")//
 						.select("CRON.ID", "CRON.NAME", "CRON.JOB_CLASS", "CRON.CRON", "CRON.STATE")//
 						.like(pageIn.hasParm("name"), "CRON.NAME", pageIn.getParm("name"))//

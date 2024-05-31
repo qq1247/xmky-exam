@@ -1,27 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true"
 	monitoring="autodetect" dynamicConfig="true">
 	<diskStore path="java.io.tmpdir"/>
 	<defaultCache 
 		maxElementsInMemory="10000" 
-		eternal="false" 
-		timeToIdleSeconds="120"
-		timeToLiveSeconds="120" 
-		maxElementsOnDisk="10000000"
-		diskExpiryThreadIntervalSeconds="120" 
-		memoryStoreEvictionPolicy="LRU">
+		 >
 		<persistence strategy="localTempSwap" />
 	</defaultCache><!-- 配置来自jar包内ehcache-failsafe.xml-->
 	<!-- 资源缓存，内存 -->
 	<cache name="MY_CACHE"
 		maxEntriesLocalHeap="100000">
 	</cache>
-	<!-- 进度条缓存，内存，空闲60秒后失效 -->
-	<cache name="PROGRESS_BAR_CACHE"
-		maxEntriesLocalHeap="100000"
-		timeToIdleSeconds="60">
-    </cache>
     <!-- 令牌缓存，硬盘持久化 -->
     <cache name="TOKEN_CACHE" 
 		maxElementsInMemory="1"
@@ -52,13 +41,44 @@
 		timeToIdleSeconds="0"
 		timeToLiveSeconds="0">
     </cache>
-    <!-- 自动阅卷缓存，内存 -->
-	<cache name="AUTO_MARK_CACHE"
-		maxEntriesLocalHeap="100000">
-	</cache>
+    <!-- 进度条缓存，空闲60秒后失效 -->
+	<cache name="PROGRESS_BAR_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="60">
+    </cache>
+    <!-- 用户缓存，空闲2小时后失效 -->
+	<cache name="USER_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="7200">
+    </cache>
+    <!-- 机构缓存，空闲2小时后失效 -->
+	<cache name="ORG_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="7200">
+    </cache>
+    <!-- 参数缓存，空闲2小时后失效 -->
+	<cache name="PARM_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="7200">
+    </cache>
 	<!-- 试题缓存，空闲2小时后失效 -->
 	<cache name="QUESTION_CACHE"
-		maxEntriesLocalHeap="10000"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="7200">
+    </cache>
+    <!-- 考试缓存，空闲2小时后失效 -->
+	<cache name="EXAM_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="7200">
+    </cache>
+    <!-- 我的考试缓存，空闲2小时后失效 -->
+	<cache name="MYEXAM_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToIdleSeconds="7200">
+    </cache>
+    <!-- 我的试题缓存，空闲2小时后失效 -->
+	<cache name="MYQUESTION_CACHE"
+		maxEntriesLocalHeap="100000"
 		timeToIdleSeconds="7200">
     </cache>
 </ehcache>

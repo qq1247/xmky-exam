@@ -9,15 +9,16 @@ import java.math.BigDecimal;
  */
 public class BigDecimalUtil {
 	private BigDecimal result = null;
-	
-	private BigDecimalUtil (BigDecimal curValue) {
+
+	private BigDecimalUtil(BigDecimal curValue) {
 		this.result = curValue;
 	}
-	
+
 	/**
 	 * 获取实例
 	 * 
 	 * v1.0 zhanghc 2020年5月14日上午12:05:25
+	 * 
 	 * @param curValue
 	 * @return BigDecimalUtil
 	 */
@@ -27,17 +28,17 @@ public class BigDecimalUtil {
 	}
 
 	private static void validateValue(Object curValue) {
-		if (!(curValue instanceof String || curValue instanceof Integer 
-				|| curValue instanceof Long || curValue instanceof Double 
-				|| curValue instanceof Float || curValue instanceof BigDecimal)) {
+		if (!(curValue instanceof String || curValue instanceof Integer || curValue instanceof Long
+				|| curValue instanceof Double || curValue instanceof Float || curValue instanceof BigDecimal)) {
 			throw new RuntimeException("参数错误：curValue");
 		}
 	}
-	
+
 	/**
 	 * 相加
 	 * 
 	 * v1.0 zhanghc 2020年5月14日上午12:05:25
+	 * 
 	 * @param value 加数
 	 * @return BigDecimalUtil
 	 */
@@ -51,6 +52,7 @@ public class BigDecimalUtil {
 	 * 相减
 	 * 
 	 * v1.0 zhanghc 2020年5月14日上午12:05:25
+	 * 
 	 * @param value 减数
 	 * @return BigDecimalUtil
 	 */
@@ -64,6 +66,7 @@ public class BigDecimalUtil {
 	 * 相乘
 	 * 
 	 * v1.0 zhanghc 2020年5月14日上午12:05:25
+	 * 
 	 * @param value乘数
 	 * @return BigDecimalUtil
 	 */
@@ -77,6 +80,7 @@ public class BigDecimalUtil {
 	 * 相除
 	 * 
 	 * v1.0 zhanghc 2020年5月14日上午12:05:25
+	 * 
 	 * @param value 除数
 	 * @param scale 保留小数位
 	 * @return BigDecimalUtil
@@ -94,6 +98,7 @@ public class BigDecimalUtil {
 	 * 获取结果
 	 * 
 	 * v1.0 zhanghc 2020年5月14日上午12:05:25
+	 * 
 	 * @return BigDecimal
 	 */
 	public BigDecimal getResult() {

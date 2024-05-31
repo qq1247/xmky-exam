@@ -60,7 +60,7 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/add")
 	public PageResult add(Bulletin bulletin) {
 		try {
-			// 校验数据有效性
+			// 数据校验
 			if (!ValidateUtil.isValid(bulletin.getStartTime())) {
 				throw new MyException("参数错误：startTime");
 			}
@@ -95,7 +95,7 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/edit")
 	public PageResult edit(Bulletin bulletin) {
 		try {
-			// 校验数据有效性
+			// 数据校验
 			if (!ValidateUtil.isValid(bulletin.getStartTime())) {
 				throw new MyException("参数错误：startTime");
 			}

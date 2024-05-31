@@ -18,7 +18,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
 /**
- * 考试随机规则服务层实现
+ * 考试规则服务层实现
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
@@ -48,6 +48,6 @@ public class ExamRuleServiceImpl extends BaseServiceImp<ExamRule> implements Exa
 
 	@Override
 	public void clear(Integer examId) {
-		examRuleDao.paperClear(examId);
+		examRuleDao.clear(examId);
 	}
 }

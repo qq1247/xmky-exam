@@ -16,11 +16,14 @@ import java.util.stream.Stream;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.base.service.ProgressBarService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
@@ -30,8 +33,7 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.cache.QuestionCache;
+import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
@@ -45,19 +47,17 @@ import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 import com.wcpdoc.exam.core.entity.ex.ExamQuestionEx;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
-import com.wcpdoc.exam.core.service.QuestionAnswerService;
-import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
-import com.wcpdoc.notify.service.NotifyService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,27 +73,27 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Resource
 	private ExamDao examDao;
 	@Resource
+	private ExamCacheService examCacheService;
+	@Resource
+	private BaseCacheService baseCacheService;
+	@Resource
 	private QuestionService questionService;
-	@Resource
-	private QuestionTypeService questionTypeService;
-	@Resource
-	private UserService userService;
 	@Resource
 	private ExamQuestionService examQuestionService;
 	@Resource
-	private NotifyService notifyService;
+	private ExamRuleService examRuleService;
 	@Resource
-	private MyMarkService myMarkService;
+	private QuestionTypeService questionTypeService;
 	@Resource
 	private MyExamService myExamService;
 	@Resource
 	private MyQuestionService myQuestionService;
 	@Resource
-	private QuestionAnswerService questionAnswerService;
+	private UserService userService;
 	@Resource
-	private ExamRuleService examRuleService;
+	private MyMarkService myMarkService;
 	@Resource
-	private QuestionOptionService questionOptionService;
+	private ProgressBarService progressBarService;
 
 	@Override
 	public RBaseDao<Exam> getDao() {
@@ -117,65 +117,123 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	 * 2, }
 	 */
 	@Override
+	@Caching(evict = { //
+			@CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), //
+			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, allEntries = true), //
+			@CacheEvict(value = ExamConstant.MYQUESTION_CACHE, allEntries = true), })
 	public void publish(ExamInfo examInfo, String processBarId) {
 		/**
-		 * 数据处理 1：如果是人工组卷，且从题库抽题，试题类型等重新查一遍数据库，不要依赖前端，用于检测包含主观题等
+		 * 数据处理 <br/>
+		 * 1：如果是人工组卷，且从题库抽题，试题类型等重新查一遍数据库，不要依赖前端，用于检测包含主观题等 <br/>
 		 * 2：如果是随机组卷，提前返回需要的题库，用于随机抽题
 		 */
-		Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;// 说明参考控制层
-		ProgressBarCache.setProgressBar(processBarId, 0.0, processLen, "校验前数据处理开始", HttpStatus.OK.value());
+		Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;
 		Map<Integer, List<Question>> questionListCache = publishHandle(examInfo);
-		ProgressBarCache.setProgressBar(processBarId, 1.0, processLen, "校验前数据处理完成", HttpStatus.OK.value());
+		progressBarService.setProgressBar(processBarId, 1.0, processLen, HttpStatus.OK.value(), "校验前数据处理完成", null);
 
 		// 数据校验
 		publishValid(examInfo, questionListCache);
-		ProgressBarCache.setProgressBar(processBarId, 2.0, processLen, "校验数据完成", HttpStatus.OK.value());
+		progressBarService.setProgressBar(processBarId, 2.0, processLen, HttpStatus.OK.value(), "校验数据完成", null);
 
-		// 保存考试信息
-		Exam exam = publishExam(examInfo);
-		ProgressBarCache.setProgressBar(processBarId, 3.0, processLen, "生成考试完成", HttpStatus.OK.value());
+		// 考试保存
+		publishExam(examInfo);
+		progressBarService.setProgressBar(processBarId, 3.0, processLen, HttpStatus.OK.value(), "生成考试完成", null);
 
-		// 保存试卷信息
+		// 试卷保存
 		publishPaper(examInfo);
-		ProgressBarCache.setProgressBar(processBarId, 4.0, processLen, "生成试卷完成", HttpStatus.OK.value());
+		progressBarService.setProgressBar(processBarId, 4.0, processLen, HttpStatus.OK.value(), "生成试卷完成", null);
 
-		// 分配试卷到考试用户
+		// 考试用户发卷
 		publishUser(examInfo, questionListCache, processBarId);
-
-		// 标记为需要监听的考试（考试结束自动阅卷）
-		AutoMarkCache.put(exam.getId(), exam);
-		log.info("考试核心加入：【{}-{}】加入监听，{}开始自动阅卷", exam.getId(), exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
-				exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime())
-						: DateUtil.formatDateTime(exam.getMarkEndTime()));
 	}
 
 	@Override
+	@CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true)
 	public void delEx(Integer id) {
-		// 校验数据有效性（只要有权限就删，不管是否考试中，如创建了一个超长的结束时间）
-		Exam exam = getById(id);
-		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-			throw new MyException("无操作权限");
-		}
+		// 数据校验
+		delValid(id);
 
-		// 删除考试
+		// 考试删除
+		Exam exam = examCacheService.getExam(id);
 		exam.setState(0);
 		exam.setUpdateTime(new Date());
 		exam.setUpdateUserId(getCurUser().getId());
 		updateById(exam);
-
-		// 清除标记为需要监听的考试
-		AutoMarkCache.del(exam.getId());
-		log.info("考试核心清除：【{}-{}】清除监听", exam.getId(), exam.getName());
 	}
 
 	@Override
-	public List<Exam> getList() {
-		return examDao.getList();
+	@Caching(evict = { //
+			@CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), //
+			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, allEntries = true), })
+	public void time(Integer id, Integer timeType, Integer minute) {
+		// 数据校验
+		timeValid(id, timeType, minute);
+
+		// 变更考试时间
+		Exam exam = examCacheService.getExam(id);
+		if (timeType == 1) {// 时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
+			timeStartTime(exam, minute);
+		} else if (timeType == 2) {
+			timeEndTime(exam, minute);
+		} else if (timeType == 3) {
+			timeMarkStartTime(exam, minute);
+		} else if (timeType == 4) {
+			timeMarkEndTime(exam, minute);
+		}
+	}
+
+	@Override
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	public Exam pause(Integer id) {
+		// 数据校验
+		pauseValid(id);
+
+		// 考试暂停
+		Exam exam = examCacheService.getExam(id);
+		if (exam.getState() == 1) {
+			exam.setState(2);
+		} else {
+			exam.setState(1);
+		}
+
+		updateById(exam);
+		return exam;
+	}
+
+	@Override
+	public void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
+
+	}
+
+	@Override
+	public void assist(Integer id, Integer[] markUserIds) {
+		// 数据校验
+		markUserIds = assistValid(id, markUserIds);
+
+		// 阅卷用户添加
+		List<MyMark> myMarkList = myMarkService.getList(id);
+		for (MyMark myMark : myMarkList) {
+			myMarkService.removeById(myMark.getId());
+		}
+
+		for (Integer markUserId : markUserIds) {
+			MyMark myMark = new MyMark();
+			myMark.setExamId(id);
+			myMark.setMarkUserId(markUserId);
+			myMark.setUpdateTime(new Date());
+			myMark.setUpdateUserId(getCurUser().getId());
+			myMarkService.save(myMark);
+		}
+	}
+
+	@Override
+	public List<Exam> getExamingList() {
+		return examDao.getExamingList();
 	}
 
 	@Override
 	public void mail(Exam exam, Integer notifyType, String content) {
-//		Parm parm = ParmCache.get();
+//		Parm parm = baseCacheService.getParm();
 //		if (parm == null) {
 //			throw new MyException("管理员未配置系统参数");
 //		}
@@ -207,7 +265,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //		
 //		content = StringEscapeUtils.unescapeXml(content);
 //		if (notifyType == 1) {
-//			List<MyExam> myExamList = myExamService.getList(exam.getId());// 所有考试人员
+//			List<MyExam> myExamList = examCacheService.getMyExamList(exam.getId());// 所有考试人员
 //			for(MyExam myExam : myExamList){
 //				userList.save(myExam.getUserId());
 //			}
@@ -224,7 +282,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //		StringBuilder errMsg = new StringBuilder();
 //		for(Integer userId : userList){
 //			newContent = content;
-//			User user = userService.getById(userId);
+//			User user = baseCacheService.getUseruserId);
 //			newContent = newContent.replace("【姓名】", user.getName());
 //			
 //			if (!ValidateUtil.isValid(user.getEmail())) {
@@ -246,9 +304,211 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //		}
 	}
 
-	@Override
-	public void timeUpdate(Integer id, Integer timeType, Integer minute) {
-		// 数据校验
+	private void timeMarkEndTime(Exam exam, Integer minute) {
+		Date curTime = DateUtil.getDateTime(DateUtil.formatDateCustom(new Date(), "yyyy-MM-dd HH:mm:00"));// 秒归零
+		if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
+			throw new MyException("无需阅卷");
+		}
+		if (exam.getMarkEndTime().getTime() <= curTime.getTime()) {
+			throw new MyException("阅卷已结束");
+		}
+		if (exam.getMarkState() == 3) {
+			throw new MyException("已阅卷");
+		}
+
+		Date oldMarkEndTime = exam.getMarkEndTime();
+		Date newMarkEndTime = DateUtil.getNextMinute(exam.getMarkEndTime(), minute);
+		if (newMarkEndTime.getTime() <= curTime.getTime()) {
+			exam.setMarkEndTime(curTime);
+		} else if (newMarkEndTime.getTime() <= exam.getMarkStartTime().getTime()) {
+			exam.setMarkEndTime(exam.getMarkStartTime());
+		} else {
+			exam.setMarkEndTime(newMarkEndTime);
+		}
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		updateById(exam);
+
+		User curUser = baseCacheService.getUser(getCurUser().getId());
+		log.info("【{}-{}】变更【{}-{}】阅卷结束时间，{} -> {}", curUser.getLoginName(), curUser.getName(), exam.getId(),
+				exam.getName(), DateUtil.formatDateTime(oldMarkEndTime),
+				DateUtil.formatDateTime(exam.getMarkEndTime()));
+
+		examCacheService.getMyExamList(exam.getId()).stream()//
+				.filter(myExam -> myExam.getMarkState() == 2)// 查找阅卷中的用户（未阅卷第一次打开试卷会生成阅卷时间；已阅卷不应该在修改）
+				.forEach(myExam -> {
+					Date oldMyMarkEndTime = myExam.getMarkEndTime();
+					myExam.setMarkEndTime(exam.getMarkEndTime());
+					myExamService.updateById(myExam);
+					
+					User examUser = baseCacheService.getUser(myExam.getUserId());
+					log.info("【{}-{}】变更【{}-{}】【{}-{}】阅卷结束时间，{}->{}", curUser.getLoginName(), curUser.getName(),
+							exam.getId(), exam.getName(), examUser.getLoginName(), examUser.getName(),
+							DateUtil.formatDateTime(oldMyMarkEndTime), DateUtil.formatDateTime(myExam.getMarkEndTime()));
+				});
+	}
+
+	private void timeMarkStartTime(Exam exam, Integer minute) {
+		Date curTime = DateUtil.getDateTime(DateUtil.formatDateCustom(new Date(), "yyyy-MM-dd HH:mm:00"));// 秒归零
+		if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
+			throw new MyException("无需阅卷");
+		}
+		if (exam.getMarkStartTime().getTime() <= curTime.getTime()) {
+			throw new MyException("阅卷已开始");
+		}
+		Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
+		if (newMarkStartTime.getTime() >= exam.getMarkEndTime().getTime()) {
+			throw new MyException("超过阅卷结束时间");
+		}
+		if (exam.getMarkState() == 3) {// 未阅卷或阅卷中都可以
+			throw new MyException("已阅卷");
+		}
+
+		Date oldMarkStartTime = exam.getMarkStartTime();
+		if (newMarkStartTime.getTime() <= curTime.getTime()) {
+			exam.setMarkStartTime(curTime);
+		} else if (newMarkStartTime.getTime() <= exam.getEndTime().getTime()) {
+			exam.setMarkStartTime(exam.getEndTime());
+		} else {
+			exam.setMarkStartTime(newMarkStartTime);
+		}
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		updateById(exam);
+
+		User curUser = baseCacheService.getUser(getCurUser().getId());
+		log.info("【{}-{}】变更【{}-{}】阅卷开始时间，{} -> {}", curUser.getLoginName(), curUser.getName(), exam.getId(),
+				exam.getName(), DateUtil.formatDateTime(oldMarkStartTime),
+				DateUtil.formatDateTime(exam.getMarkStartTime()));
+	}
+
+	private void timeEndTime(Exam exam, Integer minute) {
+		/**
+		 * 考试结束时间变更<br/>
+		 * 考试已结束、超过阅卷开始时间、已阅卷，不能修改<br/>
+		 * 不限时考试：考试中的用户的考试结束时间，对齐整场考试结束时间；未考试的用户不处理（第一次进入会生成，不进入就没时间）；已交卷的用户不处理（已有时间，不在处理）；<br/>
+		 * 限时考试：考试中的部分用户的考试结束时间，需要进行时间裁剪或时间补偿（主要处理进入考试较迟，剩余答题时长不足限时时长的考试用户）；<br/>
+		 * 
+		 * 变更示例1：<br/>
+		 * 考试时间：8:00-12:00；<br/>
+		 * ....|__________|__________|__________|__________|<br/>
+		 * ...08:00.......09:00......10:00......11:00......12:00<br/>
+		 * A:..|_____|<br/>
+		 * B:......|_______________________________________|<br/>
+		 * C:........................................|_____|<br/>
+		 * 
+		 * 情况一：考试结束时间提前10分钟，A已交卷不处理，BC正在考试中，最多裁剪10分钟
+		 * B:......|_____________________________________|<br/>
+		 * C:........................................|___|<br/>
+		 * 
+		 * 变更示例2：<br/>
+		 * 考试时间：8:00-12:00；考试时长：60分钟 <br/>
+		 * ....|__________|__________|__________|__________|<br/>
+		 * ...08:00.......09:00......10:00......11:00......12:00<br/>
+		 * A:..|__________|<br/>
+		 * B:...................................|__________|<br/>
+		 * C:........................................|_____|<br/>
+		 * 
+		 * 情况一：考试结束时间延长10分钟，AB正常，C最多补偿10分钟
+		 * C:........................................|_______|<br/>
+		 * 
+		 * 情况二：考试结束时间提前10分钟，A正常，BC最多裁剪10分钟
+		 * B:...................................|________|<br/>
+		 * C:........................................|___|<br/>
+		 */
+		Date curTime = DateUtil.getDateTime(DateUtil.formatDateCustom(new Date(), "yyyy-MM-dd HH:mm:00"));// 秒归零
+		if (exam.getEndTime().getTime() <= curTime.getTime()) {
+			throw new MyException("考试已结束");
+		}
+		Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
+		if (ValidateUtil.isValid(exam.getMarkStartTime())) {// 需要人工阅卷
+			if (newEndTime.getTime() >= exam.getMarkStartTime().getTime()) {
+				throw new MyException("超过阅卷开始时间");
+			}
+		}
+		if (exam.getMarkState() != 1) {
+			throw new MyException("已阅卷");
+		}
+
+		Date oldEndTime = exam.getEndTime();
+		if (newEndTime.getTime() <= curTime.getTime()) {// 当前08:30，考试08:00-10:00，考试结束时间提前120分钟，需重置为08:30
+			exam.setEndTime(curTime);
+		} else if (newEndTime.getTime() <= exam.getStartTime().getTime()) {// 当前07:00，考试08:00-10:00，考试结束时间提前150分钟，需重置为08:00
+			exam.setEndTime(exam.getStartTime());
+		} else {
+			exam.setEndTime(newEndTime);
+		}
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		updateById(exam);
+
+		User curUser = baseCacheService.getUser(getCurUser().getId());
+		log.info("【{}-{}】变更【{}-{}】考试结束时间，{}->{}", curUser.getLoginName(), curUser.getName(), exam.getId(),
+				exam.getName(), DateUtil.formatDateTime(oldEndTime), DateUtil.formatDateTime(exam.getEndTime()));
+
+		examCacheService.getMyExamList(exam.getId()).stream()//
+				.filter(myExam -> myExam.getState() == 2)// 查找考试中的用户（未考试第一次打开试卷会生成考试时间；已交卷不应该在修改）
+				.forEach(myExam -> {
+					Date oldExamEndTime = myExam.getExamEndTime();
+					if (!ExamUtil.hasTimeLimit(exam)) {// 如果是不限时考试
+						myExam.setExamEndTime(exam.getEndTime());// 用户考试结束时间和考试时间对齐
+					} else {// 如果是限时考试
+						myExam.setExamEndTime(DateUtil.getNextMinute(myExam.getExamStartTime(), exam.getLimitMinute()));// 进行时间补偿或裁剪
+						if (myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {// 超出考试结束边界，重置到考试结束边界
+							myExam.setExamEndTime(exam.getEndTime());
+						}
+					}
+					myExamService.updateById(myExam);
+					
+					User examUser = baseCacheService.getUser(myExam.getUserId());
+					log.info("【{}-{}】变更【{}-{}】【{}-{}】考试结束时间，{} -> {}", curUser.getLoginName(), curUser.getName(),
+							exam.getId(), exam.getName(), examUser.getLoginName(), examUser.getName(),
+							DateUtil.formatDateTime(oldExamEndTime), DateUtil.formatDateTime(myExam.getExamEndTime()));
+				});
+	}
+
+	private void timeStartTime(Exam exam, Integer minute) {
+		/**
+		 * 考试开始时间变更<br/>
+		 * 考试已开始、超过考试结束时间、已阅卷，不能修改<br/>
+		 * 
+		 * 变更示例：<br/>
+		 * 当前时间07:30，考试时间08:00-10:00，考试开始时间提前10分钟<br/>
+		 * 调整后为07:50-10:00<br/>
+		 * 
+		 * 当前时间07:30，考试时间08:00-10:00，考试开始时间提前60分钟<br/>
+		 * 调整后为07:30-10:00（不超过当前时间）<br/>
+		 */
+		Date curTime = DateUtil.getDateTime(DateUtil.formatDateCustom(new Date(), "yyyy-MM-dd HH:mm:00"));// 秒归零
+		if (exam.getStartTime().getTime() <= curTime.getTime()) {
+			throw new MyException("考试已开始");
+		}
+		Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
+		if (exam.getEndTime().getTime() <= newStartTime.getTime()) {
+			throw new MyException("超过考试结束时间");
+		}
+		if (exam.getMarkState() != 1) {// 未阅卷就可以
+			throw new MyException("已阅卷");
+		}
+
+		Date oldStartTime = exam.getStartTime();
+		exam.setStartTime(newStartTime);
+		if (exam.getStartTime().getTime() <= curTime.getTime()) {
+			exam.setStartTime(DateUtil.getNextMinute(curTime, 1));
+		}
+		if (exam.getStartTime().getTime() - System.currentTimeMillis() <= 30 * 1000) {// 当前时间07:59:10，考试开始时间08:30:00，提前60分钟，调整后08:00:00
+			exam.setStartTime(DateUtil.getNextMinute(exam.getStartTime(), 1));// 当前时间07:59:40，考试开始时间08:30:00，提前60分钟，调整后08:01:00（需要预留最少30秒提前缓存考试）
+		}
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		updateById(exam);
+
+		User curUser = baseCacheService.getUser(getCurUser().getId());
+		log.info("【{}-{}】变更【{}-{}】考试开始时间，{} -> {}", curUser.getLoginName(), curUser.getName(), exam.getId(),
+				exam.getName(), DateUtil.formatDateTime(oldStartTime), DateUtil.formatDateTime(exam.getStartTime()));
+	}
+
+	private void timeValid(Integer id, Integer timeType, Integer minute) {
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误:id");
 		}
@@ -258,151 +518,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(minute)) {
 			throw new MyException("参数错误:minute");
 		}
-		Exam exam = getById(id);
+		Exam exam = examCacheService.getExam(id);
 		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
-
-		// 变更考试时间
-		Date curTime = DateUtil.getDateTime(DateUtil.formatDateCustom(new Date(), "yyyy-MM-dd HH:mm:00"));// 秒归零
-		if (timeType == 1) {// 时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
-			/**
-			 * 考试开始时间变更<br/>
-			 * 考试已开始、超过考试结束时间、已阅卷，不能修改<br/>
-			 * 
-			 * 变更示例：<br/>
-			 * 当前时间07:30，考试时间08:00-10:00，考试开始时间提前10分钟<br/>
-			 * 调整后为07:50-10:00<br/>
-			 * 
-			 * 当前时间07:30，考试时间08:00-10:00，考试开始时间提前60分钟<br/>
-			 * 调整后为07:30-10:00（不超过当前时间）<br/>
-			 */
-			if (exam.getStartTime().getTime() < curTime.getTime()) {
-				throw new MyException("考试已开始");
-			}
-			Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
-			if (exam.getEndTime().getTime() < newStartTime.getTime()) {
-				throw new MyException("超过考试结束时间");
-			}
-			if (exam.getMarkState() != 1) {// 未阅卷就可以
-				throw new MyException("已阅卷");
-			}
-
-			exam.setStartTime(newStartTime.getTime() < curTime.getTime() ? curTime : newStartTime);
-		}
-
-		if (timeType == 2) {
-			/**
-			 * 考试结束时间变更<br/>
-			 * 考试已结束、超过阅卷开始时间、已阅卷，不能修改<br/>
-			 * 不限时考试：正常调整 限时考试：考试结束前，可以提前或延后时间，需要对部分考试用户，进行时间裁剪或时间补偿；<br/>
-			 * 
-			 * 变更示例1：<br/>
-			 * 同上
-			 * 
-			 * 变更示例2：<br/>
-			 * 考试时间：8:00-12:00；考试时长：60分钟 <br/>
-			 * ....|__________|__________|__________|__________|<br/>
-			 * ...08:00.......09:00......10:00......11:00......12:00<br/>
-			 * A:..|__________|<br/>
-			 * B:...................................|__________|<br/>
-			 * C:........................................|_____|<br/>
-			 * 
-			 * 情况一：考试结束时间延长10分钟，AB正常，C最多补偿10分钟
-			 * C:........................................|_______|<br/>
-			 * 
-			 * 情况二：考试结束时间提前10分钟，A正常，BC最多裁剪10分钟
-			 * B:...................................|________|<br/>
-			 * C:........................................|___|<br/>
-			 */
-			if (exam.getEndTime().getTime() < curTime.getTime()) {
-				throw new MyException("考试已结束");
-			}
-			Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
-			if (ValidateUtil.isValid(exam.getMarkStartTime())) {// 需要人工阅卷
-				if (exam.getMarkStartTime().getTime() < newEndTime.getTime()) {
-					throw new MyException("超过阅卷开始时间");
-				}
-			}
-			if (exam.getMarkState() != 1) {
-				throw new MyException("已阅卷");
-			}
-
-			exam.setEndTime(newEndTime.getTime() < curTime.getTime() ? curTime
-					: (newEndTime.getTime() < exam.getStartTime().getTime() ? exam.getStartTime() : newEndTime));
-			if (ExamUtil.hasTimeLimit(exam)) {
-				List<MyExam> myExamList = myExamService.getList(id);
-				for (MyExam myExam : myExamList) {
-					if (!ValidateUtil.isValid(myExam.getExamStartTime())) {
-						continue;
-					}
-					
-					if (minute > 0) {// 延后结束考试
-						if (DateUtil.diffMinute(myExam.getExamStartTime(), myExam.getExamEndTime()) < exam.getLimitMinute()) {
-							myExam.setExamEndTime(DateUtil.getNextMinute(myExam.getExamStartTime(), exam.getLimitMinute()));
-							if (myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {
-								myExam.setExamEndTime(exam.getEndTime());
-							}
-						}
-					} else if (minute < 0) {// 提前结束考试
-						if (myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {
-							myExam.setExamEndTime(exam.getEndTime());
-						}
-					}
-					myExamService.updateById(myExam);
-				}
-			}
-		}
-
-		if (timeType == 3) {
-			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
-				throw new MyException("无需阅卷");
-			}
-			if (exam.getMarkStartTime().getTime() < curTime.getTime()) {
-				throw new MyException("阅卷已开始");
-			}
-			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
-			if (exam.getMarkEndTime().getTime() < newMarkStartTime.getTime()) {
-				throw new MyException("超过阅卷结束时间");
-			}
-			if (exam.getMarkState() == 3) {// 未阅卷或阅卷中都可以
-				throw new MyException("已阅卷");
-			}
-			exam.setMarkStartTime(newMarkStartTime.getTime() < curTime.getTime() ? curTime
-					: (newMarkStartTime.getTime() < exam.getEndTime().getTime() ? exam.getEndTime()
-							: newMarkStartTime));
-		}
-
-		if (timeType == 4) {
-			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
-				throw new MyException("无需阅卷");
-			}
-			if (exam.getMarkEndTime().getTime() < curTime.getTime()) {
-				throw new MyException("阅卷已结束");
-			}
-			if (exam.getMarkState() == 3) {
-				throw new MyException("已阅卷");
-			}
-			Date newMarkEndTime = DateUtil.getNextMinute(exam.getMarkEndTime(), minute);
-			exam.setMarkEndTime(newMarkEndTime.getTime() < curTime.getTime() ? curTime
-					: (newMarkEndTime.getTime() < exam.getMarkStartTime().getTime() ? exam.getMarkStartTime()
-							: newMarkEndTime));
-		}
-		exam.setUpdateTime(curTime);
-		exam.setUpdateUserId(getCurUser().getId());
-		updateById(exam);
-
-		// 缓存放入新时间
-		AutoMarkCache.put(exam.getId(), exam);
-		log.info("考试核心更新：【{}-{}】更新监听，{}开始自动阅卷", exam.getId(), exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
-				exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime())
-						: DateUtil.formatDateTime(exam.getMarkEndTime()));
 	}
 
 	private Exam publishExam(ExamInfo examInfo) {
 		Exam exam = new Exam();
 		if (ValidateUtil.isValid(examInfo.getId())) {
-			exam = getById(examInfo.getId());
+			exam = examCacheService.getExam(examInfo.getId());
 		}
 		exam.setName(examInfo.getName());
 		exam.setPaperName(examInfo.getPaperName());
@@ -423,6 +548,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setState(examInfo.getState());
 		exam.setLimitMinute(examInfo.getLimitMinute());
 		exam.setMarkState(1);// 标记为未阅卷
+		exam.setUserNum(examInfo.getExamUserIds().size());
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
 
@@ -437,50 +563,39 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	private void publishPaper(ExamInfo examInfo) {
-		// 删除旧试卷信息（二次修改会有；试题和规则都删除一次，页面可能会切换固定试卷和随机试卷）
+		// 旧试卷信息删除（二次修改会有；试题和规则都删除一次，页面可能会切换固定试卷和随机试卷）
 		examQuestionService.clear(examInfo.getId());
-//		List<ExamQuestion> examQuestionList = examQuestionService.getList(examInfo.getId());
-//		for (ExamQuestion examQuestion : examQuestionList) {
-//			examQuestionService.removeById(examQuestion.getId());
-//		}
 		examRuleService.clear(examInfo.getId());
-//		List<ExamRule> examRuleList = examRuleService.getList(examInfo.getId());
-//		for (ExamRule examRule : examRuleList) {
-//			examRuleService.removeById(examRule.getId());
-//		}
 
-		// 保存新试卷信息
+		// 新试卷信息保存
 		if (examInfo.getGenType() == 1) {
-			QuestionType questionType = null;// 创建一个题库，题库名称保持和考试名称一致，用于存放部分从文本导入的新题
+			QuestionType questionType = new QuestionType();// 创建一个题库，题库名称保持和考试名称一致，用于存放部分从文本导入的新题
 			for (int i = 0; i < examInfo.getExamQuestions().size(); i++) {
 				ExamQuestionEx examQuestionEx = examInfo.getExamQuestions().get(i);
 				examQuestionEx.setNo(i + 1);// 重新保存顺序，不要依赖前端
 				examQuestionEx.setExamId(examInfo.getId());
-				if (ExamUtil.hasQuestion(examQuestionEx)) {
-					if (!ValidateUtil.isValid(examQuestionEx.getQuestionId())) {// 如果是从文本导入的新题，先保存
-						if (questionType == null) {
-							questionType = new QuestionType();
-							questionType.setName(examInfo.getName());
-							questionType.setCreateUserId(getCurUser().getId());
-							questionType.setUpdateTime(new Date());
-							questionType.setUpdateUserId(getCurUser().getId());
-							questionTypeService.save(questionType);
-						}
-
-						Question question = new Question();
-						question.setType(examQuestionEx.getQuestionType());
-						question.setTitle(examQuestionEx.getTitle());
-						question.setMarkType(examQuestionEx.getMarkType());
-						question.setMarkOptions(examQuestionEx.getMarkOptions());
-						question.setAnalysis(examQuestionEx.getAnalysis());
-						question.setScore(examQuestionEx.getScore());
-						question.setQuestionTypeId(questionType.getId());
-						question.setUpdateUserId(getCurUser().getId());
-						question.setUpdateTime(new Date());
-						questionService.addEx(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
-								examQuestionEx.getScores());
-						examQuestionEx.setQuestionId(question.getId());
+				if (ExamUtil.hasQuestion(examQuestionEx) && !ValidateUtil.isValid(examQuestionEx.getQuestionId())) {// 如果是从文本导入的新题，先保存
+					if (!ValidateUtil.isValid(questionType.getId())) {
+						questionType.setName(examInfo.getName());
+						questionType.setCreateUserId(getCurUser().getId());
+						questionType.setUpdateTime(new Date());
+						questionType.setUpdateUserId(getCurUser().getId());
+						questionTypeService.save(questionType);
 					}
+
+					Question question = new Question();
+					question.setType(examQuestionEx.getQuestionType());
+					question.setTitle(examQuestionEx.getTitle());
+					question.setMarkType(examQuestionEx.getMarkType());
+					question.setMarkOptions(examQuestionEx.getMarkOptions());
+					question.setAnalysis(examQuestionEx.getAnalysis());
+					question.setScore(examQuestionEx.getScore());
+					question.setQuestionTypeId(questionType.getId());
+					question.setUpdateUserId(getCurUser().getId());
+					question.setUpdateTime(new Date());
+					questionService.addEx(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
+							examQuestionEx.getScores());
+					examQuestionEx.setQuestionId(question.getId());
 				}
 
 				ExamQuestion examQuestion = new ExamQuestion();
@@ -510,16 +625,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	private void publishUser(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache, String processBarId) {
-		// 删除用户试卷
+		// 删除考试用户试卷
 		myExamService.clear(examInfo.getId());
 		myQuestionService.clear(examInfo.getId());
 
-		// 生成用户试卷
+		// 生成考试用户试卷
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
 		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
 		int curProgressNum = 1;// 当前保存进度
 		Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;// 说明参考控制层
-		int diffMinute = DateUtil.diffMinute(examInfo.getStartTime(), examInfo.getEndTime());
 		for (Integer examUserId : examInfo.getExamUserIds()) {
 			MyExam myExam = new MyExam();// 生成我的考试信息
 			myExam.setExamId(examInfo.getId());
@@ -529,10 +643,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myExam.setMarkState(1);// 未阅卷
 			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
-			if (diffMinute == examInfo.getLimitMinute()) {// 如果不限制时长，我的考试时间和考试时间一致；否则根据用户第一次打开试卷时，生成我的考试开始结束时间
-				myExam.setExamStartTime(examInfo.getStartTime());
-				myExam.setExamEndTime(examInfo.getEndTime());
-			}
 			myExamService.save(myExam);
 
 			if (examInfo.getGenType() == 1) {// 如果是人工组卷，直接生成我的试卷
@@ -572,13 +682,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					if (ExamUtil.hasOptionRand(examInfo)) {// 如果是选项乱序
 						if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
 							questionOptionCache.put(myQuestion.getQuestionId(),
-									questionOptionService.getList(myQuestion.getQuestionId()));
+									examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
 						}
 						List<QuestionOption> questionOptionList = questionOptionCache.get(myQuestion.getQuestionId());// A,B,C,D
 						myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
 						myQuestionService.updateById(myQuestion);
 					}
-
 				}
 			} else if (examInfo.getGenType() == 2) {// 如果是随机组卷，按抽题规则生成我的试卷（校验里判断过规则是否满足，不用在判断）
 				Set<Question> questionOfUsed = new HashSet<>();
@@ -625,7 +734,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 									&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
 								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
 									questionAnswerCache.put(myQuestion.getQuestionId(),
-											questionAnswerService.getList(myQuestion.getQuestionId()));
+											examCacheService.getQuestionAnswerList(myQuestion.getQuestionId()));
 								}
 								List<QuestionAnswer> questionAnswerList = questionAnswerCache
 										.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
@@ -643,8 +752,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				}
 			}
 
-			ProgressBarCache.setProgressBar(processBarId, 4.0 + curProgressNum++, processLen,
-					"生成用户-" + examUserId + "试卷完成", HttpStatus.OK.value());
+			progressBarService.setProgressBar(processBarId, 4.0 + curProgressNum++, processLen, HttpStatus.OK.value(),
+					"生成用户-" + examUserId + "试卷完成", null);
 		}
 	}
 
@@ -661,12 +770,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(examInfo.getExamUserIds())) {
 			throw new MyException("最少添加一个考试用户");
 		}
-		if (examInfo.getExamUserIds().size() != examInfo.getExamUserIds().size()) {
+		if (examInfo.getExamUserIds().size() != new HashSet<Integer>(examInfo.getExamUserIds()).size()) {
 			throw new MyException("考试用户重复");
 		}
 
 		if (getCurUser().getType() != 0) {
-			User curUser = userService.getById(getCurUser().getId());
+			User curUser = baseCacheService.getUser(getCurUser().getId());
 			if (!curUser.getUserIds().containsAll(examInfo.getExamUserIds())) {
 				throw new MyException("无用户操作权限");
 			}
@@ -762,7 +871,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						}
 						questionIdCache.add(examQuestion.getQuestionId());
 
-						Question question = QuestionCache.getQuestion(examQuestion.getQuestionId());
+						Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
 						if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 							throw new MyException(String.format("试题无权限，编号：%s", examQuestion.getQuestionId()));
 						}
@@ -905,7 +1014,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	private void publishValidExam(ExamInfo examInfo) {
 		if (ValidateUtil.isValid(examInfo.getId())) {// 如果是二次修改，校验考试是否结束
-			Exam exam = getById(examInfo.getId());
+			Exam exam = examCacheService.getExam(examInfo.getId());
 			if (exam.getMarkType() == 3) {
 				throw new MyException("已阅卷");
 			}
@@ -960,11 +1069,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			if (!ValidateUtil.isValid(examInfo.getEndTime())) {
 				throw new MyException("参数错误：endTime");
 			}
-			if (examInfo.getStartTime().getTime() >= examInfo.getEndTime().getTime()) {
-				throw new MyException("考试开始时间必须小于考试结束时间");
+
+			if (examInfo.getStartTime().getTime() - System.currentTimeMillis() < 30 * 1000) {// 最少需要预留30秒提前缓存数据
+				throw new MyException("考试开始时间必须大于当前时间");
 			}
-			if (examInfo.getEndTime().getTime() <= System.currentTimeMillis()) {
-				throw new MyException("考试结束时间必须大于当前时间");
+			if (examInfo.getEndTime().getTime() < examInfo.getStartTime().getTime()) {
+				throw new MyException("考试结束时间必须大于考试开始时间");
 			}
 
 			if (!ValidateUtil.isValid(examInfo.getLimitMinute())) {
@@ -1048,31 +1158,24 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	private Map<Integer, List<Question>> publishHandle(ExamInfo examInfo) {
 		if (examInfo.getGenType() == 1) {// 如果是人工组卷
-			for (ExamQuestionEx examQuestion : examInfo.getExamQuestions()) {
-				if (ExamUtil.hasQuestion(examQuestion)) {// 如果是试题
-					if (ValidateUtil.isValid(examQuestion.getQuestionId())) {// 如果是从题库抽的题
-						Question question = QuestionCache.getQuestion(examQuestion.getQuestionId());
+			examInfo.getExamQuestions().stream()//
+					.filter(examQuestion -> ExamUtil.hasQuestion(examQuestion)
+							&& ValidateUtil.isValid(examQuestion.getQuestionId())) // 从题库抽题
+					.forEach(examQuestion -> {
+						Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
 						examQuestion.setQuestionType(question.getType());// 试题类型等重新查一遍数据库，不要依赖前端
-						examQuestion.setMarkType(question.getMarkType());
-						// examQuestion.setTitle(question.getTitle());
-						// examQuestion.setAnalysis(question.getAnalysis());
-						// examQuestion.setOptions(null);// 用不着可以不查询
-						// examQuestion.setAnswers(null);//
-					}
-				}
-			}
+						examQuestion.setMarkType(question.getMarkType());// 其他字段不用
+					});
 			return null;
 		}
 
 		Map<Integer, List<Question>> questionListCache = new HashMap<>();
 		if (examInfo.getGenType() == 2) {// 如果是随机组卷
-			for (int i = 0; i < examInfo.getExamRules().size(); i++) {
-				ExamRule examRule = examInfo.getExamRules().get(i);
-				if (!ValidateUtil.isValid(questionListCache.get(examRule.getQuestionTypeId()))) {
-					List<Question> questionList = questionService.getList(examRule.getQuestionTypeId());
-					questionListCache.put(examRule.getQuestionTypeId(), questionList);// 把题库缓存起来，用于模拟随机抽题
-				}
-			}
+			examInfo.getExamRules().stream()//
+					.map(ExamRule::getQuestionTypeId)// 提取需要的题库
+					.collect(Collectors.toSet()).stream()// 去重
+					.forEach(questionTypeId -> questionListCache.put(questionTypeId,
+							questionService.getList(questionTypeId)));// 把题库缓存起来，用于模拟随机抽题
 		}
 		return questionListCache;
 	}
@@ -1108,14 +1211,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		return Arrays.asList(shuffleNums);
 	}
 
-	@Override
-	public void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
-
-	}
-
-	@Override
-	public void assist(Integer id, Integer[] markUserIds) {
-		// 数据校验
+	private Integer[] assistValid(Integer id, Integer[] markUserIds) {
 		if (markUserIds == null) {
 			markUserIds = new Integer[0];
 		}
@@ -1130,27 +1226,59 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!markUserIdsOfDb.containsAll(CollectionUtil.toSet(markUserIds))) {
 			throw new MyException("无用户操作权限");
 		}
-		Exam exam = getById(id);
+		Exam exam = examCacheService.getExam(id);
 		if (exam.getMarkType() == 1) {
 			throw new MyException("无需阅卷");
 		}
 		if (exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {
 			throw new MyException("阅卷已结束");
 		}
+		return markUserIds;
+	}
 
-		// 阅卷用户添加
-		List<MyMark> myMarkList = myMarkService.getList(id);
-		for (MyMark myMark : myMarkList) {
-			myMarkService.removeById(myMark.getId());
+	private Exam delValid(Integer id) {
+		Exam exam = examCacheService.getExam(id);
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
 		}
+		if (exam.getState() == 0) {
+			throw new MyException("已删除");
+		}
+		if (exam.getState() == 2) {
+			throw new MyException("已暂停");
+		}
+		if (exam.getMarkState() == 1) {
+			throw new MyException("未阅卷");
+		}
+		if (exam.getMarkState() == 2) {
+			throw new MyException("阅卷中");
+		}
+		return exam;
+	}
 
-		for (Integer markUserId : markUserIds) {
-			MyMark myMark = new MyMark();
-			myMark.setExamId(id);
-			myMark.setMarkUserId(markUserId);
-			myMark.setUpdateTime(new Date());
-			myMark.setUpdateUserId(getCurUser().getId());
-			myMarkService.save(myMark);
+	private void pauseValid(Integer id) {
+		Exam exam = examCacheService.getExam(id);
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
 		}
+		if (exam.getState() == 0) {
+			throw new MyException("已删除");
+		}
+//		if (exam.getState() == 2) {// 根据现在状态切换到另一个状态
+//			throw new MyException("已暂停");
+//		}
+		if (exam.getMarkState() == 3) {
+			throw new MyException("已结束");
+		}
+//		if (exam.getMarkType() == 1) {
+		if (exam.getEndTime().getTime() < System.currentTimeMillis()) {// 只限制答题就可以
+			throw new MyException("已结束");
+		}
+//		}
+//		if (exam.getMarkType() == 2) {
+//			if (exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {
+//				throw new MyException("阅卷已结束");
+//			}
+//		}
 	}
 }

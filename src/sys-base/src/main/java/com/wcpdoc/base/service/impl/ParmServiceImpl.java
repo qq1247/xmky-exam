@@ -6,11 +6,13 @@ import java.util.Date;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.ParmCache;
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.dao.ParmDao;
 import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.ParmExService;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.dao.RBaseDao;
@@ -32,6 +34,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 	private ParmDao parmDao;
 	@Resource
 	private ParmExService parmExService;
+	@Resource
+	private BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<Parm> getDao() {
@@ -39,8 +43,9 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 	}
 
 	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void emailUpdate(String host, String userName, String pwd, String protocol, String encode) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(host)) {
 			throw new MyException("参数错误：host");
 		}
@@ -57,8 +62,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：encode");
 		}
 
-		// 修改邮箱地址
-		Parm entity = getById(1);
+		// 邮箱修改
+		Parm entity = baseCacheService.getParm();
 		entity.setEmailHost(host);
 		entity.setEmailUserName(userName);
 		entity.setEmailPwd(pwd);
@@ -68,26 +73,18 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		entity.setUpdateUserId(getCurUser().getId());
 		updateById(entity);
 
-		// 更新缓存
-		ParmCache.flushCache(entity);
-
-		// 扩展处理
+		// 邮箱验证
 		try {
 			parmExService.emailUpdate(entity);
-		} catch (Exception e) {// 配置不成功，数据回滚，不刷入缓存
-			entity.setEmailHost(null);
-			entity.setEmailUserName(null);
-			entity.setEmailPwd(null);
-			entity.setEmailProtocol(null);
-			entity.setEmailEncode(null);
-			ParmCache.flushCache(entity);
+		} catch (Exception e) {
 			throw new MyException(e.getMessage());
 		}
 	}
 
 	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void entUpdate(Integer logoFileId, String name) throws Exception {
-		// 校验数据有效性
+		// 数据校验
 		// if (!ValidateUtil.isValid(logoFileId)) {// 不是每次都替换
 		// throw new MyException("参数错误：logoFileId");
 		// }
@@ -95,29 +92,27 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：name");
 		}
 
-		// 更新企业信息
-		Parm entity = getById(1);
+		// 企业信息更新
+		Parm entity = baseCacheService.getParm();
 		entity.setEntName(name);
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		updateById(entity);
 
-		// 扩展处理
+		// 附件处理
 		parmExService.entUpdate(logoFileId);
-
-		// 更新缓存
-		ParmCache.flushCache(entity);
 	}
 
 	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void pwdUpdate(Integer type, String value) {
-		// 校验数据有效性
+		// 数据校验
 		if (type != 1 && type != 2) {
 			throw new MyException("参数错误：type");
 		}
 
-		// 修改密码
-		Parm entity = getById(1);
+		// 密码修改
+		Parm entity = baseCacheService.getParm();
 		entity.setPwdType(type);
 		if (type == 2) {
 			entity.setPwdValue(value);
@@ -125,20 +120,18 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		updateById(entity);
-
-		// 更新缓存
-		ParmCache.flushCache(entity);
 	}
 
 	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void fileUpdate(String uploadDir) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(uploadDir)) {
 			throw new MyException("参数错误：uploadDir");
 		}
 
-		// 修改上传地址
-		Parm parm = getById(1);
+		// 上传地址修改
+		Parm parm = baseCacheService.getParm();
 		String oldFileUploadDir = parm.getFileUploadDir();
 		if (oldFileUploadDir.equals(uploadDir)) {
 			throw new MyException("目录名称相同");
@@ -146,7 +139,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parm.setUpdateTime(new Date());
 		parm.setUpdateUserId(getCurUser().getId());
 		parm.setFileUploadDir(uploadDir);
-		parmDao.updateById(parm);
+		updateById(parm);
 
 		File oldFileUploadFile = new File(oldFileUploadDir);
 		File uploadDirFile = new File(uploadDir);
@@ -161,29 +154,27 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			log.error("移动上传备份目录失败：", e);
 			throw new MyException("未知异常");
 		}
-
-		// 更新缓存
-		ParmCache.flushCache(parm);
 	}
 
 	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void dbUpdate(String bakDir) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(bakDir)) {
 			throw new MyException("参数错误：bakDir");
 		}
 
-		Parm parm = parmDao.selectById(1);
+		Parm parm = baseCacheService.getParm();
 		String oldBakDir = parm.getDbBakDir();
 		if (oldBakDir.equals(bakDir)) {
 			throw new MyException("目录名称相同");
 		}
 
-		// 修改备份地址
+		// 备份地址修改
 		parm.setUpdateTime(new Date());
 		parm.setUpdateUserId(getCurUser().getId());
 		parm.setDbBakDir(bakDir);
-		parmDao.updateById(parm);
+		updateById(parm);
 
 		// 移动备份目录
 		File oldBakFile = new File(String.format("%s%s%s%s%s", oldBakDir, File.separator, "bak", File.separator, "db"));
@@ -198,14 +189,12 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			log.error("移动数据库备份目录失败：", e);
 			throw new MyException("未知异常");
 		}
-
-		// 更新缓存
-		ParmCache.flushCache(parm);
 	}
 
 	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void customUpdate(String title, String content) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(title)) {
 			throw new MyException("参数错误：title");
 		}
@@ -213,13 +202,10 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：content");
 		}
 
-		// 自定义内容更新
-		Parm parm = parmDao.selectById(1);
+		// 自定义内容修改
+		Parm parm = baseCacheService.getParm();
 		parm.setCustomTitle(title);
 		parm.setCustomContent(content);
-		parmDao.updateById(parm);
-
-		// 更新缓存
-		ParmCache.flushCache(parm);
+		updateById(parm);
 	}
 }

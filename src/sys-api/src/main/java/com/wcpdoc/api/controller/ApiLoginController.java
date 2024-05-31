@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.api.entity.UserToken;
 import com.wcpdoc.api.service.LoginService;
-import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
@@ -34,9 +34,11 @@ public class ApiLoginController extends BaseController {
 
 	@Resource
 	private LoginService loginService;
+	@Resource
+	private BaseCacheService baseCacheService;
 
 	/**
-	 * 完成登录
+	 * 登录
 	 * 
 	 * v1.0 zhanghc 2016年7月18日下午3:23:00
 	 * 
@@ -52,33 +54,34 @@ public class ApiLoginController extends BaseController {
 			UserToken userToken = loginService.in(loginName, pwd);
 			return PageResultEx.ok().data(userToken);
 		} catch (LoginException e) {
-			log.error("完成登录错误：{}", e.getMessage());
+			log.error("登录错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成登录错误：", e);
+			log.error("登录错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 退出登录 v1.0 zhanghc 2016年9月8日下午8:50:37
+	 * 退出
+	 * 
+	 * v1.0 zhanghc 2016年9月8日下午8:50:37
 	 * 
 	 * @return String
 	 */
 	@RequestMapping("/out")
 	public PageResult out() {
 		try {
-			// 完成退出登录
 			loginService.out();
 			return PageResult.ok();
 		} catch (Exception e) {
-			log.error("退出登录错误：", e);
+			log.error("退出错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 修改密码
+	 * 密码修改
 	 * 
 	 * v1.0 zhanghc 2017年7月14日下午3:05:21
 	 * 
@@ -92,18 +95,19 @@ public class ApiLoginController extends BaseController {
 			loginService.pwdUpdate(oldPwd, newPwd);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改密码错误：{}", e.getMessage());
+			log.error("密码修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改密码错误：", e);
+			log.error("密码修改错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取服务器时间
+	 * 服务器时间
 	 * 
-	 * v1.0 zhanghc 2017年6月25日下午4:19:05 每隔30秒前端请求一次，心跳机制检测在线状态
+	 * v1.0 zhanghc 2017年6月25日下午4:19:05 <br/>
+	 * 每隔30秒前端请求一次，心跳机制检测在线状态
 	 * 
 	 * @return PageResult
 	 */
@@ -118,7 +122,7 @@ public class ApiLoginController extends BaseController {
 	}
 
 	/**
-	 * 获取企业信息
+	 * 企业信息
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * 
@@ -127,16 +131,16 @@ public class ApiLoginController extends BaseController {
 	@RequestMapping("/ent")
 	public PageResult ent() {
 		try {
-			Parm parm = ParmCache.get();
+			Parm parm = baseCacheService.getParm();
 			return PageResultEx.ok().addAttr("name", parm.getEntName());
 		} catch (Exception e) {
-			log.error("获取企业名称错误：", e);
+			log.error("企业信息错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}
 
 	/**
-	 * 获取自定义信息
+	 * 自定义信息
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午11:36:23
 	 * 
@@ -145,17 +149,18 @@ public class ApiLoginController extends BaseController {
 	@RequestMapping("/custom")
 	public PageResult custom() {
 		try {
-			Parm parm = ParmCache.get();
-			return PageResultEx.ok().addAttr("title", parm.getCustomTitle()).addAttr("content",
-					parm.getCustomContent());
+			Parm parm = baseCacheService.getParm();
+			return PageResultEx.ok()//
+					.addAttr("title", parm.getCustomTitle())//
+					.addAttr("content", parm.getCustomContent());
 		} catch (Exception e) {
-			log.error("获取自定义错误：", e);
+			log.error("自定义信息错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}
 
 	/**
-	 * 获取企业logo
+	 * 企业logo
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * 
@@ -170,9 +175,10 @@ public class ApiLoginController extends BaseController {
 			response.setContentType("application/force-download");
 			FileUtils.copyFile(logo, response.getOutputStream());
 		} catch (MyException e) {
-			log.error("获取企业logo失败：{}", e.getMessage());
+			log.error("企业logo失败：{}", e.getMessage());
 		} catch (Exception e) {
-			log.error("获取企业logo失败：", e);
+			log.error("企业logo失败：", e);
 		}
 	}
+
 }

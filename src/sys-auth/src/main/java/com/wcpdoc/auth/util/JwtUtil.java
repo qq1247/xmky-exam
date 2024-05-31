@@ -24,31 +24,32 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class JwtUtil {
-	private JwtBuilder builder = null; 
+	private JwtBuilder builder = null;
 
 	private JwtUtil() {
-		
+
 	}
-	
+
 	/**
 	 * 获取实例
 	 * 
 	 * v1.0 zhanghc 2021年3月16日下午12:16:40
+	 * 
 	 * @return JwtUtil
 	 */
 	public static JwtUtil getInstance() {
 		return new JwtUtil();
 	}
-	
+
 	/**
 	 * 生成令牌
 	 * 
 	 * v1.0 zhanghc 2019年10月24日上午10:38:24
 	 * 
-	 * @param id 令牌唯一标识
+	 * @param id      令牌唯一标识
 	 * @param subject 主题
 	 * @param expTime 过期时间
-	 * @param params 自定义参数。
+	 * @param params  自定义参数。
 	 * @return String
 	 */
 	public JwtUtil createToken(String id, String subject, Date expTime) {
@@ -74,11 +75,12 @@ public class JwtUtil {
 		builder.signWith(SignatureAlgorithm.HS512, JwtSecretCache.get());
 		return this;
 	}
-	
+
 	/**
 	 * 添加属性
 	 * 
 	 * v1.0 zhanghc 2021年3月16日下午12:25:22
+	 * 
 	 * @param key
 	 * @param value
 	 * @return JwtUtil
@@ -94,26 +96,28 @@ public class JwtUtil {
 		if (Claims.EXPIRATION.equals(key)) {
 			throw new MyException(String.format("key[%s]为jwt关键字", Claims.EXPIRATION));
 		}
-		
+
 		// 添加属性
 		builder.claim(key, value);
 		return this;
 	}
-	
+
 	/**
 	 * 构建字符串
 	 * 
 	 * v1.0 zhanghc 2021年3月16日下午12:26:17
+	 * 
 	 * @return String
 	 */
 	public String build() {
 		return builder.compact();
 	}
-	
+
 	/**
 	 * 解析令牌
 	 * 
 	 * v1.0 zhanghc 2019年10月24日上午10:38:32
+	 * 
 	 * @param token
 	 * @return JwtResult
 	 */

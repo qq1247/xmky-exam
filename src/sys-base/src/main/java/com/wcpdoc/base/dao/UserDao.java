@@ -10,7 +10,6 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.StringUtil;
 
 /**
@@ -81,19 +80,6 @@ public interface UserDao extends RBaseDao<User> {
 	 */
 	default List<User> getList(Integer orgId) {
 		return selectList(new LambdaQueryWrapper<User>().ne(User::getState, 0).eq(User::getOrgId, orgId));
-	}
-
-	/**
-	 * 获取用户列表
-	 * 
-	 * v1.0 zhanghc 2021年11月5日上午10:39:04
-	 * 
-	 * @param ids
-	 * @return List<User>
-	 */
-	default List<User> getList(Integer[] ids) {
-		return selectList(
-				new LambdaQueryWrapper<User>().ne(User::getState, 0).in(User::getId, CollectionUtil.toSet(ids)));
 	}
 
 	/**

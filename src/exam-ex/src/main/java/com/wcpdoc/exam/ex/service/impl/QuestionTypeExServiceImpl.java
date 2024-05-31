@@ -41,15 +41,15 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 
 	@Override
 	public void delEx(QuestionType questionType) {
-		int questionNum = questionService.getNum(questionType.getId());
-		if (questionNum > 0) {
-			throw new MyException("该题库有试题，不允许删除");
+		List<Integer> questionIds = questionService.getIds(questionType.getId());
+		if (ValidateUtil.isValid(questionIds)) {
+			throw new MyException("请先清空试题");
 		}
 	}
 
 	@Override
 	public void move(Integer sourceId, Integer targetId) {
-		// 校验数据有效性
+		// 数据校验
 		if (sourceId == null) {
 			throw new MyException("参数错误：sourceId");
 		}

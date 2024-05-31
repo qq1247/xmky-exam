@@ -17,10 +17,10 @@ import com.wcpdoc.core.entity.PageOut;
  * v1.0 zhanghc 2016-11-3下午9:03:40
  */
 public interface DictDao extends RBaseDao<Dict> {
-	
+
 	@Override
 	default PageOut getListpage(PageIn pageIn) {
-		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(),//
+		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<Dict>().setAlias("DICT")//
 						.select("DICT.ID", "DICT.DICT_INDEX", "DICT.DICT_KEY", "DICT.DICT_VALUE", "DICT.NO")//
 						.like(pageIn.hasParm("dictIndex"), "DICT.DICT_INDEX", pageIn.getParm("dictIndex"))//

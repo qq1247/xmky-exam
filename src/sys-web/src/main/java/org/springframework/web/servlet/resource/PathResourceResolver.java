@@ -48,19 +48,13 @@ import org.springframework.web.util.UrlPathHelper;
 
 import com.wcpdoc.core.util.SpringUtil;
 
-
-
-/**
- * A simple {@code ResourceResolver} that tries to find a resource under the given
- * locations matching to the request path.
- *
- * <p>This resolver does not delegate to the {@code ResourceResolverChain} and is
- * expected to be configured at the end in a chain of resolvers.
- *
- * @author Jeremy Grelle
- * @author Rossen Stoyanchev
- * @author Sam Brannen
- * @since 4.1
+/*
+ * 集成前端程序，根据设备类型自动路由到pc端还是移动端
+ * 
+ * 核心代码：重写getResource()方法
+ * myLocations.add(new FileUrlResource(LOCATIONS_CACHE.get(device.isNormal() ? "pc" : "mobile")));
+ * 
+ * class加载比jar优先，优先执行的本类
  */
 public class PathResourceResolver extends AbstractResourceResolver {
 
@@ -71,31 +65,34 @@ public class PathResourceResolver extends AbstractResourceResolver {
 
 	@Nullable
 	private UrlPathHelper urlPathHelper;
-	
+
 	private static final Map<String, String> LOCATIONS_CACHE = new HashMap<>();
 	private static final DeviceResolver deviceResolver = new LiteDeviceResolver();
 	static {
-		String[] STATIC_LOCATIONS = SpringUtil.getBean(Environment.class).getProperty("spring.resources.static-locations").trim().split(";");
-		for (int i = 0; i < STATIC_LOCATIONS.length; i++) {//pc:./h5/;mobile:./m/
+		String[] STATIC_LOCATIONS = SpringUtil.getBean(Environment.class)
+				.getProperty("spring.resources.static-locations").trim().split(";");
+		for (int i = 0; i < STATIC_LOCATIONS.length; i++) {// pc:./h5/;mobile:./m/
 			String[] split = STATIC_LOCATIONS[i].split(":");
 			LOCATIONS_CACHE.put(split[0].trim(), split[1].trim());
 		}
 	}
 
-
 	/**
 	 * By default when a Resource is found, the path of the resolved resource is
-	 * compared to ensure it's under the input location where it was found.
-	 * However sometimes that may not be the case, e.g. when
+	 * compared to ensure it's under the input location where it was found. However
+	 * sometimes that may not be the case, e.g. when
 	 * {@link org.springframework.web.servlet.resource.CssLinkResourceTransformer}
-	 * resolves public URLs of links it contains, the CSS file is the location
-	 * and the resources being resolved are css files, images, fonts and others
-	 * located in adjacent or parent directories.
-	 * <p>This property allows configuring a complete list of locations under
-	 * which resources must be so that if a resource is not under the location
-	 * relative to which it was found, this list may be checked as well.
-	 * <p>By default {@link ResourceHttpRequestHandler} initializes this property
-	 * to match its list of locations.
+	 * resolves public URLs of links it contains, the CSS file is the location and
+	 * the resources being resolved are css files, images, fonts and others located
+	 * in adjacent or parent directories.
+	 * <p>
+	 * This property allows configuring a complete list of locations under which
+	 * resources must be so that if a resource is not under the location relative to
+	 * which it was found, this list may be checked as well.
+	 * <p>
+	 * By default {@link ResourceHttpRequestHandler} initializes this property to
+	 * match its list of locations.
+	 * 
 	 * @param locations the list of allowed locations
 	 * @since 4.1.2
 	 * @see ResourceHttpRequestHandler#initAllowedLocations()
@@ -111,11 +108,13 @@ public class PathResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * Configure charsets associated with locations. If a static resource is found
-	 * under a {@link org.springframework.core.io.UrlResource URL resource}
-	 * location the charset is used to encode the relative path
-	 * <p><strong>Note:</strong> the charset is used only if the
-	 * {@link #setUrlPathHelper urlPathHelper} property is also configured and
-	 * its {@code urlDecode} property is set to true.
+	 * under a {@link org.springframework.core.io.UrlResource URL resource} location
+	 * the charset is used to encode the relative path
+	 * <p>
+	 * <strong>Note:</strong> the charset is used only if the
+	 * {@link #setUrlPathHelper urlPathHelper} property is also configured and its
+	 * {@code urlDecode} property is set to true.
+	 * 
 	 * @since 4.3.13
 	 */
 	public void setLocationCharsets(Map<Resource, Charset> locationCharsets) {
@@ -125,6 +124,7 @@ public class PathResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * Return charsets associated with static resource locations.
+	 * 
 	 * @since 4.3.13
 	 */
 	public Map<Resource, Charset> getLocationCharsets() {
@@ -133,8 +133,9 @@ public class PathResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * Provide a reference to the {@link UrlPathHelper} used to map requests to
-	 * static resources. This helps to derive information about the lookup path
-	 * such as whether it is decoded or not.
+	 * static resources. This helps to derive information about the lookup path such
+	 * as whether it is decoded or not.
+	 * 
 	 * @since 4.3.13
 	 */
 	public void setUrlPathHelper(@Nullable UrlPathHelper urlPathHelper) {
@@ -143,13 +144,13 @@ public class PathResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * The configured {@link UrlPathHelper}.
+	 * 
 	 * @since 4.3.13
 	 */
 	@Nullable
 	public UrlPathHelper getUrlPathHelper() {
 		return this.urlPathHelper;
 	}
-
 
 	@Override
 	protected Resource resolveResourceInternal(@Nullable HttpServletRequest request, String requestPath,
@@ -162,8 +163,8 @@ public class PathResourceResolver extends AbstractResourceResolver {
 	protected String resolveUrlPathInternal(String resourcePath, List<? extends Resource> locations,
 			ResourceResolverChain chain) {
 
-		return (StringUtils.hasText(resourcePath) &&
-				getResource(resourcePath, null, locations) != null ? resourcePath : null);
+		return (StringUtils.hasText(resourcePath) && getResource(resourcePath, null, locations) != null ? resourcePath
+				: null);
 	}
 
 	@Nullable
@@ -177,7 +178,7 @@ public class PathResourceResolver extends AbstractResourceResolver {
 		} catch (MalformedURLException e) {
 			logger.error("获取设备类型错误：", e);
 		}
-		
+
 		for (Resource location : locations) {
 			try {
 				String pathToUse = encodeIfNecessary(resourcePath, request, location);
@@ -185,14 +186,12 @@ public class PathResourceResolver extends AbstractResourceResolver {
 				if (resource != null) {
 					return resource;
 				}
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				if (logger.isDebugEnabled()) {
 					String error = "Skip location [" + location + "] due to error";
 					if (logger.isTraceEnabled()) {
 						logger.trace(error, ex);
-					}
-					else {
+					} else {
 						logger.debug(error + ": " + ex.getMessage());
 					}
 				}
@@ -203,10 +202,12 @@ public class PathResourceResolver extends AbstractResourceResolver {
 
 	/**
 	 * Find the resource under the given location.
-	 * <p>The default implementation checks if there is a readable
-	 * {@code Resource} for the given path relative to the location.
+	 * <p>
+	 * The default implementation checks if there is a readable {@code Resource} for
+	 * the given path relative to the location.
+	 * 
 	 * @param resourcePath the path to the resource
-	 * @param location the location to check
+	 * @param location     the location to check
 	 * @return the resource, or {@code null} if none found
 	 */
 	@Nullable
@@ -215,13 +216,12 @@ public class PathResourceResolver extends AbstractResourceResolver {
 		if (resource.isReadable()) {
 			if (checkResource(resource, location)) {
 				return resource;
-			}
-			else if (logger.isWarnEnabled()) {
+			} else if (logger.isWarnEnabled()) {
 				Resource[] allowedLocations = getAllowedLocations();
-				logger.warn("Resource path \"" + resourcePath + "\" was successfully resolved " +
-						"but resource \"" +	resource.getURL() + "\" is neither under the " +
-						"current location \"" + location.getURL() + "\" nor under any of the " +
-						"allowed locations " + (allowedLocations != null ? Arrays.asList(allowedLocations) : "[]"));
+				logger.warn("Resource path \"" + resourcePath + "\" was successfully resolved " + "but resource \""
+						+ resource.getURL() + "\" is neither under the " + "current location \"" + location.getURL()
+						+ "\" nor under any of the " + "allowed locations "
+						+ (allowedLocations != null ? Arrays.asList(allowedLocations) : "[]"));
 			}
 		}
 		return null;
@@ -232,6 +232,7 @@ public class PathResourceResolver extends AbstractResourceResolver {
 	 * resources exists and is readable. The default implementation also verifies
 	 * the resource is either under the location relative to which it was found or
 	 * is under one of the {@link #setAllowedLocations allowed locations}.
+	 * 
 	 * @param resource the resource to check
 	 * @param location the location relative to which the resource was found
 	 * @return "true" if resource is in a valid location, "false" otherwise.
@@ -263,16 +264,13 @@ public class PathResourceResolver extends AbstractResourceResolver {
 		if (resource instanceof UrlResource) {
 			resourcePath = resource.getURL().toExternalForm();
 			locationPath = StringUtils.cleanPath(location.getURL().toString());
-		}
-		else if (resource instanceof ClassPathResource) {
+		} else if (resource instanceof ClassPathResource) {
 			resourcePath = ((ClassPathResource) resource).getPath();
 			locationPath = StringUtils.cleanPath(((ClassPathResource) location).getPath());
-		}
-		else if (resource instanceof ServletContextResource) {
+		} else if (resource instanceof ServletContextResource) {
 			resourcePath = ((ServletContextResource) resource).getPath();
 			locationPath = StringUtils.cleanPath(((ServletContextResource) location).getPath());
-		}
-		else {
+		} else {
 			resourcePath = resource.getURL().getPath();
 			locationPath = StringUtils.cleanPath(location.getURL().getPath());
 		}
@@ -298,8 +296,7 @@ public class PathResourceResolver extends AbstractResourceResolver {
 				sb.setLength(sb.length() - 1);
 			}
 			return sb.toString();
-		}
-		else {
+		} else {
 			return path;
 		}
 	}
@@ -317,8 +314,7 @@ public class PathResourceResolver extends AbstractResourceResolver {
 					logger.warn("Resolved resource path contains encoded \"../\" or \"..\\\": " + resourcePath);
 					return true;
 				}
-			}
-			catch (UnsupportedEncodingException ex) {
+			} catch (UnsupportedEncodingException ex) {
 				// Should never happen...
 			}
 		}

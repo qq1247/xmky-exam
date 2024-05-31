@@ -24,5 +24,5 @@ public class Cron {
 	private Integer state;
 	private Integer updateUserId;
 	private Date updateTime;
-	
+
 }

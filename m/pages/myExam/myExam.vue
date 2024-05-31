@@ -11,7 +11,7 @@
 				v-for="myExam in listpage.list" 
 				:key="myExam.examId" 
 				:title="`${ myExam.examName } / ${ myExam.examStartTime }`" 
-				:note="`用时：${getMinute(myExam.answerStartTime, myExam.answerEndTime)}分钟 | 分数：${ myExam.totalScore || '-' } / ${ myExam.examTotalScore } | 排名：${ myExam.no || '-' } / ${ myExam.userNum || '-' } | ${ getDictName('EXAM_STATE', myExam.state) } | ${ getDictName('MARK_STATE', myExam.markState) }`"
+				:note="`用时：${getMinute(myExam.examStartTime, myExam.examEndTime)}分钟 | 分数：${ myExam.totalScore || '-' } / ${ myExam.examTotalScore } | 排名：${ myExam.no || '-' } / ${ myExam.userNum || '-' } | ${ getDictName('EXAM_STATE', myExam.state) } | ${ getDictName('MARK_STATE', myExam.markState) }`"
 				link 
 				showArrow
 				@click="toExam(myExam)" 

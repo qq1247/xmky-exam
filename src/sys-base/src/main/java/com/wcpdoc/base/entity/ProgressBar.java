@@ -16,8 +16,9 @@ public class ProgressBar {
 	private String id;
 	private Double curNum;
 	private Double totalNum;
-	private String msg;
 	private Integer code;
+	private String msg;
+	private Object data;
 
 	/**
 	 * 获取百分比

@@ -21,7 +21,8 @@ import org.springframework.http.HttpStatus;
 public class AnyRolesEx extends RolesAuthorizationFilter {
 
 	@Override
-	public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
+	public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
+			throws IOException {
 		Subject subject = getSubject(request, response);
 		String[] rolesArray = (String[]) mappedValue;
 
@@ -37,14 +38,16 @@ public class AnyRolesEx extends RolesAuthorizationFilter {
 		}
 		return false;
 	}
-	
+
 	@Override
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
+	protected boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue)
+			throws Exception {
 		HttpServletResponse httpResponse = WebUtils.toHttp(response);
 		httpResponse.setCharacterEncoding("UTF-8");
 		httpResponse.setContentType("application/json;charset=UTF-8");
 		httpResponse.setStatus(HttpStatus.OK.value());
-		httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"未授权\"}", HttpStatus.UNAUTHORIZED.value()));
+		httpResponse.getWriter()
+				.write(String.format("{\"code\": %s, \"msg\": \"未授权\"}", HttpStatus.UNAUTHORIZED.value()));
 		return false;
 	}
 }

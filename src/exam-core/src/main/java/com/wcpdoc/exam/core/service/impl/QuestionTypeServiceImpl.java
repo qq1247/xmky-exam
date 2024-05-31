@@ -37,12 +37,12 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
-		// 删除题库
+		// 题库删除
 		// entity.setUpdateTime(new Date());// 物理删除，不需要再记录
 		// entity.setUpdateUserId(getCurUser().getId());
 		removeById(entity.getId());
 
-		// 删除题库扩展
+		// 题库扩展删除
 		questionTypeExService.delEx(entity);
 	}
 

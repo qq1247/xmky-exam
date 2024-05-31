@@ -36,7 +36,7 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 	@SuppressWarnings("unchecked")
 	@Override
 	public void updateEx(Cron cron) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(cron.getJobClass())) {
 			throw new MyException("参数错误：jobClass");
 		}

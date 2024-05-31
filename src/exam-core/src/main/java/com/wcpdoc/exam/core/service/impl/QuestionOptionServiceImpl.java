@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -25,10 +23,5 @@ public class QuestionOptionServiceImpl extends BaseServiceImp<QuestionOption> im
 	@Override
 	public RBaseDao<QuestionOption> getDao() {
 		return questionOptionDao;
-	}
-
-	@Override
-	public List<QuestionOption> getList(Integer questionId) {
-		return questionOptionDao.getList(questionId);
 	}
 }

@@ -1,8 +1,10 @@
 package com.wcpdoc.quartz.service.impl;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.ParmCache;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.quartz.entity.Cron;
@@ -15,6 +17,8 @@ import com.wcpdoc.quartz.service.CronExService;
  */
 @Service
 public class CronExServiceImpl extends BaseServiceImp<Cron> implements CronExService {
+	@Resource
+	private BaseCacheService baseCacheService;
 	@Override
 	public RBaseDao<Cron> getDao() {
 		return null;
@@ -22,6 +26,6 @@ public class CronExServiceImpl extends BaseServiceImp<Cron> implements CronExSer
 
 	@Override
 	public String getDbBakDir() {
-		return ParmCache.get().getDbBakDir();
+		return baseCacheService.getParm().getDbBakDir();
 	}
 }

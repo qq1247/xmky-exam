@@ -16,17 +16,17 @@ public interface ExerService extends BaseService<Exer> {
 	 * 试题模拟添加
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @param exer 
-	 * void
+	 * 
+	 * @param exer void
 	 */
 	void addEx(Exer exer);
-	
+
 	/**
 	 * 试题模拟修改
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @param exer 
-	 * void
+	 * 
+	 * @param exer void
 	 */
 	void updateEx(Exer exer);
 
@@ -34,6 +34,7 @@ public interface ExerService extends BaseService<Exer> {
 	 * 练习列表
 	 * 
 	 * v1.0 chenyun 2021年9月17日上午11:19:21
+	 * 
 	 * @param questionTypeId
 	 * @return List<Exer>
 	 */

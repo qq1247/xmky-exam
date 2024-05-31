@@ -93,15 +93,4 @@ public interface OrgDao extends RBaseDao<Org> {
 				.isNotNull(Org::getCode).notIn(Org::getId, excludeId)) > 0;
 	}
 
-	/**
-	 * 获取机构
-	 * 
-	 * v1.0 chenyun 2021年3月5日上午10:41:51
-	 * 
-	 * @param name
-	 * @return Org
-	 */
-	default Org getOrg(String name) {
-		return selectOne(new LambdaQueryWrapper<Org>().eq(Org::getState, 1).eq(Org::getName, name));
-	}
 }

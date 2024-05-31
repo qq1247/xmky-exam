@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.auth.cache.OldTokenCache;
 import com.wcpdoc.auth.cache.TokenCache;
 import com.wcpdoc.base.service.UserExService;
-import com.wcpdoc.core.cache.OnlineUserCache;
 import com.wcpdoc.core.entity.OnlineUser;
 import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.util.DateUtil;
@@ -24,17 +23,17 @@ public class OnlineUserServiceImpl implements OnlineUserService {// 不继承Bas
 
 	@Override
 	public void add(OnlineUser onlineUser) {
-		OnlineUserCache.put(onlineUser);
+//		OnlineUserCache.put(onlineUser);
 	}
 
 	@Override
 	public void update(OnlineUser onlineUser) {
-		OnlineUserCache.put(onlineUser);
+//		OnlineUserCache.put(onlineUser);
 	}
 
 	@Override
 	public void del(Integer id) {
-		OnlineUserCache.remove((Integer) id);
+//		OnlineUserCache.remove((Integer) id);
 	}
 
 	@Override
@@ -46,7 +45,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {// 不继承Bas
 
 	@Override
 	public OnlineUser getEntity(Integer id) {
-		return OnlineUserCache.get((Integer) id);
+//		return OnlineUserCache.get((Integer) id);
+		return null;
 	}
 
 	@Override

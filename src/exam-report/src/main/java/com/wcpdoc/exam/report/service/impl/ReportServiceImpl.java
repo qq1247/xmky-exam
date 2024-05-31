@@ -24,8 +24,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.DictService;
-import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.entity.PageIn;
@@ -35,7 +35,6 @@ import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
@@ -43,6 +42,7 @@ import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
@@ -64,25 +64,27 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	@Resource
 	private QuestionTypeService questionTypeService;
 	@Resource
-	private ExamService examService;
-	@Resource
-	private MyExamService myExamService;
-	@Resource
 	private MyMarkService myMarkService;
 	@Resource
 	private DictService dictService;
 	@Resource
-	private QuestionService questionService;
-	@Resource
-	private UserService userService;
-	@Resource
-	private OrgService orgService;
+	private BaseCacheService baseCacheService;
 	@Resource
 	private ExamQuestionService examQuestionService;
 	@Resource
 	private ExamRuleService examRuleService;
 	@Resource
 	private ExerService exerService;
+	@Resource
+	private ExamCacheService examCacheService;
+	@Resource
+	private ExamService examService;
+	@Resource
+	private MyExamService myExamService;
+	@Resource
+	private QuestionService questionService;
+	@Resource
+	private UserService userService;
 
 	@Override
 	public RBaseDao<Object> getDao() {
@@ -169,7 +171,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 				.eq(Exer::getState, 1)//
 				.eq(Exer::getCreateUserId, subAdminUserId));
 		// 首页展示考试用户数量
-		int examUserNum = userService.getById(subAdminUserId).getUserIds().size();
+		int examUserNum = baseCacheService.getUser(subAdminUserId).getUserIds().size();
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("examNum", examNum);
@@ -233,7 +235,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 
 	@Override
 	public Map<String, Object> questionStatis(Integer questionTypeId) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(questionTypeId)) {
 			throw new MyException("参数错误：questionTypeId");
 		}
@@ -280,11 +282,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 
 	@Override
 	public Map<String, Object> examStatis(Integer examId) {
-		// 校验数据有效性
+		// 数据校验
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
-		Exam exam = examService.getById(examId);
+		Exam exam = examCacheService.getExam(examId);
 		if (ValidateUtil.isValid(exam.getEndTime()) && exam.getEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("考试未结束");
 		}
@@ -297,17 +299,17 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 
 		// 获取试卷、人员成绩信息
-		List<MyExam> myExamList = myExamService.getList(examId);// 我的考试信息
+		List<MyExam> myExamList = examCacheService.getMyExamList(examId);// 我的考试信息
 		List<Question> questionList = new ArrayList<>();// 试题列表
 		List<ExamQuestion> examQuestionList = examQuestionService.getList(examId);// 试卷信息
 		List<ExamRule> examRuleList = null;// 考试规则列表
 		if (exam.getGenType() == 1) {// 如果是人工组卷，查询试题
 			for (ExamQuestion examQuestion : examQuestionList) {
 				if (examQuestion.getType() == 2) {
-					questionList.add(QuestionCache.getQuestion(examQuestion.getQuestionId()));// 已关联考试的试题不会改变，缓存起来加速查询。
+					questionList.add(examCacheService.getQuestion(examQuestion.getQuestionId()));
 				}
 			}
-		} else {// 如果是随机组卷，查询随机规则
+		} else {// 如果是随机组卷，查询考试规则
 			examRuleList = examRuleService.getList(examId);
 		}
 
@@ -457,14 +459,14 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 								"USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "ORG.NAME AS ORG_NAME", // 用户机构信息
 								"MY_EXAM.STATE AS MY_EXAM_STATE", "MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE",
 								"MY_EXAM.ANSWER_STATE AS MY_EXAM_ANSWER_STATE", // 考试状态信息
-								"MY_EXAM.ANSWER_START_TIME AS MY_EXAM_START_TIME",
-								"MY_EXAM.ANSWER_END_TIME AS MY_EXAM_END_TIME", // 答题时间
+								"MY_EXAM.EXAM_START_TIME AS MY_EXAM_START_TIME",
+								"MY_EXAM.EXAM_END_TIME AS MY_EXAM_END_TIME", // 答题时间
 								"MY_EXAM.MARK_START_TIME AS MY_EXAM_MARK_START_TIME",
 								"MY_EXAM.MARK_END_TIME AS MY_EXAM_MARK_END_TIME", // 阅卷时间
 								"MY_EXAM.TOTAL_SCORE AS MY_EXAM_TOTAL_SCORE", // 用户分数
 								"EXAM.MARK_TYPE AS EXAM_MARK_TYPE", "EXAM.MARK_STATE AS EXAM_MARK_STATE")// 考试信息，用于判断如果是主观题试卷，分数应该考试结束才显示
 						.eq("MY_EXAM.EXAM_ID", pageIn.getParm("examId"))//
-						.orderByAsc("MY_EXAM.NO").orderByDesc("MY_EXAM.ANSWER_END_TIME"));
+						.orderByAsc("MY_EXAM.NO").orderByDesc("MY_EXAM.EXAM_END_TIME"));
 		return new PageOut(page.getRecords(), page.getTotal());
 	}
 
