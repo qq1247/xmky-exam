@@ -36,6 +36,7 @@
 <a href="h5">PC端更新</a>
 <a href="src">后端更新</a>
 <a href="m">移动端更新</a>
+<a href="doc">压测报告</a>
 
 ## 界面预览
 <a href="img/webpage">去查看</a>
