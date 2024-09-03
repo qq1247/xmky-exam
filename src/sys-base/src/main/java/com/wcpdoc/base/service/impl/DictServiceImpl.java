@@ -4,8 +4,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.dao.DictDao;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.service.DictService;
@@ -24,6 +26,29 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 
 	public RBaseDao<Dict> getDao() {
 		return dictDao;
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.DICT_CACHE, allEntries = true)
+	public void addEx(Dict dict) {
+		save(dict);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.DICT_CACHE, allEntries = true)
+	public void editEx(Dict dict) {
+		Dict entity = getById(dict.getId());
+		entity.setDictIndex(dict.getDictIndex());
+		entity.setDictKey(dict.getDictKey());
+		entity.setDictValue(dict.getDictValue());
+		entity.setNo(dict.getNo());
+		updateById(entity);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.DICT_CACHE, allEntries = true)
+	public void delEx(Integer id) {
+		removeById(id);
 	}
 
 	@Override

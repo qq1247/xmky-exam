@@ -14,7 +14,7 @@
 	</appenders>
 	<loggers>
 		<!-- sql日志 -->
-		<Logger name="p6spy" level="error"></Logger>		
+		<Logger name="p6spy" level="info"></Logger>		
 		<!-- 打印令牌登陆、过期、刷新等日志 -->
 		<Logger name="com.wcpdoc.api.service.impl.LoginServiceImpl" level="info"></Logger>
 		<Logger name="com.wcpdoc.auth.filter.JWTFilter" level="info"></Logger>

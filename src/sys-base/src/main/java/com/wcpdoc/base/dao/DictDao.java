@@ -31,7 +31,7 @@ public interface DictDao extends RBaseDao<Dict> {
 	}
 
 	/**
-	 * 获取列表
+	 * 数据字典列表
 	 * 
 	 * v1.0 zhanghc 2017年5月23日下午5:18:29
 	 * 
@@ -39,5 +39,16 @@ public interface DictDao extends RBaseDao<Dict> {
 	 */
 	default List<Dict> getList(String dictIndex) {
 		return selectList(new LambdaQueryWrapper<Dict>().eq(Dict::getDictIndex, dictIndex));
+	}
+
+	/**
+	 * 数据字典列表
+	 * 
+	 * v1.0 zhanghc 2024年6月21日上午9:31:43
+	 * 
+	 * @return List<Dict>
+	 */
+	default List<Dict> getList() {
+		return selectList(new LambdaQueryWrapper<Dict>());
 	}
 }

@@ -1,14 +1,18 @@
 package com.wcpdoc.base.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.constant.BaseConstant;
+import com.wcpdoc.base.dao.DictDao;
 import com.wcpdoc.base.dao.OrgDao;
 import com.wcpdoc.base.dao.ParmDao;
 import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
@@ -30,6 +34,8 @@ public class BaseCacheServiceImpl implements BaseCacheService {
 	private OrgDao orgDao;
 	@Resource
 	private ParmDao parmDao;
+	@Resource
+	private DictDao dictDao;
 
 	@Override
 	@Cacheable(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id", sync = true)
@@ -55,4 +61,9 @@ public class BaseCacheServiceImpl implements BaseCacheService {
 		return parm;
 	}
 
+	@Override
+	@Cacheable(value = BaseConstant.DICT_CACHE, key = BaseConstant.DICT_LIST_KEY, sync = true)
+	public List<Dict> getDictList() {
+		return dictDao.getList();
+	}
 }

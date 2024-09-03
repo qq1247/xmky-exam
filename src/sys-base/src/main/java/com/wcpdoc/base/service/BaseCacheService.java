@@ -1,5 +1,8 @@
 package com.wcpdoc.base.service;
 
+import java.util.List;
+
+import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
@@ -37,4 +40,12 @@ public interface BaseCacheService {
 	 * @return Parm
 	 */
 	Parm getParm();
+	
+	/**
+	 * 数据字典列表
+	 * 
+	 * v1.0 zhanghc 2024年6月21日上午10:59:56
+	 * @return List<Dict>
+	 */
+	List<Dict> getDictList();
 }

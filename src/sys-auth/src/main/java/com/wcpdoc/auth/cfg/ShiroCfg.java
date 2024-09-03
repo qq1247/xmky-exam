@@ -53,6 +53,7 @@ public class ShiroCfg {
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
 		filterChainMap.put("/api/login/*", "anon");// 登录相关功能免登录
 		filterChainMap.put("/api/file/download", "anon");// 下载免登录
+		filterChainMap.put("/api/dict/indexList", "jwt");// 数据字典列表需登录
 		filterChainMap.put("/api/dict/listpage", "jwt");// 数据字典分页列表需登录
 		filterChainMap.put("/api/bulletin/listpage", "jwt");// 公告分页列表需登录
 		filterChainMap.put("/api/bulletin/get", "jwt");// 公告详情列表需登录
