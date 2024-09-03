@@ -88,8 +88,8 @@ public class ApiMyMarkController extends BaseController {
 					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
 					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
 					.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
-					.addAttr("examStartTime", myExam.getExamStartTime())//
-					.addAttr("answerEndTime", myExam.getExamEndTime())//
+					.addAttr("answerStartTime", myExam.getAnswerStartTime())//
+					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore", myExam.getObjectiveScore())//

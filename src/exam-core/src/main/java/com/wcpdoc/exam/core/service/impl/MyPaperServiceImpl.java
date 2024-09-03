@@ -329,10 +329,10 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 		}
 
 		long curTime = System.currentTimeMillis() + 500;// 业务上变更考试结束时间为当前时间时，自动阅卷概率性校验为考试未结束（数据库时间四舍五入后比当前时间大。
-		if (myExam.getExamStartTime().getTime() > curTime) {// 例：传入2022-05-12 23:59:59,999999，保存为2022-05-13 00:00:00
+		if (myExam.getAnswerStartTime().getTime() > curTime) {// 例：传入2022-05-12 23:59:59,999999，保存为2022-05-13 00:00:00
 			throw new MyException("考试未开始");
 		}
-		if (myExam.getExamEndTime().getTime() > curTime) {
+		if (myExam.getAnswerEndTime().getTime() > curTime) {
 			throw new MyException("考试未结束");
 		}
 	}

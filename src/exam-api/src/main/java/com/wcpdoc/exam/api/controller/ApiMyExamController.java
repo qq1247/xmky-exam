@@ -1,12 +1,16 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -15,11 +19,11 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
-import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +46,8 @@ public class ApiMyExamController extends BaseController {
 	private ExamService examService;
 	@Resource
 	private ExamCacheService examCacheService;
+	@Resource
+	private BaseCacheService baseCacheService;
 
 	/**
 	 * 我的考试列表
@@ -57,7 +63,7 @@ public class ApiMyExamController extends BaseController {
 			PageOut pageOut = myExamService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				Exam exam = new Exam();
-				exam.setScoreState((Integer) map.remove("examScoreState"));// 页面不需要字段用remove
+				exam.setScoreState((Integer) map.get("examScoreState"));
 				exam.setMarkState((Integer) map.get("examMarkState"));
 				MyExam myExam = new MyExam();
 				myExam.setMarkState((Integer) map.get("markState"));
@@ -95,17 +101,9 @@ public class ApiMyExamController extends BaseController {
 			}
 			Exam exam = examCacheService.getExam(examId);
 			return PageResultEx.ok()// 考试用户没有exam/get权限，所以字段在这里回显
-					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
-					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
-					.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
-					.addAttr("examMarkStartTime", exam.getMarkStartTime())
-					.addAttr("examMarkEndTime", exam.getMarkEndTime())// 如果是交卷后公布，但试卷是主观题试卷，页面提示几点之后查询
 					.addAttr("examName", exam.getName())// 考试名称
-					.addAttr("examStartTime",
-							ExamUtil.hasTimeLimit(exam) ? myExam.getExamStartTime() : exam.getStartTime())// 我的考试结束时间（进入我的试卷使用）
-					.addAttr("examEndTime", ExamUtil.hasTimeLimit(exam) ? myExam.getExamEndTime() : exam.getEndTime())//
-					.addAttr("examStartTime", myExam.getExamStartTime())//
-					.addAttr("answerEndTime", myExam.getExamEndTime())//
+					.addAttr("answerStartTime", myExam.getAnswerStartTime())
+					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore", myExam.getObjectiveScore())//
@@ -120,6 +118,112 @@ public class ApiMyExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取我的考试错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 考试
+	 * 
+	 * v1.0 zhanghc 2022年11月2日下午2:38:55
+	 * 
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/examGet")
+	public PageResult examGet(Integer examId) {
+		try {
+			MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
+			if (myExam == null) {
+				throw new MyException("无查阅权限");
+			}
+
+			Exam exam = examCacheService.getExam(examId);
+			return PageResultEx.ok()//
+					.addAttr("id", exam.getId())//
+					.addAttr("name", exam.getName())//
+					.addAttr("paperName", exam.getPaperName())//
+					.addAttr("startTime", exam.getStartTime())//
+					.addAttr("endTime", exam.getEndTime())//
+					.addAttr("markStartTime", exam.getMarkStartTime())//
+					.addAttr("markEndTime", exam.getMarkEndTime())//
+					.addAttr("markState", exam.getMarkState())// 页面控制是否显示错题
+					.addAttr("scoreState", exam.getScoreState())// 页面控制是否显示错题
+					.addAttr("rankState", exam.getRankState())// 页面控制是否显示排名
+					.addAttr("anonState", exam.getAnonState())//
+					.addAttr("passScore", exam.getPassScore())//
+					.addAttr("totalScore", exam.getTotalScore())//
+					.addAttr("markType", exam.getMarkType())//
+					.addAttr("genType", exam.getGenType())//
+					.addAttr("sxes", exam.getSxes())//
+					.addAttr("state", exam.getState())//
+					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null)//
+					.addAttr("limitMinute", exam.getLimitMinute());//
+		} catch (MyException e) {
+			log.error("获取考试错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取考试错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 zhanghc 2024年8月30日下午4:18:55
+	 * 
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionStatis")
+	public PageResult questionStatis(Integer examId) {
+		try {
+			MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
+			if (myExam == null) {
+				throw new MyException("无查阅权限");
+			}
+
+			Map<Integer, Long> markTypeResult = examCacheService.getMyQuestionList(examId, getCurUser().getId())//
+					.stream()//
+					.filter(myQuestion -> myQuestion.getType() == 2)// 排除章节
+					.map(myQuestion -> examCacheService.getQuestion(myQuestion.getQuestionId()))//
+					.collect(Collectors.groupingBy(Question::getMarkType, Collectors.counting()));
+			Map<String, Object> markTypeStatis = new HashMap<>();
+			baseCacheService.getDictList()//
+					.stream()//
+					.filter(dict -> dict.getDictIndex().equals("PAPER_MARK_TYPE"))//
+					.forEach(dict -> {
+						String key = dict.getDictKey().equals("1") ? "objective" : "subjective";
+						Long value = markTypeResult.get(Integer.parseInt(dict.getDictKey()));
+						markTypeStatis.put(key, value == null ? 0 : value);
+					});
+
+			Map<Integer, Long> typeCountMap = examCacheService.getMyQuestionList(examId, getCurUser().getId())//
+					.stream()//
+					.filter(myQuestion -> myQuestion.getType() == 2)// 排除章节
+					.map(myQuestion -> examCacheService.getQuestion(myQuestion.getQuestionId()))//
+					.collect(Collectors.groupingBy(Question::getType, Collectors.counting()));
+
+			List<Map<String, Object>> typeStatis = baseCacheService.getDictList()//
+					.stream()//
+					.filter(dict -> dict.getDictIndex().equals("QUESTION_TYPE"))//
+					.map(dict -> {//
+						Map<String, Object> data = new HashMap<String, Object>();
+						data.put("type", dict.getDictKey());
+						Long value = typeCountMap.get(Integer.parseInt(dict.getDictKey()));
+						data.put("count", value == null ? 0 : value);
+						return data;
+					})//
+					.collect(Collectors.toList());
+			return PageResultEx.ok()//
+					.addAttr("markTypeStatis", markTypeStatis)//
+					.addAttr("typeStatis", typeStatis);
+		} catch (MyException e) {
+			log.error("获取试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题统计错误：", e);
 			return PageResult.err();
 		}
 	}

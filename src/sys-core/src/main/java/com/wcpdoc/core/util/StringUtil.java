@@ -208,7 +208,8 @@ public class StringUtil {
 	 */
 	public static String join(Object[] strArr, String separator) {
 		if (!ValidateUtil.isValid(strArr)) {
-			throw new MyException("参数错误：strArr");
+//			throw new MyException("参数错误：strArr");// bug：如果只是想直接打印页面参数，这里抛异常，上层需要判断麻烦
+			return "";// 如：log.info("答案：{}", StringUtil.join(answers));
 		}
 
 		StringBuilder sb = new StringBuilder();

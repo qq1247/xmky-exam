@@ -449,21 +449,21 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		examCacheService.getMyExamList(exam.getId()).stream()//
 				.filter(myExam -> myExam.getState() == 2)// 查找考试中的用户（未考试第一次打开试卷会生成考试时间；已交卷不应该在修改）
 				.forEach(myExam -> {
-					Date oldExamEndTime = myExam.getExamEndTime();
+					Date oldExamEndTime = myExam.getAnswerEndTime();
 					if (!ExamUtil.hasTimeLimit(exam)) {// 如果是不限时考试
-						myExam.setExamEndTime(exam.getEndTime());// 用户考试结束时间和考试时间对齐
+						myExam.setAnswerEndTime(exam.getEndTime());// 用户考试结束时间和考试时间对齐
 					} else {// 如果是限时考试
-						myExam.setExamEndTime(DateUtil.getNextMinute(myExam.getExamStartTime(), exam.getLimitMinute()));// 进行时间补偿或裁剪
-						if (myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {// 超出考试结束边界，重置到考试结束边界
-							myExam.setExamEndTime(exam.getEndTime());
+						myExam.setAnswerEndTime(DateUtil.getNextMinute(myExam.getAnswerStartTime(), exam.getLimitMinute()));// 进行时间补偿或裁剪
+						if (myExam.getAnswerEndTime().getTime() > exam.getEndTime().getTime()) {// 超出考试结束边界，重置到考试结束边界
+							myExam.setAnswerEndTime(exam.getEndTime());
 						}
 					}
 					myExamService.updateById(myExam);
 					
 					User examUser = baseCacheService.getUser(myExam.getUserId());
-					log.info("【{}-{}】变更【{}-{}】【{}-{}】考试结束时间，{} -> {}", curUser.getLoginName(), curUser.getName(),
+					log.info("【{}-{}】变更【{}-{}】【{}-{}】答题结束时间，{} -> {}", curUser.getLoginName(), curUser.getName(),
 							exam.getId(), exam.getName(), examUser.getLoginName(), examUser.getName(),
-							DateUtil.formatDateTime(oldExamEndTime), DateUtil.formatDateTime(myExam.getExamEndTime()));
+							DateUtil.formatDateTime(oldExamEndTime), DateUtil.formatDateTime(myExam.getAnswerEndTime()));
 				});
 	}
 

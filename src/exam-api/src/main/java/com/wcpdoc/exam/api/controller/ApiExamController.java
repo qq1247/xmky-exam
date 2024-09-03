@@ -327,7 +327,8 @@ public class ApiExamController extends BaseController {
 					.addAttr("markType", exam.getMarkType())//
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
-					.addAttr("state", exam.getState());
+					.addAttr("state", exam.getState())//
+					.addAttr("userNum", exam.getUserNum());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

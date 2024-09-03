@@ -1,5 +1,6 @@
 <template>
-    <div class="paper" v-loading="loading" :element-loading-text="loadingText" element-loading-background="rgba(122, 122, 122, 0.8)">
+    <div class="paper" v-loading="loading" :element-loading-text="loadingText"
+        element-loading-background="rgba(122, 122, 122, 0.8)">
         <!-- 答题卡 -->
         <div class="paper-left">
             <el-card shadow="never" class="paper-left-top">
@@ -18,7 +19,7 @@
                         <Iconfont icon="icon-shijianxuanzhong" :size="20" color="#F6961E;" :width="30" :height="30"
                             :radius="5" background-color="#FDF3E7" />
                         <span class="paper-left-top-statis-value">
-                            {{ myExam.state === 3 ? timeDiff(myExam.examStartTime, myExam.examEndTime) : '-' }}
+                            {{ myExam.state === 3 ? timeDiff(myExam.answerStartTime, myExam.answerEndTime) : '-' }}
                         </span><!-- 交卷就有 -->
                         <span class="paper-left-top-statis-txt">答题用时</span>
                     </div>
@@ -81,17 +82,11 @@
                             maxlength="128" :autosize="{ minRows: 1 }" resize="none" placeholder="请输入章节描述"
                             :readonly="true" />
                     </div>
-                    <Question 
-                        v-else :no="examQuestion.no" 
-                        :type="examQuestion.questionType || 1"
-                        :markType="examQuestion.markType || 1" 
-                        :title="examQuestion.title || ''"
-                        :score="examQuestion.score || 1" 
-                        :answers="examQuestion.answers"
-                        :userAnswers="examQuestion.userAnswers" 
-                        :userScore="examQuestion.userScore"
-                        :options="examQuestion.options" 
-                        :editable="isAnswer"
+                    <Question v-else :no="examQuestion.no" :type="examQuestion.questionType || 1"
+                        :markType="examQuestion.markType || 1" :title="examQuestion.title || ''"
+                        :score="examQuestion.score || 1" :answers="examQuestion.answers"
+                        :userAnswers="examQuestion.userAnswers" :userScore="examQuestion.userScore"
+                        :options="examQuestion.options" :editable="isAnswer"
                         @change="(answers: string[]) => answerUpdate(examQuestion, answers)" :errShow="scoreShow">
                         <template #bottom-right
                             v-if="myExam.state === 3 || (myExam.state === 1 && myExam.markState === 3)"><!-- 已交卷或（未考试已阅卷） -->
@@ -134,8 +129,8 @@ const exam = reactive({// 考试信息
 const myExamEndTime = ref()// 我的考试结束时间（用reactive必须new Date()，会造成倒计时立即结束）
 const myExam = reactive({// 我的考试信息
     totalScore: 0, //总分
-    examStartTime: new Date(),// 答题开始时间
-    examEndTime: new Date(),// 答题结束时间
+    answerStartTime: new Date(),// 答题开始时间
+    answerEndTime: new Date(),// 答题结束时间
     state: 0, // 考试状态
     markState: 0, // 阅卷状态
     answerState: 0, // 答题状态
@@ -173,22 +168,23 @@ onMounted(async () => {
     })
 
     // 获取我的考试信息
-    let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
-    exam.name = data.examName
-    exam.markState = data.examMarkState
-    exam.scoreState = data.examScoreState
-    exam.rankState = data.examRankState
+    let { data: { data: _exam } } = await http.post("myExam/examGet", { examId: exam.id })
+    exam.name = _exam.name
+    exam.markState = _exam.markState
+    exam.scoreState = _exam.scoreState
+    exam.rankState = _exam.rankState
 
-    myExamEndTime.value = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
+    myExamEndTime.value = dayjs(data.answerEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     myExam.totalScore = data.totalScore
-    myExam.examStartTime = dayjs(data.examStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
-    myExam.examEndTime = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    myExam.answerStartTime = dayjs(data.answerStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    myExam.answerEndTime = dayjs(data.answerEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     myExam.state = data.state
     myExam.markState = data.markState
     myExam.answerState = data.answerState
     myExam.no = data.no
     myExam.userNum = data.userNum
-    
+
 })
 // 组件卸载完成后，执行如下方法
 onUnmounted(() => {
@@ -251,16 +247,17 @@ async function examEnd() {
         callback: async (action: Action) => {
             // 获取我的考试信息（相当于考试结束后刷新页面）
             exam.id = parseInt(route.params.examId as string)
-            let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
-            exam.name = data.examName
-            exam.markState = data.examMarkState
-            exam.scoreState = data.examScoreState
-            exam.rankState = data.examRankState
+            let { data: { data: _exam } } = await http.post("myExam/examGet", { examId: exam.id })
+            exam.name = _exam.name
+            exam.markState = _exam.markState
+            exam.scoreState = _exam.scoreState
+            exam.rankState = _exam.rankState
 
+            let { data: { data } } = await http.post("myExam/get", { examId: exam.id })
             myExamEndTime.value = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
             myExam.totalScore = data.totalScore
-            myExam.examStartTime = dayjs(data.examStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
-            myExam.examEndTime = dayjs(data.examEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+            myExam.answerStartTime = dayjs(data.answerStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+            myExam.answerEndTime = dayjs(data.answerEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
             myExam.state = data.state
             myExam.markState = data.markState
             myExam.answerState = data.answerState

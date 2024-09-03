@@ -130,7 +130,7 @@ public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements Exam
 		if (log.isDebugEnabled()) {
 			log.debug("缓存待阅卷列表：{}", unMarkList.stream()//
 					.map(myExam -> String.format("{examId: %s, userId: %s, examEndTime: %s}", myExam.getExamId(),
-							myExam.getUserId(), DateUtil.formatDateTime(myExam.getExamEndTime())))
+							myExam.getUserId(), DateUtil.formatDateTime(myExam.getAnswerEndTime())))
 					.collect(Collectors.toList()));
 		}
 		return unMarkList;

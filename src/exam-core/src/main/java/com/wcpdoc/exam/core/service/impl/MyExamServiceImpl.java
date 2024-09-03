@@ -69,7 +69,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		// 试卷处理
 		Exam exam = examCacheService.getExam(examId);
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
-		if (!ValidateUtil.isValid(myExam.getExamStartTime())
+		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())
 				&& exam.getEndTime().getTime() > System.currentTimeMillis()) {
 			SpringUtil.getBean(MyExamService.class).paperHandle(examId, userId);// 接口调用缓存注解才生效
 		}
@@ -99,14 +99,14 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		 */
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
 		Exam exam = examCacheService.getExam(examId);
-		myExam.setExamStartTime(new Date());
+		myExam.setAnswerStartTime(new Date());
 		if (ExamUtil.hasTimeLimit(exam)) {
-			myExam.setExamEndTime(DateUtil.getNextMinute(myExam.getExamStartTime(), exam.getLimitMinute()));
-			if (myExam.getExamEndTime().getTime() > exam.getEndTime().getTime()) {
-				myExam.setExamEndTime(exam.getEndTime());
+			myExam.setAnswerEndTime(DateUtil.getNextMinute(myExam.getAnswerStartTime(), exam.getLimitMinute()));
+			if (myExam.getAnswerEndTime().getTime() > exam.getEndTime().getTime()) {
+				myExam.setAnswerEndTime(exam.getEndTime());
 			}
 		} else {
-			myExam.setExamEndTime(exam.getEndTime());
+			myExam.setAnswerEndTime(exam.getEndTime());
 		}
 		myExam.setState(2);
 		updateById(myExam);
@@ -142,10 +142,19 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		// 数据校验
 		finishValid(examId, userId);
 
-		// 交卷
+		/**
+		 * 交卷
+		 * 
+		 * 正常在页面自动交卷，会有网络延时，更新交卷时间时，如果它超出正常范围时修正一下，保证计算答题分钟等结果正常。 <br/>
+		 * 如：限时2分钟考试，2024-09-03 至 13:00:11 2024-09-03 13:02:12，页面计算答题时长为2分1秒 <br/>
+		 * 交卷时间需修正为2024-09-03 13:02:12
+		 */
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
-		myExam.setExamEndTime(new Date());
-		updateById(myExam);
+		Date curTime = new Date();
+		if (myExam.getAnswerEndTime().getTime() > curTime.getTime()) {//
+			myExam.setAnswerEndTime(curTime);
+			updateById(myExam);
+		}
 
 		User user = baseCacheService.getUser(myExam.getUserId());
 		Exam exam = examCacheService.getExam(examId);
@@ -240,10 +249,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
 		long curTime = System.currentTimeMillis();
-		if (myExam.getExamStartTime().getTime() > curTime) {
+		if (myExam.getAnswerStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (myExam.getExamEndTime().getTime() < curTime) {
+		if (myExam.getAnswerEndTime().getTime() < curTime) {
 			throw new MyException("考试已结束");
 		}
 		if (myExam.getState() == 3) {
@@ -277,7 +286,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			throw new MyException("考试已暂停");
 		}
 		long curTime = System.currentTimeMillis();
-		if (myExam.getExamStartTime().getTime() > curTime) {
+		if (myExam.getAnswerStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
 //		if (myExam.getExamEndTime().getTime() < curTime + 1) {// 预留1秒网络延时
