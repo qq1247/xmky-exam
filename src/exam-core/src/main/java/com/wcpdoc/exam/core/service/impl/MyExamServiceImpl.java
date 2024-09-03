@@ -151,7 +151,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		 */
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
 		Date curTime = new Date();
-		if (myExam.getAnswerEndTime().getTime() > curTime.getTime()) {//
+		if (myExam.getAnswerEndTime().getTime() > curTime.getTime()) {
 			myExam.setAnswerEndTime(curTime);
 			updateById(myExam);
 		}
