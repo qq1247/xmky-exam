@@ -69,9 +69,9 @@
                         </el-table-column>
                         <el-table-column prop="" label="答题用时" align="center">
                             <template #default="scope">
-                                {{ scope.row.myExamEndTime &&  scope.row.myExamStartTime
-                                    ? Math.ceil((dayjs(scope.row.myExamEndTime, 'YYYY-MM-DD HH:mm:ss').toDate().getTime() 
-                                        - dayjs(scope.row.myExamStartTime, 'YYYY-MM-DD HH:mm:ss').toDate().getTime()) / (60 * 1000)) + '分钟'
+                                {{ scope.row.myExamAnswerEndTime &&  scope.row.myExamAnswerStartTime
+                                    ? Math.ceil((dayjs(scope.row.myExamAnswerEndTime, 'YYYY-MM-DD HH:mm:ss').toDate().getTime() 
+                                        - dayjs(scope.row.myExamAnswerStartTime, 'YYYY-MM-DD HH:mm:ss').toDate().getTime()) / (60 * 1000)) + '分钟'
                                     : '-'}}
                             </template>
                         </el-table-column>
@@ -122,7 +122,7 @@
 </template>
   
 <script lang="ts" setup>
-import * as echarts from 'echarts/core';
+import * as echarts from 'echarts';
 import { computed, onMounted, reactive, ref } from 'vue';
 import http from '@/request';
 import { useRoute } from 'vue-router'

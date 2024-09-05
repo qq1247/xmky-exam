@@ -83,7 +83,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_KEY_PRE
 					+ "#examId + ':' + #userId"),
 			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_LIST_KEY_PRE + "#examId"),
-			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_UNMARK_LIST_KEY), })
+			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_UNMARK_LIST_KEY), })//字段变更就清除缓存，保持和数据库一致
 	public void paperHandle(Integer examId, Integer userId) {
 		/**
 		 * 考试用户如果是第一次打开试卷，并且考试没结束，生成他自己的考试时间，并标记为考试中<br/>
