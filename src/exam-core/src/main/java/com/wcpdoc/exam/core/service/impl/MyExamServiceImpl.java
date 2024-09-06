@@ -147,7 +147,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		 * 
 		 * 正常在页面自动交卷，会有网络延时，更新交卷时间时，如果它超出正常范围时修正一下，保证计算答题分钟等结果正常。 <br/>
 		 * 如：限时2分钟考试，2024-09-03 至 13:00:11 2024-09-03 13:02:12，页面计算答题时长为2分1秒 <br/>
-		 * 交卷时间需修正为2024-09-03 13:02:12
+		 * 交卷时间需修正为2024-09-03 13:02:11
 		 */
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
 		Date curTime = new Date();

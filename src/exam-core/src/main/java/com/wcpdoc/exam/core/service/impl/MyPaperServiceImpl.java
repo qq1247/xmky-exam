@@ -33,6 +33,7 @@ import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.ex.ChapterPart;
 import com.wcpdoc.exam.core.entity.ex.PaperPart;
 import com.wcpdoc.exam.core.entity.ex.QuestionPart;
+import com.wcpdoc.exam.core.exception.BatchMarkException;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
@@ -72,7 +73,6 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 
 	@Override
 	public List<PaperPart> generatePaper(Integer examId, Integer userId, Boolean scoreShow, Boolean answerShow) {
-		long curTime = System.currentTimeMillis();
 		List<PaperPart> paper = new ArrayList<>();
 		List<MyQuestion> myQuestionList = examCacheService.getMyQuestionList(examId, userId);
 		Exam exam = examCacheService.getExam(examId);
@@ -168,8 +168,6 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 				paper.add(questionPart);
 			}
 		}
-		long total = System.currentTimeMillis() - curTime;
-		log.info("生成试卷【{}-{}】耗时：{}毫秒", examId, userId, total);
 		return paper;
 	}
 
@@ -263,7 +261,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 		List<MyExam> markingList = myExamList.stream().filter(myExam -> myExam.getState() == 2)
 				.collect(Collectors.toList());
 		if (ValidateUtil.isValid(markingList)) {
-			throw new MyException(String.format("批量阅卷剩余%s张", markingList.size()));
+			throw new BatchMarkException(String.format("批量阅卷剩余%s张", markingList.size()));
 		}
 
 		return myExamList;

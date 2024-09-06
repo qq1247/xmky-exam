@@ -13,13 +13,17 @@ import javax.annotation.Resource;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.stereotype.Component;
 
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.exception.BatchMarkException;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.MyPaperService;
 
@@ -46,7 +50,6 @@ public class ExamCoreRunner implements ApplicationRunner {
 
 	@Override // SpringApplication.callRunners方法会顺序执行ApplicationRunner实现，while(true)不返回导致其他任务不执行
 	public void run(ApplicationArguments args) throws Exception {
-
 		// 查找待阅试卷，自动批阅
 		new Thread(() -> {
 			while (true) {
@@ -109,7 +112,13 @@ public class ExamCoreRunner implements ApplicationRunner {
 									} catch (MyException e) {
 										log.error(String.format("自动结束【%s-%s】的考试错误：%s", exam.getId(), exam.getName(),
 												e.getMessage()));
-									} catch (Exception e) {
+									} catch (BatchMarkException e) {
+										log.error(String.format("自动结束【%s-%s】的考试错误：%s，尝试清除缓存后在试", exam.getId(),
+												exam.getName(), e.getMessage()));
+										SpringUtil.getBean(EhCacheCacheManager.class)
+												.getCache(ExamConstant.MYEXAM_CACHE)
+												.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));
+									} catch (Exception e) {// bug：如果有人进入考试后退出，不交卷不触发刷新缓存，导致一直存在未阅卷而不能结束考试。
 										log.error(String.format("自动结束【%s-%s】的考试错误：", exam.getId(), exam.getName()), e);
 									}
 									return null;
@@ -173,6 +182,25 @@ public class ExamCoreRunner implements ApplicationRunner {
 					} catch (InterruptedException e1) {
 					}
 				}
+			}
+		}).start();
+
+		/**
+		 * 每隔5分钟，刷新未阅卷列表。<br/>
+		 * bug：在限时考试中，用户进入考试后退出，未点击交卷，导致不刷新未阅卷列表，该用户考试结束时间到，但未阅卷。<br/>
+		 * 如：考试时间为2024-09-06 00:00:00-2024-09-06 23:59:59，限时60分钟。<br/>
+		 * 用户A在08:36进入考试，应该最迟在09:36交卷并自动阅卷。<br/>
+		 * 因为没有在页面点击交卷按钮，需要等到2024-09-06 23:59:59才有结果<br/>
+		 */
+		new Thread(() -> {
+			while (true) {
+				try {
+					TimeUnit.MINUTES.sleep(5);
+				} catch (InterruptedException e) {
+				}
+				log.debug("自动清除未阅卷列表缓存");
+				SpringUtil.getBean(EhCacheCacheManager.class).getCache(ExamConstant.MYEXAM_CACHE)
+						.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));
 			}
 		}).start();
 	}
