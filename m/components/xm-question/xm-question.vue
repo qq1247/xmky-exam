@@ -1,262 +1,539 @@
 <template>
-    <view class="question">
+	<view class="question">
 		<!-- 题干（如果是填空题，直接在题干答题） -->
 		<view class="question-title">
-			<text>{{no}}、</text>
+			<slot name="title-pre"></slot>
 			<template v-for="(title, index) in titles as Title[]" :key="index">
-				<text v-if="title.type === 'txt'" :decode="true">{{ title.value.replaceAll('<br/>', '\n') }}</text>
-				<uni-easyinput 
-					v-else
-					:modelValue="!answersShow ? userAnswers[title.index] : answers[title.index]"
-					@update:modelValue="(value: string) => userAnswers[title.index] = value"
-					@input="() => { $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }" 
-					:clearable="false"
-					:disabled="!editable"
-					:style="{ width: title.value.length * 36 + 'rpx' }"
-					></uni-easyinput>
+				<text v-if="title.type === 'txt'" class="question-title__text">{{ title.value }}</text>
+				<view v-else class="question-title__fill-blank">
+					<input
+						:modelValue="userAnswers[title.index]"
+						@update:modelValue="(value: string) => userAnswers[title.index] = value"
+						@input="
+							() => {
+								$emit('update:modelValue', userAnswers);
+								$emit('change', userAnswers);
+							}
+						"
+						:disabled="!editable"
+						:style="{ width: (title.value.length > 20 ? 20 : title.value.length) * 26 + 50 + 'rpx' }"
+					/>
+					<text :class="['question-title__score', { 'question-title__score--err': userScore !== score }, { 'question-title__score--succ': userScore === score }]"></text>
+				</view>
 			</template>
-			<text>（{{ score }}分）</text>
-			<uni-icons 
-				v-if="errMark" 
-				custom-prefix="iconfont" :type="score === userScore ? 'icon-duigoux' : userScore === 0 ? 'icon-cuo' : 'icon-bandui'"
-				:style="`color: ${score === userScore ? '#18bc37' : '#e43d33'}`"
-				></uni-icons>
-			<text v-if="errMark" :style="`color: ${score === userScore ? '#18bc37' : '#e43d33'}`">{{ userScore }}分</text>
+			<slot name="title-post"></slot>
 		</view>
 		<!-- 单选题选项 -->
-		<radio-group v-if="type === 1" @change="(e: any) => { userAnswers[0] = e.detail.value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }">
-			<label v-for="(option, index) in options" :key="index" :class="['question-option', { 'is-checked': isChecked(optionLabs(index)) }, { 'is-succ': isSucc(optionLabs(index)) }, { 'is-err': isErr(optionLabs(index)) }]">
-				<radio :value="optionLabs(index)" :checked="isChecked(optionLabs(index))" :disabled="!editable"/>
-				<view class="question-option-radio">
-					<view class="question-option-radio-inner"></view>
+		<radio-group
+			v-if="type === 1"
+			@change="(e: any) => { userAnswers[0] = e.detail.value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }"
+			class="question-option__radio-wrap"
+		>
+			<label
+				v-for="(option, index) in options"
+				:key="index"
+				:class="['question-option', { 'is-checked': isChecked(optionLabs(index)) }, { 'is-succ': isSucc(optionLabs(index)) }, { 'is-err': isErr(optionLabs(index)) }]"
+			>
+				<radio :value="optionLabs(index)" :checked="isChecked(optionLabs(index))" :disabled="!editable" class="question-option__radio-hover" />
+				<view class="question-option__radio">
+					<view class="question-option__radio-inner"></view>
 				</view>
-				<text class="question-option-content">{{ optionLabs(index) }}、{{ option }}</text>
+				<text class="question-option__content">{{ optionLabs(index) }}、{{ option }}</text>
 			</label>
 		</radio-group>
 		<!-- 多选题选项 -->
-		<checkbox-group v-if="type === 2" @change="(e: any) => { userAnswers = e.detail.value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }">
-			<label v-for="(option, index) in options" :key="index" :class="['question-option', { 'is-checked': isChecked(optionLabs(index)) }, { 'is-succ': isSucc(optionLabs(index)) }, { 'is-err': isErr(optionLabs(index)) }]">
-				<checkbox :value="optionLabs(index)" :checked="isChecked(optionLabs(index))" :disabled="!editable"/>
-				<view class="question-option-checkbox">
-					<view class="question-option-checkbox-inner"></view>
+		<checkbox-group
+			v-if="type === 2"
+			@change="(e: any) => { userAnswers = e.detail.value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }"
+			class="question-option__checkbox-wrap"
+		>
+			<label
+				v-for="(option, index) in options"
+				:key="index"
+				:class="['question-option', { 'is-checked': isChecked(optionLabs(index)) }, { 'is-succ': isSucc(optionLabs(index)) }, { 'is-err': isErr(optionLabs(index)) }]"
+			>
+				<checkbox :value="optionLabs(index)" :checked="isChecked(optionLabs(index))" :disabled="!editable" class="question-option__checkbox-hover" />
+				<view class="question-option__checkbox">
+					<view class="question-option__checkbox-inner"></view>
 				</view>
-				<text class="question-option-content">{{ optionLabs(index) }}、{{ option }}</text>
+				<text class="question-option__content">{{ optionLabs(index) }}、{{ option }}</text>
 			</label>
 		</checkbox-group>
 		<!-- 填空题（题干处填空） -->
 		<!-- 判断题选项 -->
-		<radio-group v-if="type === 4" @change="(e: any) => { userAnswers[0] = e.detail.value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }">
-			<label v-for="(option, index) in judges" :key="index" :class="['question-option', { 'is-checked': isChecked(optionLabs(index)) }, { 'is-succ': isSucc(optionLabs(index)) }, { 'is-err': isErr(optionLabs(index)) }]">
-				<radio :value="option" :checked="isChecked(optionLabs(index))" :disabled="!editable"/>
-				<view class="question-option-radio">
-					<view class="question-option-radio-inner"></view>
+		<radio-group
+			v-if="type === 4"
+			@change="(e: any) => { userAnswers[0] = e.detail.value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }"
+			class="question-option__radio-wrap"
+		>
+			<label
+				v-for="(option, index) in judges"
+				:key="index"
+				:class="['question-option', { 'is-checked': isChecked(optionLabs(index)) }, { 'is-succ': isSucc(optionLabs(index)) }, { 'is-err': isErr(optionLabs(index)) }]"
+			>
+				<radio :value="option" :checked="isChecked(optionLabs(index))" :disabled="!editable" class="question-option__radio-hover" />
+				<view class="question-option__radio">
+					<view class="question-option__radio-inner"></view>
 				</view>
-				<text class="question-option-content">{{ option }}</text>
+				<text class="question-option__content">{{ option }}</text>
 			</label>
 		</radio-group>
 		<!-- 问答题答案 -->
-		<uni-easyinput
+		<textarea
 			v-if="type === 5"
-			:modelValue="!answersShow ? userAnswers[0] : answers[0]"
-			@update:modelValue="(value: string) => {userAnswers[0] = value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }">
+			:modelValue="escape2Html(userAnswers[0])"
+			@update:modelValue="(value: string) => {userAnswers[0] = value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }"
 			@input="() => $emit('update:modelValue', userAnswers)"
-			type="textarea" 
-			autoHeight
+			type="textarea"
 			placeholder="请输入答案"
+			:inputBorder="false"
 			:disabled="!editable"
-			></uni-easyinput>
-    </view>
+			:styles="{
+				backgroundColor: '#F6F7FC'
+			}"
+			maxlength="999"
+			class="question-user-answer"
+		></textarea>
+		<!-- 分数 -->
+		<view v-if="resultShow" class="question-score">
+			<view>
+				<uni-icons customPrefix="iconfont" type="icon-defen" color="#0d9df6" size="34rpx"></uni-icons>
+				<text class="question-score__label">得分:</text>
+			</view>
+			<view>
+				<text :class="['question-score__user', { 'question-score__user--err': userScore === 0 }, { 'question-score__user--succ': userScore === score }]">
+					{{ userScore }}分
+				</text>
+				<text class="question-score__standard">/{{ score }}分</text>
+			</view>
+		</view>
+		<!-- 答案 -->
+		<view v-if="resultShow && (type === 1 || type === 2 || type === 4)" class="question-select-answer">
+			<view class="question-select-answer__diff">
+				<text class="question-select-answer__label">作答答案</text>
+				<text
+					:class="[
+						'question-select-answer__value',
+						{ 'question-select-answer__value--err': userScore === 0 },
+						{ 'question-select-answer__value--succ': userScore === score }
+					]"
+				>
+					{{ userAnswers.join('') || '-' }}
+				</text>
+			</view>
+			<view class="question-select-answer__diff">
+				<text class="question-select-answer__label">标准答案</text>
+				<text class="question-select-answer__value question-select-answer__value--succ">{{ answers.join('') }}</text>
+			</view>
+		</view>
+		<view v-else-if="resultShow && type === 3" class="question-fill-blank-answer">
+			<text class="question-fill-blank-answer__label">标准答案</text>
+			<view class="question-title">
+				<template v-for="(title, index) in titles as Title[]" :key="index">
+					<text v-if="title.type === 'txt'" class="question-title__text">{{ title.value }}</text>
+					<view v-else class="question-title__fill-blank">
+						<input :modelValue="answers[title.index]" :disabled="!editable" :style="{ width: (title.value.length > 20 ? 20 : title.value.length) * 26 + 50 + 'rpx' }" />
+						<text class="question-title__score"></text>
+					</view>
+				</template>
+			</view>
+		</view>
+		<view v-else-if="resultShow && type === 5" class="question-qa-answer">
+			<text class="question-qa-answer__label">标准答案</text>
+			<view>
+				<text class="question-qa-answer__content">{{ answers[0] }}</text>
+			</view>
+		</view>
+		<!-- 解析 -->
+		<view v-if="resultShow && analysis" class="question-analysis">
+			<view class="question-analysis__title-wrap">
+				<view class="question-analysis__title-icon"></view>
+				<view class="question-analysis__title-icon1"></view>
+				<text class="question-analysis__title">解析</text>
+			</view>
+			<!-- <text class="question-analysis__content">{{ analysis || '无' }}</text> -->
+			<text class="question-analysis__content">
+				各民族在政治、经济、文化艺术、语言文字、 风俗习惯、心理素质等方面的特点。在长期的 历史发展中形成，并随着社会的发展，自然环 各民族在政治、经济、文化艺术、语言文字、
+				风俗习惯、心理素质等方面的特点。在长期的 历史发展中形成，并随着社会的发展，自然环 各民族在政治、经济、文化艺术、语言文字、 风俗习惯、心理素质等方面的特点。在长期的
+				历史发展中形成，并随着社会的发展，自然环 各民族在政治、经济、文化艺术、语言文字、 风俗习惯、心理素质等方面的特点。在长期的 历史发展中形成，并随着社会的发展，自然环
+			</text>
+		</view>
+	</view>
 </template>
-  
+
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
-import { onLoad } from "@dcloudio/uni-app"
-import { Title } from "@/ts";
-	// 定义变量
-	const emit = defineEmits<{
-		'update:modelValue': string[]
-		'change': string[]
-	}>()
-	
-	const props = withDefaults(defineProps<{
-	    modelValue?: string[] //用户答案
-	    no?: string | number // 题号
-	    editable?: boolean // 可编辑（true：是；false：否）
-	    type: number // 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）
-	    markType: number // 阅卷类型
-	    title: string // 题干
-	    score: number // 分数
-	    answers?: string[] // 标准答案
-	    userScore?: number //用户分数
-	    options?: string[] // 试题选项
-	    answersShow?: boolean // 标准答案显示（true：用户答案显示；false：标准答案显示）
-	    errMark?: boolean // 错题标记（true：标记；false：不标记）
-	}>(), {
-	    editable: false,
+import { computed, ref, watch } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
+import { Title } from '@/ts/question.d';
+
+/************************变量定义相关***********************/
+const emit = defineEmits<{
+	'update:modelValue': string[];
+	change: string[];
+}>();
+
+const props = withDefaults(
+	defineProps<{
+		modelValue?: string[]; //用户答案
+		title: string; // 题干
+		options?: string[]; // 试题选项
+		type: number; // 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）
+		markType: number; // 阅卷方式（1：客观题；2：主观题；
+		answers?: string[]; // 标准答案
+		score: number; // 分数
+		userScore?: number; //用户分数
+		analysis?: string; // 解析
+		editable?: boolean; // 可编辑（true：是；false：否）
+		answersShow?: boolean; // 标准答案显示（true：用户答案显示；false：标准答案显示）
+		resultShow?: boolean; // 成绩显示（true：显示；false：不显示）
+	}>(),
+	{
 		modelValue: () => [],
-	    answers: () => [],
-	    options: () => [],
-	    answersShow: false,
-		errMark: false,
-	})
-	
-	const judges = ['对', '错']// 判断题使用
-	const userAnswers = ref(props.modelValue) // 用户答案
-	
-	// 页面加载完毕，执行如下方法
-	onLoad(async() => {
-		if (props.type === 3 && !userAnswers.value.length) {// 初始化填空题答案
-			userAnswers.value = props.title.match(/[_]{5,}/g).map(() => '')
-		}
-		if (props.type === 5 && !userAnswers.value.length) {// 初始化问答题答案
-			userAnswers.value = ['']
-		}
-	})
-	
-	// 计算属性
-	const titles = computed(() => {
-	    // 如果不是填空题，正常返回
-	    if (props.type !== 3) {
-	        return [{
-	            type: 'txt',
-	            value: props.title,
-	            index: -1,
-	        },]
-	    }
-	
-	    // 如果是填空题，下划线转输入框，用于在题干填空
-	    let title = props.title// '______AAAAA_____BBBBB____________CCCCC__DDDDD______'
-	    let titles = [] as Title[]
-	    let pos = 0
-	    title.match(/[_]{5,}/g)?.forEach((value) => {// 大于连续的5个下划线算一个填空
-	        let index = title.indexOf(value)
-	        if (index > 0) {
-	            titles.push({// 添加文本
-	                type: 'txt',
-	                value: title.substring(0, index),
-	                index: -1,
-	            })
-	        }
-	        titles.push({// 添加输入框
-	            type: 'input',
-	            value,
-	            index: pos++, // 用于找对应答案的位置
-	        })
-	        title = title.substring(index + value.length) // 解析过的部分题干删除,下次循环从剩余题干中找
-	    })
-	    if (title) {// 最后一节拼接
-	        titles.push({
-	            type: 'txt',
-	            value: title,
-	            index: -1,
-	        })
-	    }
-	    return titles
-	})
-	
-	// 监听属性
-	watch(() => props.modelValue, () => {
-		userAnswers.value = props.modelValue
-	})
-	
-	// 是否选中
-	function isChecked(curAnswer: string) {
-		if (!(props.type === 1 || props.type === 2 || props.type === 4)) {
-			return false
-		}
-		return !props.answersShow ? userAnswers.value.includes(curAnswer) : props.answers.includes(curAnswer)
+		title: '',
+		type: 1,
+		markType: 1,
+		score: 0,
+		answers: () => [],
+		options: () => [],
+		editable: false,
+		answersShow: false,
+		resultShow: false
 	}
-	
-	// 是否答对
-	function isSucc(curAnswer: string) {
-		if (!props.errMark) {
-		        return false
-		    }
-		
-		if (!(props.type === 1 || props.type === 2 || props.type === 4)) {// 不是单多选判断
-			return false
-		}
-		
-		if (!props.answers.includes(curAnswer) ) {
-			return false
-		}
-		
-		return true
+);
+
+const judges = ['对', '错']; // 判断题使用
+const userAnswers = ref(props.modelValue); // 用户答案
+
+/************************组件生命周期相关*********************/
+onLoad(async () => {
+	if (props.type === 3 && !userAnswers.value.length) {
+		userAnswers.value = props.title.match(/[_]{5,}/g).map(() => ''); // 初始化填空题答案
 	}
-	
-	// 是否答错
-	function isErr(curAnswer: string) {
-		if (!props.errMark) {
-		        return false
-		    }
-		
-		if (!(props.type === 1 || props.type === 2 || props.type === 4)) {// 不是单多选判断
-			return false
-		}
-		if (userAnswers.value.includes(curAnswer) && !props.answers.includes(curAnswer)) {
-			return true
-		}
-		return false
+	if (props.type === 5 && !userAnswers.value.length) {
+		userAnswers.value = ['']; // 初始化问答题答案
 	}
-	
-	// 获取选项标签
-	function optionLabs(index: number) {
-		if (props.type === 1 || props.type === 2) {
-			return String.fromCharCode(65 + index)
-		}
-		if (props.type === 4) {
-			return judges[index]
-		}
+});
+
+/************************计算属性相关*****************************/
+const titles = computed(() => {
+	// 如果不是填空题，正常返回
+	if (props.type !== 3) {
+		return [{ type: 'txt', value: props.title, index: -1 }];
 	}
+
+	// 如果是填空题，下划线转输入框，用于在题干填空
+	let title = props.title; // '______AAAAA_____BBBBB____________CCCCC__DDDDD______'
+	let titles: Title[] = [];
+	let pos = 0;
+	title.match(/[_]{5,}/g)?.forEach((value) => {
+		// 大于连续的5个下划线算一个填空
+		let index = title.indexOf(value);
+		if (index > 0) {
+			titles.push({ type: 'txt', value: title.substring(0, index), index: -1 }); // 添加文本
+		}
+		titles.push({ type: 'input', value, index: pos++ }); //添加输入框；pos用于找对应答案的位置
+		title = title.substring(index + value.length); // 解析过的部分题干删除,下次循环从剩余题干中找
+	});
+	if (title) {
+		titles.push({ type: 'txt', value: title, index: -1 }); // 最后一节拼接
+	}
+	return titles;
+});
+
+const isChecked = computed(() => (curAnswer: string) => {
+	if (!(props.type === 1 || props.type === 2 || props.type === 4)) {
+		return false;
+	}
+	return !props.answersShow ? userAnswers.value.includes(curAnswer) : props.answers.includes(curAnswer);
+}); // 指定选项是否选中
+
+const isSucc = computed(() => (curAnswer: string) => {
+	if (!props.resultShow) {
+		return false;
+	}
+
+	if (!(props.type === 1 || props.type === 2 || props.type === 4)) {
+		return false; // 不是单多选判断
+	}
+
+	if (!props.answers.includes(curAnswer)) {
+		return false;
+	}
+
+	return true;
+}); // 指定选项是否答对
+
+const isErr = computed(() => (curAnswer: string) => {
+	if (!props.resultShow) {
+		return false;
+	}
+
+	if (!(props.type === 1 || props.type === 2 || props.type === 4)) {
+		return false; // 不是单多选判断
+	}
+	if (userAnswers.value.includes(curAnswer) && !props.answers.includes(curAnswer)) {
+		return true;
+	}
+	return false;
+}); // 指定选项是否答错
+
+const optionLabs = computed(() => (index: number) => {
+	if (props.type === 1 || props.type === 2) {
+		return String.fromCharCode(65 + index);
+	}
+	if (props.type === 4) {
+		return judges[index];
+	}
+}); // 获取选项标签
+
+/************************监听相关*****************************/
+watch(
+	() => props.modelValue,
+	() => {
+		userAnswers.value = props.modelValue;
+	}
+);
+
+/************************事件相关*****************************/
+// 特殊字符转义
+function escape2Html(txt: string | string[]) {
+	if (typeof txt === 'string') {
+		return txt
+			.replaceAll('&lt;', '<')
+			.replaceAll('&gt;', '>')
+			.replaceAll('&amp;', '&')
+			.replaceAll('&quot;', '"')
+			.replaceAll('&apos;', "'")
+			.replaceAll('&ldquo;', '“')
+			.replaceAll('&rdquo;', '”');
+	}
+
+	if (Array.isArray(txt)) {
+		return (txt as string[]).map((t: string) => {
+			return t
+				.replaceAll('&lt;', '<')
+				.replaceAll('&gt;', '>')
+				.replaceAll('&amp;', '&')
+				.replaceAll('&quot;', '"')
+				.replaceAll('&apos;', "'")
+				.replaceAll('&ldquo;', '“')
+				.replaceAll('&rdquo;', '”');
+		});
+	}
+
+	return '';
+}
 </script>
 
 <style lang="scss" scoped>
 .question {
-	.uni-easyinput {
-		display: inline-block;
-		border-radius: 0rpx;
-		
-		:deep(.uni-easyinput__content) {
-			border-color: $uni-primary !important;
-			border-top: 0rpx;
-			border-right: 0rpx;
-			border-left: 0rpx;
-			border-radius: 0px;
-			.uni-easyinput__content-input {
-				
+	.question-title {
+		margin-bottom: 20rpx;
+		.question-title__text {
+			display: inline;
+			font-size: 34rpx;
+			color: #303133;
+			line-height: 60rpx;
+		}
+		:deep(.question-title__fill-blank) {
+			display: inline-block;
+			padding-right: 50rpx;
+			border-bottom: 1px solid black;
+			position: relative;
+			vertical-align: bottom;
+
+			.uni-input-input {
+				text-align: center;
+			}
+			.question-title__score {
+				position: absolute;
+				//left: 50%;
+				//dtransform: translateX(-50%);
+				right: -10rpx;
+				bottom: -5rpx;
+				font-size: 24rpx;
+				color: #0d9df6;
+			}
+			.question-title__score--succ {
+				color: #18bc38;
+			}
+			.question-title__score--err {
+				color: #e43d33;
 			}
 		}
 	}
-	.question-title {
-		font-size: 30rpx;
-		font-weight: bold;
-		margin-bottom: 20rpx;
+	:deep(.question-user-answer) {
+		background-color: #f6f7fc;
+		width: 100%;
+		padding: 20rpx;
+		min-height: 600rpx;
+		line-height: 50rpx;
+		.uni-textarea-wrap {
+			min-height: 600rpx;
+		}
 	}
-	uni-radio-group, uni-checkbox-group {
+	.question-score {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 20rpx;
+		padding: 0rpx 20rpx;
+		height: 96rpx;
+		background: #f6f7fc;
+		border-radius: 10rpx 10rpx 10rpx 10rpx;
+		.question-score__label {
+			margin-left: 5rpx;
+			font-weight: bold;
+			font-size: 34rpx;
+			color: #303133;
+		}
+		.question-score__user {
+			font-weight: bold;
+			font-size: 34rpx;
+			color: #0d9df6;
+		}
+		.question-score__user--succ {
+			color: #18bc38;
+		}
+		.question-score__user--err {
+			color: #e43d33;
+		}
+		.question-score__standard {
+			font-weight: bold;
+			font-size: 34rpx;
+			color: #999999;
+		}
+	}
+	.question-select-answer {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 20rpx;
+		padding: 20rpx 0rpx 10rpx 0rpx;
+		background: #f6f7fc;
+		border-radius: 10rpx;
+		.question-select-answer__diff {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			.question-select-answer__label {
+				font-weight: bold;
+				font-size: 30rpx;
+				color: #999999;
+			}
+			.question-select-answer__value {
+				margin-top: 10rpx;
+				font-weight: bold;
+				font-size: 30rpx;
+				color: #0d9df6;
+			}
+			.question-select-answer__value--succ {
+				color: #18bc38;
+			}
+			.question-select-answer__value--err {
+				color: #e43d33;
+			}
+		}
+	}
+	.question-fill-blank-answer {
+		margin-top: 20rpx;
+		padding: 20rpx;
+		background: #f6f7fc;
+		border-radius: 10rpx;
+		.question-fill-blank-answer__label {
+			display: inline-block;
+			margin-bottom: 20rpx;
+			font-weight: bold;
+			font-size: 30rpx;
+			color: #999999;
+		}
+	}
+	.question-qa-answer {
+		margin-top: 20rpx;
+		padding: 20rpx;
+		background: #f6f7fc;
+		border-radius: 10rpx;
+		.question-qa-answer__label {
+			margin-top: 20rpx;
+			font-weight: bold;
+			font-size: 30rpx;
+			color: #999999;
+		}
+		.question-qa-answer__content {
+			display: inline-block;
+			margin-top: 20rpx;
+			line-height: 60rpx;
+		}
+	}
+	.question-analysis {
+		margin-top: 20rpx;
+		.question-analysis__title-wrap {
+			position: relative;
+			.question-analysis__title-icon {
+				position: absolute;
+				left: 0rpx;
+				top: 10rpx;
+				width: 20rpx;
+				height: 20rpx;
+				border-radius: 50%;
+				background: #2979ff;
+			}
+			.question-analysis__title-icon1 {
+				position: absolute;
+				left: 12rpx;
+				top: 10rpx;
+				width: 20rpx;
+				height: 20rpx;
+				border-radius: 50%;
+				background: #2979ff;
+				opacity: 0.6;
+			}
+			.question-analysis__title {
+				margin-left: 50rpx;
+				font-weight: bold;
+				font-size: 36rpx;
+				color: #303133;
+			}
+		}
+
+		.question-analysis__content {
+			display: inline-block;
+			margin-top: 20rpx;
+			line-height: 60rpx;
+			font-size: 34rpx;
+			color: #303133;
+		}
+	}
+	.question-option__radio-wrap,
+	.question-option__checkbox-wrap {
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
 		flex-direction: column;
 		position: relative;
-		margin: 10rpx 50rpx 20rpx 0rpx;
+		margin: 10rpx 0rpx 20rpx 0rpx;
 		.question-option {
 			/* #ifndef APP-NVUE */
 			display: flex;
 			/* #endif */
 			flex-direction: row;
-			align-items: flex-start;
+			align-items: center;
+
 			position: relative;
-			margin: 5px 0;
-			margin-right: 25px;
-			uni-radio {// 隐藏默认单选按钮
+			margin: 0rpx 0rpx 25rpx 0rpx;
+			padding: 20rpx 0rpx 20rpx 20rpx;
+			.question-option__radio-hover {
+				// 隐藏默认单选按钮
 				position: absolute;
 				opacity: 0;
 			}
-			uni-checkbox {
+			.question-option__checkbox-hover {
 				position: absolute;
 				opacity: 0;
 			}
-			.question-option-radio {// 重新实现单选按钮
+			.question-option__radio {
+				// 重新实现单选按钮
 				/* #ifndef APP-NVUE */
 				display: flex;
 				flex-shrink: 0;
@@ -267,24 +544,24 @@ import { Title } from "@/ts";
 				position: relative;
 				width: 40rpx;
 				height: 40rpx;
-				border: 2rpx solid $uni-border-3;
+				border: 2rpx solid #0292f8;
 				border-radius: 30rpx;
 				background-color: #fff;
 				z-index: 1;
-				.question-option-radio-inner {
+				.question-option__radio-inner {
 					width: 20rpx;
 					height: 20rpx;
 					border-radius: 30rpx;
 					opacity: 0;
 				}
 			}
-			.question-option-content {
+			.question-option__content {
 				font-size: 34rpx;
-				color: $uni-base-color;
-				margin-left: 20rpx;
+				color: #303133;
+				margin: 0rpx 20rpx;
 				line-height: 46rpx;
 			}
-			.question-option-checkbox {
+			.question-option__checkbox {
 				/* #ifndef APP-NVUE */
 				flex-shrink: 0;
 				box-sizing: border-box;
@@ -296,18 +573,18 @@ import { Title } from "@/ts";
 				border-radius: 8rpx;
 				background-color: #fff;
 				z-index: 1;
-				.question-option-checkbox-inner {
+				.question-option__checkbox-inner {
 					position: absolute;
 					/* #ifndef APP-NVUE */
-					top: 2rpx;
+					top: 6rpx;
 					/* #endif */
 					left: 12rpx;
 					height: 20rpx;
-					width: 10rpx;
+					width: 14rpx;
 					border-right-width: 4rpx;
 					border-right-color: #fff;
 					border-right-style: solid;
-					border-bottom-width: 4rpx ;
+					border-bottom-width: 4rpx;
 					border-bottom-color: #fff;
 					border-bottom-style: solid;
 					opacity: 0;
@@ -315,67 +592,59 @@ import { Title } from "@/ts";
 					transform: rotate(40deg);
 				}
 			}
-			&.is-checked {// 选中样式
-				.question-option-radio {
-					border-color: $uni-primary;
-					.question-option-radio-inner {
+			&.is-checked {
+				background-color: #e0f9ff;
+				// 选中样式
+				.question-option__radio {
+					.question-option__radio-inner {
 						opacity: 1;
-						background-color: $uni-primary;
+						background: linear-gradient(to right, #04b7f2 0%, #007dfc 100%);
 					}
 				}
-				.question-option-checkbox {
-					border-color: $uni-primary;
-					background-color: $uni-primary;
-					
-					.question-option-checkbox-inner {
+				.question-option__checkbox {
+					border-width: 0;
+					background: linear-gradient(to right, #04b7f2 0%, #007dfc 100%);
+
+					.question-option__checkbox-inner {
 						opacity: 1;
 						transform: rotate(45deg);
 					}
 				}
-				.question-option-content {
-					color: $uni-primary;
+				.question-option__content {
+					font-size: 34rpx;
+					color: #303133;
 				}
 			}
 			&.is-succ {
-				.question-option-radio {
-					border-color: $uni-success;
-					.question-option-radio-inner {
+				background-color: #d1f2d7;
+				.question-option__radio {
+					.question-option__radio-inner {
 						opacity: 1;
-						background-color: $uni-success;
 					}
 				}
-				.question-option-checkbox {
-					border-color: $uni-success;
-					background-color: $uni-success;
-					
-					.question-option-checkbox-inner {
+				.question-option__checkbox {
+					.question-option__checkbox-inner {
 						opacity: 1;
 						transform: rotate(45deg);
 					}
 				}
-				.question-option-content {
-					color: $uni-success;
+				.question-option__content {
 				}
 			}
 			&.is-err {
-				.question-option-radio {
-					border-color: $uni-error;
-					.question-option-radio-inner {
+				background-color: #fad8d6;
+				.question-option__radio {
+					.question-option__radio-inner {
 						opacity: 1;
-						background-color: $uni-error;
 					}
 				}
-				.question-option-checkbox {
-					border-color: $uni-error;
-					background-color: $uni-error;
-					
-					.question-option-checkbox-inner {
+				.question-option__checkbox {
+					.question-option__checkbox-inner {
 						opacity: 1;
 						transform: rotate(45deg);
 					}
 				}
-				.question-option-content {
-					color: $uni-error;
+				.question-option__content {
 				}
 			}
 		}

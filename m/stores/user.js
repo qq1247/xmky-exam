@@ -1,17 +1,23 @@
-import { ref } from 'vue'
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { ref } from 'vue';
+import { defineStore, acceptHMRUpdate } from 'pinia';
 
-export const useUserStore = defineStore('user', () => {
-    const id = ref(0)
-    const name = ref('')
-    const headFileId = ref(0)
-    const roles = ref([]) 
-    const accessToken = ref('')
-    return { id, name, headFileId, roles, accessToken }
-}, {
-	unistorage: true
-})
+export const useUserStore = defineStore(
+	'user',
+	() => {
+		const user = ref({
+			id: 0,
+			name: '',
+			type: 0,
+			accessToken: '',
+			sysName: ''
+		});
+		return { user };
+	},
+	{
+		unistorage: true
+	}
+);
 
 if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot))
+	import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot));
 }

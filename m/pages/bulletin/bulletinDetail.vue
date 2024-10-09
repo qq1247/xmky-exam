@@ -1,27 +1,73 @@
 <template>
-	<uni-card :is-full="true">
-		<uni-title type="h1" align="center" :title="bulletin.title"></uni-title>
-		<uni-title class="h5" type="h5" color="#666" :title="bulletin.content"></uni-title>
-	</uni-card>
+	<view class="bulletin-detail">
+		<view class="bulletin-detail__main-title">
+			<text :decode="true">{{ bulletin.title }}</text>
+		</view>
+		<view class="bulletin-detail__sub-title">
+			<text :decode="true">{{ bulletin.startTime }}</text>
+		</view>
+		<view class="bulletin-detail__content">
+			<text :decode="true">{{ bulletin.content }}</text>
+		</view>
+	</view>
 </template>
 
 <script lang="ts" setup>
-	import { onLoad } from "@dcloudio/uni-app"
-	import http from '@/utils/request'
-	import { reactive } from "vue";
-	import { Bulletin } from "../../ts";
+import { ref, reactive, computed } from 'vue';
+import { onLoad, onReady } from '@dcloudio/uni-app';
+import { Bulletin } from '@/ts/bulletin.d';
+import { bulletinGet } from '@/api/bulletin';
 
-	// 定义变量
-	const bulletin = reactive({} as Bulletin)
+/************************变量定义相关***********************/
+const bulletin = reactive<Bulletin>({
+	id: null,
+	title: '',
+	content: '',
+	startTime: '',
+	endTime: ''
+});
 
-	// 页面加载完毕，执行如下方法
-	onLoad(async (option) => {
-		let id = option.id
-		let { data } = await http.post("bulletin/get", { id })
-		bulletin.title = data.title
-		bulletin.content = data.content
-	})
+/************************组件生命周期相关*********************/
+onLoad(async (options) => {
+	bulletin.id = options.id;
+	await bulletinQuery(false);
+});
+
+/************************事件相关*****************************/
+// 公告列表查询
+async function bulletinQuery(append: boolean) {
+	let { data } = await bulletinGet({ id: bulletin.id });
+	bulletin.id = data.id;
+	bulletin.title = data.title;
+	bulletin.content = data.content;
+	bulletin.startTime = data.startTime;
+	bulletin.endTime = data.endTime;
+}
 </script>
 
 <style lang="scss" scoped>
+.bulletin-detail {
+	height: inherit;
+	background-color: #fff;
+	padding: 30rpx;
+	.bulletin-detail__main-title {
+		font-size: 32rpx;
+		color: #333333;
+		line-height: 46rpx;
+		text-align: center;
+	}
+	.bulletin-detail__sub-title {
+		font-size: 26rpx;
+		color: #8f939c;
+		text-align: center;
+		line-height: 46rpx;
+	}
+	.bulletin-detail__content {
+		margin-top: 20rpx;
+		font-size: 26rpx;
+		color: #8f939c;
+		line-height: 40rpx;
+		line-height: 46rpx;
+	}
+}
 </style>

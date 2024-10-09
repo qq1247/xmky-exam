@@ -1,20 +1,35 @@
-import { createSSRApp } from 'vue'
-import * as Pinia from 'pinia'
-import { createUnistorage } from './uni_modules/pinia-plugin-unistorage'
-import App from './App.vue'
-// #ifdef H5
-//import VConsole from 'vconsole';
+// #ifndef VUE3
+import Vue from 'vue'
+import App from './App'
+
+Vue.config.productionTip = false
+
+App.mpType = 'app'
+
+const app = new Vue({
+	...App
+})
+app.$mount()
 // #endif
 
+// #ifdef VUE3
+import {
+	createSSRApp
+} from 'vue'
+import * as Pinia from 'pinia';
+import {
+	createUnistorage
+} from "./uni_modules/pinia-plugin-unistorage";
+import App from './App.vue'
 export function createApp() {
 	const app = createSSRApp(App)
-	const store = Pinia.createPinia()
-	store.use(createUnistorage())
+	const store = Pinia.createPinia();
+	store.use(createUnistorage());
 	app.use(store)
-	
-	// #ifdef H5
-	//const vConsole = new VConsole();
-	// #endif
-	
-	return { app, Pinia }
+
+	return {
+		app,
+		Pinia,
+	}
 }
+// #endif

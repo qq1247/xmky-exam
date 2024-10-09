@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -207,6 +208,85 @@ public class ApiMyExerController extends BaseController {
 			// 试题列表
 			List<Integer> questionIds = questionService.getIds(exer.getQuestionTypeId());
 			return PageResultEx.ok().data(questionIds);
+		} catch (MyException e) {
+			log.error("我的练习试题列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("我的练习试题列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 我的练习试题列表（临时，后期改为提前缓存数据）
+	 * 
+	 * v1.0 zhanghc 2024年9月24日下午6:17:39
+	 * @param exerId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionList2")
+	public PageResult questionList2(Integer exerId) {
+		try {
+			// 数据有效性校验
+			Exer exer = exerService.getById(exerId);
+			if (exer.getState() == 0) {
+				throw new MyException("练习已删除");
+			}
+			long curTime = System.currentTimeMillis();
+			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
+				throw new MyException("时间已过期");
+			}
+			if (!exer.getUserIds().contains(getCurUser().getId())) {
+				throw new MyException("无权限");
+			}
+			
+			// 试题列表
+			List<Map<String, Object>> list = questionService.getIds(exer.getQuestionTypeId()).stream().map(questionId -> {
+				// 试题获取
+				Map<String, Object> questionMap = new HashMap<>();
+				Question question = examCacheService.getQuestion(questionId);
+				questionMap.put("id", question.getId());
+				questionMap.put("type", question.getType());
+				questionMap.put("markType", question.getMarkType());
+				questionMap.put("title", question.getTitle());
+				questionMap.put("markOptions", question.getMarkOptions());
+				questionMap.put("score", question.getScore());
+				questionMap.put("analysis", question.getAnalysis());
+				{// 试题选项
+					List<String> options = new ArrayList<>();
+					if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
+						List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(question.getId());
+						for (QuestionOption questionOption : questionOptionList) {
+							options.add(questionOption.getOptions());
+						}
+					}
+					questionMap.put("options", options);
+				}
+				{// 试题答案
+					List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(question.getId());
+					List<Object> answers = new ArrayList<>();
+					List<BigDecimal> scores = new ArrayList<>();
+					for(QuestionAnswer answer : questionAnswerList) {
+						if (QuestionUtil.hasSingleChoice(question) 
+								|| QuestionUtil.hasTrueFalse(question) 
+								|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
+							answers.add(answer.getAnswer());
+						} else if (QuestionUtil.hasMultipleChoice(question)) {
+							Collections.addAll(answers, answer.getAnswer().split(","));
+							scores.add(answer.getScore());
+						} else if (QuestionUtil.hasFillBlank(question) 
+								|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
+							answers.add(answer.getAnswer());
+							scores.add(answer.getScore());
+						}
+					}
+					questionMap.put("answers", answers);
+					questionMap.put("scores", scores);
+				}
+				return questionMap;
+			}).collect(Collectors.toList());
+			
+			return PageResultEx.ok().data(list);
 		} catch (MyException e) {
 			log.error("我的练习试题列表错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

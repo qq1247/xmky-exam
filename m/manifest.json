@@ -1,8 +1,8 @@
 {
-    "name" : "小猫考试",
+    "name" : "xm-exam",
     "appid" : "__UNI__BBF03DB",
     "description" : "",
-    "versionName" : "4.4.1",
+    "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
     "app-plus" : {
@@ -50,7 +50,7 @@
     /* 快应用特有相关 */
     "mp-weixin" : {
         /* 小程序特有相关 */
-        "appid" : "",
+        "appid" : "wxdb27c60d5b1228c2",
         "setting" : {
             "urlCheck" : false
         },
@@ -59,11 +59,8 @@
     "vueVersion" : "3",
     "h5" : {
         "router" : {
-            "mode" : "history"
-        },
-        "devServer" : {
-            "port" : ""
-        },
-        "template" : "template.h5.html"
+            "mode" : "history",
+            "base" : ""
+        }
     }
 }

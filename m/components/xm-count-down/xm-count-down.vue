@@ -1,93 +1,127 @@
 <template>
-    <text :style="`color: ${props.color};`">{{preTxt}} {{ d > 0 ? d + '天' : '' }}{{ h }}小时{{ m }}分{{ s }}秒</text>
+	<text :style="`color: ${props.color};`">{{ preTxt }}{{ d > 0 ? `${d}天` : '' }}{{ padNumber(h) }}小时{{ padNumber(m) }}分{{ padNumber(s) }}秒</text>
 </template>
 
 <script lang="ts" setup>
-import http from '@/utils/request.js';
-import { computed, onMounted, ref, watch } from 'vue';
+import { loginSysTime } from '@/api/login';
+import { onMounted, computed, ref, watch } from 'vue';
 
-// 定义变量
-const emit = defineEmits(['end', 'remind'])
-const props = withDefaults(defineProps<{
-    expireTime?: Date // 到期时间
-    preTxt?: string // 前置文本
-    remind?: number // 剩余多久提醒（单位：秒）
-    color?: string// 文字颜色
-}>(), {
-    preTxt: '',
-    color: '$uni-base-color'
-})
+/************************变量定义相关***********************/
+const emit = defineEmits<{
+	end: [];
+	remind: [];
+	change: [Date];
+}>();
 
-const expireTime = ref(props.expireTime) // 到期时间
-const curTime = ref(new Date())// 当前时间
-const times = ref(0) // 剩余次数
+const props = withDefaults(
+	defineProps<{
+		expireTime?: string; // 到期时间 yyyy-MM-dd HH:mm:ss
+		preTxt?: string; // 前置文本
+		remind?: number; // 剩余多久提醒（单位：秒）
+		color?: string; // 文字颜色
+	}>(),
+	{
+		preTxt: '',
+		color: '#ff5d15'
+	}
+);
 
-// 监听属性
-watch(() => props.expireTime, () => {
-    expireTime.value = props.expireTime
-})
+const expireTime = ref<Date | string>(); // 到期时间（苹果手机不识别横线）
+const curTime = ref<Date | string>(); // 当前时间
+const times = ref(0); // 剩余次数
 
-// 计算属性
-const d = computed(() => !expireTime.value ? '-' : Math.floor((expireTime.value.getTime() - curTime.value.getTime()) / 1000 / 60 / 60 / 24))
-const h = computed(() => !expireTime.value ? '-' : Math.floor(((expireTime.value.getTime() - curTime.value.getTime()) / 1000 / 60 / 60) % 24))
-const m = computed(() => !expireTime.value ? '-' : Math.floor(((expireTime.value.getTime() - curTime.value.getTime()) / 1000 / 60 ) % 60))
-const s = computed(() => !expireTime.value ? '-' : Math.floor(((expireTime.value.getTime() - curTime.value.getTime()) / 1000 ) % 60))
-
-// 组件挂载完成后，执行如下方法
+/************************组件生命周期相关*********************/
 onMounted(async () => {
-    synTime()
-})
+	synTime();
+});
+
+/************************监听相关*****************************/
+watch(
+	() => props.expireTime,
+	() => {
+		expireTime.value = props.expireTime ? new Date(props.expireTime.replaceAll('-', '/')) : '';
+	},
+	{ immediate: true }
+);
+
+/************************计算属性相关*************************/
+const d = computed(() => {
+	if (!(expireTime.value instanceof Date) || !(curTime.value instanceof Date)) {
+		return 0;
+	}
+
+	return Math.floor((expireTime.value.getTime() - curTime.value.getTime()) / 1000 / 60 / 60 / 24);
+});
+const h = computed(() => {
+	if (!(expireTime.value instanceof Date) || !(curTime.value instanceof Date)) {
+		return 0;
+	}
+	return Math.floor((((expireTime.value as Date).getTime() - (curTime.value as Date).getTime()) / 1000 / 60 / 60) % 24);
+});
+const m = computed(() => {
+	if (!(expireTime.value instanceof Date) || !(curTime.value instanceof Date)) {
+		return 0;
+	}
+	return Math.floor((((expireTime.value as Date).getTime() - (curTime.value as Date).getTime()) / 1000 / 60) % 60);
+});
+const s = computed(() => {
+	if (!(expireTime.value instanceof Date) || !(curTime.value instanceof Date)) {
+		return 0;
+	}
+	return Math.floor((((expireTime.value as Date).getTime() - (curTime.value as Date).getTime()) / 1000) % 60);
+});
+
+/************************事件相关*****************************/
+// 数字前面补零
+function padNumber(num: number) {
+	if (num < 0) {
+		return '00';
+	}
+	return num.toString().padStart(2, '0');
+}
 
 /**
  * 同步服务器时间
  * 每隔30秒同步一次服务器时间；30秒内使用本地浏览器计时；30秒内会有误差，但影响不大
- */ 
+ */
 async function synTime() {
-    // 如果没有过期时间，继续等待
-    if (!expireTime.value) {
-        setTimeout(synTime, 1000)
-        return
-    }
+	// 如果没有过期时间，继续等待
+	if (!(expireTime.value instanceof Date)) {
+		setTimeout(synTime, 1000);
+		return;
+	}
 
-    // 每间隔30秒同步一次服务器时间
-    if (times.value <= 0) {
-        times.value = 30
-        let { data } = await http.post("login/sysTime", {  })
-        curTime.value = new Date(data.replaceAll('-', '/'))
-        //console.log('服务时间：', data.replaceAll('-', '/'))
-    } else {
-		curTime.value = new Date(curTime.value.getTime() + 1000)
-        times.value--
-        //console.log('本地时间：', curTime.value, !expireTime.value ? '-' : Math.floor(((expireTime.value.getTime() - curTime.value.getTime()) / 1000 ) % 60), s.value)
-    }
-    
-    // 如果有提醒，触发提醒事件
-    if (props.remind) {
-        if  (curTime.value.getTime() + (props.remind * 1000) >= expireTime.value.getTime()) {
-            // console.log('倒计时事件：remind', curTime.value, expireTime.value)
-            emit('remind')
-        }
-    }
+	// 每间隔30秒同步一次服务器时间
+	if (times.value <= 0) {
+		times.value = 30;
+		let { data } = await loginSysTime();
+		curTime.value = new Date(data.replaceAll('-', '/'));
+		//console.log('服务时间：', data.replaceAll('-', '/'))
+	} else {
+		curTime.value = new Date((curTime.value as Date).getTime() + 1000);
+		times.value--;
+		//console.log('本地时间：', curTime.value, !expireTime.value ? '-' : Math.floor(((expireTime.value.getTime() - curTime.value.getTime()) / 1000 ) % 60), s.value)
+	}
+	emit('change', curTime.value);
 
-    // 如果时间已到，触发事件，让上层处理
-    if  (curTime.value.getTime() >= expireTime.value.getTime()) {
-        // console.log('倒计时事件：end', curTime.value, expireTime.value)
-        emit('end')
-        return
-    }
+	// 如果有提醒，触发提醒事件
+	if (props.remind) {
+		if (curTime.value.getTime() + props.remind * 1000 >= expireTime.value.getTime()) {
+			// console.log('倒计时事件：remind', curTime.value, expireTime.value)
+			emit('remind');
+		}
+	}
 
-    setTimeout(synTime, 1000)
-    return
+	// 如果时间已到，触发事件，让上层处理
+	if (curTime.value.getTime() >= expireTime.value.getTime()) {
+		// console.log('倒计时事件：end', curTime.value, expireTime.value)
+		emit('end');
+		return;
+	}
+
+	setTimeout(synTime, 1000);
+	return;
 }
 </script>
 
-<style lang="scss" scoped>
-span {
-    font-weight: bold;
-    font-size: 14px;
-    color: var(--el-color-primary);
-    margin: auto;
-    display: block;
-    text-align: center;
-}
-</style>
+<style lang="scss" scoped></style>

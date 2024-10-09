@@ -1,129 +1,89 @@
 {
 	"pages": [{
-		"path": "pages/index/index",
-		"style": {
-			"navigationBarTitleText": "小猫考试",
-			"navigationBarBackgroundColor": "white",
-			"enablePullDownRefresh": true
-		}
+		"path": "pages/login/login"
 	}, {
-		"path": "pages/login/login",
-		"style": {
-			"navigationBarTitleText": "登录"
-		}
+		"path": "pages/home/home"
 	}, {
-		"path": "pages/myExam/myExam",
-		"style": {
-			"navigationBarTitleText": "我的考试"
-		}
+		"path": "pages/myExam/myExam"
 	}, {
-		"path": "pages/myExam/myExamPage",
-		"style": {
-			"navigationBarTitleText": "考试试卷"
-		}
+		"path": "pages/myExam/myPaper"
 	}, {
-		"path": "pages/myExam/myExamResult",
-		"style": {
-			"navigationBarTitleText": "考试结果"
-		}
-
+		"path": "pages/myExam/myRank"
 	}, {
-		"path": "pages/myExer/myExer",
-		"style": {
-			"navigationBarTitleText": "我的模拟"
-		}
+		"path": "pages/myExam/myRead"
 	}, {
-		"path": "pages/myExer/myExerPage",
-		"style": {
-			"navigationBarTitleText": "模拟试卷"
-		}
+		"path": "pages/myExer/myExer"
 	}, {
-		"path": "pages/myExer/myExerResult",
-		"style": {
-			"navigationBarTitleText": "模拟结果"
-		}
+		"path": "pages/myExer/myPaper"
 	}, {
-		"path": "pages/my/my",
-		"style": {
-			"navigationBarTitleText": "个人中心"
-		}
-
+		"path": "pages/center/center"
 	}, {
-		"path": "pages/my/pwd",
-		"style": {
-			"navigationBarTitleText": "修改密码"
-		}
-
+		"path": "pages/bulletin/bulletin"
 	}, {
-		"path": "pages/bulletin/bulletin",
-		"style": {
-			"navigationBarTitleText": "公告列表"
-		}
+		"path": "pages/bulletin/bulletinDetail"
 	}, {
-		"path": "pages/bulletin/bulletinDetail",
-		"style": {
-			"navigationBarTitleText": "公告详情"
-		}
+		"path": "pages/center/pwd"
+	}, {
+		"path": "pages/center/custom"
+	}, {
+		"path": "pages/login/anonLogin"
 	}],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app2",
-		"navigationBarBackgroundColor": "#F8F8F8",
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#007dfc",
 		"backgroundColor": "#F8F8F8",
 		"app-plus": {
 			"background": "#efeff4"
 		}
+
 	},
 	"tabBar": {
 		"color": "#7A7E83",
 		"selectedColor": "#007AFF",
 		"borderStyle": "black",
 		"backgroundColor": "#F8F8F8",
-		"iconfontSrc": "/static/iconfont.ttf",
+		"iconfontSrc": "/static/font/iconfont.ttf",
 		"list": [{
-				"pagePath": "pages/index/index",
-				"text": "首页",
-				"iconfont": {
-					"text": "\ue63d",
-					"selectedText": "\ue63d",
-					"fontSize": "48rpx",
-					"color": "#000000",
-					"selectedColor": "#2979ff"
-				}
-			},
-			{
-				"pagePath": "pages/myExam/myExam",
-				"text": "考试",
-				"iconfont": {
-					"text": "\ue605",
-					"selectedText": "\ue605",
-					"fontSize": "48rpx",
-					"color": "#000000",
-					"selectedColor": "#2979ff"
-				}
-			},
-			{
-				"pagePath": "pages/myExer/myExer",
-				"text": "练习",
-				"iconfont": {
-					"text": "\ue665",
-					"selectedText": "\ue665",
-					"fontSize": "48rpx",
-					"color": "#000000",
-					"selectedColor": "#2979ff"
-				}
-			},
-			{
-				"pagePath": "pages/my/my",
-				"text": "我的",
-				"iconfont": {
-					"text": "\ue61f",
-					"selectedText": "\ue61f",
-					"fontSize": "48rpx",
-					"color": "#000000",
-					"selectedColor": "#2979ff"
-				}
+			"pagePath": "pages/home/home",
+			"text": "首页",
+			"iconfont": {
+				"text": "\ue61a",
+				"selectedText": "\ue61a",
+				"fontSize": "48rpx",
+				"color": "#000000",
+				"selectedColor": "#2979ff"
 			}
-		]
+		}, {
+			"pagePath": "pages/myExam/myExam",
+			"text": "考试",
+			"iconfont": {
+				"text": "\ue617",
+				"selectedText": "\ue617",
+				"fontSize": "48rpx",
+				"color": "#000000",
+				"selectedColor": "#2979ff"
+			}
+		}, {
+			"pagePath": "pages/myExer/myExer",
+			"text": "练习",
+			"iconfont": {
+				"text": "\ue619",
+				"selectedText": "\ue619",
+				"fontSize": "48rpx",
+				"color": "#000000",
+				"selectedColor": "#2979ff"
+			}
+		}, {
+			"pagePath": "pages/center/center",
+			"text": "个人中心",
+			"iconfont": {
+				"text": "\ue618",
+				"selectedText": "\ue618",
+				"fontSize": "48rpx",
+				"color": "#000000",
+				"selectedColor": "#2979ff"
+			}
+		}]
 	}
 }

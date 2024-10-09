@@ -180,7 +180,7 @@ function parseQuestion(questionTxt: string[]) {
 
 
     let type = 5; // 试题类型
-    let title = questionTxt.slice(0, optionIndexArr.length > 0 ? optionIndexArr[0] : answerIndex).join("<br/>").replace(/^\d+[.。、]/, '') // 题干（换行转br标签）
+    let title = questionTxt.slice(0, optionIndexArr.length > 0 ? optionIndexArr[0] : answerIndex).join("\n").replace(/^\d+[.。、]/, '') // 题干（换行用\n）
     if (optionIndexArr.length > 0) {// 如果有选项
         type = /^\[[A-Ga-g]{2,}\]/.test(questionTxt[answerIndex]) ? 2 : 1 // 找到大于一个答案就是多选，否则单选（格式不对可能没有答案，后面处理）
     } else if (/_{5,}/.test(title)) { // 如果题干有连续大于等于五个的下划线，类型为填空
