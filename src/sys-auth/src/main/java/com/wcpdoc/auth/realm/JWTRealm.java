@@ -48,8 +48,8 @@ public class JWTRealm extends AuthorizingRealm {
 		// 数据校验
 		String jwt = (String) principals.getPrimaryPrincipal();
 		JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);
-		String loginName = jwtResult.getClaims().get("loginName", String.class);
-		AuthUser user = shiroService.getUser(loginName);
+		Integer userId = jwtResult.getClaims().get("userId", Integer.class);
+		AuthUser user = shiroService.getUser(userId);
 		if (user == null) {
 			throw new UnknownAccountException("账号密码错误");
 		}

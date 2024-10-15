@@ -25,7 +25,7 @@
 					:type="marks.includes(curQuestionIndex) ? 'icon-biaoji2' : 'icon-igw-l-sign'"
 					:color="marks.includes(curQuestionIndex) ? '#FF8C11' : '#231815'"
 					size="36rpx"
-					@click="mark"
+					@click="mark(examQuestions[curQuestionIndex].no)"
 				></uni-icons>
 			</view>
 			<xm-swiper ref="swiperRef" v-model="curQuestionIndex" :items="examQuestions" :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
@@ -41,8 +41,9 @@
 							:answers="examQuestion.answers"
 							:userScore="examQuestion.userScore"
 							:options="examQuestion.options"
+							:analysis="examQuestion.analysis"
 							:editable="examing"
-							:resultShow="resultShow"
+							:analysisShow="analysisShow"
 							@change="(answers: string[]) => answer(examQuestion, answers)"
 						>
 							<template #title-pre>
@@ -135,6 +136,7 @@ const exam = reactive<Exam>({
 	totalScore: null,
 	markType: null,
 	genType: null,
+	loginType: null,
 	sxes: [],
 	state: null,
 	userNum: null,
@@ -174,21 +176,17 @@ onLoad(async (options) => {
 });
 
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.mypaper-main__scroll')
-				.boundingClientRect((data: any) => {
-					questionHeight.value = res.windowHeight - data.top - 50;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.mypaper-main__scroll')
+		.boundingClientRect((data: any) => {
+			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************计算属性相关*************************/
 const examing = computed(() => (myExam.state === 1 && myExam.markState != 3) || myExam.state === 2); // 考试中
-const resultShow = computed(() => {
+const analysisShow = computed(() => {
 	return (
 		(exam.scoreState == 1 && exam.markState == 3) || // 如果是考试结束后显示成绩，需要等到考试结束
 		(exam.scoreState == 3 && myExam.markState == 3) // 如果是交卷后显示成绩，需要等到该试卷阅卷完成。比如主观题没阅卷，得不到总分，得不到是否及格
@@ -252,8 +250,7 @@ async function paperQuery() {
 	let no = 1;
 	examQuestions.value = (data as any[]).map((examQuestion: ExamQuestion) => {
 		if (examQuestion.type === 2) {
-			// 处理题号
-			examQuestion.no = no++;
+			examQuestion.no = no++; // 处理题号
 		}
 		return examQuestion;
 	});
@@ -272,11 +269,11 @@ function answer(examQuestion: ExamQuestion, answers: string[]) {
 }
 
 // 标记
-function mark() {
-	if (marks.value.includes(curQuestionIndex.value)) {
-		marks.value = marks.value.filter((markQuestion) => markQuestion != curQuestionIndex.value);
+function mark(no: number) {
+	if (marks.value.includes(no)) {
+		marks.value = marks.value.filter((_no) => _no != no);
 	} else {
-		marks.value.push(curQuestionIndex.value);
+		marks.value.push(no);
 	}
 }
 
@@ -458,6 +455,11 @@ function toHome() {
 			// #ifdef MP-WEIXIN
 			:deep(swiper) {
 				height: 100%;
+				swiper-item {
+					& > view {
+						height: 100%;
+					}
+				}
 			}
 			// #endif
 		}

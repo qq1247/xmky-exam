@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed } from 'vue';
-import { onLoad, onReady } from '@dcloudio/uni-app';
+import { onLoad } from '@dcloudio/uni-app';
 import { loginCustom, loginOut } from '@/api/login';
 
 /************************变量定义相关***********************/

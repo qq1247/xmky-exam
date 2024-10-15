@@ -1,11 +1,10 @@
 import ajax from '@/uni_modules/u-ajax/js_sdk/index';
 import refreshToken from '@/request/refresh';
-import { baseURL } from '@/static/config';
 import { useUserStore } from '@/stores/user';
 
 const userStore = useUserStore();
 const instance = ajax.create({
-	baseURL: baseURL,
+	baseURL: uni.getStorageSync('BASE_URL'),
 	timeout: 6000
 });
 

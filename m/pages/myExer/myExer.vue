@@ -174,17 +174,14 @@ onShow(async () => {
 	todoExerQuery(false); //onLoad只加载一次
 	myExerQuery(false);
 });
+
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.myexer-main__scroll')
-				.boundingClientRect((data: any) => {
-					taskListHeight.value = res.windowHeight - data.top;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.myexer-main__scroll')
+		.boundingClientRect((data: any) => {
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************计算属性相关*************************/

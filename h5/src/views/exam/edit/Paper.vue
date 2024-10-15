@@ -324,6 +324,7 @@ function txtImport(questions: any) {
             scores: question.scores,
             options: question.options,
             markOptions: question.markOptions,
+            analysis: question.analysis,
         })
     })
     form.noUpdate()

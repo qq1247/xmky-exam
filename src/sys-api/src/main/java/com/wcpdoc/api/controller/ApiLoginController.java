@@ -61,6 +61,28 @@ public class ApiLoginController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 免登录
+	 * 
+	 * v1.0 zhanghc 2024年10月9日下午3:14:18
+	 * @param name
+	 * @return PageResult
+	 */
+	@RequestMapping("/noLogin")
+	public PageResult noLogin(String name) {
+		try {
+			// 完成登录
+			UserToken userToken = loginService.noLogin(name);
+			return PageResultEx.ok().data(userToken);
+		} catch (LoginException e) {
+			log.error("匿名登录错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("匿名登录错误：", e);
+			return PageResult.err();
+		}
+	}
 
 	/**
 	 * 退出

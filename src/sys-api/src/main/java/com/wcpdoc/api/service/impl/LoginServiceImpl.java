@@ -98,6 +98,62 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	}
 
 	@Override
+	public UserToken noLogin(String name) throws LoginException {
+		// 数据校验
+		if (!ValidateUtil.isValid(name)) {
+			throw new LoginException("参数错误：name");
+		}
+		if (name.length() < 2) {
+			throw new LoginException("参数错误：name必须大于2位");
+		}
+		if (name.length() > 16) {
+			throw new LoginException("参数错误：name必须小于16位");
+		}
+		
+//		if (!Pattern.compile("^1[3-9]\\d{9}$").matcher(phone).matches()) {
+//			throw new LoginException("手机号格式错误");
+//		}
+
+		// 生成匿名用户
+		User user = new User();
+		user.setName(name);
+		user.setLoginName(null);// 无登录账号
+		user.setType(4);
+		user.setRegistTime(new Date());
+		user.setOrgId(1);
+		user.setState(1);
+		user.setUpdateUserId(1);
+		user.setUpdateTime(new Date());
+		userService.save(user);
+
+		// 生成令牌（登陆由shiro接收令牌控制）
+		Date curTime = new Date();
+		Long tokenId = curTime.getTime();
+		Date expTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
+		String accessToken = JwtUtil.getInstance().createToken(tokenId.toString(), "default", expTime)
+				.addAttr("userId", user.getId()).addAttr("loginName", user.getLoginName())
+				.addAttr("type", user.getType()).build();
+		if (log.isDebugEnabled()) {
+			log.debug("shiro权限：用户【{}】免登陆，旧令牌创建时间【{}】，当前令牌创建时间【{}】", user.getName(), null,
+					DateUtil.formatDateTime(new Date(tokenId)));
+		}
+
+		TokenCache.put(user.getId(), accessToken);// 缓存刷新令牌（用于续租登陆）
+
+		// 更新用户登录时间
+		user.setLastLoginTime(new Date());
+		userService.updateById(user);
+
+		// 返回响应数据
+		UserToken userToken = new UserToken();
+		userToken.setUserName(user.getName());
+		userToken.setAccessToken(accessToken);
+		userToken.setUserId(user.getId());
+		userToken.setType(user.getType());
+		return userToken;
+	}
+
+	@Override
 	public void out() {
 		LoginUser curUser = getCurUser();
 		if (curUser == null) {

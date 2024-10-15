@@ -3,7 +3,7 @@
 		<view class="login-head">
 			<image class="login-head__bg" src="@/static/img/login-bg.png"></image>
 			<view class="login-head__wrap">
-				<image class="login-head__logo" :src="`${baseURL}/login/logo`"></image>
+				<image class="login-head__logo" :src="`${baseUrl}/login/logo`"></image>
 				<text class="login-head__sysname">{{ userStore.user.sysName }}</text>
 			</view>
 		</view>
@@ -39,19 +39,20 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { onLoad, onReady } from '@dcloudio/uni-app';
+import { onLoad,  } from '@dcloudio/uni-app';
 import { loginIn, loginEnt } from '@/api/login';
 import { dictIndexList } from '@/api/dict';
 import { useUserStore } from '@/stores/user';
 import { useDictStore } from '@/stores/dict';
-import { baseURL } from '@/static/config';
 
 /************************变量定义相关***********************/
 const userStore = useUserStore();
 const dictStore = useDictStore();
+const baseUrl = ref(uni.getStorageSync('BASE_URL'));
+const redirectPath = ref('');
 const form = reactive({
-	loginName: 'test1',
-	pwd: '111111'
+	loginName: '',
+	pwd: ''
 });
 const formRef = ref();
 const formRules = {
@@ -64,7 +65,9 @@ const formRules = {
 };
 
 /************************组件生命周期相关*********************/
-onLoad(async () => {
+onLoad(async (option) => {
+	redirectPath.value = option.redirectPath;
+
 	let {
 		data: { name }
 	} = await loginEnt();
@@ -89,6 +92,10 @@ async function login() {
 	if (code !== 200) {
 		return;
 	}
+	if (data.type !== 1) {
+		uni.showToast({ title: '暂不支持管理员登录', icon: 'error' });
+		return;
+	}
 
 	// 用户信息保存
 	userStore.user.id = data.userId;
@@ -101,12 +108,12 @@ async function login() {
 	dictStore.dicts = dicts;
 
 	// 进入相关页面
-	let redirectPath = uni.getStorageSync('redirectPath');
-	if (redirectPath) {
+	if (redirectPath.value) {
+		uni.reLaunch({ url: redirectPath.value }); // 扫码登录进入考试页面
+	} else if (uni.getStorageSync('redirectPath')) {
+		let _redirectPath = uni.getStorageSync('redirectPath'); // 过期登录返回之前页面
 		uni.removeStorageSync('redirectPath');
-		uni.reLaunch({
-			url: redirectPath
-		});
+		uni.reLaunch({ url: _redirectPath });
 	} else {
 		uni.switchTab({ url: '/pages/home/home' });
 	}

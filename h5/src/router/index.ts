@@ -277,9 +277,14 @@ const router = createRouter({
                                     meta: { title: '企业信息' },
                                 },
                                 {
+                                    path: 'mobile',
+                                    component: () => import('../views/base/parm/setting/Mobile.vue'),
+                                    meta: { title: '移动端设置' },
+                                },
+                                {
                                     path: 'custom',
                                     component: () => import('../views/base/parm/setting/Custom.vue'),
-                                    meta: { title: '自定义' },
+                                    meta: { title: '服务支持' },
                                 },
                                 // {
                                 //     path: 'email',
@@ -414,6 +419,11 @@ const router = createRouter({
                                     component: () => import('../views/exam/setting/MarkUser.vue'),
                                     meta: { title: '协助阅卷' },
                                 },
+                                {
+                                    path: 'qrcode/:id',
+                                    component: () => import('../views/exam/setting/Qrcode.vue'),
+                                    meta: { title: '扫码答题' },
+                                },
                             ]
                         },
                         {
@@ -439,7 +449,7 @@ const router = createRouter({
                         {
                             path: 'paper/:id/:userId',
                             component: () => import('../views/exam/Paper.vue'),
-                            meta: { title: '统计' },
+                            meta: { title: '试卷' },
                         },
                     ]
                 },

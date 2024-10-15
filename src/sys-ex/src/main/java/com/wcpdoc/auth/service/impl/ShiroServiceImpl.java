@@ -28,8 +28,8 @@ public class ShiroServiceImpl implements ShiroService {
 	private UserService userService;
 
 	@Override
-	public AuthUser getUser(String loginName) {
-		User user = userService.getUser(loginName);
+	public AuthUser getUser(Integer userId) {
+		User user = userService.getById(userId);
 		return new AuthUser() {
 
 			@Override

@@ -54,7 +54,7 @@
 						</view>
 						<view>
 							<text>用时：</text>
-							<text class="myexam-main__value">{{ diffMinute(myExam.examStartTime, myExam.examEndTime) }}分钟</text>
+							<text class="myexam-main__value">{{ diffMinute(myExam.answerStartTime, myExam.answerEndTime) }}分钟</text>
 							<text>分数：</text>
 							<text class="myexam-main__value">
 								{{ myExam.totalScore == null ? '-' : myExam.totalScore }} / {{ myExam.examTotalScore == null ? '-' : myExam.examTotalScore }}
@@ -177,7 +177,7 @@ const todoExamListpage = reactive<Page<any>>({
 	list: [],
 	status: 'more'
 }); // 未完成考试列表
-const myExamListpage = reactive<Page<MyExam>>({
+const myExamListpage = reactive<Page<any>>({
 	curPage: 1,
 	pageSize: 10,
 	total: 0,
@@ -191,17 +191,14 @@ onShow(async () => {
 	todoExamQuery(false); //onLoad只加载一次
 	myExamQuery(false);
 });
+
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.myexam-main__scroll')
-				.boundingClientRect((data: any) => {
-					taskListHeight.value = res.windowHeight - data.top;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.myexam-main__scroll')
+		.boundingClientRect((data: any) => {
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************计算属性相关*************************/

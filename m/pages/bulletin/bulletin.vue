@@ -86,20 +86,17 @@ const bulletinListpage = reactive<Page<any>>({
 const taskListHeight = ref(0); // 下侧列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
-onLoad(async () => {
+onLoad(() => {
 	bulletinQuery(false);
 });
+
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.bulletin-main__scroll')
-				.boundingClientRect((data: any) => {
-					taskListHeight.value = res.windowHeight - data.top;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.bulletin-main__scroll')
+		.boundingClientRect((data: any) => {
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************计算属性相关*************************/

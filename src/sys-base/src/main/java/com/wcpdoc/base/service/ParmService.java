@@ -66,4 +66,13 @@ public interface ParmService extends BaseService<Parm> {
 	 */
 	void customUpdate(String title, String content);
 
+	/**
+	 * 移动端设置
+	 * 
+	 * v1.0 zhanghc 2024年9月30日下午1:04:31
+	 * 
+	 * @param host void
+	 */
+	void mUpdate(String host);
+
 }

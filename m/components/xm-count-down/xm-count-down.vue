@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts" setup>
-import { loginSysTime } from '@/api/login';
 import { onMounted, computed, ref, watch } from 'vue';
+import { loginSysTime } from '@/api/login';
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{

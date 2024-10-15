@@ -21,3 +21,6 @@ export function myExamFinish(parm) {
 export function myExamQuestionStatis(parm) {
 	return request.post('myExam/questionStatis', parm);
 }
+export function myExamGeneratePaper(parm) {
+	return request.post('myExam/generatePaper', parm);
+}

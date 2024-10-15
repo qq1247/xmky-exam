@@ -208,4 +208,18 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parm.setCustomContent(content);
 		updateById(parm);
 	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
+	public void mUpdate(String host) {
+		// 数据校验
+		if (!ValidateUtil.isValid(host)) {
+			throw new MyException("参数错误：host");
+		}
+
+		// 自定义内容修改
+		Parm parm = baseCacheService.getParm();
+		parm.setMHost(host);
+		updateById(parm);
+	}
 }

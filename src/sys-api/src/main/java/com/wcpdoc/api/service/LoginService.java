@@ -22,6 +22,15 @@ public interface LoginService extends BaseService<Object>{
 	UserToken in(String loginName, String pwd) throws LoginException;
 	
 	/**
+	 * 免登录
+	 * 
+	 * v1.0 zhanghc 2024年10月9日下午3:38:59
+	 * @param name
+	 * @return UserToken
+	 */
+	UserToken noLogin(String name) throws LoginException;
+	
+	/**
 	 * 退出登录
 	 * 
 	 * v1.0 zhanghc 2017年7月17日下午4:25:41

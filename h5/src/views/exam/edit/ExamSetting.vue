@@ -84,6 +84,14 @@
                     </el-radio>
                 </el-radio-group>
             </el-form-item>
+            <el-form-item label="登录方式：" prop="loginType">
+                <el-radio-group v-model="form.loginType">
+                    <el-radio v-for="(option, index) in dictStore.getList('LOGIN_TYPE')" :key="index" :label="parseInt(option.dictKey)">
+                        {{ option.dictValue }}
+                    </el-radio>
+                </el-radio-group>
+                <el-alert :title="`免登录暂支持移动端使用`" type="warning" :closable="false"/>
+            </el-form-item>
         </el-form>
     </el-card>
 </template>

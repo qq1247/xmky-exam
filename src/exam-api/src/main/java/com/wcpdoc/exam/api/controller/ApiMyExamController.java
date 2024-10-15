@@ -250,6 +250,28 @@ public class ApiMyExamController extends BaseController {
 	}
 
 	/**
+	 * 生成试卷
+	 * 
+	 * v1.0 zhanghc 2024年10月11日上午9:11:57
+	 * 
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/generatePaper")
+	public PageResult generatePaper(Integer examId) {
+		try {
+			myExamService.generatePaper(examId, getCurUser().getId());
+			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("我的试卷错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的试卷错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
 	 * 答题
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20

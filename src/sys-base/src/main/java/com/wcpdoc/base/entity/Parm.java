@@ -34,6 +34,7 @@ public class Parm {
 	private String pwdValue;
 	private String customTitle;
 	private String customContent;
+	private String mHost;
 
 	public String getFileUploadDir() {
 		if (ValidateUtil.isValid(fileUploadDir)) {

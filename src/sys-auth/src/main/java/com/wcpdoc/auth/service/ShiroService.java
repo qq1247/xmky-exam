@@ -16,10 +16,10 @@ public interface ShiroService {
 	 * 
 	 * v1.0 zhanghc 2021年3月19日下午4:51:46
 	 * 
-	 * @param loginName
+	 * @param userId
 	 * @return User
 	 */
-	AuthUser getUser(String loginName);
+	AuthUser getUser(Integer userId);
 
 	/**
 	 * 获取角色列表

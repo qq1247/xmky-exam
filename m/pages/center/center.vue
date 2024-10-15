@@ -77,16 +77,12 @@ onShow(async () => {
 });
 
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.center-main__scroll')
-				.boundingClientRect((data: any) => {
-					taskListHeight.value = res.windowHeight - data.top - 100;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.center-main__scroll')
+		.boundingClientRect((data: any) => {
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************事件相关*****************************/
@@ -155,24 +151,29 @@ async function out() {
 	}
 	.center-main {
 		padding: 20rpx;
-		.center-main__list {
+		:deep(.center-main__list) {
 			background-color: initial;
+			// #ifdef MP-WEIXIN
+			.uni-list {
+				background-color: initial; // .center-main__list和.uni-list，在h5是平级，在wx是上下级
+			}
+			// #endif
 			.uni-list-item {
 				min-height: 105rpx;
 				margin: 10rpx 0rpx;
 				border-radius: 16rpx;
-				:deep(.uni-list-item__content-title) {
+				.uni-list-item__content-title {
 					font-size: 32rpx;
 					color: #222222;
 				}
-				:deep(.uni-list--border) {
+				.uni-list--border {
 					display: none;
 				}
 			}
 		}
 	}
 	.center-foot {
-		height: 100rpx;
+		height: 200rpx;
 		.center-foot__out {
 			margin-top: 30rpx;
 			width: 628rpx;

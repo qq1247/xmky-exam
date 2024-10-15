@@ -57,6 +57,12 @@ onMounted(() => {
         url: `/parm/Ent`,
     })
     tabs.push({
+        title: '移动端设置',
+        desc: '移动端设置',
+        icon: 'icon-setting',
+        url: `/parm/Mobile`,
+    })
+    tabs.push({
         title: '服务支持',
         desc: '服务支持',
         icon: 'icon-fuwuzhichi',

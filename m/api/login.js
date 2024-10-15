@@ -3,6 +3,9 @@ import request from '@/request/request'
 export function loginIn(parm) {
 	return request.post('/login/in', parm);
 }
+export function loginNoLogin(parm) {
+	return request.post('/login/noLogin', parm);
+}
 export function loginPwd(parm) {
 	return request.post('/login/pwd', parm);
 }

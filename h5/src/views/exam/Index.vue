@@ -143,6 +143,7 @@ function generateMenu(exam: any) {
         { name: '变更时间', icon: 'icon-time', event: () => router.push(`/exam/time/${exam.id}`) },
         { name: '阅卷', icon: 'icon-peixunkaoshi', event: () => router.push(`/exam/mark/${exam.id}`) },
         { name: '统计', icon: 'icon-statistics', event: () => router.push(`/exam/statis/${exam.id}`) },
+        { name: '扫码答题', icon: 'icon-datika', event: () => router.push(`/exam/qrcode/${exam.id}`) },
     ]
 
     if (exam.markState === 3) {// 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）

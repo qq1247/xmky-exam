@@ -1,6 +1,6 @@
 <template>
     <el-card class="mark-setting" shadow="never">
-        <el-form ref="formRef" :model="form" :rules="formRules" label-width="100">
+        <el-form v-if="form.loginType === 1" ref="formRef" :model="form" :rules="formRules" label-width="100">
             <el-form-item label="考试用户：" prop="examUserIds">
                 <Select
                     v-model="form.examUserIds"
@@ -36,7 +36,7 @@ const form = useExamStore() // 表单
 const formRef = ref<FormInstance>()// 表单引用
 const formRules = reactive<FormRules>({// 表单校验规则
     examUserIds: [
-        { required: true, message: '请选择考试用户', trigger: 'blur' },
+        //{ required: true, message: '请选择考试用户', trigger: 'blur' },
     ],
 })
 const examUsers = ref([] as any[]) // 考试用户

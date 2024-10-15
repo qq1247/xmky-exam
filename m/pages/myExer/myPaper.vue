@@ -38,10 +38,11 @@
 							:answers="question.answers"
 							:userScore="question.userScore"
 							:options="question.options"
+							:analysis="question.analysis"
 							:editable="exering(question)"
-							:resultShow="resultShow(question)"
-							:answersShow="answerModel === 2"
-							@change="autoNext(question)"
+							:analysisShow="analysisShow(question)"
+							:answerShow="answerShow(question)"
+							@change="(userAnswers: string[]) =>autoNext(question, userAnswers)"
 						>
 							<template #title-pre>
 								<text class="mypaper-main__question-cur-no">{{ question.no }}、</text>
@@ -67,8 +68,7 @@
 			</view>
 			<button class="mypaper-foot__pre-question" type="primary" @click="pre">上一题</button>
 			<button class="mypaper-foot__next-question" type="primary" @click="next">下一题</button>
-			<button v-if="exering" class="mypaper-foot__finish" type="primary" @click="finish">完成</button>
-			<button v-if="!exering" class="mypaper-foot__finish" type="primary" @click="toHome">返回</button>
+			<button class="mypaper-foot__finish" type="primary" @click="finish">完成</button>
 
 			<xm-popup ref="answerSheet" name="答题卡" class="answer-sheet">
 				<view class="answer-sheet-head">
@@ -113,7 +113,6 @@ import { useDictStore } from '@/stores/dict';
 import { MyExer } from '@/ts/myExer.d';
 import { Question } from '@/ts/question.d';
 import { myExerGet, myExerQuestionList2 } from '@/api/myExer';
-import { loginSysTime } from '@/api/login';
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore();
@@ -144,21 +143,18 @@ onLoad(async (options) => {
 });
 
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.mypaper-main__scroll')
-				.boundingClientRect((data: any) => {
-					questionHeight.value = res.windowHeight - data.top - 50;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.mypaper-main__scroll')
+		.boundingClientRect((data: any) => {
+			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************计算属性相关*************************/
 const exering = computed(() => (question: Question) => answerModel.value === 1 && question.userScore == null); // 练习中
-const resultShow = computed(() => (question: Question) => (answerModel.value === 1 && question.userScore != null) || answerModel.value === 2); // 结果显示
+const analysisShow = computed(() => (question: Question) => answerModel.value === 2 || question.userScore != null); // 解析显示
+const answerShow = computed(() => (question: Question) => answerModel.value === 2); // 标准答案显示
 const questionNum = computed(() => questions.value.length); // 试题数量
 const userAnswerNum = computed(() => questions.value.reduce((total, question) => (question.userAnswers.some((userAnswer) => userAnswer.length) ? total + 1 : total), 0)); // 用户答题数量
 
@@ -228,11 +224,11 @@ function answered(question: Question) {
 }
 
 // 标记
-function mark(id: number) {
-	if (marks.value.includes(id)) {
-		marks.value = marks.value.filter((_id) => _id != id);
+function mark(no: number) {
+	if (marks.value.includes(no)) {
+		marks.value = marks.value.filter((_no) => _no != no);
 	} else {
-		marks.value.push(id);
+		marks.value.push(no);
 	}
 }
 
@@ -264,7 +260,6 @@ async function pre() {
 // 下一题
 async function next() {
 	let curQuestion = questions.value[curQuestionIndex.value];
-	console.log(curQuestionIndex.value, questions);
 	// 如果是单选多选判断，并且已答题，并且没打分
 	if ((curQuestion.type === 1 || curQuestion.type === 2 || curQuestion.type === 4) && answered(curQuestion) && !scored(curQuestion)) {
 		// 智能打分
@@ -279,7 +274,7 @@ async function next() {
 }
 
 // 自动下一题
-function autoNext(question: Question) {
+function autoNext(question: Question, userAnswers: string[]) {
 	// 如果是单选或判断，并且是答题模式
 	if ((question.type === 1 || question.type === 4) && answerModel.value === 1) {
 		// 智能打分
@@ -405,6 +400,11 @@ function toHome() {
 			// #ifdef MP-WEIXIN
 			:deep(swiper) {
 				height: 100%;
+				swiper-item {
+					& > view {
+						height: 100%;
+					}
+				}
 			}
 			// #endif
 		}

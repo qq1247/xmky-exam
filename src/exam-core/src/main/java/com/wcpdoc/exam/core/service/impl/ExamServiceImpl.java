@@ -340,11 +340,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					Date oldMyMarkEndTime = myExam.getMarkEndTime();
 					myExam.setMarkEndTime(exam.getMarkEndTime());
 					myExamService.updateById(myExam);
-					
+
 					User examUser = baseCacheService.getUser(myExam.getUserId());
 					log.info("【{}-{}】变更【{}-{}】【{}-{}】阅卷结束时间，{}->{}", curUser.getLoginName(), curUser.getName(),
 							exam.getId(), exam.getName(), examUser.getLoginName(), examUser.getName(),
-							DateUtil.formatDateTime(oldMyMarkEndTime), DateUtil.formatDateTime(myExam.getMarkEndTime()));
+							DateUtil.formatDateTime(oldMyMarkEndTime),
+							DateUtil.formatDateTime(myExam.getMarkEndTime()));
 				});
 	}
 
@@ -453,17 +454,19 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					if (!ExamUtil.hasTimeLimit(exam)) {// 如果是不限时考试
 						myExam.setAnswerEndTime(exam.getEndTime());// 用户考试结束时间和考试时间对齐
 					} else {// 如果是限时考试
-						myExam.setAnswerEndTime(DateUtil.getNextMinute(myExam.getAnswerStartTime(), exam.getLimitMinute()));// 进行时间补偿或裁剪
+						myExam.setAnswerEndTime(
+								DateUtil.getNextMinute(myExam.getAnswerStartTime(), exam.getLimitMinute()));// 进行时间补偿或裁剪
 						if (myExam.getAnswerEndTime().getTime() > exam.getEndTime().getTime()) {// 超出考试结束边界，重置到考试结束边界
 							myExam.setAnswerEndTime(exam.getEndTime());
 						}
 					}
 					myExamService.updateById(myExam);
-					
+
 					User examUser = baseCacheService.getUser(myExam.getUserId());
 					log.info("【{}-{}】变更【{}-{}】【{}-{}】答题结束时间，{} -> {}", curUser.getLoginName(), curUser.getName(),
 							exam.getId(), exam.getName(), examUser.getLoginName(), examUser.getName(),
-							DateUtil.formatDateTime(oldExamEndTime), DateUtil.formatDateTime(myExam.getAnswerEndTime()));
+							DateUtil.formatDateTime(oldExamEndTime),
+							DateUtil.formatDateTime(myExam.getAnswerEndTime()));
 				});
 	}
 
@@ -536,6 +539,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setMarkStartTime(examInfo.getMarkStartTime());
 		exam.setMarkEndTime(examInfo.getMarkEndTime());
 		exam.setMarkType(examInfo.getMarkType());
+		exam.setLoginType(examInfo.getLoginType());
 		exam.setScoreState(examInfo.getScoreState());
 		exam.setRankState(examInfo.getRankState());
 		exam.setAnonState(examInfo.getAnonState());
@@ -767,9 +771,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	private void publishValidUser(ExamInfo examInfo) {
-		if (!ValidateUtil.isValid(examInfo.getExamUserIds())) {
+		if (examInfo.getLoginType() == 1 && !ValidateUtil.isValid(examInfo.getExamUserIds())) {
 			throw new MyException("最少添加一个考试用户");
 		}
+		
+		if (examInfo.getLoginType() == 2 && ValidateUtil.isValid(examInfo.getExamUserIds())) {
+			throw new MyException("免登录考试不能添加考试用户");
+		}
+
 		if (examInfo.getExamUserIds().size() != new HashSet<Integer>(examInfo.getExamUserIds()).size()) {
 			throw new MyException("考试用户重复");
 		}
@@ -1127,6 +1136,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(examInfo.getGenType())
 				|| (examInfo.getGenType() != 1 && examInfo.getGenType() != 2)) {
 			throw new MyException("参数错误：genType");
+		}
+		if (!ValidateUtil.isValid(examInfo.getLoginType())
+				|| (examInfo.getLoginType() != 1 && examInfo.getLoginType() != 2)) {
+			throw new MyException("参数错误：loginType");
 		}
 		if (!ValidateUtil.isValid(examInfo.getState()) || (examInfo.getState() != 1 && examInfo.getState() != 2)) {
 			throw new MyException("参数错误：state");

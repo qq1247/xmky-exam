@@ -259,6 +259,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("markEndTime", exam.getMarkEndTime())//
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("showType", exam.getShowType())//
+					.addAttr("loginType", exam.getLoginType())//
 					.addAttr("passScore", exam.getPassScore())//
 					.addAttr("anonState", exam.getAnonState())//
 					.addAttr("scoreState", exam.getScoreState())//
@@ -325,6 +326,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("passScore", exam.getPassScore())//
 					.addAttr("totalScore", exam.getTotalScore())//
 					.addAttr("markType", exam.getMarkType())//
+					.addAttr("loginType", exam.getLoginType())//
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//

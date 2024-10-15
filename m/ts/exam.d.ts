@@ -14,6 +14,7 @@ export interface Exam {
 	totalScore: number | null; //总分数
 	markType: number | null; //阅卷方式（1：客观题；2：主观题；）
 	genType: number | null; //组卷方式（1：人工组卷；2：随机组卷）
+	loginType: number | null; //登录方式（1：正常登录；2：免登录；）
 	sxes: number[]; //反作弊（1：试题乱序；2：选项乱序；）
 	state: number | null; //状态（0：删除；1：发布；2：暂停；）
 	userNum: number | null; //考试用户数量

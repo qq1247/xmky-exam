@@ -67,4 +67,14 @@ public interface MyExamService extends BaseService<MyExam> {
 	 * @param id void
 	 */
 	void clear(Integer examId);
+
+	/**
+	 * 生成试卷
+	 * 
+	 * v1.0 zhanghc 2024年10月10日下午7:39:54
+	 * 
+	 * @param examId
+	 * @param userId     void
+	 */
+	void generatePaper(Integer examId, Integer userId);
 }

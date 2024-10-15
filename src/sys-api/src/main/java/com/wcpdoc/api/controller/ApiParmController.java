@@ -163,6 +163,29 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
+	 * 移动端设置
+	 * 
+	 * v1.0 zhanghc 2024年9月30日下午1:03:10
+	 * 
+	 * @param title
+	 * @param content
+	 * @return PageResult
+	 */
+	@RequestMapping("/m")
+	public PageResult m(String host) {
+		try {
+			parmService.mUpdate(host);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("移动端设置修改错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("移动端设置修改错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
 	 * 参数获取
 	 * 
 	 * v1.0 chenyun 2021年11月12日下午3:38:42
@@ -173,10 +196,14 @@ public class ApiParmController extends BaseController {
 	public PageResult get() {
 		try {
 			Parm parm = parmService.getById(1);
-			return PageResultEx.ok().addAttr("entName", parm.getEntName())
-					.addAttr("fileUploadDir", parm.getFileUploadDir()).addAttr("dbBakDir", parm.getDbBakDir())
-					.addAttr("pwdType", parm.getPwdType()).addAttr("pwdValue", parm.getPwdValue())
-					.addAttr("customTitle", parm.getCustomTitle()).addAttr("customContent", parm.getCustomContent());
+			return PageResultEx.ok()//
+					.addAttr("entName", parm.getEntName())//
+					.addAttr("fileUploadDir", parm.getFileUploadDir())//
+					.addAttr("dbBakDir", parm.getDbBakDir())//
+					.addAttr("pwdType", parm.getPwdType())//
+					.addAttr("pwdValue", parm.getPwdValue())//
+					.addAttr("customTitle", parm.getCustomTitle())//
+					.addAttr("customContent", parm.getCustomContent()).addAttr("mHost", parm.getMHost());
 		} catch (MyException e) {
 			log.error("参数获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

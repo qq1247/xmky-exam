@@ -23,6 +23,7 @@ export const useExamStore = defineStore('exam', () => {
     const passScore = ref(0) // 及格分数
     const sxes = ref([] as number[]) // 防作弊
     const showType = ref(1) // 展示方式
+    const loginType = ref(1) // 登录方式（1：正常登录；2：免登录；）
     const anonState = ref(2) // 匿名阅卷（1：是；2：否）
     const scoreState = ref(2) // 成绩查询（1：考试结束后；2：不公布；3：交卷后）
     const rankState = ref(2) // 排名公布（1：是；2：否）
@@ -111,7 +112,7 @@ export const useExamStore = defineStore('exam', () => {
     }
     return {
         // 属性
-        id, name, paperName, examTimes, markTimes, limitMinute, genType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds,
+        id, name, paperName, examTimes, markTimes, limitMinute, genType, loginType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds,
         // 计算属性
         totalScore, markQuestions, markType, examUserNum, markUserNum, objectiveQuestionNum, subjectiveQuestionNum, examTimeDiff,
         // 方法

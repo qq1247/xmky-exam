@@ -112,8 +112,6 @@
 import { ref } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
-import { Bulletin } from '@/ts/bulletin.d';
-import { MyExam } from '@/ts/myExam.d';
 import { myExamListpage } from '@/api/myExam';
 import { myExerListpage } from '@/api/myExer';
 import { bulletinListpage } from '@/api/bulletin';
@@ -146,16 +144,12 @@ onShow(async () => {
 });
 
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			uni.createSelectorQuery()
-				.select('.home-foot__scroll')
-				.boundingClientRect((data: any) => {
-					taskListHeight.value = res.windowHeight - data.top;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.home-foot__scroll')
+		.boundingClientRect((data: any) => {
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************事件相关*****************************/
@@ -215,7 +209,7 @@ function quickNav({ detail: { index } }) {
 	}
 	if (index === 1) {
 		uni.switchTab({
-			url: '/pages/myExam/myExam'
+			url: '/pages/myExer/myExer'
 		});
 		return;
 	}

@@ -15,7 +15,7 @@
             <el-form-item label="及格分数：">
                 {{ examStore.passScore }} / {{ examStore.totalScore }}
             </el-form-item>
-            <el-form-item label="防 作 弊：">
+            <el-form-item label="防止作弊：">
                 {{ examStore.sxes.length ? '' : '无' }}
                 {{ examStore.sxes.indexOf(1) !== -1 ? '试题乱序' : '' }}
                 {{ examStore.sxes.indexOf(2) !== -1 ? '选项乱序' : '' }}
@@ -23,6 +23,9 @@
             <!-- <el-form-item label="匿名阅卷：">
                 {{ examStore.anonState === 1 ? '是' : '否' }}
             </el-form-item> -->
+            <el-form-item label="登录方式：">
+                {{ dictStore.getValue('LOGIN_TYPE', examStore.loginType) }}
+            </el-form-item>
             <el-form-item label="成绩查询：">
                 {{ dictStore.getValue('SCORE_STATE', examStore.scoreState) }}
             </el-form-item>

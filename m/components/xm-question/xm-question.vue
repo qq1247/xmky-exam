@@ -7,8 +7,7 @@
 				<text v-if="title.type === 'txt'" class="question-title__text">{{ title.value }}</text>
 				<view v-else class="question-title__fill-blank">
 					<input
-						:modelValue="userAnswers[title.index]"
-						@update:modelValue="(value: string) => userAnswers[title.index] = value"
+						v-model="userAnswers[title.index]"
 						@input="
 							() => {
 								$emit('update:modelValue', userAnswers);
@@ -81,9 +80,13 @@
 		<!-- 问答题答案 -->
 		<textarea
 			v-if="type === 5"
-			:modelValue="escape2Html(userAnswers[0])"
-			@update:modelValue="(value: string) => {userAnswers[0] = value; $emit('update:modelValue', userAnswers); $emit('change', userAnswers) }"
-			@input="() => $emit('update:modelValue', userAnswers)"
+			v-model="userAnswers[0]"
+			@input="
+				() => {
+					$emit('update:modelValue', userAnswers);
+					$emit('change', userAnswers);
+				}
+			"
 			type="textarea"
 			placeholder="请输入答案"
 			:inputBorder="false"
@@ -95,7 +98,7 @@
 			class="question-user-answer"
 		></textarea>
 		<!-- 分数 -->
-		<view v-if="resultShow" class="question-score">
+		<view v-if="analysisShow" class="question-score">
 			<view>
 				<uni-icons customPrefix="iconfont" type="icon-defen" color="#0d9df6" size="34rpx"></uni-icons>
 				<text class="question-score__label">得分:</text>
@@ -108,7 +111,7 @@
 			</view>
 		</view>
 		<!-- 答案 -->
-		<view v-if="resultShow && (type === 1 || type === 2 || type === 4)" class="question-select-answer">
+		<view v-if="analysisShow && (type === 1 || type === 2 || type === 4)" class="question-select-answer">
 			<view class="question-select-answer__diff">
 				<text class="question-select-answer__label">作答答案</text>
 				<text
@@ -126,26 +129,26 @@
 				<text class="question-select-answer__value question-select-answer__value--succ">{{ answers.join('') }}</text>
 			</view>
 		</view>
-		<view v-else-if="resultShow && type === 3" class="question-fill-blank-answer">
+		<view v-else-if="analysisShow && type === 3" class="question-fill-blank-answer">
 			<text class="question-fill-blank-answer__label">标准答案</text>
 			<view class="question-title">
 				<template v-for="(title, index) in titles as Title[]" :key="index">
 					<text v-if="title.type === 'txt'" class="question-title__text">{{ title.value }}</text>
 					<view v-else class="question-title__fill-blank">
-						<input :modelValue="answers[title.index]" :disabled="!editable" :style="{ width: (title.value.length > 20 ? 20 : title.value.length) * 26 + 50 + 'rpx' }" />
+						<input :value="answers[title.index]" :disabled="!editable" :style="{ width: (title.value.length > 20 ? 20 : title.value.length) * 26 + 50 + 'rpx' }" />
 						<text class="question-title__score"></text>
 					</view>
 				</template>
 			</view>
 		</view>
-		<view v-else-if="resultShow && type === 5" class="question-qa-answer">
+		<view v-else-if="analysisShow && type === 5" class="question-qa-answer">
 			<text class="question-qa-answer__label">标准答案</text>
 			<view>
 				<text class="question-qa-answer__content">{{ answers[0] }}</text>
 			</view>
 		</view>
 		<!-- 解析 -->
-		<view v-if="resultShow && analysis" class="question-analysis">
+		<view v-if="analysisShow && analysis" class="question-analysis">
 			<view class="question-analysis__title-wrap">
 				<view class="question-analysis__title-icon"></view>
 				<view class="question-analysis__title-icon1"></view>
@@ -184,8 +187,8 @@ const props = withDefaults(
 		userScore?: number; //用户分数
 		analysis?: string; // 解析
 		editable?: boolean; // 可编辑（true：是；false：否）
-		answersShow?: boolean; // 标准答案显示（true：用户答案显示；false：标准答案显示）
-		resultShow?: boolean; // 成绩显示（true：显示；false：不显示）
+		answerShow?: boolean; // 标准答案显示（true：用户答案显示；false：标准答案显示）
+		analysisShow?: boolean; // 解析显示（true：显示；false：不显示）
 	}>(),
 	{
 		modelValue: () => [],
@@ -196,13 +199,13 @@ const props = withDefaults(
 		answers: () => [],
 		options: () => [],
 		editable: false,
-		answersShow: false,
-		resultShow: false
+		answerShow: false,
+		analysisShow: false
 	}
 );
 
 const judges = ['对', '错']; // 判断题使用
-const userAnswers = ref(props.modelValue); // 用户答案
+const userAnswers = ref(escape2Html(props.modelValue)); // 用户答案
 
 /************************组件生命周期相关*********************/
 onLoad(async () => {
@@ -244,11 +247,11 @@ const isChecked = computed(() => (curAnswer: string) => {
 	if (!(props.type === 1 || props.type === 2 || props.type === 4)) {
 		return false;
 	}
-	return !props.answersShow ? userAnswers.value.includes(curAnswer) : props.answers.includes(curAnswer);
+	return !props.answerShow ? userAnswers.value.includes(curAnswer) : props.answers.includes(curAnswer);
 }); // 指定选项是否选中
 
 const isSucc = computed(() => (curAnswer: string) => {
-	if (!props.resultShow) {
+	if (!props.analysisShow) {
 		return false;
 	}
 
@@ -264,7 +267,7 @@ const isSucc = computed(() => (curAnswer: string) => {
 }); // 指定选项是否答对
 
 const isErr = computed(() => (curAnswer: string) => {
-	if (!props.resultShow) {
+	if (!props.analysisShow) {
 		return false;
 	}
 
@@ -345,6 +348,11 @@ function escape2Html(txt: string | string[]) {
 			.uni-input-input {
 				text-align: center;
 			}
+			// #ifdef MP-WEIXIN
+			input {
+				text-align: center;
+			}
+			// #endif
 			.question-title__score {
 				position: absolute;
 				//left: 50%;

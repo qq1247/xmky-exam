@@ -13,8 +13,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed } from 'vue';
-import { onLoad, onReady } from '@dcloudio/uni-app';
+import { ref, reactive } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 import { Bulletin } from '@/ts/bulletin.d';
 import { bulletinGet } from '@/api/bulletin';
 
@@ -30,12 +30,12 @@ const bulletin = reactive<Bulletin>({
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	bulletin.id = options.id;
-	await bulletinQuery(false);
+	await bulletinQuery();
 });
 
 /************************事件相关*****************************/
 // 公告列表查询
-async function bulletinQuery(append: boolean) {
+async function bulletinQuery() {
 	let { data } = await bulletinGet({ id: bulletin.id });
 	bulletin.id = data.id;
 	bulletin.title = data.title;

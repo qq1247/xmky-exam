@@ -319,9 +319,12 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 
 		}
 		if (CurLoginUserUtil.isSubAdmin()) {// 子管理看自己的人
-			if (!baseCacheService.getUser(getCurUser().getId()).getUserIds().contains(userId)) {
+			if (examCacheService.getExam(examId).getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 				throw new MyException("无查阅权限");
 			}
+//			if (!baseCacheService.getUser(getCurUser().getId()).getUserIds().contains(userId)) {
+//				throw new MyException("无查阅权限");// 免登录考试中，考试用户不是自己管理的人
+//			}
 		}
 		if (CurLoginUserUtil.isMarkUser()) {// 协助阅卷只看自己阅过的
 			if (myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {

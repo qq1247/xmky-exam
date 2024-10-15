@@ -15,17 +15,17 @@
 						<view class="myread-user-content__outer">
 							<view class="myread-user-content__inner">
 								<text class="myread-exam__label">账号：</text>
-								<text class="myread-exam__value">{{ user.loginName }}</text>
+								<text class="myread-exam__value">{{ user.loginName || '-' }}</text>
 							</view>
 						</view>
 						<view class="myread-user-content__outer">
 							<view class="myread-user-content__inner">
 								<text class="myread-exam__label">姓名：</text>
-								<text class="myread-exam__value">{{ user.name }}</text>
+								<text class="myread-exam__value">{{ user.name || '-' }}</text>
 							</view>
 							<view class="myread-user-content__inner">
 								<text class="myread-exam__label">机构：</text>
-								<text class="myread-exam__value">{{ user.orgName }}</text>
+								<text class="myread-exam__value">{{ user.orgName || '-' }}</text>
 							</view>
 						</view>
 					</view>
@@ -80,7 +80,7 @@
 						</view>
 						<view class="myread-exam__row">
 							<text class="myread-exam__label">考试分数：</text>
-							<text class="myread-exam__value">{{ exam.passScore }} / {{ exam.totalScore }}</text>
+							<text class="myread-exam__value">{{ exam.passScore }} / {{ exam.totalScore }}（及格 / 总分）</text>
 						</view>
 						<view class="myread-exam__row">
 							<text class="myread-exam__label">试卷类型：</text>
@@ -198,12 +198,6 @@
 				></xm-count-down>
 				<text>进入考试</text>
 			</button>
-			<button
-				type="primary"
-				@click="$router.push('/pages/login/anonLogin')"
-			>
-				<text>登录</text>
-			</button>
 		</view>
 	</view>
 </template>
@@ -216,7 +210,7 @@ import { Exam } from '@/ts/exam.d';
 import { MyExam } from '@/ts/myExam.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
-import { myExamExamGet, myExamGet, myExamQuestionStatis } from '@/api/myExam';
+import { myExamExamGet, myExamGet, myExamQuestionStatis, myExamGeneratePaper } from '@/api/myExam';
 import { useDictStore } from '@/stores/dict';
 
 /************************变量定义相关***********************/
@@ -246,6 +240,7 @@ const exam = reactive<Exam>({
 	totalScore: null,
 	markType: null,
 	genType: null,
+	loginType: null,
 	sxes: [],
 	state: null,
 	userNum: null,
@@ -296,25 +291,26 @@ const questionStatisOpts = reactive({
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	examId.value = options.examId;
+	if (options.loginType === '2') {
+		let { code, msg } = await myExamGeneratePaper({ examId: examId.value });
+		if (code !== 200) {
+			return;
+		}
+	}
 
-	userQuery();
 	examQuery();
+	userQuery();
 	myExamQuery();
 	questionStatisQueryWithInit();
 });
 
 onReady(() => {
-	uni.getSystemInfo({
-		success(res) {
-			let wHeight = res.windowHeight;
-			let titleH = uni.createSelectorQuery().select('.myread-main__scroll');
-			titleH
-				.boundingClientRect((data: any) => {
-					myreadMainHeight.value = wHeight - data.top - 80;
-				})
-				.exec();
-		}
-	});
+	uni.createSelectorQuery()
+		.select('.myread-main__scroll')
+		.boundingClientRect((data: any) => {
+			myreadMainHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+		})
+		.exec();
 });
 
 /************************计算属性相关*************************/

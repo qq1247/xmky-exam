@@ -17,7 +17,7 @@
             <div v-if="progressBar.percent > 0 && active >= 4" class="edit-bottom-percent">
                 <el-progress :percentage="progressBar.percent">{{ progressBar.msg }}</el-progress>
             </div>
-            <el-button v-if="active >= 1 && paperShow != 'editor' && btnShow" type="primary" @click="active--">上一步</el-button>
+            <el-button v-if="active >= 1 && paperShow != 'editor' && btnShow" type="primary" @click="pre()">上一步</el-button>
             <el-button v-if="active >= 1 && active < 4 && paperShow != 'editor' && btnShow" type="primary" @click="next()">下一步</el-button>
             <el-button v-if="active >= 4 && paperShow != 'editor' && btnShow" type="primary" @click="publish()">发布</el-button>
         </div>
@@ -74,6 +74,7 @@ onMounted(async () => {
         form.passScore = 0
         form.sxes = [] as number[]
         form.showType = 1
+        form.loginType = 1
         form.anonState = 2
         form.scoreState = 2
         form.rankState = 2
@@ -97,6 +98,7 @@ onMounted(async () => {
             form.markTimes[1] = data.markEndTime
         }
         form.genType = data.genType
+        form.loginType = data.loginType
         form.passScore = data.passScore
         form.sxes = data.sxes
         form.showType = data.showType
@@ -164,6 +166,9 @@ async function next() {
         let component = examSetting
         if (await component.value.next()) {
             active.value++
+            if (form.loginType === 2) {
+                active.value++
+            } 
         }
         return
     }
@@ -175,6 +180,16 @@ async function next() {
         }
     }
 }
+
+// 上一步
+async function pre() {
+    active.value--
+    if (active.value === 3 && form.loginType === 2) {
+        active.value--
+    }
+}
+
+
 
 // 发布考试
 async function publish() {
@@ -190,6 +205,7 @@ async function publish() {
             passScore: form.passScore,
             sxes: form.sxes,
             showType: form.showType,
+            loginType: form.loginType,
             anonState: form.anonState,
             scoreState: form.scoreState,
             rankState: form.rankState,

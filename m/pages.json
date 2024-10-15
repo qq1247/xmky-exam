@@ -26,7 +26,7 @@
 	}, {
 		"path": "pages/center/custom"
 	}, {
-		"path": "pages/login/anonLogin"
+		"path": "pages/login/noLogin"
 	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
@@ -40,50 +40,29 @@
 	},
 	"tabBar": {
 		"color": "#7A7E83",
-		"selectedColor": "#007AFF",
+		"selectedColor": "#0d9df6",
 		"borderStyle": "black",
 		"backgroundColor": "#F8F8F8",
-		"iconfontSrc": "/static/font/iconfont.ttf",
 		"list": [{
 			"pagePath": "pages/home/home",
-			"text": "首页",
-			"iconfont": {
-				"text": "\ue61a",
-				"selectedText": "\ue61a",
-				"fontSize": "48rpx",
-				"color": "#000000",
-				"selectedColor": "#2979ff"
-			}
+			"iconPath": "/static/img/tabtar/home.png",
+			"selectedIconPath": "/static/img/tabtar/home-active.png",
+			"text": "首页"
 		}, {
 			"pagePath": "pages/myExam/myExam",
-			"text": "考试",
-			"iconfont": {
-				"text": "\ue617",
-				"selectedText": "\ue617",
-				"fontSize": "48rpx",
-				"color": "#000000",
-				"selectedColor": "#2979ff"
-			}
+			"iconPath": "/static/img/tabtar/exam.png",
+			"selectedIconPath": "/static/img/tabtar/exam-active.png",
+			"text": "考试"
 		}, {
 			"pagePath": "pages/myExer/myExer",
-			"text": "练习",
-			"iconfont": {
-				"text": "\ue619",
-				"selectedText": "\ue619",
-				"fontSize": "48rpx",
-				"color": "#000000",
-				"selectedColor": "#2979ff"
-			}
+			"iconPath": "/static/img/tabtar/exer.png",
+			"selectedIconPath": "/static/img/tabtar/exer-active.png",
+			"text": "练习"
 		}, {
 			"pagePath": "pages/center/center",
-			"text": "个人中心",
-			"iconfont": {
-				"text": "\ue618",
-				"selectedText": "\ue618",
-				"fontSize": "48rpx",
-				"color": "#000000",
-				"selectedColor": "#2979ff"
-			}
+			"iconPath": "/static/img/tabtar/center.png",
+			"selectedIconPath": "/static/img/tabtar/center-active.png",
+			"text": "个人中心"
 		}]
 	}
 }

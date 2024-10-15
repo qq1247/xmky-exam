@@ -36,6 +36,7 @@ public class Exam {
 	private BigDecimal totalScore;
 	private Integer markType;
 	private Integer showType;
+	private Integer loginType;
 	private Integer genType;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> sxes;

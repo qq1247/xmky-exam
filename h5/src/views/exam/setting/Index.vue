@@ -68,6 +68,12 @@ onMounted(() => {
         icon: 'icon-persons',
         url: `/exam/markUser/${route.params.id}`,
     })
+    tabs.push({
+        title: '扫码答题',
+        desc: '扫码答题',
+        icon: 'icon-persons',
+        url: `/exam/qrcode/${route.params.id}`,
+    })
 })
 
 /**
