@@ -182,7 +182,7 @@ async function bulletinQuery() {
 
 // 公告查询
 function toBulletin(bulletin: any) {
-	if (bulletin) {
+	if (bulletin && bulletin.id) {
 		uni.navigateTo({ url: `/pages/bulletin/bulletinDetail?id=${bulletin.id}` });
 	} else {
 		uni.navigateTo({ url: `/pages/bulletin/bulletin` });

@@ -20,8 +20,8 @@
 				</button>
 				<uni-icons
 					customPrefix="iconfont"
-					:type="marks.includes(questions[curQuestionIndex].no) ? 'icon-biaoji2' : 'icon-igw-l-sign'"
-					:color="marks.includes(questions[curQuestionIndex].no) ? '#FF8C11' : '#231815'"
+					:type="isMark(questions[curQuestionIndex]) ? 'icon-biaoji2' : 'icon-igw-l-sign'"
+					:color="isMark(questions[curQuestionIndex]) ? '#FF8C11' : '#231815'"
 					size="36rpx"
 					@click="mark(questions[curQuestionIndex].no)"
 				></uni-icons>

@@ -22,8 +22,8 @@
 				<uni-icons
 					v-if="examQuestions[curQuestionIndex].type === 2"
 					customPrefix="iconfont"
-					:type="marks.includes(curQuestionIndex) ? 'icon-biaoji2' : 'icon-igw-l-sign'"
-					:color="marks.includes(curQuestionIndex) ? '#FF8C11' : '#231815'"
+					:type="isMark(examQuestions[curQuestionIndex]) ? 'icon-biaoji2' : 'icon-igw-l-sign'"
+					:color="isMark(examQuestions[curQuestionIndex]) ? '#FF8C11' : '#231815'"
 					size="36rpx"
 					@click="mark(examQuestions[curQuestionIndex].no)"
 				></uni-icons>

@@ -124,6 +124,7 @@ async function out() {
 				margin: 0rpx 20rpx;
 				height: 130rpx;
 				width: 130rpx;
+				z-index: 0;
 			}
 			.center-head__inner {
 				display: flex;

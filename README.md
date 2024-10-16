@@ -42,7 +42,7 @@
 <a href="img/webpage">去查看</a>
 
 ## 技术实现
-bs架构：jdk8、mysql5.7、springboot2x、element-plus（vue3）、unapp
+bs架构：jdk8、mysql5.7、springboot2x、element-plus（vue3）、uni-app
 
 ## 技术交流
 软件bug：可直接提Issues或提qq群（811189776），按严重程度决定修复版本的时间<br/>
