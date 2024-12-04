@@ -22,4 +22,20 @@ public class QuestionType {
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;
+	/** 客观题数量*/
+	private Integer objectiveNum;
+	/** 主观题数量*/
+	private Integer subjectiveNum;
+	/** 单选题数量*/
+	private Integer singleNum;
+	/** 多选题数量*/
+	private Integer multipleNum;
+	/** 判断题数量*/
+	private Integer judgeNum;
+	/** 填空题数量*/
+	private Integer blankNum;
+	/** 简答题数量*/
+	private Integer shortAnswerNum;
+	/** 试题总数量*/
+	private Integer questionNum;
 }

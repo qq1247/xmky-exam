@@ -21,7 +21,9 @@ public interface QuestionTypeDao extends RBaseDao<QuestionType> {
 				new MPJQueryWrapper<QuestionType>().setAlias("QUESTION_TYPE")//
 						.leftJoin("SYS_USER CREATE_USER ON QUESTION_TYPE.CREATE_USER_ID = CREATE_USER.ID")
 						.select("QUESTION_TYPE.ID", "QUESTION_TYPE.NAME", "CREATE_USER.NAME AS CREATE_USER_NAME",
-								"(SELECT COUNT(*) FROM EXM_QUESTION Z WHERE Z.QUESTION_TYPE_ID = QUESTION_TYPE.ID AND Z.STATE = 1) AS QUESTION_NUM")//
+								"QUESTION_TYPE.QUESTION_NUM","QUESTION_TYPE.OBJECTIVE_NUM","QUESTION_TYPE.SUBJECTIVE_NUM",
+								"QUESTION_TYPE.SINGLE_NUM","QUESTION_TYPE.MULTIPLE_NUM","QUESTION_TYPE.JUDGE_NUM",
+								"QUESTION_TYPE.BLANK_NUM","QUESTION_TYPE.SHORT_ANSWER_NUM","QUESTION_TYPE.UPDATE_TIME")//
 						.like(pageIn.hasParm("name"), "QUESTION_TYPE.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("id"), "QUESTION_TYPE.ID", pageIn.getParm("id"))//
 						.eq(pageIn.hasParm("curUserId"), "QUESTION_TYPE.CREATE_USER_ID", pageIn.getParm("curUserId"))//

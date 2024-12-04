@@ -82,6 +82,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 附件保存
 		addFile(question, options);
+
+		questionTypeService.computeTypeNum(questionType.getId());
 	}
 
 	@Override
@@ -119,6 +121,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 附件保存
 		addFile(question, options);
+
+		questionTypeService.computeTypeNum(questionType.getId());
 	}
 
 	@Override
@@ -137,6 +141,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		updateById(question);
+
+		questionTypeService.computeTypeNum(question.getQuestionTypeId());
 	}
 
 	@Override

@@ -5,3 +5,7 @@
 /bin/
 *.bak
 *.sql
+/.idea/
+/bak/
+*.pid
+*.iml

@@ -74,6 +74,14 @@ public class ApiQuestionTypeController extends BaseController {
 			questionType.setCreateUserId(getCurUser().getId());
 			questionType.setUpdateTime(new Date());
 			questionType.setUpdateUserId(getCurUser().getId());
+			questionType.setObjectiveNum(0);
+			questionType.setSubjectiveNum(0);
+			questionType.setSingleNum(0);
+			questionType.setMultipleNum(0);
+			questionType.setJudgeNum(0);
+			questionType.setBlankNum(0);
+			questionType.setShortAnswerNum(0);
+			questionType.setQuestionNum(0);
 			questionTypeService.save(questionType);
 			
 			return PageResultEx.ok().data(questionType.getId());

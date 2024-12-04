@@ -2,6 +2,8 @@ package com.wcpdoc.exam.core.service.impl;
 
 import javax.annotation.Resource;
 
+import com.wcpdoc.exam.core.dao.QuestionDao;
+import com.wcpdoc.exam.core.entity.Question;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
@@ -12,6 +14,8 @@ import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+
+import java.util.List;
 
 /**
  * 题库服务层实现
@@ -24,6 +28,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private QuestionTypeDao questionTypeDao;
 	@Resource
 	private QuestionTypeExService questionTypeExService;
+	@Resource
+	private QuestionDao questionDao;
 
 	@Override
 	public RBaseDao<QuestionType> getDao() {
@@ -54,5 +60,53 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Override
 	public void clear(Integer id) {
 		questionTypeExService.clear(id);
+	}
+
+	@Override
+	public void computeTypeNum(Integer id) {
+		QuestionType questionType = getById(id);
+		List<Question> list = questionDao.getList(id);
+		if(list != null && list.size() > 0){
+			Integer objectiveNum = 0;
+			Integer subjectiveNum = 0;
+			Integer singleNum = 0;
+			Integer multipleNum = 0;
+			Integer judgeNum = 0;
+			Integer blankNum = 0;
+			Integer shortAnswerNum = 0;
+			Integer questionNum = list.size();
+
+			for(Question question: list){
+				switch (question.getType()){
+					case 1: singleNum += 1;
+					        break;
+					case 2: multipleNum += 1;
+						break;
+					case 3: judgeNum += 1;
+						break;
+					case 4: blankNum += 1;
+						break;
+					case 5: shortAnswerNum += 1;
+						break;
+				}
+
+				switch (question.getMarkType()){
+					case 1: objectiveNum += 1;
+						break;
+					case 2: subjectiveNum += 1;
+						break;
+				}
+			}
+			questionType.setObjectiveNum(objectiveNum);
+			questionType.setSubjectiveNum(subjectiveNum);
+			questionType.setSingleNum(singleNum);
+			questionType.setMultipleNum(multipleNum);
+			questionType.setJudgeNum(judgeNum);
+			questionType.setBlankNum(blankNum);
+			questionType.setShortAnswerNum(shortAnswerNum);
+			questionType.setQuestionNum(questionNum);
+
+			updateById(questionType);
+		}
 	}
 }

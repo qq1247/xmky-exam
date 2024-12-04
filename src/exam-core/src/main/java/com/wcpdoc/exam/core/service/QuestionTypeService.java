@@ -39,4 +39,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 */
 	void clear(Integer id);
 
+
+	void computeTypeNum(Integer id);
+
 }

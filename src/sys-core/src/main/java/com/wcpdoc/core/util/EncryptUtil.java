@@ -77,4 +77,9 @@ public class EncryptUtil {
 		return md52Hex(key, "utf-8");
 	}
 
+	public static void main(String[] args) {
+		String test1001111111 = EncryptUtil.md52Base64("abc111111");
+		System.out.println(test1001111111);
+	}
+
 }

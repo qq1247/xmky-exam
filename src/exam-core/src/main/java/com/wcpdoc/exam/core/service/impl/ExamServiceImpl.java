@@ -616,6 +616,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				examQuestion.setUpdateTime(new Date());
 				examQuestionService.save(examQuestion);
 			}
+			questionTypeService.computeTypeNum(questionType.getId());
 		}
 		// 如果是随机试卷，保存抽题规则
 		else if (examInfo.getGenType() == 2) {
