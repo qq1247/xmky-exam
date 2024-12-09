@@ -71,8 +71,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			Integer subjectiveNum = 0;
 			Integer singleNum = 0;
 			Integer multipleNum = 0;
-			Integer judgeNum = 0;
 			Integer blankNum = 0;
+			Integer judgeNum = 0;
 			Integer shortAnswerNum = 0;
 			Integer questionNum = list.size();
 
@@ -82,9 +82,9 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 					        break;
 					case 2: multipleNum += 1;
 						break;
-					case 3: judgeNum += 1;
+					case 3: blankNum += 1;
 						break;
-					case 4: blankNum += 1;
+					case 4: judgeNum += 1;
 						break;
 					case 5: shortAnswerNum += 1;
 						break;
@@ -101,8 +101,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			questionType.setSubjectiveNum(subjectiveNum);
 			questionType.setSingleNum(singleNum);
 			questionType.setMultipleNum(multipleNum);
-			questionType.setJudgeNum(judgeNum);
 			questionType.setBlankNum(blankNum);
+			questionType.setJudgeNum(judgeNum);
 			questionType.setShortAnswerNum(shortAnswerNum);
 			questionType.setQuestionNum(questionNum);
 
