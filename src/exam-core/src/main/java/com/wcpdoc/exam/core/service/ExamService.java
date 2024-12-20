@@ -93,4 +93,12 @@ public interface ExamService extends BaseService<Exam> {
 	 * @param markUserIds void
 	 */
 	void assist(Integer id, Integer[] markUserIds);
+
+	void changeName(Integer id, String name);
+
+	void changeSxes(Integer id, List<Integer> sxes);
+
+	void changeScoreState(Integer id, Integer scoreState);
+
+	void changeRankState(Integer id, Integer rankState);
 }

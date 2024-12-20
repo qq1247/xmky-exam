@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.UserService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +34,8 @@ public class ApiQuestionTypeController extends BaseController {
 	
 	@Resource
 	private QuestionTypeService questionTypeService;
-	
+	@Resource
+	private UserService userService;
 	/**
 	 * 题库列表 
 	 * 
@@ -164,6 +167,26 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName());
+		} catch (MyException e) {
+			log.error("题库获取错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("题库获取错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	@RequestMapping("/getById")
+	public PageResult getById(Integer id) {
+		try {
+			QuestionType entity = questionTypeService.getById(id);
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			User user = userService.getById(entity.getCreateUserId());
+			return PageResultEx.ok()
+					.addAttr("type",entity)
+					.addAttr("cuser",user.getName());
 		} catch (MyException e) {
 			log.error("题库获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

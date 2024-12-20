@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -330,7 +331,9 @@ public class ApiExamController extends BaseController {
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
-					.addAttr("userNum", exam.getUserNum());//
+					.addAttr("userNum", exam.getUserNum())//
+					.addAttr("markUserNum",exam.getMarkUserNum())//阅卷人数
+					.addAttr("limitMinute", exam.getLimitMinute());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -492,5 +495,52 @@ public class ApiExamController extends BaseController {
 			log.error("考试用户列表错误：", e);
 			return PageResult.err();
 		}
+	}
+
+	/**
+	 * 修改考试名称
+	 *
+	 * @param id
+	 * @param name
+	 * @return PageResult
+	 */
+	@RequestMapping("/changeName")
+	public PageResult changeName(Integer id, String name) {
+		examService.changeName(id, name);
+		return PageResult.ok();
+	}
+
+	/**
+	 * 修改考试防作弊
+	 * @param id
+	 * @param sxes
+	 * @return PageResult
+	 */
+	@RequestMapping("/changeSxes")
+	public PageResult changeSxes(@RequestParam Integer id, @RequestParam List<Integer> sxes) {
+		examService.changeSxes(id, sxes);
+		return PageResult.ok();
+	}
+	/**
+	 * 修改成绩公布状态
+	 * @param id
+	 * @param scoreState
+	 * @return PageResult
+	 */
+	@RequestMapping("/changeScoreState")
+	public PageResult changeScoreState(Integer id, Integer scoreState) {
+		examService.changeScoreState(id, scoreState);
+		return PageResult.ok();
+	}
+	/**
+	 * 修改排名公布状态
+	 * @param id
+	 * @param rankState
+	 * @return PageResult
+	 */
+	@RequestMapping("/changeRankState")
+	public PageResult changeRankState(Integer id, Integer rankState) {
+		examService.changeRankState(id, rankState);
+		return PageResult.ok();
 	}
 }

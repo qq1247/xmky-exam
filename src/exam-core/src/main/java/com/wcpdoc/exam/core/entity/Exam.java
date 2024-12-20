@@ -46,4 +46,6 @@ public class Exam {
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;
+	/** 阅卷人数  */
+	private Integer markUserNum;
 }

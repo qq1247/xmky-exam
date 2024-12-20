@@ -205,6 +205,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	}
 
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
 	@Override
 	public void assist(Integer id, Integer[] markUserIds) {
 		// 数据校验
@@ -224,6 +225,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myMark.setUpdateUserId(getCurUser().getId());
 			myMarkService.save(myMark);
 		}
+		Exam exam = getById(id);
+		exam.setMarkUserNum(markUserIds.length);
+		updateById(exam);
 	}
 
 	@Override
@@ -1294,5 +1298,57 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //				throw new MyException("阅卷已结束");
 //			}
 //		}
+	}
+
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	@Override
+	public void changeName(Integer id, String name) {
+		Exam exam = getById(id);
+		Date now = new Date();
+		Date startTime = exam.getStartTime();
+		if(now.after(startTime)){
+			throw new MyException("已开始考试，名称不能修改");
+		}
+		exam.setName(name);
+		updateById(exam);
+	}
+
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	@Override
+	public void changeSxes(Integer id, List<Integer> sxes) {
+		Exam exam = getById(id);
+		Date now = new Date();
+		Date startTime = exam.getStartTime();
+		if(now.after(startTime)){
+			throw new MyException("已开始考试，名称不能修改");
+		}
+		exam.setSxes(sxes);
+		updateById(exam);
+	}
+
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	@Override
+	public void changeScoreState(Integer id, Integer scoreState){
+		Exam exam = getById(id);
+		Date now = new Date();
+		Date startTime = exam.getStartTime();
+		if(now.after(startTime)){
+			throw new MyException("已开始考试，名称不能修改");
+		}
+		exam.setScoreState(scoreState);
+		updateById(exam);
+	}
+
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	@Override
+	public void changeRankState(Integer id, Integer rankState){
+		Exam exam = getById(id);
+		Date now = new Date();
+		Date startTime = exam.getStartTime();
+		if(now.after(startTime)){
+			throw new MyException("已开始考试，名称不能修改");
+		}
+		exam.setRankState(rankState);
+		updateById(exam);
 	}
 }
