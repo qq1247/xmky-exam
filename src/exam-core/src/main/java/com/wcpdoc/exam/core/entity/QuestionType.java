@@ -34,11 +34,10 @@ public class QuestionType {
 	/** 判断题数量*/
 	private Integer judgeNum;
 	/** 填空题数量*/
-	@TableField("FILL_BLANK_NUM")
-	private Integer blankNum;
+	private Integer fillBlankNum;
 	/** 简答题数量*/
 	@TableField("QA_NUM")
-	private Integer shortAnswerNum;
+	private Integer qaNum;
 	/** 试题总数量*/
 	private Integer questionNum;
 }
