@@ -101,9 +101,9 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			questionType.setSubjectiveNum(subjectiveNum);
 			questionType.setSingleNum(singleNum);
 			questionType.setMultipleNum(multipleNum);
-			questionType.setBlankNum(blankNum);
+			questionType.setFillBlankNum(blankNum);
 			questionType.setJudgeNum(judgeNum);
-			questionType.setShortAnswerNum(shortAnswerNum);
+			questionType.setQaNum(shortAnswerNum);
 			questionType.setQuestionNum(questionNum);
 
 			updateById(questionType);
