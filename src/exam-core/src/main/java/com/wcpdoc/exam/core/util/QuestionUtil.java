@@ -74,7 +74,7 @@ public class QuestionUtil {
 	 * @param question
 	 * @return boolean
 	 */
-	public static boolean hasTrueFalse(Question question) {
+	public static boolean hasJudge(Question question) {
 		return question.getType() == 4;
 	}
 

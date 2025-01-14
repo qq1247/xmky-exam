@@ -207,7 +207,7 @@ public class ApiExamController extends BaseController {
 								examCacheService.getQuestionAnswerList(_question.getId())//
 										.forEach(answer -> {
 											if (QuestionUtil.hasSingleChoice(_question)
-													|| QuestionUtil.hasTrueFalse(_question)
+													|| QuestionUtil.hasJudge(_question)
 													|| (QuestionUtil.hasQA(_question)
 															&& QuestionUtil.hasSubjective(_question))) {
 												_answers.add(answer.getAnswer());

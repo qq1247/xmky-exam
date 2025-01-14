@@ -157,7 +157,7 @@ public class ApiMyExerController extends BaseController {
 				List<BigDecimal> scores = new ArrayList<>();
 				for(QuestionAnswer answer : questionAnswerList) {
 					if (QuestionUtil.hasSingleChoice(question) 
-							|| QuestionUtil.hasTrueFalse(question) 
+							|| QuestionUtil.hasJudge(question)
 							|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 						answers.add(answer.getAnswer());
 					} else if (QuestionUtil.hasMultipleChoice(question)) {
@@ -268,7 +268,7 @@ public class ApiMyExerController extends BaseController {
 					List<BigDecimal> scores = new ArrayList<>();
 					for(QuestionAnswer answer : questionAnswerList) {
 						if (QuestionUtil.hasSingleChoice(question) 
-								|| QuestionUtil.hasTrueFalse(question) 
+								|| QuestionUtil.hasJudge(question)
 								|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 							answers.add(answer.getAnswer());
 						} else if (QuestionUtil.hasMultipleChoice(question)) {

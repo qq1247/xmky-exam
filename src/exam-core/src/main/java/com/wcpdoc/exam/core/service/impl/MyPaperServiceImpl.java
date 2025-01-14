@@ -117,7 +117,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					List<QuestionAnswer> questionAnswerList = examCacheService
 							.getQuestionAnswerList(myQuestion.getQuestionId());
 					for (QuestionAnswer answer : questionAnswerList) {
-						if (QuestionUtil.hasTrueFalse(question)
+						if (QuestionUtil.hasJudge(question)
 								|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 							questionPart.getAnswers().add(answer.getAnswer());
 						} else if (QuestionUtil.hasSingleChoice(question)) {
@@ -143,7 +143,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 				}
 
 				if (ValidateUtil.isValid(myQuestion.getUserAnswer())) {// 组装用户答案
-					if (QuestionUtil.hasTrueFalse(question) || QuestionUtil.hasQA(question)) {
+					if (QuestionUtil.hasJudge(question) || QuestionUtil.hasQA(question)) {
 						questionPart.getUserAnswers().add(myQuestion.getUserAnswer());
 					} else if (QuestionUtil.hasSingleChoice(question)) {
 						if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
@@ -277,7 +277,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(question.getId());
 					if (QuestionUtil.hasQA(question)) {
 						MyExamUtil.qAHandle(question, questionAnswerList, myQuestion);// 问答处理
-					} else if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)) {
+					} else if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasJudge(question)) {
 						MyExamUtil.singleChoiceHandle(question, questionAnswerList, myQuestion);// 单选判断处理
 					} else if (QuestionUtil.hasMultipleChoice(question)) {
 						MyExamUtil.multipleChoiceHandle(question, questionAnswerList, myQuestion);// 多选处理

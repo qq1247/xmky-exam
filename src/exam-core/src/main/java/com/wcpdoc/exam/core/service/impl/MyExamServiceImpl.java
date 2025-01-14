@@ -219,7 +219,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		Question question = examCacheService.getQuestion(questionId);
 		if (!ValidateUtil.isValid(answers)) {
 			myQuestion.setUserAnswer(null);
-		} else if (QuestionUtil.hasTrueFalse(question)) {
+		} else if (QuestionUtil.hasJudge(question)) {
 			myQuestion.setUserAnswer(answers[0]);
 		} else if (QuestionUtil.hasSingleChoice(question)) {
 			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {

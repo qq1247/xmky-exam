@@ -208,7 +208,7 @@ public class ApiQuestionController extends BaseController {
 			List<Object> answers = new ArrayList<>();
 			List<BigDecimal> scores = new ArrayList<>();
 			for (QuestionAnswer answer : questionAnswerList) {
-				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)
+				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasJudge(question)
 						|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 					answers.add(answer.getAnswer());
 				} else if (QuestionUtil.hasMultipleChoice(question)) {

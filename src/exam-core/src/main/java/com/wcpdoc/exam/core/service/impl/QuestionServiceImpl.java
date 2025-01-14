@@ -206,7 +206,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	private void addAnswer(Question question, List<String> answers, List<BigDecimal> scores) {
-		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)) {
+		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasJudge(question)) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers.get(0));
 			questionAnswer.setScore(null);
@@ -406,7 +406,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				// throw new MyException("参数错误：scores");
 				// } // 主观填空允许有子分数
 			}
-		} else if (QuestionUtil.hasTrueFalse(question)) {
+		} else if (QuestionUtil.hasJudge(question)) {
 			if (question.getMarkType() != 1) {
 				throw new MyException("参数错误：markType");
 			}

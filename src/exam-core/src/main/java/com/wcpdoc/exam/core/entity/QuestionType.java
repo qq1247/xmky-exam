@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -33,8 +34,10 @@ public class QuestionType {
 	/** 判断题数量*/
 	private Integer judgeNum;
 	/** 填空题数量*/
+	@TableField("FILL_BLANK_NUM")
 	private Integer blankNum;
 	/** 简答题数量*/
+	@TableField("QA_NUM")
 	private Integer shortAnswerNum;
 	/** 试题总数量*/
 	private Integer questionNum;
