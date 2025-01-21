@@ -82,8 +82,10 @@ public class ApiQuestionTypeController extends BaseController {
 			questionType.setSingleNum(0);
 			questionType.setMultipleNum(0);
 			questionType.setJudgeNum(0);
-			questionType.setFillBlankNum(0);
-			questionType.setQaNum(0);
+			questionType.setFillBlankSubNum(0);
+			questionType.setFillBlankObjNum(0);
+			questionType.setQaSubNum(0);
+			questionType.setQaObjNum(0);
 			questionType.setQuestionNum(0);
 			questionTypeService.save(questionType);
 			

@@ -71,9 +71,11 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			Integer subjectiveNum = 0;
 			Integer singleNum = 0;
 			Integer multipleNum = 0;
-			Integer blankNum = 0;
+			Integer blankSubNum = 0;
+			Integer blankObjNum = 0;
 			Integer judgeNum = 0;
-			Integer shortAnswerNum = 0;
+			Integer qaSubNum = 0;
+			Integer qaObjNum = 0;
 			Integer questionNum = list.size();
 
 			for(Question question: list){
@@ -82,11 +84,21 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 					        break;
 					case 2: multipleNum += 1;
 						break;
-					case 3: blankNum += 1;
+					case 3:
+						if(question.getMarkType() == 1){//客观
+							blankObjNum += 1;
+						}else if (question.getMarkType() == 2) {//主观
+							blankSubNum += 1;
+						}
 						break;
 					case 4: judgeNum += 1;
 						break;
-					case 5: shortAnswerNum += 1;
+					case 5:
+						if(question.getMarkType() == 1){//客观
+							qaObjNum += 1;
+						}else if (question.getMarkType() == 2) {//主观
+							qaSubNum += 1;
+						}
 						break;
 				}
 
@@ -101,9 +113,11 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			questionType.setSubjectiveNum(subjectiveNum);
 			questionType.setSingleNum(singleNum);
 			questionType.setMultipleNum(multipleNum);
-			questionType.setFillBlankNum(blankNum);
+			questionType.setFillBlankObjNum(blankObjNum);
+			questionType.setFillBlankSubNum(blankSubNum);
 			questionType.setJudgeNum(judgeNum);
-			questionType.setQaNum(shortAnswerNum);
+			questionType.setQaObjNum(qaObjNum);
+			questionType.setQaSubNum(qaSubNum);
 			questionType.setQuestionNum(questionNum);
 
 			updateById(questionType);
