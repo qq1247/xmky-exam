@@ -18,7 +18,10 @@ spring:
     hikari:
       minimum-idle: 10
       maximum-pool-size: 100 #mysql5.7默认151，预留一些，防止其他人调试连接不上
-
+mybatis-plus:
+  global-config:
+    db-config:
+      update-strategy: ALWAYS
 runtime:
   monitor: true
   timeout: 1000
@@ -27,6 +30,7 @@ runtime:
 token:
   expireMinute: 1440
   refreshMinute: 60
+
     
 sys:
   ver: 4.6.0
