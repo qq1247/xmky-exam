@@ -386,6 +386,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 
 		// 考试结束
 		exam.setMarkState(3);// 标记考试为已阅卷
+		exam.setState(1);// bug修复：删除考试，提示已暂停；发布考试，提示考试已结束。
 		examService.updateById(exam);
 	}
 
@@ -395,6 +396,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 			doExamPaperHandle(exam, myExamList);// 未考试的试卷处理
 
 			exam.setMarkState(2);
+			exam.setState(1); // bug修复：删除考试，提示已暂停；发布考试，提示考试已结束。
 			examService.updateById(exam);
 			return;
 		}
