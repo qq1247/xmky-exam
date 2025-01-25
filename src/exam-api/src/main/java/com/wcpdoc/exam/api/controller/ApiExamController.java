@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.ProgressBarService;
@@ -32,7 +31,6 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.ex.ExamInfo;
@@ -78,7 +76,7 @@ public class ApiExamController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2018年10月25日下午9:23:06
 	 * 
-	 * @return pageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -162,7 +160,7 @@ public class ApiExamController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2022年10月25日下午3:30:55
 	 * 
-	 * @param id 考试ID
+	 * @param id
 	 * @return PageResult
 	 */
 	@RequestMapping("/paper")
@@ -284,7 +282,8 @@ public class ApiExamController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-06-11 09:13:23
 	 * 
-	 * @return pageOut
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
@@ -446,51 +445,4 @@ public class ApiExamController extends BaseController {
 		}
 	}
 
-	/**
-	 * 考试用户列表
-	 * 
-	 * v1.0 zhanghc 2023年9月26日下午5:12:17
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/examUserList")
-	public PageResult examUserList(Integer id) {
-		try {
-			// 数据校验
-			Exam exam = examCacheService.getExam(id);
-			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-				throw new MyException("无操作权限");
-			}
-
-			// 获取考试用户列表
-			List<MyExam> myExamList = examCacheService.getMyExamList(id);
-			Integer[] userIds = new Integer[myExamList.size()];
-			for (int i = 0; i < myExamList.size(); i++) {
-				userIds[i] = myExamList.get(i).getUserId();
-			}
-
-			List<Map<String, Object>> resultList = new ArrayList<>();
-			for (MyExam myExam : myExamList) {
-				User user = baseCacheService.getUser(myExam.getUserId());
-				Org org = baseCacheService.getOrg(user.getOrgId());
-
-				Map<String, Object> result = new HashMap<>();
-				result.put("userId", user.getId());
-				result.put("userName", user.getName());
-				result.put("orgId", org.getId());
-				result.put("orgName", org.getName());
-				result.put("myExamState", myExam.getState());
-				result.put("myExamMarkState", myExam.getMarkState());
-				resultList.add(result);
-			}
-			return PageResultEx.ok().data(resultList);
-		} catch (MyException e) {
-			log.error("考试用户列表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试用户列表错误：", e);
-			return PageResult.err();
-		}
-	}
 }

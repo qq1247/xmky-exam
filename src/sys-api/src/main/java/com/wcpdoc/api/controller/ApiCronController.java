@@ -43,7 +43,7 @@ public class ApiCronController extends BaseController {
 	 * v1.0 zhanghc 2019-07-29 10:38:17
 	 * 
 	 * @param pageIn
-	 * @return PageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -141,7 +141,7 @@ public class ApiCronController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2019-07-29 10:38:17
 	 * 
-	 * @param ids
+	 * @param id
 	 * @return PageResult
 	 */
 	@RequestMapping("/del")
@@ -163,7 +163,7 @@ public class ApiCronController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2019年9月12日下午5:30:34
 	 * 
-	 * @param ids
+	 * @param id
 	 * @return PageResult
 	 */
 	@RequestMapping("/startTask")
@@ -185,7 +185,7 @@ public class ApiCronController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2019年9月12日下午5:30:34
 	 * 
-	 * @param ids
+	 * @param id
 	 * @return PageResult
 	 */
 	@RequestMapping("/stopTask")
@@ -207,7 +207,7 @@ public class ApiCronController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2019年9月12日下午5:30:34
 	 * 
-	 * @param ids
+	 * @param id
 	 * @return PageResult
 	 */
 	@RequestMapping("/runOnceTask")

@@ -40,7 +40,7 @@ public class ApiOrgController extends BaseController {
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
 	 * @param pageIn
-	 * @return PageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {

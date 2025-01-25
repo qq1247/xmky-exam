@@ -42,7 +42,7 @@ public class ApiDictController extends BaseController {
 	 * v1.0 zhanghc 2016-11-3下午9:03:40
 	 * 
 	 * @param pageIn
-	 * @return PageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -152,11 +152,10 @@ public class ApiDictController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2024年6月21日上午11:03:12
 	 * 
-	 * @param id
 	 * @return PageResult
 	 */
 	@RequestMapping("/indexList")
-	public PageResult indexList(Integer id) {
+	public PageResult indexList() {
 		try {
 			List<Map<String, Object>> result = baseCacheService.getDictList().stream()//
 					.map(dict -> {

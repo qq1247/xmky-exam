@@ -39,7 +39,7 @@ public class ApiExerRmkController extends BaseController {
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
 	 * @param pageIn
-	 * @return PageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -50,7 +50,7 @@ public class ApiExerRmkController extends BaseController {
 					map.put("likeUserIds", new Integer[0]);
 					continue;
 				}
-				
+
 				String likeUserIds = map.get("likeUserIds").toString();
 				String[] likeUserIdStrArr = likeUserIds.substring(1, likeUserIds.length() - 1).split(",");
 				Integer[] likeUserIdArr = new Integer[likeUserIdStrArr.length];

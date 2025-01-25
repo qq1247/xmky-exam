@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
@@ -26,6 +27,8 @@ public class ApiParmController extends BaseController {
 
 	@Resource
 	private ParmService parmService;
+	@Resource
+	private BaseCacheService baseCacheService;
 
 	/**
 	 * 企业修改
@@ -167,8 +170,7 @@ public class ApiParmController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2024年9月30日下午1:03:10
 	 * 
-	 * @param title
-	 * @param content
+	 * @param host
 	 * @return PageResult
 	 */
 	@RequestMapping("/m")
@@ -195,7 +197,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/get")
 	public PageResult get() {
 		try {
-			Parm parm = parmService.getById(1);
+			Parm parm = baseCacheService.getParm();;
 			return PageResultEx.ok()//
 					.addAttr("entName", parm.getEntName())//
 					.addAttr("fileUploadDir", parm.getFileUploadDir())//
@@ -203,7 +205,8 @@ public class ApiParmController extends BaseController {
 					.addAttr("pwdType", parm.getPwdType())//
 					.addAttr("pwdValue", parm.getPwdValue())//
 					.addAttr("customTitle", parm.getCustomTitle())//
-					.addAttr("customContent", parm.getCustomContent()).addAttr("mHost", parm.getMHost());
+					.addAttr("customContent", parm.getCustomContent())//
+					.addAttr("mHost", parm.getMHost());
 		} catch (MyException e) {
 			log.error("参数获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

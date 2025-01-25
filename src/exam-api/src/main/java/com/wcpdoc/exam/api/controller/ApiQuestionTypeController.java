@@ -29,15 +29,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/questionType")
 @Slf4j
 public class ApiQuestionTypeController extends BaseController {
-	
+
 	@Resource
 	private QuestionTypeService questionTypeService;
-	
+
 	/**
-	 * 题库列表 
+	 * 题库列表
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return pageOut
+	 * 
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -57,7 +59,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 题库添加
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return pageOut
+	 * 
+	 * @param questionType
+	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	public PageResult add(QuestionType questionType) {
@@ -66,16 +70,16 @@ public class ApiQuestionTypeController extends BaseController {
 			if (!ValidateUtil.isValid(questionType.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			//if (existName(questionType)) {
-			//	throw new MyException("名称已存在");
-			//} // 不同的子管理员添加可以重复
-			
+			// if (existName(questionType)) {
+			// throw new MyException("名称已存在");
+			// } // 不同的子管理员添加可以重复
+
 			// 题库添加
 			questionType.setCreateUserId(getCurUser().getId());
 			questionType.setUpdateTime(new Date());
 			questionType.setUpdateUserId(getCurUser().getId());
 			questionTypeService.save(questionType);
-			
+
 			return PageResultEx.ok().data(questionType.getId());
 		} catch (MyException e) {
 			log.error("题库添加错误：{}", e.getMessage());
@@ -90,26 +94,28 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 题库修改
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return pageOut
+	 * 
+	 * @param questionType
+	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
 	public PageResult edit(QuestionType questionType) {
 		try {
-			//数据校验
-			if(!ValidateUtil.isValid(questionType.getName())) {
+			// 数据校验
+			if (!ValidateUtil.isValid(questionType.getName())) {
 				throw new MyException("参数错误：name");
 			}
 			QuestionType entity = questionTypeService.getById(questionType.getId());
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 				throw new MyException("无操作权限");
 			}
-			
+
 			// 保存题库
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			questionTypeService.updateById(entity);
-			
+
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("题库修改错误：{}", e.getMessage());
@@ -119,12 +125,14 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 题库删除
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return pageOut
+	 * 
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
@@ -139,12 +147,14 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 题库获取
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return pageOut
+	 * 
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/get")
 	public PageResult get(Integer id) {
@@ -153,8 +163,8 @@ public class ApiQuestionTypeController extends BaseController {
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
+			return PageResultEx.ok()//
+					.addAttr("id", entity.getId())//
 					.addAttr("name", entity.getName());
 		} catch (MyException e) {
 			log.error("题库获取错误：{}", e.getMessage());
@@ -164,7 +174,7 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 //	/**
 //	 * 题库合并
 //	 * 
@@ -185,11 +195,12 @@ public class ApiQuestionTypeController extends BaseController {
 //			return PageResult.err();
 //		}
 //	}
-	
+
 	/**
 	 * 题库清空
 	 * 
 	 * v1.0 zhanghc 2022年9月15日上午9:28:44
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */

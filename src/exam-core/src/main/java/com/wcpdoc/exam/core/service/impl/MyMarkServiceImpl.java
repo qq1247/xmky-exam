@@ -179,11 +179,6 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 
 	@Override
-	public PageOut getListpage(PageIn pageIn) {
-		return myMarkDao.getListpage(pageIn);
-	}
-
-	@Override
 	public PageOut getUserListpage(PageIn pageIn) {
 		return myMarkDao.getUserListpage(pageIn);
 	}

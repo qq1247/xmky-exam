@@ -65,7 +65,8 @@ public class ApiFileController extends BaseController {
 	 * v1.0 zhanghc 2017年3月29日下午10:18:28 <br/>
 	 * 使用spring ResponseEntity <byte[]>方式，附件大会造成内存溢出。
 	 * 
-	 * @param id void
+	 * @param id
+	 * @return void
 	 */
 	@RequestMapping(value = "/download")
 	public void download(Integer id) {
