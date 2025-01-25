@@ -221,9 +221,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			if (user.getType() == 0) {
 				throw new MyException("管理员不能删除管理员");
 			}
-			if (user.getType() == 3) {
-				throw new MyException("管理员不能删除阅卷用户");
-			}
+//			if (user.getType() == 3) {// bug修复：自己创建的自己不能删除
+//				throw new MyException("管理员不能删除阅卷用户");
+//			}
 		}
 		if (getCurUser().getType() == 2) {
 			if (user.getType() == 0) {
