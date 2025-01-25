@@ -246,7 +246,12 @@ async function pwdUpdate() {
         .header-top-username {
             cursor: pointer;
             line-height: 45px;
-
+            .el-dropdown-link {
+                outline: none;
+                &:focus {
+                    outline: none;
+                }
+            }
             :hover {
                 color: var(--el-color-primary);
             }
