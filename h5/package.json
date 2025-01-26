@@ -1,6 +1,6 @@
 {
-  "name": "xm-exam",
-  "version": "4.6.0",
+  "name": "xmky-exam",
+  "version": "4.6.1",
   "private": true,
   "scripts": {
     "dev": "vite",

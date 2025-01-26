@@ -1,98 +1,100 @@
 <template>
     <el-card class="exam-setting" shadow="never">
-        <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" style="width: 500px;">
-            <el-form-item label="考试名称：" prop="name">
-                <el-input v-model="form.name" placeholder="请输入考试名称" />
-            </el-form-item>
-            <el-form-item label="考试时间：" prop="examTimes">
-                <el-date-picker 
-                    v-model="form.examTimes" 
-                    type="datetimerange" 
-                    start-placeholder="开始时间"
-                    end-placeholder="结束时间"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                    format="YYYY-MM-DD HH:mm"
-                    @change="() => { 
-                        if (form.limitMinute >= form.examTimeDiff)  {
-                            form.limitMinute = form.examTimeDiff - 1
-                        }
-                    }"
-                    />
-            </el-form-item>
-            <el-form-item v-if="form.markType === 2" label="阅卷时间：" prop="markTimes">
-                <el-date-picker 
-                    v-model="form.markTimes" 
-                    type="datetimerange" 
-                    start-placeholder="开始时间"
-                    end-placeholder="结束时间"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                    format="YYYY-MM-DD HH:mm"
-                    >
-                </el-date-picker>
-                <el-alert :title="`需要阅卷题号：${markQuestions}`" type="warning" :closable="false"/>
-            </el-form-item>
-            <el-form-item label="限制时长：" prop="limitMinute">
-                <el-input-number 
-                    v-model="form.limitMinute" 
-                    controls-position="right" 
-                    :min="0" 
-                    :max="form.examTimeDiff - 1"
-                    :step="10"
-                    :precision="0"
-                    />&nbsp;/ {{form.examTimeDiff}}分钟
-            <el-alert :title="`从第一次打开试卷开始计时，最长能考几分钟，0代表不限制`" type="warning" :closable="false"/>
-            </el-form-item>
-            <el-form-item label="及格分数：" prop="passScore">
-                <el-input-number 
-                    v-model="form.passScore" 
-                    controls-position="right" 
-                    :min="0" 
-                    :max="form.totalScore"
-                    :step="10"
-                    :precision="1"
-                    />&nbsp;/ {{form.totalScore}}分
-            </el-form-item>
-            <el-form-item v-if="form.genType === 1" label="防作弊：" prop="sxes">
-                <el-checkbox-group v-model="form.sxes">
-                    <el-checkbox :label="1" key="1">试题乱序</el-checkbox>
-                    <el-checkbox :label="2" key="2">选项乱序</el-checkbox>
-                </el-checkbox-group>
-            </el-form-item>
-            <!-- <el-form-item v-if="form.genType === 1" label="匿名阅卷：" prop="anonState">
-                <el-radio-group v-model="form.anonState">
-                    <el-radio v-for="(option, index) in dictStore.getList('STATE_YN')" :key="index" :label="parseInt(option.dictKey)">
-                        {{ option.dictValue }}
-                    </el-radio>
-                </el-radio-group>
-            </el-form-item> -->
-            <el-form-item label="成绩查询：" prop="scoreState">
-                <el-radio-group v-model="form.scoreState">
-                    <el-radio 
-                        v-for="(option, index) in dictStore.getList('SCORE_STATE')" 
-                        :key="index" 
-                        :label="parseInt(option.dictKey)"
-                        :disabled="(form.markType === 2 && option.dictKey === '3') ? true : false"
+        <el-scrollbar max-height="calc(100vh - 250px)" class="paper-right">
+            <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" style="width: 500px;">
+                <el-form-item label="考试名称：" prop="name">
+                    <el-input v-model="form.name" placeholder="请输入考试名称" />
+                </el-form-item>
+                <el-form-item label="考试时间：" prop="examTimes">
+                    <el-date-picker 
+                        v-model="form.examTimes" 
+                        type="datetimerange" 
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                        format="YYYY-MM-DD HH:mm"
+                        @change="() => { 
+                            if (form.limitMinute >= form.examTimeDiff)  {
+                                form.limitMinute = form.examTimeDiff - 1
+                            }
+                        }"
+                        />
+                </el-form-item>
+                <el-form-item v-if="form.markType === 2" label="阅卷时间：" prop="markTimes">
+                    <el-date-picker 
+                        v-model="form.markTimes" 
+                        type="datetimerange" 
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                        format="YYYY-MM-DD HH:mm"
                         >
-                        {{ option.dictValue }}
-                    </el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="排名公布：" prop="rankState">
-                <el-radio-group v-model="form.rankState">
-                    <el-radio v-for="(option, index) in dictStore.getList('STATE_ON')" :key="index" :label="parseInt(option.dictKey)">
-                        {{ option.dictValue }}
-                    </el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="登录方式：" prop="loginType">
-                <el-radio-group v-model="form.loginType">
-                    <el-radio v-for="(option, index) in dictStore.getList('LOGIN_TYPE')" :key="index" :label="parseInt(option.dictKey)">
-                        {{ option.dictValue }}
-                    </el-radio>
-                </el-radio-group>
-                <el-alert :title="`免登录暂支持移动端使用`" type="warning" :closable="false"/>
-            </el-form-item>
-        </el-form>
+                    </el-date-picker>
+                    <el-alert :title="`需要阅卷题号：${markQuestions}`" type="warning" :closable="false"/>
+                </el-form-item>
+                <el-form-item label="限制时长：" prop="limitMinute">
+                    <el-input-number 
+                        v-model="form.limitMinute" 
+                        controls-position="right" 
+                        :min="0" 
+                        :max="form.examTimeDiff - 1"
+                        :step="10"
+                        :precision="0"
+                        />&nbsp;/ {{form.examTimeDiff}}分钟
+                <el-alert :title="`从第一次打开试卷开始计时，最长能考几分钟，0代表不限制`" type="warning" :closable="false"/>
+                </el-form-item>
+                <el-form-item label="及格分数：" prop="passScore">
+                    <el-input-number 
+                        v-model="form.passScore" 
+                        controls-position="right" 
+                        :min="0" 
+                        :max="form.totalScore"
+                        :step="10"
+                        :precision="1"
+                        />&nbsp;/ {{form.totalScore}}分
+                </el-form-item>
+                <el-form-item v-if="form.genType === 1" label="防作弊：" prop="sxes">
+                    <el-checkbox-group v-model="form.sxes">
+                        <el-checkbox :label="1" key="1">试题乱序</el-checkbox>
+                        <el-checkbox :label="2" key="2">选项乱序</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+                <!-- <el-form-item v-if="form.genType === 1" label="匿名阅卷：" prop="anonState">
+                    <el-radio-group v-model="form.anonState">
+                        <el-radio v-for="(option, index) in dictStore.getList('STATE_YN')" :key="index" :label="parseInt(option.dictKey)">
+                            {{ option.dictValue }}
+                        </el-radio>
+                    </el-radio-group>
+                </el-form-item> -->
+                <el-form-item label="成绩查询：" prop="scoreState">
+                    <el-radio-group v-model="form.scoreState">
+                        <el-radio 
+                            v-for="(option, index) in dictStore.getList('SCORE_STATE')" 
+                            :key="index" 
+                            :label="parseInt(option.dictKey)"
+                            :disabled="(form.markType === 2 && option.dictKey === '3') ? true : false"
+                            >
+                            {{ option.dictValue }}
+                        </el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="排名公布：" prop="rankState">
+                    <el-radio-group v-model="form.rankState">
+                        <el-radio v-for="(option, index) in dictStore.getList('STATE_ON')" :key="index" :label="parseInt(option.dictKey)">
+                            {{ option.dictValue }}
+                        </el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="登录方式：" prop="loginType">
+                    <el-radio-group v-model="form.loginType">
+                        <el-radio v-for="(option, index) in dictStore.getList('LOGIN_TYPE')" :key="index" :label="parseInt(option.dictKey)">
+                            {{ option.dictValue }}
+                        </el-radio>
+                    </el-radio-group>
+                    <el-alert :title="`免登录暂支持移动端使用`" type="warning" :closable="false"/>
+                </el-form-item>
+            </el-form>
+        </el-scrollbar>
     </el-card>
 </template>
 

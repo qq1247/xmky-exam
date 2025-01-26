@@ -1262,9 +1262,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		if (exam.getState() == 2) {
-			throw new MyException("已暂停");
-		}
+//		if (exam.getState() == 2) {// bug修复：删除考试，提示已暂停；发布考试，提示考试已结束。
+//			throw new MyException("已暂停");
+//		}
 		if (exam.getMarkState() == 1) {
 			throw new MyException("未阅卷");
 		}

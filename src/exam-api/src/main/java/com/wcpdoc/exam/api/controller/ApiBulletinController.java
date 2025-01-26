@@ -28,17 +28,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/bulletin")
 @Slf4j
 public class ApiBulletinController extends BaseController {
-	
+
 	@Resource
 	private BulletinService bulletinService;
 	@Resource
 	private UserService userService;
-	
+
 	/**
 	 * 公告列表
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
-	 * @return pageOut
+	 * 
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -50,12 +52,14 @@ public class ApiBulletinController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 添加公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
-	 * @return pageOut
+	 * 
+	 * @param bulletin
+	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	public PageResult add(Bulletin bulletin) {
@@ -70,7 +74,7 @@ public class ApiBulletinController extends BaseController {
 			if (!ValidateUtil.isValid(bulletin.getTitle())) {
 				throw new MyException("参数错误：title");
 			}
-			
+
 			// 添加公告
 			bulletin.setState(1);
 			bulletin.setUpdateTime(new Date());
@@ -85,12 +89,14 @@ public class ApiBulletinController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 修改公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
-	 * @return pageOut
+	 * 
+	 * @param bulletin
+	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
 	public PageResult edit(Bulletin bulletin) {
@@ -105,7 +111,7 @@ public class ApiBulletinController extends BaseController {
 			if (!ValidateUtil.isValid(bulletin.getTitle())) {
 				throw new MyException("参数错误：title");
 			}
-			
+
 			// 添加公告
 			bulletin.setState(1);
 			bulletin.setUpdateTime(new Date());
@@ -120,12 +126,14 @@ public class ApiBulletinController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 删除公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
-	 * @return pageOut
+	 * 
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
@@ -147,17 +155,16 @@ public class ApiBulletinController extends BaseController {
 	 * 获取公告
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
+	 * 
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/get")
-	public PageResult get(Integer id) {		
+	public PageResult get(Integer id) {
 		try {
 			Bulletin bulletin = bulletinService.getById(id);
-			return PageResultEx.ok()
-					.addAttr("id", bulletin.getId())
-					.addAttr("startTime", bulletin.getStartTime())
-					.addAttr("endTime", bulletin.getEndTime())
-					.addAttr("title", bulletin.getTitle())
+			return PageResultEx.ok().addAttr("id", bulletin.getId()).addAttr("startTime", bulletin.getStartTime())
+					.addAttr("endTime", bulletin.getEndTime()).addAttr("title", bulletin.getTitle())
 					.addAttr("content", bulletin.getContent());
 		} catch (MyException e) {
 			log.error("获取公告错误：{}", e.getMessage());

@@ -42,7 +42,8 @@ public class ApiMyMarkController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * 
-	 * @return pageOut
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -77,6 +78,7 @@ public class ApiMyMarkController extends BaseController {
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
 	 * 
 	 * @param examId
+	 * @param userId
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
@@ -114,7 +116,8 @@ public class ApiMyMarkController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * 
-	 * @return pageOut
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/userListpage")
 	public PageResult userListpage(PageIn pageIn) {
@@ -204,6 +207,7 @@ public class ApiMyMarkController extends BaseController {
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
 	 * @param examId
+	 * @param userId
 	 * @return PageResult
 	 */
 	@RequestMapping("/finish")

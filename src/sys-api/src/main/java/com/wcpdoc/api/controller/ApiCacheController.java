@@ -34,7 +34,7 @@ public class ApiCacheController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2024年5月30日上午10:26:21
 	 * 
-	 * @return Map<Object,Object>
+	 * @return PageResult
 	 */
 	@RequestMapping("/list")
 	public PageResult list() {
@@ -61,6 +61,7 @@ public class ApiCacheController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2024年5月30日上午9:28:11
 	 * 
+	 * @param cacheNames
 	 * @return PageResult
 	 */
 	@RequestMapping("/refresh")

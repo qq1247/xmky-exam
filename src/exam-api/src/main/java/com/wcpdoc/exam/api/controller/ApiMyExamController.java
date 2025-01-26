@@ -54,7 +54,8 @@ public class ApiMyExamController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * 
-	 * @return pageOut
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -154,6 +155,7 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("passScore", exam.getPassScore())//
 					.addAttr("totalScore", exam.getTotalScore())//
 					.addAttr("markType", exam.getMarkType())//
+					.addAttr("loginType", exam.getLoginType())//
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//

@@ -49,7 +49,8 @@ public class ApiQuestionController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * 
-	 * @return pageOut
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -138,6 +139,7 @@ public class ApiQuestionController extends BaseController {
 	 * @param options  选项（单选多选时有效）
 	 * @param answers  答案
 	 * @param scores   答案分数（填空或智能问答有多项）
+	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
 	public PageResult edit(Question question, String[] options, String[] answers, BigDecimal[] scores) {
@@ -160,7 +162,7 @@ public class ApiQuestionController extends BaseController {
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * 
 	 * @param ids
-	 * @return pageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/del")
 	public PageResult del(Integer[] ids) {

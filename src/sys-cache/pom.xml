@@ -6,20 +6,13 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>4.6.0</version>
+		<version>4.6.1</version>
 	</parent>
 	<artifactId>sys-cache</artifactId>
 	<name>sys-cache</name>
 	<description>系统缓存</description>
 
 	<dependencies>
-		<!-- 集成系统核心
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-core</artifactId>
-			<version>${project.version}</version>
-		</dependency> -->
-
 		<!-- 集成缓存 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

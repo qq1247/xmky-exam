@@ -52,7 +52,7 @@ public class ApiUserController extends BaseController {
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * 
 	 * @param pageIn
-	 * @return PageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -194,8 +194,7 @@ public class ApiUserController extends BaseController {
 					.addAttr("orgId", user.getOrgId())//
 					.addAttr("orgName", org == null ? null : org.getName())//
 					.addAttr("state", user.getState())//
-					.addAttr("userIds", user.getUserIds())//
-					.addAttr("orgIds", user.getOrgIds());
+					.addAttr("userIds", user.getUserIds());//
 			return pageResult;
 		} catch (MyException e) {
 			log.error("用户获取错误：{}", e.getMessage());
@@ -235,8 +234,8 @@ public class ApiUserController extends BaseController {
 	 * 
 	 * v1.0 chenyun 2022年04月21日下午3:36:55
 	 * 
-	 * @param userId
-	 * @return pageOut
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/frozen")
 	public PageResult frozen(Integer id) {
@@ -257,8 +256,8 @@ public class ApiUserController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2016年8月27日上午11:36:55
 	 * 
-	 * @param userId
-	 * @return pageOut
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/out")
 	public PageResult out(Integer id) {
@@ -272,10 +271,27 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
+	 * 用户模板导出
+	 * 
+	 * v1.0 chenyun 2021年3月4日下午5:41:02
+	 * 
+	 * @return void
+	 */
+	@RequestMapping("/template")
+	public void template() {
+		try {
+			fileService.exportTemplate("用户.xlsx");
+		} catch (Exception e) {
+			log.error("用户模板导出失败：", e);
+		}
+	}
+	
+	/**
 	 * 用户导入
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * 
+	 * @param fileId
 	 * @return PageResult
 	 */
 	@RequestMapping("/import")
@@ -292,19 +308,4 @@ public class ApiUserController extends BaseController {
 		}
 	}
 
-	/**
-	 * 用户模板导出
-	 * 
-	 * v1.0 chenyun 2021年3月4日下午5:41:02
-	 * 
-	 * @return PageResult
-	 */
-	@RequestMapping("/template")
-	public void template() {
-		try {
-			fileService.exportTemplate("用户.xlsx");
-		} catch (Exception e) {
-			log.error("用户模板导出失败：", e);
-		}
-	}
 }

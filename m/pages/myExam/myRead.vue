@@ -115,7 +115,7 @@
 					<view class="myread-myexam-content">
 						<view class="myread-myexam__row">
 							<text class="myread-myexam__label">答题时间：</text>
-							<text class="myread-myexam__value">{{ myExam.answerStartTime }} - {{ myExam.answerEndTime }}</text>
+							<text class="myread-myexam__value">{{ dateTimeFormat(myExam.answerStartTime) }} - {{ dateTimeFormat(myExam.answerEndTime) }}</text>
 						</view>
 						<view v-if="scoreShow" class="myread-myexam__row">
 							<text class="myread-myexam__label">考试分数：</text>

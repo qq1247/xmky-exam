@@ -44,8 +44,7 @@ public class ApiLoginController extends BaseController {
 	 * 
 	 * @param loginName
 	 * @param pwd
-	 * @param model
-	 * @return String
+	 * @return PageResult
 	 */
 	@RequestMapping("/in")
 	public PageResult in(String loginName, String pwd) {
@@ -61,11 +60,12 @@ public class ApiLoginController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 免登录
 	 * 
 	 * v1.0 zhanghc 2024年10月9日下午3:14:18
+	 * 
 	 * @param name
 	 * @return PageResult
 	 */
@@ -89,7 +89,7 @@ public class ApiLoginController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2016年9月8日下午8:50:37
 	 * 
-	 * @return String
+	 * @return PageResult
 	 */
 	@RequestMapping("/out")
 	public PageResult out() {
@@ -129,7 +129,6 @@ public class ApiLoginController extends BaseController {
 	 * 服务器时间
 	 * 
 	 * v1.0 zhanghc 2017年6月25日下午4:19:05 <br/>
-	 * 每隔30秒前端请求一次，心跳机制检测在线状态
 	 * 
 	 * @return PageResult
 	 */
@@ -148,7 +147,7 @@ public class ApiLoginController extends BaseController {
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * 
-	 * @return void
+	 * @return PageResult
 	 */
 	@RequestMapping("/ent")
 	public PageResult ent() {

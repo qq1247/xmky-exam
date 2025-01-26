@@ -32,19 +32,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/exer")
 @Slf4j
 public class ApiExerController extends BaseController {
-	
+
 	@Resource
 	private ExerService exerService;
 	@Resource
 	private QuestionService questionService;
 	@Resource
 	private QuestionTypeService questionTypeService;
-	
+
 	/**
 	 * 练习列表
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @return pageOut
+	 * 
+	 * @param pageIn
+	 * @return PageResult
 	 */
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
@@ -66,12 +68,14 @@ public class ApiExerController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 练习添加
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @return pageOut
+	 * 
+	 * @param exer
+	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	public PageResult add(Exer exer) {
@@ -86,12 +90,14 @@ public class ApiExerController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 练习修改
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @return pageOut
+	 * 
+	 * @param exer
+	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
 	public PageResult edit(Exer exer) {
@@ -106,12 +112,14 @@ public class ApiExerController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 练习删除
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @return pageOut
+	 * 
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
@@ -121,7 +129,7 @@ public class ApiExerController extends BaseController {
 			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			
+
 			// 删除
 			exer.setState(0);
 			exer.setUpdateTime(new Date());
@@ -136,12 +144,14 @@ public class ApiExerController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 练习获取
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * @return pageOut
+	 * 
+	 * @param id
+	 * @return PageResult
 	 */
 	@RequestMapping("/get")
 	public PageResult get(Integer id) {
@@ -150,16 +160,15 @@ public class ApiExerController extends BaseController {
 			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			return PageResultEx.ok()
-					.addAttr("id", exer.getId())
-					.addAttr("name", exer.getName())
-					.addAttr("questionTypeId", exer.getQuestionTypeId())
-					.addAttr("questionTypeName", questionTypeService.getById(exer.getQuestionTypeId()).getName())
-					.addAttr("startTime", exer.getStartTime())
-					.addAttr("endTime", exer.getEndTime())
-					.addAttr("userIds", exer.getUserIds())
-					.addAttr("rmkState", exer.getRmkState())
-					;
+			return PageResultEx.ok()//
+					.addAttr("id", exer.getId())//
+					.addAttr("name", exer.getName())//
+					.addAttr("questionTypeId", exer.getQuestionTypeId())//
+					.addAttr("questionTypeName", questionTypeService.getById(exer.getQuestionTypeId()).getName())//
+					.addAttr("startTime", exer.getStartTime())//
+					.addAttr("endTime", exer.getEndTime())//
+					.addAttr("userIds", exer.getUserIds())//
+					.addAttr("rmkState", exer.getRmkState());
 		} catch (MyException e) {
 			log.error("练习获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
