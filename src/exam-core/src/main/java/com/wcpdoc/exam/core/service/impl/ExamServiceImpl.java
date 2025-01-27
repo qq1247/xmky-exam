@@ -225,9 +225,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myMark.setUpdateUserId(getCurUser().getId());
 			myMarkService.save(myMark);
 		}
-		Exam exam = getById(id);
-		exam.setMarkUserNum(markUserIds.length);
-		updateById(exam);
 	}
 
 	@Override

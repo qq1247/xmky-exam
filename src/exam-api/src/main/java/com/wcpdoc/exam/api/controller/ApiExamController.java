@@ -331,7 +331,6 @@ public class ApiExamController extends BaseController {
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
 					.addAttr("userNum", exam.getUserNum())//
-					.addAttr("markUserNum",exam.getMarkUserNum())//阅卷人数
 					.addAttr("limitMinute", exam.getLimitMinute());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
