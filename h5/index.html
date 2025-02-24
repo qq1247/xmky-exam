@@ -1,30 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="">
+    <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title><!-- js控制加载 -->
-    <script type="module" src="/config.js"></script>
 </head>
 
 <body>
     <div id="app"></div>
-    <script>
-        if (typeof String.prototype.replaceAll === "undefined") {
-            String.prototype.replaceAll = function (match, replace) {
-                return this.replace(new RegExp(match, 'g'), () => replace);
-            }
-        }
-    </script>
     <script type="module" src="/src/main.ts"></script>
 </body>
-
 <style lang="scss" scoped>
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
         background-color: #F2F3F5;
+        font-family: '黑体', 'Heiti SC', 'Droidsansfallback';
+
+        #app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+    }
+
+    .el-input {
+        .el-input__wrapper {
+            border-radius: 6px 6px 6px 6px;
+
+            &.is-focus {
+                box-shadow: 0 0 0 1px #1EA1EE inset;
+            }
+        }
+    }
+
+    .el-radio {
+        &.is-bordered {
+            height: 38px;
+
+            &.is-checked {
+                border: 1px solid transparent;
+                border-radius: 6px 6px 6px 6px;
+                background-clip: padding-box, border-box;
+                background-image: linear-gradient(to bottom, #fff, #fff), linear-gradient(180deg, #259ff8, #04c7f2);
+            }
+        }
+
+        &.is-disabled {
+            .el-radio__label {
+                color: #fff;
+            }
+        }
+
+        .el-radio__input {
+            &.is-checked {
+                .el-radio__inner {
+                    width: 18px;
+                    height: 18px;
+                    background-color: white;
+                    border-color: #0292F8;
+
+                    &::after {
+                        transform: translate(-50%, -50%) scale(2.4);
+                    }
+                }
+
+                +.el-radio__label {
+                    font-size: 14px;
+                    color: #303133 !important;
+                    line-height: 45px;
+                }
+            }
+
+            +.el-radio__label {
+                font-size: 14px;
+                color: #303133 !important;
+                line-height: 45px;
+            }
+
+            .el-radio__inner {
+                width: 18px !important;
+                height: 18px !important;
+                border-color: #CCCCCC;
+                background-color: initial;
+
+                &::after {
+                    background-image: linear-gradient(to right, #04C7F2, #259FF8);
+                }
+            }
+        }
+    }
+
+    .el-checkbox {
+        .el-checkbox__input {
+            &.is-disabled {
+                .el-checkbox__inner {
+                    background-color: #ffffff;
+                    width: 17px;
+                    height: 17px;
+                    border: 1px solid #CCCCCC;
+                    border-radius: 4px 4px 4px 4px;
+                }
+            }
+
+            &.is-checked {
+                .el-checkbox__inner {
+                    width: 17px;
+                    height: 17px;
+                    border: 0px;
+                    border-radius: 4px 4px 4px 4px;
+                    background-image: linear-gradient(to right, #04C7F2, #259FF8);
+
+                    &:after {
+                        left: 5px;
+                        width: 5px;
+                        height: 8px;
+                        border: 2px solid transparent;
+                        transform: rotate(45deg) scaleY(1);
+                        border-color: #ffffff;
+                        border-left: 0;
+                        border-top: 0;
+                        top: 2px;
+                    }
+                }
+            }
+
+            .el-checkbox__inner {
+                width: 17px;
+                height: 17px;
+            }
+        }
+
+        .el-checkbox__label {
+            color: #303133 !important;
+        }
+    }
+
+    .el-select__wrapper {
+        &.is-focused {
+            box-shadow: 0 0 0 1px #1EA1EE inset;
+        }
+    }
+
+    .el-select-dropdown__item {
+        &.is-selected {
+            color: #1EA1EE;
+        }
+    }
+
+    .el-textarea__inner {
+        &:focus {
+            box-shadow: 0 0 0 1px #1EA1EE inset;
+        }
+    }
+
+    .el-table {
+        .el-table__header-wrapper {
+            width: 1140px;
+            height: 49px;
+
+            border-radius: 2px 2px 2px 2px;
+            border: 1px solid #E5E5E5;
+
+            .el-table__cell {
+                background: #F5F5F5;
+            }
+
+        }
     }
 </style>
 

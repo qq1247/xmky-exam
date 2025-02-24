@@ -1,22 +1,23 @@
+// import './assets/main.css'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import piniaPersist from 'pinia-plugin-persist'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import './assets/iconfont/iconfont.css'
 
 import App from './App.vue'
 import router from './router'
 
-import ElementPlus from 'element-plus'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import 'element-plus/dist/index.css'
-
-import './assets/iconfont/iconfont.css'
-import Iconfont from './components/Iconfont.vue'
-
 const app = createApp(App)
 const pinia = createPinia()
-pinia.use(piniaPersist)
+pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router)
-app.use(ElementPlus, { locale: zhCn })
-app.component('Iconfont', Iconfont)
+app.use(ElementPlus, {
+    locale: zhCn,
+})
+
 app.mount('#app')
