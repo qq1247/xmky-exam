@@ -67,7 +67,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 
 	@Override
 	@CacheEvict(value = ExamConstant.MYEXAM_CACHE, allEntries = true)
-	public void assign(Integer examId, Integer num) {
+	public void claim(Integer examId, Integer num) {
 		// 数据校验
 		assignValid(examId, num);
 
@@ -247,7 +247,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("该题为客观题");
 		}
 		if (myExam.getState() == 1) {
-			throw new MyException("未参与考试，阅卷无效");
+			throw new MyException("用户未参与考试，阅卷无效");
 		}
 		return myQuestion;
 	}
@@ -265,6 +265,9 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		if (myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("未参与考试");
+		}
+		if (myExam.getState() == 1) {
+			throw new MyException("用户未参与考试，阅卷无效");
 		}
 
 		Exam exam = examCacheService.getExam(examId);
@@ -371,6 +374,13 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		if (exam.getMarkState() == 3) {
 			throw new MyException("阅卷已结束");
+		}
+
+		long unMarkCount = examCacheService.getMyExamList(examId).stream()//
+				.filter(myExam -> myExam.getMarkUserId() == null)//
+				.count();
+		if (unMarkCount == 0) {
+			throw new MyException("无新试卷可领取");
 		}
 	}
 }

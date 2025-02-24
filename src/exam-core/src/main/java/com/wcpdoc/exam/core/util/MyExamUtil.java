@@ -21,7 +21,7 @@ import com.wcpdoc.exam.core.entity.QuestionAnswer;
  */
 public class MyExamUtil {
 	/**
-	 * 分数显示
+	 * 总分数显示
 	 * 
 	 * v1.0 zhanghc 2023年3月2日上午11:07:27
 	 * 
@@ -29,9 +29,23 @@ public class MyExamUtil {
 	 * @param myExam
 	 * @return boolean
 	 */
-	public static boolean scoreShow(Exam exam, MyExam myExam) {
+	public static boolean totalScoreShow(Exam exam, MyExam myExam) {
 		return (exam.getScoreState() == 1 && exam.getMarkState() == 3) // 如果是考试结束后显示成绩，需要等到考试结束
 				|| (exam.getScoreState() == 3 && myExam.getMarkState() == 3);// 如果是交卷后显示成绩，需要等到该试卷阅卷完成。比如主观题没阅卷，得不到总分，得不到是否及格
+	}
+
+	/**
+	 * 单题分数显示
+	 * 
+	 * v1.0 zhanghc 2025年2月14日上午11:39:56
+	 * 
+	 * @param exam
+	 * @param myExam
+	 * @return boolean
+	 */
+	public static boolean scoreShow(Exam exam, MyExam myExam) {
+		return (exam.getScoreState() == 1 && exam.getMarkState() == 3) // 如果是考试结束后显示成绩，需要等到考试结束（否则张三交卷后就立即知道客观试题的对错，就可以告诉正在答题中的李四）
+				|| (exam.getScoreState() == 3 && myExam.getMarkState() >= 2);// 如果是交卷后显示成绩，交卷后客观题就可以立即显示分数。，如果有主观题，只是暂时没分数，显示也没有问题。
 	}
 
 	/**
@@ -44,22 +58,10 @@ public class MyExamUtil {
 	 * @return boolean
 	 */
 	public static boolean answerShow(Exam exam, MyExam myExam) {
-		if (exam.getScoreState() == 1) {// 如果是考试结束后公布答案
-			if (exam.getMarkType() == 1 && exam.getEndTime().getTime() < System.currentTimeMillis()) {
-				return true;// 如果是客观题考试，考试结束后显示标准答案； 10:00-12:00 < 12:05
-			}
-			if (exam.getMarkType() == 2 && exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {
-				return true;// 如果是主观题考试，阅卷结束后显示标准答案
-			}
-		}
-
-		if (exam.getScoreState() == 3) {// 如果是交卷后公布答案
-			if (myExam.getState() == 3) {// 如果用户已交卷，显示标准答案
-				return true;
-			}
-		}
-
-		return false;
+		return (exam.getScoreState() == 1 && exam.getMarkState() == 3)// 如果是考试结束后显示成绩，需要等到考试结束。
+				|| (exam.getScoreState() == 3 && myExam.getMarkState() >= 2);// 如果是交卷后显示成绩，交卷后就可以显示全部标准答案（包括主观题答案）。
+		// (myExam.markState>=2) ==
+		// ((myExam.state==1&&myExam.markState()==3)||myExam.state==3)
 	}
 
 	/**

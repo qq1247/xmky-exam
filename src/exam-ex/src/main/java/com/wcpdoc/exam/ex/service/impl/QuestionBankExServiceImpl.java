@@ -14,10 +14,10 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeExService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.QuestionBankExService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 
 /**
  * 题库扩展服务层实现
@@ -25,23 +25,23 @@ import com.wcpdoc.exam.core.service.QuestionTypeService;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 @Service
-public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> implements QuestionTypeExService {
+public class QuestionBankExServiceImpl extends BaseServiceImp<QuestionBank> implements QuestionBankExService {
 
 	@Resource
 	@Lazy
 	private QuestionService questionService;
 	@Resource
 	@Lazy
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 
 	@Override
-	public RBaseDao<QuestionType> getDao() {
+	public RBaseDao<QuestionBank> getDao() {
 		return null;
 	}
 
 	@Override
-	public void delEx(QuestionType questionType) {
-		List<Integer> questionIds = questionService.getIds(questionType.getId());
+	public void delEx(QuestionBank questionBank) {
+		List<Integer> questionIds = questionService.getIds(questionBank.getId());
 		if (ValidateUtil.isValid(questionIds)) {
 			throw new MyException("请先清空试题");
 		}
@@ -57,11 +57,11 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 			throw new MyException("参数错误：targetId");
 		}
 
-		QuestionType source = questionTypeService.getById(sourceId);
+		QuestionBank source = questionBankService.getById(sourceId);
 		if (source == null) {
 			throw new MyException(String.format("参数错误：sourceId"));
 		}
-		QuestionType target = questionTypeService.getById(targetId);
+		QuestionBank target = questionBankService.getById(targetId);
 		if (target == null) {
 			throw new MyException(String.format("参数错误：targetId"));
 		}
@@ -76,7 +76,7 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		// 合并
 		List<Question> questionList = questionService.getList(sourceId);
 		for (Question question : questionList) {
-			question.setQuestionTypeId(targetId);
+			question.setQuestionBankId(targetId);
 			// question.setUpdateTime(new Date());
 			// question.setUpdateUserId(getCurUser().getId()); // 保留移动前的
 			questionService.updateById(question);
@@ -89,7 +89,7 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
-		QuestionType entity = questionTypeService.getById(id);
+		QuestionBank entity = questionBankService.getById(id);
 		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}

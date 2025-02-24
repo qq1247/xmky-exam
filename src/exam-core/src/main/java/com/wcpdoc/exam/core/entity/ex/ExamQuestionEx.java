@@ -23,8 +23,8 @@ public class ExamQuestionEx extends ExamQuestion {
 	}
 
 	/** 类型（1：单选；2：多选；3：填空；4：判断；5：问答） */
-	public void setQuestionType(Integer questionType) {
-		this.questionType = questionType;
+	public void setQuestionType(Integer questionBank) {
+		this.questionType = questionBank;
 	}
 
 	/** 阅卷类型（1：客观题；2：主观题） */

@@ -67,7 +67,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/user/del", "jwt,anyRolesEx[0,2]");// 用户删除
 		filterChainMap.put("/api/user/pwdInit", "jwt,anyRolesEx[0,2]");// 用户密码初始化
 		filterChainMap.put("/api/user/frozen", "jwt,anyRolesEx[0,2]");// 用户冻结
-		filterChainMap.put("/api/questionType/*", "jwt,anyRolesEx[0,2]");// 题库
+		filterChainMap.put("/api/questionBank/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/question/*", "jwt,anyRolesEx[0,2]");// 题库
 		filterChainMap.put("/api/exer/*", "jwt,anyRolesEx[0,2]");// 练习
 		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[0,2,3]");// 考试详情

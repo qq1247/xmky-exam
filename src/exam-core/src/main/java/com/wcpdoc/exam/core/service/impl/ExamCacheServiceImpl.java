@@ -60,8 +60,8 @@ public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements Exam
 	public Question getQuestion(Integer id) {
 		Question question = questionDao.selectById(id);
 		if (log.isDebugEnabled()) {
-			log.debug("缓存试题：{id: {}, type: {}, questionTypeId: {}}", question.getId(), question.getType(),
-					question.getQuestionTypeId());
+			log.debug("缓存试题：{id: {}, type: {}, questionBankId: {}}", question.getId(), question.getType(),
+					question.getQuestionBankId());
 		}
 		return question;
 	}

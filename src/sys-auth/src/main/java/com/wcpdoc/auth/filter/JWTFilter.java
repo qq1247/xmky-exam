@@ -167,7 +167,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		httpResponse.setContentType("application/json;charset=UTF-8");
 		httpResponse.setStatus(HttpStatus.OK.value());
 		httpResponse.getWriter()
-				.write(String.format("{\"code\": %s, \"msg\": \"未授权\"}", HttpStatus.UNAUTHORIZED.value()));
+				.write(String.format("{\"code\": %s, \"msg\": \"无接口权限\"}", HttpStatus.UNAUTHORIZED.value()));
 		return false;
 	}
 

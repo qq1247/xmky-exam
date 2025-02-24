@@ -19,7 +19,7 @@ import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +38,7 @@ public class ApiExerController extends BaseController {
 	@Resource
 	private QuestionService questionService;
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 
 	/**
 	 * 练习列表
@@ -163,8 +163,8 @@ public class ApiExerController extends BaseController {
 			return PageResultEx.ok()//
 					.addAttr("id", exer.getId())//
 					.addAttr("name", exer.getName())//
-					.addAttr("questionTypeId", exer.getQuestionTypeId())//
-					.addAttr("questionTypeName", questionTypeService.getById(exer.getQuestionTypeId()).getName())//
+					.addAttr("questionBankId", exer.getQuestionBankId())//
+					.addAttr("questionBankName", questionBankService.getById(exer.getQuestionBankId()).getName())//
 					.addAttr("startTime", exer.getStartTime())//
 					.addAttr("endTime", exer.getEndTime())//
 					.addAttr("userIds", exer.getUserIds())//

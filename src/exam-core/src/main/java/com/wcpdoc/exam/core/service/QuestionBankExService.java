@@ -1,23 +1,22 @@
 package com.wcpdoc.exam.core.service;
 
-import com.wcpdoc.core.service.BaseService;
-import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 
 /**
- * 题库服务层接口
+ * 题库扩展服务层接口
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
-public interface QuestionTypeService extends BaseService<QuestionType> {
+public interface QuestionBankExService {
 
 	/**
 	 * 题库删除
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * @param id void
+	 * @param questionBank void
 	 */
-	void delEx(Integer id);
+	void delEx(QuestionBank questionBank);
 
 	/**
 	 * 题库合并
@@ -38,8 +37,4 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @return PageResult
 	 */
 	void clear(Integer id);
-
-
-	void computeTypeNum(Integer id);
-
 }

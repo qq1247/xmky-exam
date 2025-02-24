@@ -1,13 +1,18 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -16,9 +21,13 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.ExamCacheService;
+import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.util.MyExamUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +45,10 @@ public class ApiMyMarkController extends BaseController {
 	private MyMarkService myMarkService;
 	@Resource
 	private ExamCacheService examCacheService;
+	@Resource
+	private ExamQuestionService examQuestionService;
+	@Resource
+	private BaseCacheService baseCacheService;
 
 	/**
 	 * 我的阅卷列表
@@ -85,23 +98,22 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult get(Integer examId, Integer userId) {
 		try {
 			MyExam myExam = examCacheService.getMyExam(examId, userId);
+			if (myExam == null) {
+				throw new MyException("无查阅权限");
+			}
 			Exam exam = examCacheService.getExam(examId);
-			return PageResultEx.ok()//
-					.addAttr("examMarkState", exam.getMarkState()) // 页面控制是否显示错题
-					.addAttr("examScoreState", exam.getScoreState())// 页面控制是否显示错题
-					.addAttr("examRankState", exam.getRankState())// 页面控制是否显示排名
-					.addAttr("answerStartTime", myExam.getAnswerStartTime())//
+			return PageResultEx.ok()// 考试用户没有exam/get权限，所以字段在这里回显
+					.addAttr("answerStartTime", myExam.getAnswerStartTime())
 					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore", myExam.getObjectiveScore())//
-					.addAttr("totalScore", myExam.getTotalScore())//
+					.addAttr("totalScore", MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getTotalScore() : null)//
+					.addAttr("answerState", MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getAnswerState() : null)//
 					.addAttr("state", myExam.getState())//
 					.addAttr("markState", myExam.getMarkState())//
-					.addAttr("answerState", myExam.getAnswerState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null)//
-			;
+					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null);
 		} catch (MyException e) {
 			log.error("我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -112,17 +124,17 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 考试用户列表
+	 * 考试用户列表（请使用markList接口）
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * 
 	 * @param pageIn
 	 * @return PageResult
 	 */
+	@Deprecated
 	@RequestMapping("/userListpage")
 	public PageResult userListpage(PageIn pageIn) {
 		try {
-			pageIn.addParm("curUserId", getCurUser().getId());
 			PageOut pageOut = myMarkService.getUserListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
@@ -132,7 +144,99 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 试卷分配
+	 * 阅卷列表
+	 * 
+	 * v1.0 zhanghc 2025年2月16日上午11:56:47
+	 * 
+	 * @param pageIn
+	 * @return PageResult
+	 */
+	@RequestMapping("/markList")
+	public PageResult markList(Integer examId) {
+		try {
+			Exam exam = examCacheService.getExam(examId);
+			List<Map<String, Object>> result = examCacheService.getMyExamList(examId).stream()//
+					.filter(myExam -> {
+						if (CurLoginUserUtil.isAdmin()) {// 管理员
+							if (exam.getMarkState() == 3// 整场考试结束看所有
+									|| (myExam.getMarkUserId() != null
+											&& myExam.getMarkUserId().intValue() == getCurUser().getId().intValue())) {// 只看自己领取的
+								return true;
+							}
+						} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员
+							if ((exam.getMarkState() == 3 && exam.getCreateUserId().intValue() == getCurUser().getId())// 整场考试结束并且自己创建的
+									|| (myExam.getMarkUserId() != null
+											&& myExam.getMarkUserId().intValue() == getCurUser().getId().intValue())) {// 只看自己领取的
+								return true;
+							}
+						} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看自己领取的
+							return myExam.getMarkUserId().intValue() == getCurUser().getId();
+						}
+						return false;
+					}).map(myExam -> {
+						Map<String, Object> data = new HashMap<>();
+						User examUser = baseCacheService.getUser(myExam.getUserId());
+						data.put("examUserId", examUser.getId());
+						data.put("examUserName", examUser.getName());
+
+						User markUser = null;
+						data.put("markUserId", null);
+						data.put("markUserName", null);
+						if (myExam.getMarkUserId() != null) {
+							markUser = baseCacheService.getUser(myExam.getMarkUserId());
+							data.put("markUserId", markUser.getId());
+							data.put("markUserName", markUser.getName());
+						}
+
+						data.put("myExamState", myExam.getState());
+						data.put("myExamMarkState", myExam.getMarkState());
+						return data;
+					}).collect(Collectors.toList());
+			return PageResultEx.ok().data(result);
+		} catch (Exception e) {
+			log.error("阅卷列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 阅卷信息
+	 * 
+	 * v1.0 zhanghc 2025年2月24日下午12:22:49
+	 * 
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/claimInfo")
+	public PageResult markInfo(Integer examId) {
+		try {
+			List<MyExam> myExamList = examCacheService.getMyExamList(examId);
+			int paperNum = myExamList.size();
+			long markNum = myExamList.stream()//
+					.filter(myExam -> myExam.getMarkUserId() != null
+							|| (myExam.getState() == 1 && myExam.getMarkState() == 3))//
+					.count();
+			long myClaimNum = myExamList.stream()//
+					.filter(myExam -> myExam.getMarkUserId() != null//
+							&& myExam.getMarkUserId().intValue() == getCurUser().getId().intValue())//
+					.count();
+			long myMarkNum = myExamList.stream()//
+					.filter(myExam -> myExam.getMarkUserId() != null//
+							&& myExam.getMarkUserId().intValue() == getCurUser().getId().intValue()//
+							&& myExam.getMarkState() == 3)//
+					.count();
+
+			return PageResultEx.ok()//
+					.addAttr("paperNum", paperNum).addAttr("markNum", markNum).addAttr("myClaimNum", myClaimNum)
+					.addAttr("myMarkNum", myMarkNum);
+		} catch (Exception e) {
+			log.error("阅卷列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 试卷领取
 	 * 
 	 * v1.0 zhanghc 2023年2月23日下午2:31:16
 	 * 
@@ -140,10 +244,10 @@ public class ApiMyMarkController extends BaseController {
 	 * @param num    分配份数
 	 * @return PageResult
 	 */
-	@RequestMapping("/assign")
-	public PageResult assign(Integer examId, Integer num) {
+	@RequestMapping("/claim")
+	public PageResult claim(Integer examId, Integer num) {
 		try {
-			myMarkService.assign(examId, num);
+			myMarkService.claim(examId, num);
 			return PageResultEx.ok();
 		} catch (MyException e) {
 			log.error("试卷分配错误：{}", e.getMessage());
@@ -220,6 +324,64 @@ public class ApiMyMarkController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("阅卷错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 zhanghc 2025年2月15日下午12:06:41
+	 * 
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionStatis")
+	public PageResult questionStatis(Integer examId) {
+		try {
+			List<ExamQuestion> examQuestionList = examQuestionService.getList(examId);
+			Map<Integer, Long> markTypeResult = examQuestionList.stream()//
+					.filter(examQuestion -> examQuestion.getType() == 2)// 排除章节
+					.map(examQuestion -> examCacheService.getQuestion(examQuestion.getQuestionId()))//
+					.collect(Collectors.groupingBy(Question::getMarkType, Collectors.counting()));
+			Map<String, Object> markTypeStatis = new HashMap<>();
+			baseCacheService.getDictList()//
+					.stream()//
+					.filter(dict -> dict.getDictIndex().equals("PAPER_MARK_TYPE"))//
+					.forEach(dict -> {
+						String key = dict.getDictKey().equals("1") ? "objective" : "subjective";
+						Long value = markTypeResult.get(Integer.parseInt(dict.getDictKey()));
+						markTypeStatis.put(key, value == null ? 0 : value);
+					});
+
+			Map<Integer, Long> typeCountMap = examQuestionList.stream()//
+					.filter(examQuestion -> examQuestion.getType() == 2)// 排除章节
+					.map(examQuestion -> examCacheService.getQuestion(examQuestion.getQuestionId()))//
+					.collect(Collectors.groupingBy(Question::getType, Collectors.counting()));
+
+			List<Map<String, Object>> typeStatis = baseCacheService.getDictList()//
+					.stream()//
+					.filter(dict -> dict.getDictIndex().equals("QUESTION_TYPE"))//
+					.map(dict -> {//
+						Map<String, Object> data = new HashMap<String, Object>();
+						data.put("type", dict.getDictKey());
+						Long value = typeCountMap.get(Integer.parseInt(dict.getDictKey()));
+						data.put("count", value == null ? 0 : value);
+						return data;
+					})//
+					.collect(Collectors.toList());
+
+			markTypeStatis.put("chapter", examQuestionList.stream()//
+					.filter(examQuestion -> examQuestion.getType() == 1)// 获取章节数量
+					.count());// 临时追加字段，后续拆解 2025-02-14 zhc
+			return PageResultEx.ok()//
+					.addAttr("markTypeStatis", markTypeStatis)//
+					.addAttr("typeStatis", typeStatis);
+		} catch (MyException e) {
+			log.error("获取试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题统计错误：", e);
 			return PageResult.err();
 		}
 	}

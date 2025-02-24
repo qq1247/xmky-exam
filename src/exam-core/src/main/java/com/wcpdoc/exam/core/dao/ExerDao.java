@@ -25,9 +25,9 @@ public interface ExerDao extends RBaseDao<Exer> {
 		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<Exer>().setAlias("EXER")//
 						.select("EXER.ID", "EXER.NAME", "EXER.START_TIME", "EXER.END_TIME", "EXER.RMK_STATE",
-								"EXER.USER_IDS", "QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME")//
-						.leftJoin("EXM_QUESTION_TYPE QUESTION_TYPE ON EXER.QUESTION_TYPE_ID = QUESTION_TYPE.ID")//
-						.eq(pageIn.hasParm("questionTypeId"), "EXER.QUESTION_TYPE_ID", pageIn.getParm("questionTypeId"))//
+								"EXER.USER_IDS", "QUESTION_BANK.NAME AS QUESTION_BANK_NAME")//
+						.leftJoin("EXM_QUESTION_BANK QUESTION_BANK ON EXER.QUESTION_BANK_ID = QUESTION_BANK.ID")//
+						.eq(pageIn.hasParm("questionBankId"), "EXER.QUESTION_BANK_ID", pageIn.getParm("questionBankId"))//
 						.like(pageIn.hasParm("name"), "EXER.NAME", pageIn.getParm("name"))//
 						.ge(pageIn.hasParm("todo"), "EXER.END_TIME", DateUtil.formatDateTime(new Date()))// 查找我的未完成的练习列表
 						.eq(pageIn.hasParm("curUserId"), "EXER.CREATE_USER_ID", pageIn.getParm("curUserId"))// 子管理员登录，各看各的
@@ -52,11 +52,11 @@ public interface ExerDao extends RBaseDao<Exer> {
 	 * 
 	 * v1.0 chenyun 2021年9月17日上午11:19:21
 	 * 
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return List<Exer>
 	 */
-	default List<Exer> getList(Integer questionTypeId) {
+	default List<Exer> getList(Integer questionBankId) {
 		return selectList(
-				new LambdaQueryWrapper<Exer>().eq(Exer::getQuestionTypeId, questionTypeId).eq(Exer::getState, 1));
+				new LambdaQueryWrapper<Exer>().eq(Exer::getQuestionBankId, questionBankId).eq(Exer::getState, 1));
 	}
 }

@@ -416,7 +416,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 					myQuestion.setNo(no++);
 					myQuestionService.save(myQuestion);
 				} else {// 如果是规则
-					List<Question> questionList = questionService.getList(examRule.getQuestionTypeId());
+					List<Question> questionList = questionService.getList(examRule.getQuestionBankId());
 					Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
 					Integer ruleRemainNum = examRule.getNum();// 该规则试题数量，找到一个数量减一
 					for (Question question : questionList) {

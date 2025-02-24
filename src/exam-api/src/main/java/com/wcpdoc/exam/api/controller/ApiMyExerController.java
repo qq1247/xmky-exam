@@ -29,7 +29,7 @@ import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class ApiMyExerController extends BaseController {
 	@Resource
 	private QuestionService questionService;
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 	@Resource
 	private ExerRmkService exerRmkService;
 	@Resource
@@ -96,8 +96,8 @@ public class ApiMyExerController extends BaseController {
 			return PageResultEx.ok()//
 					.addAttr("id", exer.getId())//
 					.addAttr("name", exer.getName())//
-					.addAttr("questionTypeId", exer.getQuestionTypeId())//
-					.addAttr("questionTypeName", questionTypeService.getById(exer.getQuestionTypeId()).getName())//
+					.addAttr("questionBankId", exer.getQuestionBankId())//
+					.addAttr("questionBankName", questionBankService.getById(exer.getQuestionBankId()).getName())//
 					.addAttr("startTime", exer.getStartTime())//
 					.addAttr("endTime", exer.getEndTime())//
 					.addAttr("rmkState", exer.getRmkState());
@@ -211,7 +211,7 @@ public class ApiMyExerController extends BaseController {
 			}
 
 			// 试题列表
-			List<Integer> questionIds = questionService.getIds(exer.getQuestionTypeId());
+			List<Integer> questionIds = questionService.getIds(exer.getQuestionBankId());
 			return PageResultEx.ok().data(questionIds);
 		} catch (MyException e) {
 			log.error("我的练习试题列表错误：{}", e.getMessage());
@@ -247,7 +247,7 @@ public class ApiMyExerController extends BaseController {
 			}
 
 			// 试题列表
-			List<Map<String, Object>> list = questionService.getIds(exer.getQuestionTypeId()).stream()
+			List<Map<String, Object>> list = questionService.getIds(exer.getQuestionBankId()).stream()
 					.map(questionId -> {
 						// 试题获取
 						Map<String, Object> questionMap = new HashMap<>();

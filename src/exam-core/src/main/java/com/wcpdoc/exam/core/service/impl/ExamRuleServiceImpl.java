@@ -14,8 +14,8 @@ import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
 
 /**
  * 考试规则服务层实现
@@ -27,7 +27,7 @@ public class ExamRuleServiceImpl extends BaseServiceImp<ExamRule> implements Exa
 	@Resource
 	private ExamRuleDao examRuleDao;
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 	@Resource
 	private QuestionService questionService;
 	@Resource

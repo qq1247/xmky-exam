@@ -71,18 +71,18 @@ public interface QuestionService extends BaseService<Question> {
 	 * 
 	 * v1.0 zhanghc 2022年5月23日下午1:39:14
 	 * 
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return List<Integer>
 	 */
-	List<Integer> getIds(Integer questionTypeId);
+	List<Integer> getIds(Integer questionBankId);
 
 	/**
 	 * 获取试题列表
 	 * 
 	 * v1.0 zhanghc 2022年5月23日下午1:39:14
 	 * 
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return List<Question>
 	 */
-	List<Question> getList(Integer questionTypeId);
+	List<Question> getList(Integer questionBankId);
 }

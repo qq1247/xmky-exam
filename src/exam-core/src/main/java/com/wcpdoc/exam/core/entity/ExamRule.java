@@ -25,7 +25,7 @@ public class ExamRule {
 	private String chapterName;
 	private String chapterTxt;
 	private Integer type;
-	private Integer questionTypeId;
+	private Integer questionBankId;
 	private Integer questionType;
 	private Integer markType;
 	@TableField(typeHandler = IntTypeHandler.class)

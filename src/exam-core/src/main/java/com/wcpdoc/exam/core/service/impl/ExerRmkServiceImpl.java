@@ -67,7 +67,7 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 			throw new MyException("无权限");
 		}
 		Question question = examCacheService.getQuestion(exerRmk.getQuestionId());
-		if (question.getQuestionTypeId().intValue() != exer.getQuestionTypeId().intValue()) {
+		if (question.getQuestionBankId().intValue() != exer.getQuestionBankId().intValue()) {
 			throw new MyException("无权限");
 		}
 		if (exer.getRmkState() == 2) {

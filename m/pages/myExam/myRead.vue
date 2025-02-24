@@ -67,7 +67,7 @@
 							<text class="myread-exam__value">{{ dateTimeFormat(exam.markStartTime) }} - {{ dateTimeFormat(exam.markEndTime) }}</text>
 						</view>
 						<view class="myread-exam__row">
-							<text class="myread-exam__label">限时考试：</text>
+							<text class="myread-exam__label">限时答题：</text>
 							<text class="myread-exam__value">{{ exam.limitMinute ? `${exam.limitMinute}分钟` : '无' }}</text>
 						</view>
 						<view class="myread-exam__row">
@@ -75,7 +75,7 @@
 							<text class="myread-exam__value">{{ dictStore.getValue('SCORE_STATE', exam.scoreState) }}</text>
 						</view>
 						<view class="myread-exam__row">
-							<text class="myread-exam__label">排名状态：</text>
+							<text class="myread-exam__label">公布排名：</text>
 							<text class="myread-exam__value">{{ dictStore.getValue('STATE_ON', exam.rankState) }}</text>
 						</view>
 						<view class="myread-exam__row">
@@ -100,7 +100,7 @@
 							<text class="myread-exam__label">防止作弊：</text>
 							<text class="myread-exam__value">
 								<template v-if="!exam.sxes.length">无</template>
-								<template else v-for="(sxe, index) in exam.sxes" :key="index">{{ index > 0 ? '、' : '' }}{{ ['', '试题乱序', '选项乱序'][sxe] }}</template>
+								<template v-else v-for="(sxe, index) in exam.sxes" :key="index">{{ index > 0 ? '、' : '' }}{{ ['', '试题乱序', '选项乱序'][sxe] }}</template>
 							</text>
 						</view>
 					</view>

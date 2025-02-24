@@ -235,12 +235,13 @@ public class ApiUserController extends BaseController {
 	 * v1.0 chenyun 2022年04月21日下午3:36:55
 	 * 
 	 * @param id
+	 * @param state
 	 * @return PageResult
 	 */
 	@RequestMapping("/frozen")
-	public PageResult frozen(Integer id) {
+	public PageResult frozen(Integer id, Integer state) {
 		try {
-			userService.frozen(id);
+			userService.frozen(id, state);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("用户冻结错误：{}", e.getMessage());

@@ -24,16 +24,16 @@ public interface MyMarkService extends BaseService<MyMark> {
 	 * @return PageOut
 	 */
 	PageOut getUserListpage(PageIn pageIn);
-
+	
 	/**
-	 * 试卷分配
+	 * 试卷领取
 	 * 
 	 * v1.0 zhanghc 2023年2月23日下午2:33:26
 	 * 
 	 * @param examId
 	 * @param num    void
 	 */
-	void assign(Integer examId, Integer num);
+	void claim(Integer examId, Integer num);
 
 	/**
 	 * 试卷

@@ -138,13 +138,13 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 	@Override
 	@CacheEvict(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id")
-	public void frozen(Integer id) {
+	public void frozen(Integer id, Integer state) {
 		// 数据校验
-		frozenValid(id);
+		frozenValid(id, state);
 
 		// 用户冻结
 		User user = baseCacheService.getUser(id);
-		user.setState(user.getState() == 1 ? 2 : 1);
+		user.setState(state);
 		updateById(user);
 
 		// 用户下线
@@ -238,9 +238,12 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		}
 	}
 
-	private void frozenValid(Integer id) {
+	private void frozenValid(Integer id, Integer state) {
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
+		}
+		if (!ValidateUtil.isValid(state)) {
+			throw new MyException("参数错误：state");
 		}
 		if (!(getCurUser().getType() == 0 || getCurUser().getType() == 2)) {// 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
 			throw new MyException("参数错误：type");
@@ -268,6 +271,16 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 		if (user.getState() != 1 && user.getState() != 2) {
 			throw new MyException("参数错误：id");
+		}
+		
+		if (state != 1 && state != 2) {
+			throw new MyException("参数错误：state");
+		}
+		if (state == 1 && user.getState() == 1) {
+			throw new MyException("用户已正常");
+		}
+		if (state == 2 && user.getState() == 2) {
+			throw new MyException("用户已冻结");
 		}
 	}
 

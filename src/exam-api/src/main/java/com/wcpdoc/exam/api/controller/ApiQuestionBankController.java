@@ -15,8 +15,8 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.entity.QuestionBank;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,12 +26,12 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @RestController
-@RequestMapping("/api/questionType")
+@RequestMapping("/api/questionBank")
 @Slf4j
-public class ApiQuestionTypeController extends BaseController {
+public class ApiQuestionBankController extends BaseController {
 
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 
 	/**
 	 * 题库列表
@@ -47,7 +47,7 @@ public class ApiQuestionTypeController extends BaseController {
 			if (!CurLoginUserUtil.isAdmin()) {// 考试用户、阅卷用户没有权限；子管理员看自己；管理员看所有；
 				pageIn.addParm("curUserId", getCurUser().getId());
 			}
-			PageOut pageOut = questionTypeService.getListpage(pageIn);
+			PageOut pageOut = questionBankService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("题库列表错误：", e);
@@ -60,37 +60,37 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * @param questionType
+	 * @param questionBank
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
-	public PageResult add(QuestionType questionType) {
+	public PageResult add(QuestionBank questionBank) {
 		try {
 			// 数据校验
-			if (!ValidateUtil.isValid(questionType.getName())) {
+			if (!ValidateUtil.isValid(questionBank.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			// if (existName(questionType)) {
+			// if (existName(questionBank)) {
 			// throw new MyException("名称已存在");
 			// } // 不同的子管理员添加可以重复
 
 			// 题库添加
-			questionType.setCreateUserId(getCurUser().getId());
-			questionType.setUpdateTime(new Date());
-			questionType.setUpdateUserId(getCurUser().getId());
-			questionType.setObjectiveNum(0);
-			questionType.setSubjectiveNum(0);
-			questionType.setSingleNum(0);
-			questionType.setMultipleNum(0);
-			questionType.setJudgeNum(0);
-			questionType.setFillBlankSubNum(0);
-			questionType.setFillBlankObjNum(0);
-			questionType.setQaSubNum(0);
-			questionType.setQaObjNum(0);
-			questionType.setQuestionNum(0);
-			questionTypeService.save(questionType);
+			questionBank.setObjectiveNum(0);
+			questionBank.setSubjectiveNum(0);
+			questionBank.setSingleNum(0);
+			questionBank.setMultipleNum(0);
+			questionBank.setJudgeNum(0);
+			questionBank.setFillBlankSubNum(0);
+			questionBank.setFillBlankObjNum(0);
+			questionBank.setQaSubNum(0);
+			questionBank.setQaObjNum(0);
+			questionBank.setQuestionNum(0);
+			questionBank.setCreateUserId(getCurUser().getId());
+			questionBank.setUpdateTime(new Date());
+			questionBank.setUpdateUserId(getCurUser().getId());
+			questionBankService.save(questionBank);
 
-			return PageResultEx.ok().data(questionType.getId());
+			return PageResultEx.ok().data(questionBank.getId());
 		} catch (MyException e) {
 			log.error("题库添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -105,26 +105,26 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * @param questionType
+	 * @param questionBank
 	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
-	public PageResult edit(QuestionType questionType) {
+	public PageResult edit(QuestionBank questionBank) {
 		try {
 			// 数据校验
-			if (!ValidateUtil.isValid(questionType.getName())) {
+			if (!ValidateUtil.isValid(questionBank.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			QuestionType entity = questionTypeService.getById(questionType.getId());
+			QuestionBank entity = questionBankService.getById(questionBank.getId());
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 				throw new MyException("无操作权限");
 			}
 
 			// 保存题库
-			entity.setName(questionType.getName());
+			entity.setName(questionBank.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
-			questionTypeService.updateById(entity);
+			questionBankService.updateById(entity);
 
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -147,7 +147,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			questionTypeService.delEx(id);
+			questionBankService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("题库删除错误：{}", e.getMessage());
@@ -169,7 +169,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/get")
 	public PageResult get(Integer id) {
 		try {
-			QuestionType entity = questionTypeService.getById(id);
+			QuestionBank entity = questionBankService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
@@ -195,7 +195,7 @@ public class ApiQuestionTypeController extends BaseController {
 //	@RequestMapping("/move")
 //	public PageResult move(Integer sourceId, Integer targetId) {
 //		try {
-//			questionTypeService.move(sourceId, targetId);
+//			questionBankService.move(sourceId, targetId);
 //			return PageResult.ok();
 //		} catch (MyException e) {
 //			log.error("题库合并错误：{}", e.getMessage());
@@ -217,7 +217,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/clear")
 	public PageResult clear(Integer id) {
 		try {
-			questionTypeService.clear(id);
+			questionBankService.clear(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("题库清空错误：{}", e.getMessage());

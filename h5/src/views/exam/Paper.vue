@@ -46,7 +46,7 @@
                     答题卡
                 </el-divider>
                 <el-scrollbar height="calc(100vh - 475px)">
-                    <template v-for="examQuestion in examQuestions">
+                    <template v-for="(examQuestion, index) in examQuestions" :key="index">
                         <div v-if="examQuestion.type === 1" class="paper-left-bottom-chapter">{{ examQuestion.chapterName }}
                         </div>
                         <el-button v-else type="primary" plain @click="toNav(examQuestion)">
@@ -87,7 +87,6 @@
                         :userScore="examQuestion.userScore"
                         :options="examQuestion.options" 
                         :editable="isAnswer"
-                        @change="" 
                         :errShow="scoreShow">
                         <template #bottom-right
                             v-if="myExam.state === 3 || (myExam.state === 1 && myExam.markState === 3)"><!-- 已交卷或（未考试已阅卷） -->

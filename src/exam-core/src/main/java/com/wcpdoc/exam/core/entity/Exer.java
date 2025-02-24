@@ -22,7 +22,7 @@ public class Exer {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
 	private String name;
-	private Integer questionTypeId;
+	private Integer questionBankId;
 	private Date startTime;
 	private Date endTime;
 	@TableField(typeHandler = IntTypeHandler.class)

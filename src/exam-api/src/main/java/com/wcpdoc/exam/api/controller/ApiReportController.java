@@ -159,9 +159,9 @@ public class ApiReportController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/question/statis")
-	public PageResult questionStatis(Integer questionTypeId) {
+	public PageResult questionStatis(Integer questionBankId) {
 		try {
-			return PageResultEx.ok().data(reportService.questionStatis(questionTypeId));
+			return PageResultEx.ok().data(reportService.questionStatis(questionBankId));
 		} catch (MyException e) {
 			log.error("试题统计错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

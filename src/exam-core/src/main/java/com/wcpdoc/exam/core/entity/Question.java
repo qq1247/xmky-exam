@@ -30,7 +30,7 @@ public class Question {
 	private String analysis;
 	private BigDecimal score;
 	private Integer state;
-	private Integer questionTypeId;
+	private Integer questionBankId;
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;

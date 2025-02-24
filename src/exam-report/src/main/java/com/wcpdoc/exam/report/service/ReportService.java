@@ -57,10 +57,10 @@ public interface ReportService {
 	 * 试题统计
 	 * 
 	 * v1.0 chenyun 2021年12月15日下午1:47:12
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return Map<String, Object>
 	 */
-	Map<String, Object> questionStatis(Integer questionTypeId);
+	Map<String, Object> questionStatis(Integer questionBankId);
 	
 	/**
 	 * 考试统计

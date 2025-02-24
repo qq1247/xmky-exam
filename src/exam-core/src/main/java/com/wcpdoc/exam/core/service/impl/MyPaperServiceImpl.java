@@ -93,7 +93,6 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 				questionPart.setTitle(question.getTitle());
 				questionPart.setMarkOptions(myQuestion.getMarkOptions());
 				questionPart.setScore(myQuestion.getScore());
-				questionPart.setAnalysis(question.getAnalysis());
 				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 组装试题选项
 					List<QuestionOption> questionOptionList = examCacheService
 							.getQuestionOptionList(myQuestion.getQuestionId());
@@ -113,7 +112,8 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					questionPart.setUserScore(myQuestion.getUserScore());
 				}
 
-				if (answerShow) {// 组装标准答案（考试结束前用不着，不用和试题一块查询）
+				if (answerShow) {// 组装标准答案
+					questionPart.setAnalysis(question.getAnalysis());
 					List<QuestionAnswer> questionAnswerList = examCacheService
 							.getQuestionAnswerList(myQuestion.getQuestionId());
 					for (QuestionAnswer answer : questionAnswerList) {

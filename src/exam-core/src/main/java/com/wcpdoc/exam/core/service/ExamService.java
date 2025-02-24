@@ -49,9 +49,9 @@ public interface ExamService extends BaseService<Exam> {
 	 * v1.0 zhanghc 2024年5月21日上午9:04:56
 	 * 
 	 * @param id
-	 * @return Exam
+	 * @return void
 	 */
-	Exam pause(Integer id);
+	void pause(Integer id);
 
 	/**
 	 * 考试列表
@@ -94,11 +94,23 @@ public interface ExamService extends BaseService<Exam> {
 	 */
 	void assist(Integer id, Integer[] markUserIds);
 
-	void changeName(Integer id, String name);
+	/**
+	 * 成绩查询状态
+	 * 
+	 * v1.0 zhanghc 2025年2月11日下午1:17:36
+	 * 
+	 * @param id
+	 * @param scoreState void
+	 */
+	void score(Integer id, Integer scoreState);
 
-	void changeSxes(Integer id, List<Integer> sxes);
-
-	void changeScoreState(Integer id, Integer scoreState);
-
-	void changeRankState(Integer id, Integer rankState);
+	/**
+	 * 排名状态
+	 * 
+	 * v1.0 zhanghc 2025年2月11日下午1:17:36
+	 * 
+	 * @param id
+	 * @param scoreState void
+	 */
+	void rank(Integer id, Integer rankState);
 }

@@ -26,16 +26,16 @@ public interface QuestionDao extends RBaseDao<Question> {
 	default PageOut getListpage(PageIn pageIn) {
 		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<Question>().setAlias("QUESTION")//
-						.leftJoin("EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID")
+						.leftJoin("EXM_QUESTION_BANK QUESTION_BANK ON QUESTION.QUESTION_BANK_ID = QUESTION_BANK.ID")
 						.leftJoin("SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID")
 						.select("QUESTION.ID", "QUESTION.TYPE", "QUESTION.TITLE", "QUESTION.MARK_TYPE",
-								"QUESTION.STATE", "QUESTION.ANALYSIS", "QUESTION.QUESTION_TYPE_ID",
-								"QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME", "QUESTION.SCORE", "QUESTION.MARK_OPTIONS",
+								"QUESTION.STATE", "QUESTION.ANALYSIS", "QUESTION.QUESTION_BANK_ID",
+								"QUESTION_BANK.NAME AS QUESTION_BANK_NAME", "QUESTION.SCORE", "QUESTION.MARK_OPTIONS",
 								"UPDATE_USER.NAME AS UPDATE_USER_NAME")//
-						.eq(pageIn.hasParm("questionTypeId"), "QUESTION.QUESTION_TYPE_ID",
-								pageIn.getParm("questionTypeId"))//
-						.like(pageIn.hasParm("questionTypeName"), "QUESTION_TYPE.NAME",
-								pageIn.getParm("questionTypeName"))//
+						.eq(pageIn.hasParm("questionBankId"), "QUESTION.QUESTION_BANK_ID",
+								pageIn.getParm("questionBankId"))//
+						.like(pageIn.hasParm("questionBankName"), "QUESTION_BANK.NAME",
+								pageIn.getParm("questionBankName"))//
 						.eq(pageIn.hasParm("id"), "QUESTION.ID", pageIn.getParm("id"))//
 						.like(pageIn.hasParm("title"), "QUESTION.TITLE", pageIn.getParm("title"))//
 						.eq(pageIn.hasParm("type"), "QUESTION.TYPE", pageIn.getParm("type"))//
@@ -72,14 +72,14 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 * 
 	 * v1.0 zhanghc 2021年12月28日下午2:56:17
 	 * 
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return List<Integer>
 	 */
-	default List<Integer> getIds(Integer questionTypeId) {
+	default List<Integer> getIds(Integer questionBankId) {
 		return selectObjs(new LambdaQueryWrapper<Question>()//
 				.select(Question::getId)//
 				.eq(Question::getState, 1)//
-				.eq(Question::getQuestionTypeId, questionTypeId));
+				.eq(Question::getQuestionBankId, questionBankId));
 	}
 
 	/**
@@ -87,13 +87,13 @@ public interface QuestionDao extends RBaseDao<Question> {
 	 * 
 	 * v1.0 zhanghc 2021年12月28日下午2:56:17
 	 * 
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return List<Integer>
 	 */
-	default List<Question> getList(Integer questionTypeId) {
+	default List<Question> getList(Integer questionBankId) {
 		return selectList(new LambdaQueryWrapper<Question>()//
 				.eq(Question::getState, 1)//
-				.eq(Question::getQuestionTypeId, questionTypeId));
+				.eq(Question::getQuestionBankId, questionBankId));
 	}
 
 	/**

@@ -35,9 +35,9 @@ public interface ExerService extends BaseService<Exer> {
 	 * 
 	 * v1.0 chenyun 2021年9月17日上午11:19:21
 	 * 
-	 * @param questionTypeId
+	 * @param questionBankId
 	 * @return List<Exer>
 	 */
-	List<Exer> getList(Integer questionTypeId);
+	List<Exer> getList(Integer questionBankId);
 
 }

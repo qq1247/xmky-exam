@@ -230,7 +230,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("options", options)//
 					.addAttr("markType", question.getMarkType())//
 					.addAttr("analysis", question.getAnalysis())//
-					.addAttr("questionTypeId", question.getQuestionTypeId())//
+					.addAttr("questionBankId", question.getQuestionBankId())//
 					.addAttr("score", question.getScore())//
 					.addAttr("markOptions", question.getMarkOptions())//
 					.addAttr("answers", answers)//

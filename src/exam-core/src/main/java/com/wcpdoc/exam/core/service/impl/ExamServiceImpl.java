@@ -44,7 +44,7 @@ import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 import com.wcpdoc.exam.core.entity.ex.ExamQuestionEx;
 import com.wcpdoc.exam.core.service.ExamCacheService;
@@ -55,7 +55,7 @@ import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
@@ -83,7 +83,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Resource
 	private ExamRuleService examRuleService;
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 	@Resource
 	private MyExamService myExamService;
 	@Resource
@@ -112,7 +112,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	 * ["单选题的A选项", "单选题的B选项", "单选题的C选项", "单选题的D选项"], "markOptions": [], "score": 2,
 	 * "answers": ["B"], "scores": [], "analysis": "", }], "examRules": [ "type": 2,
 	 * "chapterName": "单选题",// type==2有效 "chapterTxt": "每题2分，一共10题20分",// type==2有效
-	 * "questionTypeId": 1, "questionType": 2, "markType": 1, "markOptions": [],
+	 * "questionBankId": 1, "questionType": 2, "markType": 1, "markOptions": [],
 	 * "num": 10, "score": 1, "scores": [], ] "examUserIds": [2, 3], "markUserId":
 	 * 2, }
 	 */
@@ -184,7 +184,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
-	public Exam pause(Integer id) {
+	public void pause(Integer id) {
 		// 数据校验
 		pauseValid(id);
 
@@ -197,7 +197,30 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 
 		updateById(exam);
-		return exam;
+	}
+
+	@Override
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	public void score(Integer id, Integer scoreState) {
+		// 数据校验
+		scoreValid(id);
+
+		// 成绩查询状态修改
+		Exam exam = examCacheService.getExam(id);
+		exam.setScoreState(scoreState);
+		updateById(exam);
+	}
+
+	@Override
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
+	public void rank(Integer id, Integer rankState) {
+		// 数据校验
+		rankValid(id);
+
+		// 排名状态修改
+		Exam exam = examCacheService.getExam(id);
+		exam.setRankState(rankState);
+		updateById(exam);
 	}
 
 	@Override
@@ -511,6 +534,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		log.info("【{}-{}】变更【{}-{}】考试开始时间，{} -> {}", curUser.getLoginName(), curUser.getName(), exam.getId(),
 				exam.getName(), DateUtil.formatDateTime(oldStartTime), DateUtil.formatDateTime(exam.getStartTime()));
 	}
+	
+	public static void main(String[] args) {
+		System.err.println(Integer.MAX_VALUE);
+		System.err.println(Long.MAX_VALUE);
+	}
 
 	private void timeValid(Integer id, Integer timeType, Integer minute) {
 		if (!ValidateUtil.isValid(id)) {
@@ -574,18 +602,28 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 		// 新试卷信息保存
 		if (examInfo.getGenType() == 1) {
-			QuestionType questionType = new QuestionType();// 创建一个题库，题库名称保持和考试名称一致，用于存放部分从文本导入的新题
+			QuestionBank questionBank = new QuestionBank();// 创建一个题库，题库名称保持和考试名称一致，用于存放部分从文本导入的新题
 			for (int i = 0; i < examInfo.getExamQuestions().size(); i++) {
 				ExamQuestionEx examQuestionEx = examInfo.getExamQuestions().get(i);
 				examQuestionEx.setNo(i + 1);// 重新保存顺序，不要依赖前端
 				examQuestionEx.setExamId(examInfo.getId());
 				if (ExamUtil.hasQuestion(examQuestionEx) && !ValidateUtil.isValid(examQuestionEx.getQuestionId())) {// 如果是从文本导入的新题，先保存
-					if (!ValidateUtil.isValid(questionType.getId())) {
-						questionType.setName(examInfo.getName());
-						questionType.setCreateUserId(getCurUser().getId());
-						questionType.setUpdateTime(new Date());
-						questionType.setUpdateUserId(getCurUser().getId());
-						questionTypeService.save(questionType);
+					if (!ValidateUtil.isValid(questionBank.getId())) {
+						questionBank.setName(examInfo.getName());
+						questionBank.setObjectiveNum(0);
+						questionBank.setSubjectiveNum(0);
+						questionBank.setSingleNum(0);
+						questionBank.setMultipleNum(0);
+						questionBank.setFillBlankSubNum(0);
+						questionBank.setFillBlankObjNum(0);
+						questionBank.setJudgeNum(0);
+						questionBank.setQaSubNum(0);
+						questionBank.setQaObjNum(0);
+						questionBank.setQuestionNum(0);
+						questionBank.setCreateUserId(getCurUser().getId());
+						questionBank.setUpdateTime(new Date());
+						questionBank.setUpdateUserId(getCurUser().getId());
+						questionBankService.save(questionBank);
 					}
 
 					Question question = new Question();
@@ -595,7 +633,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					question.setMarkOptions(examQuestionEx.getMarkOptions());
 					question.setAnalysis(examQuestionEx.getAnalysis());
 					question.setScore(examQuestionEx.getScore());
-					question.setQuestionTypeId(questionType.getId());
+					question.setQuestionBankId(questionBank.getId());
 					question.setUpdateUserId(getCurUser().getId());
 					question.setUpdateTime(new Date());
 					questionService.addEx(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
@@ -617,7 +655,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				examQuestion.setUpdateTime(new Date());
 				examQuestionService.save(examQuestion);
 			}
-			questionTypeService.computeTypeNum(questionType.getId());
 		}
 		// 如果是随机试卷，保存抽题规则
 		else if (examInfo.getGenType() == 2) {
@@ -710,7 +747,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						myQuestion.setNo(no++);
 						myQuestionService.save(myQuestion);
 					} else {// 如果是规则
-						List<Question> questionList = questionListCache.get(examRule.getQuestionTypeId());
+						List<Question> questionList = questionListCache.get(examRule.getQuestionBankId());
 						Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
 						Integer ruleRemainNum = examRule.getNum();// 该规则试题数量，找到一个数量减一
 						for (Question question : questionList) {
@@ -776,7 +813,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (examInfo.getLoginType() == 1 && !ValidateUtil.isValid(examInfo.getExamUserIds())) {
 			throw new MyException("最少添加一个考试用户");
 		}
-		
+
 		if (examInfo.getLoginType() == 2 && ValidateUtil.isValid(examInfo.getExamUserIds())) {
 			throw new MyException("免登录考试不能添加考试用户");
 		}
@@ -905,8 +942,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					// if (!ValidateUtil.isValid(examRule.getChapterName())) { // 没有也可以
 					// throw new MyException("参数错误：examRule.chapterName");
 					// }
-					if (ValidateUtil.isValid(examRule.getQuestionTypeId())) {
-						throw new MyException("参数错误：examRules.questionTypeId");
+					if (ValidateUtil.isValid(examRule.getQuestionBankId())) {
+						throw new MyException("参数错误：examRules.questionBankId");
 					}
 					if (ValidateUtil.isValid(examRule.getQuestionType())) {
 						throw new MyException("参数错误：examRules.questionType");
@@ -934,8 +971,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						throw new MyException("参数错误：examQuestions.chapterTxt");
 					}
 
-					if (!ValidateUtil.isValid(examRule.getQuestionTypeId())) {
-						throw new MyException("参数错误：examRules.questionTypeId");
+					if (!ValidateUtil.isValid(examRule.getQuestionBankId())) {
+						throw new MyException("参数错误：examRules.questionBankId");
 					}
 					if (!ValidateUtil.isValid(examRule.getQuestionType()) || examRule.getQuestionType() < 1
 							|| examRule.getQuestionType() > 5) {
@@ -996,7 +1033,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 					ruleNo++;
 					int validQuestionNum = 0;// 符合当前抽题规则的有效题数
-					for (Question question : questionListCache.get(examRule.getQuestionTypeId())) {
+					for (Question question : questionListCache.get(examRule.getQuestionBankId())) {
 						if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 							throw new MyException(String.format("试题无权限，编号：%s", question.getId()));
 						}
@@ -1187,10 +1224,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		Map<Integer, List<Question>> questionListCache = new HashMap<>();
 		if (examInfo.getGenType() == 2) {// 如果是随机组卷
 			examInfo.getExamRules().stream()//
-					.map(ExamRule::getQuestionTypeId)// 提取需要的题库
+					.map(ExamRule::getQuestionBankId)// 提取需要的题库
 					.collect(Collectors.toSet()).stream()// 去重
-					.forEach(questionTypeId -> questionListCache.put(questionTypeId,
-							questionService.getList(questionTypeId)));// 把题库缓存起来，用于模拟随机抽题
+					.forEach(questionBankId -> questionListCache.put(questionBankId,
+							questionService.getList(questionBankId)));// 把题库缓存起来，用于模拟随机抽题
 		}
 		return questionListCache;
 	}
@@ -1297,55 +1334,24 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //		}
 	}
 
-	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
-	@Override
-	public void changeName(Integer id, String name) {
-		Exam exam = getById(id);
-		Date now = new Date();
-		Date startTime = exam.getStartTime();
-		if(now.after(startTime)){
-			throw new MyException("已开始考试，名称不能修改");
+	private void scoreValid(Integer id) {
+		Exam exam = examCacheService.getExam(id);
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
 		}
-		exam.setName(name);
-		updateById(exam);
+		if (exam.getState() == 0) {
+			throw new MyException("已删除");
+		}
 	}
 
-	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
-	@Override
-	public void changeSxes(Integer id, List<Integer> sxes) {
-		Exam exam = getById(id);
-		Date now = new Date();
-		Date startTime = exam.getStartTime();
-		if(now.after(startTime)){
-			throw new MyException("已开始考试，名称不能修改");
+	private void rankValid(Integer id) {
+		Exam exam = examCacheService.getExam(id);
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
 		}
-		exam.setSxes(sxes);
-		updateById(exam);
+		if (exam.getState() == 0) {
+			throw new MyException("已删除");
+		}
 	}
 
-	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
-	@Override
-	public void changeScoreState(Integer id, Integer scoreState){
-		Exam exam = getById(id);
-		Date now = new Date();
-		Date startTime = exam.getStartTime();
-		if(now.after(startTime)){
-			throw new MyException("已开始考试，名称不能修改");
-		}
-		exam.setScoreState(scoreState);
-		updateById(exam);
-	}
-
-	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
-	@Override
-	public void changeRankState(Integer id, Integer rankState){
-		Exam exam = getById(id);
-		Date now = new Date();
-		Date startTime = exam.getStartTime();
-		if(now.after(startTime)){
-			throw new MyException("已开始考试，名称不能修改");
-		}
-		exam.setRankState(rankState);
-		updateById(exam);
-	}
 }

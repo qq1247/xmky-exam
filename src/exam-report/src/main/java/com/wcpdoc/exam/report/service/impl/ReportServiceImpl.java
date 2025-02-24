@@ -50,7 +50,7 @@ import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.report.service.ReportService;
 
 /**
@@ -62,7 +62,7 @@ import com.wcpdoc.exam.report.service.ReportService;
 public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportService {
 
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 	@Resource
 	private MyMarkService myMarkService;
 	@Resource
@@ -234,14 +234,14 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	}
 
 	@Override
-	public Map<String, Object> questionStatis(Integer questionTypeId) {
+	public Map<String, Object> questionStatis(Integer questionBankId) {
 		// 数据校验
-		if (!ValidateUtil.isValid(questionTypeId)) {
-			throw new MyException("参数错误：questionTypeId");
+		if (!ValidateUtil.isValid(questionBankId)) {
+			throw new MyException("参数错误：questionBankId");
 		}
 
 		// 统计数据
-		List<Question> questionList = questionService.getList(questionTypeId);
+		List<Question> questionList = questionService.getList(questionBankId);
 		Map<Integer, Integer> typeStatis = new HashMap<>();
 		Map<Integer, Integer> markTypeStatis = new HashMap<>();
 		for (Question question : questionList) {

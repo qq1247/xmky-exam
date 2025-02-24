@@ -201,5 +201,4 @@ public class ApiLoginController extends BaseController {
 			log.error("企业logo失败：", e);
 		}
 	}
-
 }

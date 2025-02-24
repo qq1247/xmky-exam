@@ -69,7 +69,7 @@ public class ApiMyExamController extends BaseController {
 				MyExam myExam = new MyExam();
 				myExam.setMarkState((Integer) map.get("markState"));
 
-				if (!MyExamUtil.scoreShow(exam, myExam)) {// 成绩查询状态（1：考试结束后；2：不公布；3：交卷后）
+				if (!MyExamUtil.totalScoreShow(exam, myExam)) {// 成绩查询状态（1：考试结束后；2：不公布；3：交卷后）
 					map.put("totalScore", null);// 不显示分数
 					map.put("answerState", null);// 不显示及格状态
 				}
@@ -102,14 +102,13 @@ public class ApiMyExamController extends BaseController {
 			}
 			Exam exam = examCacheService.getExam(examId);
 			return PageResultEx.ok()// 考试用户没有exam/get权限，所以字段在这里回显
-					.addAttr("examName", exam.getName())// 考试名称
 					.addAttr("answerStartTime", myExam.getAnswerStartTime())
 					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore", myExam.getObjectiveScore())//
-					.addAttr("totalScore", MyExamUtil.scoreShow(exam, myExam) ? myExam.getTotalScore() : null)//
-					.addAttr("answerState", MyExamUtil.scoreShow(exam, myExam) ? myExam.getAnswerState() : null)//
+					.addAttr("totalScore", MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getTotalScore() : null)//
+					.addAttr("answerState", MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getAnswerState() : null)//
 					.addAttr("state", myExam.getState())//
 					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
@@ -218,6 +217,11 @@ public class ApiMyExamController extends BaseController {
 						return data;
 					})//
 					.collect(Collectors.toList());
+
+			markTypeStatis.put("chapter", examCacheService.getMyQuestionList(examId, getCurUser().getId())//
+					.stream()//
+					.filter(myQuestion -> myQuestion.getType() == 1)// 获取章节数量
+					.count());// 临时追加字段，后续拆解 2025-02-14 zhc
 			return PageResultEx.ok()//
 					.addAttr("markTypeStatis", markTypeStatis)//
 					.addAttr("typeStatis", typeStatis);

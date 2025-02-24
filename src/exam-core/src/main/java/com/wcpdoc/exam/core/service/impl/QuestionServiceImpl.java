@@ -24,13 +24,13 @@ import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionExService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.file.service.FileService;
 
@@ -46,7 +46,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Resource
 	private QuestionExService questionExService;
 	@Resource
-	private QuestionTypeService questionTypeService;
+	private QuestionBankService questionBankService;
 	@Resource
 	private FileService fileService;
 	@Resource
@@ -64,11 +64,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void addEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores) {
 		// 数据校验
-		QuestionType questionType = addValid0(question);
-		addValid(question, options, answers, scores, questionType);
+		QuestionBank questionBank = addValid0(question);
+		addValid(question, options, answers, scores, questionBank);
 
 		// 试题添加
-		question.setCreateUserId(questionType.getCreateUserId());// 如果是管理员添加子管理的题库，创建人还是子管理员（比如需要根据创建人查询自己的试题）
+		question.setCreateUserId(questionBank.getCreateUserId());// 如果是管理员添加子管理的题库，创建人还是子管理员（比如需要根据创建人查询自己的试题）
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setState(1);
@@ -83,7 +83,30 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 附件保存
 		addFile(question, options);
 
-		questionTypeService.computeTypeNum(questionType.getId());
+		// 题库数量更新
+		questionBank.setQuestionNum(questionBank.getQuestionNum() + 1);
+		if (QuestionUtil.hasObjective(question)) {
+			questionBank.setObjectiveNum(questionBank.getObjectiveNum() + 1);
+		} else if (QuestionUtil.hasSubjective(question)) {
+			questionBank.setSubjectiveNum(questionBank.getSubjectiveNum() + 1);
+		}
+
+		if (QuestionUtil.hasSingleChoice(question)) {
+			questionBank.setSingleNum(questionBank.getSingleNum() + 1);
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			questionBank.setMultipleNum(questionBank.getMultipleNum() + 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasObjective(question)) {
+			questionBank.setFillBlankObjNum(questionBank.getFillBlankObjNum() + 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasSubjective(question)) {
+			questionBank.setFillBlankSubNum(questionBank.getFillBlankSubNum() + 1);
+		} else if (QuestionUtil.hasJudge(question)) {
+			questionBank.setJudgeNum(questionBank.getJudgeNum() + 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question)) {
+			questionBank.setQaObjNum(questionBank.getQaObjNum() + 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
+			questionBank.setQaSubNum(questionBank.getQaSubNum() + 1);
+		}
+		questionBankService.updateById(questionBank);
 	}
 
 	@Override
@@ -96,12 +119,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	})
 	public void updateEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores) {
 		// 数据校验
-		QuestionType questionType = updateValie0(question);
-		addValid(question, options, answers, scores, questionType);
+		QuestionBank questionBank = updateValie0(question);
+		addValid(question, options, answers, scores, questionBank);
 		questionExService.updateValid(question);
 
 		// 试题修改
 		Question entity = examCacheService.getQuestion(question.getId());
+		Integer oldMarkType = entity.getMarkType();
+
 		entity.setTitle(question.getTitle());
 		entity.setMarkType(question.getMarkType());
 		entity.setScore(question.getScore());
@@ -122,7 +147,37 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 附件保存
 		addFile(question, options);
 
-		questionTypeService.computeTypeNum(questionType.getId());
+		// 题库数量更新
+		if (oldMarkType.intValue() != entity.getMarkType().intValue()) {
+			if (QuestionUtil.hasObjective(entity)) {
+				questionBank.setObjectiveNum(questionBank.getObjectiveNum() + 1);
+				questionBank.setSubjectiveNum(questionBank.getSubjectiveNum() - 1);
+			} else if (QuestionUtil.hasSubjective(entity)) {
+				questionBank.setSubjectiveNum(questionBank.getSubjectiveNum() + 1);
+				questionBank.setObjectiveNum(questionBank.getObjectiveNum() - 1);
+			}
+
+			if (QuestionUtil.hasFillBlank(entity)) {
+				if (QuestionUtil.hasObjective(entity)) {
+					questionBank.setFillBlankObjNum(questionBank.getFillBlankObjNum() + 1);
+					questionBank.setFillBlankSubNum(questionBank.getFillBlankSubNum() - 1);
+				} else if (QuestionUtil.hasSubjective(entity)) {
+					questionBank.setFillBlankSubNum(questionBank.getFillBlankSubNum() + 1);
+					questionBank.setFillBlankObjNum(questionBank.getFillBlankObjNum() - 1);
+				}
+			}
+			if (QuestionUtil.hasQA(entity)) {
+				if (QuestionUtil.hasObjective(entity)) {
+					questionBank.setQaObjNum(questionBank.getQaObjNum() + 1);
+					questionBank.setQaSubNum(questionBank.getQaSubNum() - 1);
+				} else if (QuestionUtil.hasSubjective(entity)) {
+					questionBank.setQaSubNum(questionBank.getQaSubNum() + 1);
+					questionBank.setQaObjNum(questionBank.getQaObjNum() - 1);
+				}
+			}
+
+			questionBankService.updateById(questionBank);
+		}
 	}
 
 	@Override
@@ -133,7 +188,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	})
 	public void delEx(Integer id) {
 		// 数据校验
-		delValid(id);
+		QuestionBank questionBank = delValid(id);
 
 		// 试题删除
 		Question question = examCacheService.getQuestion(id);
@@ -142,13 +197,36 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setUpdateUserId(getCurUser().getId());
 		updateById(question);
 
-		questionTypeService.computeTypeNum(question.getQuestionTypeId());
+		// 题库数量更新
+		questionBank.setQuestionNum(questionBank.getQuestionNum() - 1);
+		if (QuestionUtil.hasObjective(question)) {
+			questionBank.setObjectiveNum(questionBank.getObjectiveNum() - 1);
+		} else if (QuestionUtil.hasSubjective(question)) {
+			questionBank.setSubjectiveNum(questionBank.getSubjectiveNum() - 1);
+		}
+
+		if (QuestionUtil.hasSingleChoice(question)) {
+			questionBank.setSingleNum(questionBank.getSingleNum() - 1);
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			questionBank.setMultipleNum(questionBank.getMultipleNum() - 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasObjective(question)) {
+			questionBank.setFillBlankObjNum(questionBank.getFillBlankObjNum() - 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasSubjective(question)) {
+			questionBank.setFillBlankSubNum(questionBank.getFillBlankSubNum() - 1);
+		} else if (QuestionUtil.hasJudge(question)) {
+			questionBank.setJudgeNum(questionBank.getJudgeNum() - 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question)) {
+			questionBank.setQaObjNum(questionBank.getQaObjNum() - 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
+			questionBank.setQaSubNum(questionBank.getQaSubNum() - 1);
+		}
+		questionBankService.updateById(questionBank);
 	}
 
 	@Override
 	public void copy(Integer id) throws Exception {
 		// 数据校验
-		copyValid(id);
+		QuestionBank questionBank = copyValid(id);
 
 		// 试题复制
 		Question question = examCacheService.getQuestion(id);
@@ -181,6 +259,31 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionOptionService.save(questionOptionNew);
 			}
 		}
+
+		// 题库数量更新
+		questionBank.setQuestionNum(questionBank.getQuestionNum() + 1);
+		if (QuestionUtil.hasObjective(question)) {
+			questionBank.setObjectiveNum(questionBank.getObjectiveNum() + 1);
+		} else if (QuestionUtil.hasSubjective(question)) {
+			questionBank.setSubjectiveNum(questionBank.getSubjectiveNum() + 1);
+		}
+
+		if (QuestionUtil.hasSingleChoice(question)) {
+			questionBank.setSingleNum(questionBank.getSingleNum() + 1);
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			questionBank.setMultipleNum(questionBank.getMultipleNum() + 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasObjective(question)) {
+			questionBank.setFillBlankObjNum(questionBank.getFillBlankObjNum() + 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasSubjective(question)) {
+			questionBank.setFillBlankSubNum(questionBank.getFillBlankSubNum() + 1);
+		} else if (QuestionUtil.hasJudge(question)) {
+			questionBank.setJudgeNum(questionBank.getJudgeNum() + 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question)) {
+			questionBank.setQaObjNum(questionBank.getQaObjNum() + 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
+			questionBank.setQaSubNum(questionBank.getQaSubNum() + 1);
+		}
+		questionBankService.updateById(questionBank);
 	}
 
 	@Override
@@ -189,20 +292,20 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public List<Integer> getIds(Integer questionTypeId) {
-		return questionDao.getIds(questionTypeId);
+	public List<Integer> getIds(Integer questionBankId) {
+		return questionDao.getIds(questionBankId);
 	}
 
 	@Override
-	public List<Question> getList(Integer questionTypeId) {
-		return questionDao.getList(questionTypeId);
+	public List<Question> getList(Integer questionBankId) {
+		return questionDao.getList(questionBankId);
 	}
 
-	private QuestionType addValid0(Question question) {
-		if (!ValidateUtil.isValid(question.getQuestionTypeId())) {
-			throw new MyException("参数错误：questionTypeId");
+	private QuestionBank addValid0(Question question) {
+		if (!ValidateUtil.isValid(question.getQuestionBankId())) {
+			throw new MyException("参数错误：questionBankId");
 		}
-		return questionTypeService.getById(question.getQuestionTypeId());
+		return questionBankService.getById(question.getQuestionBankId());
 	}
 
 	private void addAnswer(Question question, List<String> answers, List<BigDecimal> scores) {
@@ -278,8 +381,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	private void addValid(Question question, List<String> options, List<String> answers, List<BigDecimal> scores,
-			QuestionType questionType) {
-		if (!(CurLoginUserUtil.isSelf(questionType.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
+			QuestionBank questionBank) {
+		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 			throw new MyException("无操作权限");
 		}
 
@@ -472,7 +575,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 
-	private QuestionType updateValie0(Question question) {
+	private QuestionBank updateValie0(Question question) {
 		Question entity = examCacheService.getQuestion(question.getId());
 		if (entity.getType() != question.getType()) {
 			throw new MyException("类型不能修改");
@@ -481,10 +584,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("已删除");
 		}
 
-		return questionTypeService.getById(entity.getQuestionTypeId());
+		return questionBankService.getById(entity.getQuestionBankId());
 	}
 
-	private void delValid(Integer id) {
+	private QuestionBank delValid(Integer id) {
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
@@ -492,12 +595,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
+		return questionBankService.getById(question.getQuestionBankId());
 	}
 
-	private void copyValid(Integer id) {
+	private QuestionBank copyValid(Integer id) {
 		Question question = examCacheService.getQuestion(id);
 		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
+		return questionBankService.getById(question.getQuestionBankId());
 	}
 }

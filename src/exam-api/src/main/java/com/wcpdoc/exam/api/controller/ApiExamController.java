@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -231,7 +230,7 @@ public class ApiExamController extends BaseController {
 								examRule.put("chapterName", _examRule.getChapterName());
 								examRule.put("chapterTxt", _examRule.getChapterTxt());
 							} else {
-								examRule.put("questionTypeId", _examRule.getQuestionTypeId());
+								examRule.put("questionBankId", _examRule.getQuestionBankId());
 								examRule.put("questionType", _examRule.getQuestionType());
 								examRule.put("markType", _examRule.getMarkType());
 								examRule.put("markOptions", _examRule.getMarkOptions());
@@ -312,7 +311,8 @@ public class ApiExamController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exam exam = examCacheService.getExam(id);
-			return PageResultEx.ok().addAttr("id", exam.getId())//
+			return PageResultEx.ok()//
+					.addAttr("id", exam.getId())//
 					.addAttr("name", exam.getName())//
 					.addAttr("paperName", exam.getPaperName())//
 					.addAttr("startTime", exam.getStartTime())//
@@ -376,13 +376,59 @@ public class ApiExamController extends BaseController {
 	@RequestMapping("/pause")
 	public PageResult pause(Integer id) {
 		try {
-			Exam exam = examService.pause(id);
-			return PageResultEx.ok().data(exam.getState());
+			examService.pause(id);
+			return PageResultEx.ok();
 		} catch (MyException e) {
 			log.error("考试暂停错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("考试暂停错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 成绩查询状态
+	 * 
+	 * v1.0 zhanghc 2025年2月11日下午1:15:18
+	 * 
+	 * @param id
+	 * @param scoreState
+	 * @return PageResult
+	 */
+	@RequestMapping("/score")
+	public PageResult score(Integer id, Integer scoreState) {
+		try {
+			examService.score(id, scoreState);
+			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("成绩查询状态错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("成绩查询状态错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 排名状态
+	 * 
+	 * v1.0 zhanghc 2025年2月11日下午1:15:18
+	 * 
+	 * @param id
+	 * @param rankState
+	 * @return PageResult
+	 */
+	@RequestMapping("/rank")
+	public PageResult rank(Integer id, Integer rankState) {
+		try {
+			examService.rank(id, rankState);
+			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("排名状态错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("排名状态错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -447,51 +493,4 @@ public class ApiExamController extends BaseController {
 		}
 	}
 
-
-	/**
-	 * 修改考试名称
-	 *
-	 * @param id
-	 * @param name
-	 * @return PageResult
-	 */
-	@RequestMapping("/changeName")
-	public PageResult changeName(Integer id, String name) {
-		examService.changeName(id, name);
-		return PageResult.ok();
-	}
-
-	/**
-	 * 修改考试防作弊
-	 * @param id
-	 * @param sxes
-	 * @return PageResult
-	 */
-	@RequestMapping("/changeSxes")
-	public PageResult changeSxes(@RequestParam Integer id, @RequestParam List<Integer> sxes) {
-		examService.changeSxes(id, sxes);
-		return PageResult.ok();
-	}
-	/**
-	 * 修改成绩公布状态
-	 * @param id
-	 * @param scoreState
-	 * @return PageResult
-	 */
-	@RequestMapping("/changeScoreState")
-	public PageResult changeScoreState(Integer id, Integer scoreState) {
-		examService.changeScoreState(id, scoreState);
-		return PageResult.ok();
-	}
-	/**
-	 * 修改排名公布状态
-	 * @param id
-	 * @param rankState
-	 * @return PageResult
-	 */
-	@RequestMapping("/changeRankState")
-	public PageResult changeRankState(Integer id, Integer rankState) {
-		examService.changeRankState(id, rankState);
-		return PageResult.ok();
-	}
 }
