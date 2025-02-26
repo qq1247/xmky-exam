@@ -1,6 +1,6 @@
-# exam-小猫在线考试
+# xmky-exam（小猫在线考试系统）
 ## 在线演示
-<a href="http://47.92.221.134:8080" target="_blank">去演示</a>
+<a href="http://www.xiaomaokaiyuan.com" target="_blank">去演示</a>
 
 ## 功能介绍
 ###### 题库：支持单选、多选、填空、判断、问答
@@ -30,28 +30,17 @@
 ###### 管理员 admin 111111
 
 ## 相关文档
-<a href="doc">接口文档</a>
-<a href="doc">部署文档</a>
-<a href="img/process">状态流转图</a>
-<a href="h5">PC端更新</a>
-<a href="src">后端更新</a>
-<a href="m">移动端更新</a>
-<a href="doc">压测报告</a>
-
-## 界面预览
-<a href="img/webpage">去查看</a>
+<a href="http://examdoc.xiaomaokaiyuan.com/">查看文档</a>
 
 ## 技术实现
-bs架构：jdk8、mysql5.7、springboot2x、element-plus（vue3）、uni-app
+bs架构：jdk8、mysql5.7、springboot2x、element-plus（vue3）、uni-app（vue3）
 
 ## 技术交流
-软件bug：可直接提Issues或提qq群（811189776），按严重程度决定修复版本的时间<br/>
+软件bug：- 在gitee提[bug](https://gitee.com/zhanghucheng/exam/issues)，或qq群（811189776）提[bug](https://qm.qq.com/q/N4iwu3COMq)，会按严重程度排列进行修复<br/>
 通用需求：可以影响版本走向，按排版进度加入到之后的某个版本<br/>
 定制需求：收费服务，商业合作qq（3532748782）<br/>
 开源不易：如果觉得本软件帮助了您，帮忙在gitee/github点赞<br/>
 欢迎加入：鼓励贡献代码，鼓励二次开发<br/>
-![输入图片说明](img/9.png)
-<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=Vqhsz3XUUg-SS4m8LM0mrL3WcnKrL9xo&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="在线考试技术交流群" title="在线考试技术交流群"></a>
 
 ## 开源项目推荐
 <a href="http://www.wcpknow.com" target="_blank">产品介绍</a><br/>
