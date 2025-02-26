@@ -106,13 +106,14 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
-					.addAttr("objectiveScore", myExam.getObjectiveScore())//
+					.addAttr("objectiveScore",
+							MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getObjectiveScore() : null)//
 					.addAttr("totalScore", MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getTotalScore() : null)//
 					.addAttr("answerState", MyExamUtil.totalScoreShow(exam, myExam) ? myExam.getAnswerState() : null)//
 					.addAttr("state", myExam.getState())//
 					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null);
+					.addAttr("userNum", exam.getUserNum());
 		} catch (MyException e) {
 			log.error("获取我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -158,7 +159,7 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
-					.addAttr("userNum", exam.getRankState() == 1 ? exam.getUserNum() : null)//
+					.addAttr("userNum", exam.getUserNum())//
 					.addAttr("limitMinute", exam.getLimitMinute());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
