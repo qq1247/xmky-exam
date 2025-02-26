@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>4.6.1</version>
+		<version>5.0.0</version>
 	</parent>
 	<artifactId>sys-notify</artifactId>
 	<name>sys-notify</name>
