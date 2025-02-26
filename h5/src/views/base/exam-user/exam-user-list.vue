@@ -2,15 +2,17 @@
     <div class="exam-user">
         <div class="exam-user__head">
             <div class="opt">
-                <el-button type="success" class="opt__btn" @click="$router.push('/exam-user-nav/add')">
+                <el-button v-if="userStore.type === 0" type="success" class="opt__btn"
+                    @click="$router.push('/exam-user-nav/add')">
                     <span class="iconfont icon-tubiaoziti2-02 opt__btn-icon"></span>
                     <span class="opt__btn-txt">添加</span>
                 </el-button>
-                <el-button type="success" class="opt__btn opt__btn--secondary" @click="download">
+                <el-button v-if="userStore.type === 0" type="success" class="opt__btn opt__btn--secondary"
+                    @click="download">
                     <span class="iconfont icon-xiazaimoban opt__btn-icon"></span>
                     <span class="opt__btn-txt">模板下载</span>
                 </el-button>
-                <el-upload :action="`${http.defaults.baseURL}file/upload`"
+                <el-upload v-if="userStore.type === 0" :action="`${http.defaults.baseURL}file/upload`"
                     :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
                     :before-upload="uploadBefore" :on-success="uploadSuccess">
                     <el-button type="success" class="opt__btn opt__btn--secondary">
@@ -48,7 +50,7 @@
                         <span v-else>{{ dictStore.getValue('STATE_NF', scope.row.state) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="" label="操作" align="center" width="300">
+                <el-table-column v-if="userStore.type === 0" prop="" label="操作" align="center" width="300">
                     <template #default="scope">
                         <el-tooltip ffect="dark" content="设置">
                             <span class="iconfont icon-liebiao-01 table__btn"

@@ -29,8 +29,8 @@
         <div class="exam-user-select__side">
             <div class="user-add">
                 <span class="user-add__title">尚未添加考试用户？</span>
-                <span class="user-add__desc">快去添加吧！</span>
-                <el-button type="" class="user-add__btn" @click="toUserAdd">
+                <span class="user-add__desc">{{ userStore.type === 0 ? '快去添加吧！' : '请联系管理员' }}</span>
+                <el-button v-if="userStore.type === 0" type="" class="user-add__btn" @click="toUserAdd">
                     <span class="iconfont icon-tubiaoziti2-02 user-add__btn-icon"></span>
                     <span class="user-add__btn-txt">添加</span>
                 </el-button>
@@ -45,9 +45,11 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useExamStore } from '@/stores/exam'
 import xmksSelect from '@/components/xmks-select.vue'
 import { userListpage } from '@/api/base/user'
+import { useUserStore } from '@/stores/user'
 
 /************************变量定义相关***********************/
 defineExpose({ next })
+const userStore = useUserStore()
 const formRef = ref<FormInstance>()// 表单引用
 const form = useExamStore()
 const formRules = reactive<FormRules>({// 表单校验规则

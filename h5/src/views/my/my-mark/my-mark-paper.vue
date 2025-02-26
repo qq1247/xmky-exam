@@ -87,8 +87,8 @@
                     <el-scrollbar height="calc(100vh - 300px)" class="answer-sheet__wrap">
                         <div class="answer-sheet">
                             <template v-for="(examQuestion, index) in examQuestions" :key="index">
-                                <div v-if="examQuestion.type === 1" @click="scrollView(index)"
-                                    class="answer-sheet__chapter">
+                                <div v-if="examQuestion.type === 1 && hasChapterShow(examQuestion)"
+                                    @click="scrollView(index)" class="answer-sheet__chapter">
                                     {{ examQuestion.chapterName }}
                                 </div>
                                 <div v-else-if="hasQuestionShow(examQuestion)" @click="scrollView(index)"
@@ -117,7 +117,8 @@
                         {{ exam.paperName }}
                     </div>
                     <template v-for="(examQuestion, index) in examQuestions" :key="index">
-                        <div v-if="examQuestion.type === 1" :id="`q${index}`" class="paper-chapter">
+                        <div v-if="examQuestion.type === 1 && hasChapterShow(examQuestion)" :id="`q${index}`"
+                            class="paper-chapter">
                             <span class="paper-chapter__name">{{ examQuestion.chapterName }}</span>
                             <span v-if="examQuestion.chapterTxt" class="paper-chapter__desc">
                                 {{ examQuestion.chapterTxt }}
@@ -243,6 +244,7 @@ const unMarkQuestions = computed(() => examQuestions.value.filter((examQuestion)
 const claimPaperNum = computed(() => markList.value.length)// 已领取试卷数量
 const markPaperNum = computed(() => markList.value.filter((user) => user.myExamMarkState === 3).length) // 已领取且已批阅试卷数量
 const hasQuestionShow = computed(() => (examQuestion: ExamQuestion) => (viewQuestions.value.indexOf(0) != -1 && examQuestion.markType === 1) || viewQuestions.value.indexOf(examQuestion.no as number) != -1) // 是否可以显示
+const hasChapterShow = computed(() => (examQuestion: ExamQuestion) => (viewQuestions.value.indexOf(0) != -1 && examQuestion.type === 1)) // 是否可以显示
 const isHalf = computed(() => (question: ExamQuestion) => question.userScore != null && question.userScore > 0 && question.userScore !== question.score); // 是否半对
 const isRight = computed(() => (question: ExamQuestion) => question.userScore != null && question.userScore === question.score); // 是否答对
 const isWrong = computed(() => (question: ExamQuestion) => question.userScore != null && question.userScore === 0); // 是否答错

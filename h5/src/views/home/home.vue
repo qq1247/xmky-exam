@@ -170,14 +170,14 @@
                                     <span class="my-exam__num">
                                         {{ myExam.totalScore || '-' }}<span class="my-exam__unit">/{{
                                             myExam.examTotalScore
-                                        }}</span>
+                                            }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的分数</span>
                                 </div>
                                 <div class="my-exam__inner">
                                     <span class="my-exam__num">
                                         {{ myExam.no || '-' }}<span class="my-exam__unit">/{{ myExam.userNum || '-'
-                                        }}</span>
+                                            }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的排名</span>
                                 </div>
@@ -292,10 +292,10 @@
                             <div class="calendar-task__outer">
                                 <span class="calendar-task__name">{{ exer.name }}</span>
                                 <div class="calendar-task__inner">
-                                    <span class="calendar-task__type">考试</span>
-                                    <span class="calendar-task__state calendar__date--ongoing">
-                                        练习中
-                                    </span>
+                                    <span class="calendar-task__type">练习</span>
+                                    <!-- <span class="calendar-task__state calendar__date--ongoing">
+                                        练习
+                                    </span> -->
                                 </div>
                             </div>
                             <div class="calendar-task__content">
@@ -313,18 +313,35 @@
                                 <div class="calendar-task__inner">
                                     <span class="calendar-task__type">考试</span>
                                     <span class="calendar-task__state" :class="{
-                                        'calendar__date--pending': myExam.markState === 1,
-                                        'calendar__date--ongoing': myExam.markState === 2,
-                                        'calendar__date--finished': myExam.markState === 3,
+                                        'calendar__date--pending': myExam.state === 1,
+                                        'calendar__date--ongoing': myExam.state === 2,
+                                        'calendar__date--finished': myExam.state === 3,
 
                                     }">
-                                        {{ dictStore.getValue("MARK_STATE", myExam.markState) }}
+                                        {{ dictStore.getValue("EXAM_STATE", myExam.state) }}
                                     </span>
                                 </div>
                             </div>
                             <div class="calendar-task__content">
                                 <span class="calendar-task__time">
                                     {{ myExam.examStartTime }} - {{ myExam.examEndTime }}
+                                </span>
+                            </div>
+                        </div>
+                        <div v-for="(myExer, index) in myExerGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
+                            class="calendar-task">
+                            <div class="calendar-task__outer">
+                                <span class="calendar-task__name">{{ myExer.name }}</span>
+                                <div class="calendar-task__inner">
+                                    <span class="calendar-task__type">练习</span>
+                                    <!-- <span class="calendar-task__state calendar__date--ongoing">
+                                        练习
+                                    </span> -->
+                                </div>
+                            </div>
+                            <div class="calendar-task__content">
+                                <span class="calendar-task__time">
+                                    {{ myExer.startTime }} - {{ myExer.endTime }}
                                 </span>
                             </div>
                         </div>
