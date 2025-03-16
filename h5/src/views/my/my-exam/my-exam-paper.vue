@@ -61,7 +61,7 @@
                     </el-scrollbar>
                 </div>
                 <el-scrollbar height="calc(100vh - 226px)" class="paper">
-                    <div v-if="myExam.totalScore" class="total-score">
+                    <div v-if="myExam.totalScore != null" class="total-score">
                         <div class="total-score__inner">
                             <span class="total-score__value">
                                 {{ myExam.totalScore }}
