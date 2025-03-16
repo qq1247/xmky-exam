@@ -33,9 +33,11 @@
                     <div>
                         <span class="exam-info__lab">防止作弊：
                             <span class="exam-info__value">
-                                {{ form.sxes.length ? '' : '无' }}
-                                {{ form.sxes.indexOf(1) !== -1 ? '试题乱序' : '' }}
-                                {{ form.sxes.indexOf(2) !== -1 ? '选项乱序' : '' }}
+                                <template v-if="!form.sxes.length">无</template>
+                                <template v-else v-for="(sxe, index) in form.sxes">
+                                    {{ index > 0 ? '、' : '' }}
+                                    {{ dictStore.getValue('EXAM_SXES', sxe) }}
+                                </template>
                             </span>
                         </span>
                     </div>

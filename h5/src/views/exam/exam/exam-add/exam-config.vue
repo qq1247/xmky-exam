@@ -45,12 +45,15 @@
                 <div class="exam-config-title">
                     高级配置
                 </div>
-                <el-form-item v-if="form.genType === 1" label="防作弊：" prop="sxes"
-                    @mouseover="tipShow('防作弊', '试题乱序：章节内试题进行随机排序，无章节则所有试题进行随机排序<br/>选项乱序：单选多选题的选项进行随机排序')">
+                <el-form-item v-if="form.genType === 1" label="防作弊：" prop="sxes" @mouseover="tipShow('防作弊',
+                    `试题乱序：章节内试题进行随机排序，无章节则所有试题进行随机排序<br/>
+                    选项乱序：单选多选题的选项进行随机排序<br/>
+                    禁止考试中切屏：禁止切出浏览器查询资料，超出3次自动交卷；<br/>
+                    禁止浏览器调试：禁止复制粘贴、右键、调试代码等`)">
                     <el-checkbox-group v-model="form.sxes">
-                        <el-checkbox :value="1">试题乱序</el-checkbox>
-                        <el-checkbox :value="2">选项乱序</el-checkbox>
-                    </el-checkbox-group> 
+                        <el-checkbox v-for="dict in dictStore.getList('EXAM_SXES')" :key="dict.dictKey"
+                            :value="dict.dictKey">{{ dict.dictValue }}</el-checkbox>
+                    </el-checkbox-group>
                 </el-form-item>
                 <!-- <el-form-item v-if="form.genType === 1" label="匿名阅卷：" prop="anonState">
                 <el-radio-group v-model="form.anonState">

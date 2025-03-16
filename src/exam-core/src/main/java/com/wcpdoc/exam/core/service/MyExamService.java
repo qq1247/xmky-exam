@@ -74,7 +74,20 @@ public interface MyExamService extends BaseService<MyExam> {
 	 * v1.0 zhanghc 2024年10月10日下午7:39:54
 	 * 
 	 * @param examId
-	 * @param userId     void
+	 * @param userId void
 	 */
 	void generatePaper(Integer examId, Integer userId);
+
+	/**
+	 * 作弊
+	 * 
+	 * v1.0 zhanghc 2025年3月16日上午11:19:25
+	 * 
+	 * @param examId  考试ID 
+	 * @param content 用户ID
+	 * @param type    作弊类型（3：禁止考试中切屏；）
+	 * @param content 作弊内容
+	 * @return boolean true：提前交卷；false：不处理
+	 */
+	boolean sxe(Integer examId, Integer userId, Integer type, String content);
 }

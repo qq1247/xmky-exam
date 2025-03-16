@@ -323,4 +323,27 @@ public class ApiMyExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
+
+	/**
+	 * 作弊
+	 * 
+	 * v1.0 zhanghc 2025年3月16日上午11:19:25
+	 * 
+	 * @param examId  考试ID
+	 * @param type    作弊类型（3：禁止考试中切屏；）
+	 * @param content 作弊内容
+	 * @return PageResult
+	 */
+	@RequestMapping("/sxe")
+	public PageResult sxe(Integer examId, Integer type, String content) {
+		try {
+			return PageResultEx.ok().data(myExamService.sxe(examId, getCurUser().getId(), type, content));
+		} catch (MyException e) {
+			log.error("作弊错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("作弊错误：", e);
+			return PageResult.err();
+		}
+	}
 }

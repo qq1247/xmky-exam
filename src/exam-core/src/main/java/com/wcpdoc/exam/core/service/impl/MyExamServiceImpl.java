@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MySxe;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -47,6 +49,7 @@ import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyPaperService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
+import com.wcpdoc.exam.core.service.MySxeService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.MyExamUtil;
@@ -79,6 +82,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	private ExamRuleService examRuleService;
 	@Resource
 	private QuestionService questionService;
+	@Resource
+	private MySxeService mySxeService;
 
 	@Override
 	public RBaseDao<MyExam> getDao() {
@@ -463,6 +468,33 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 				}
 			}
 		}
+	}
+
+	@Override
+	@Cacheable(value = ExamConstant.SXE_CACHE, key = ExamConstant.SXE_KEY_PRE
+			+ "#examId + ':' + #userId + ':' + #type + ':' + #content", sync = true) // 防抖，同一事件一分钟记录一次
+	public boolean sxe(Integer examId, Integer userId, Integer type, String content) {
+		MySxe mySxe = new MySxe();
+		mySxe.setExamId(examId);
+		mySxe.setUserId(getCurUser().getId());
+		mySxe.setType(type);
+		mySxe.setContent(content);
+		mySxe.setUpdateTime(new Date());
+		mySxeService.save(mySxe);
+
+		long screenSwitchNum = mySxeService.getList(examId, userId).stream()//
+				.filter(_mySxe -> _mySxe.getType() == 3)//
+				.count();
+		if (screenSwitchNum >= 3) {
+			Exam exam = examCacheService.getExam(examId);
+			User user = baseCacheService.getUser(userId);
+			log.info("【{}-{}】考试中【{}-{}】切屏{}次，系统自动交卷", exam.getId(), exam.getName(), user.getLoginName(), user.getName(),
+					screenSwitchNum);
+			SpringUtil.getBean(MyExamService.class).finish(examId, userId);// 接口调用缓存注解才生效
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

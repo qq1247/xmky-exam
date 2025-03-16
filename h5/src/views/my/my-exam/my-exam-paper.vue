@@ -1,4 +1,7 @@
 <template>
+    <xmks-anti-cheat v-if="myExam.state === 2" :screen-switch="!exam.sxes.includes(3)" :debug="!exam.sxes.includes(4)"
+        :hotkey="!exam.sxes.includes(4)" @screen-switch="(content) => sxes(3, content)"
+        @hotkey="(content) => sxes(4, content)" @debug="(content) => sxes(4, content)"></xmks-anti-cheat>
     <div v-loading="load.loading" :element-loading-text="load.text"
         element-loading-background="rgba(122, 122, 122, 0.8)" class="my-exam-paper">
         <div class="my-exam-paper__head">
@@ -95,16 +98,19 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { myExamAnswer, myExamExamGet, myExamFinish, myExamGet, myExamPaper } from '@/api/my/my-exam'
+import { loginSysTime } from '@/api/login'
+import { myExamAnswer, myExamExamGet, myExamFinish, myExamGet, myExamPaper, myExamSxe } from '@/api/my/my-exam'
+import XmksQuestion from '@/components/question/xmks-question.vue'
+import XmksAntiCheat from '@/components/xmks-anti-cheat.vue'
+import xmksCountDown from '@/components/xmks-count-down.vue'
 import type { Exam, ExamQuestion } from '@/ts/exam/exam'
+import type { MyExam } from '@/ts/exam/my-exam'
+import { toChinaNum } from '@/util/numberUtil'
+import { delay } from '@/util/timeUtil'
+import { ElMessage } from 'element-plus'
+import _ from 'lodash'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import XmksQuestion from '@/components/question/xmks-question.vue'
-import type { MyExam } from '@/ts/exam/my-exam'
-import xmksCountDown from '@/components/xmks-count-down.vue'
-import _ from 'lodash'
-import { delay } from '@/util/timeUtil'
-import { loginSysTime } from '@/api/login'
 
 /************************变量定义相关***********************/
 const route = useRoute() // 路由
@@ -181,7 +187,7 @@ const answerUpdate = _.debounce(async function (examQuestion, answers) {// // �
         answers: answers
     })
     if (code != 200) {// 答题失败也不要清空答案，比如问答题清空就尴尬了
-        // router.push('/my-exam-list')
+        router.push('/my-exam-list')
         return
     }
 }, 500) // 延时一秒体验不好，填完直接退出页面不提交
@@ -241,6 +247,22 @@ async function myExamQuery() {
 // 滚动预览
 function scrollView(index: number) {
     (document.querySelector(`#q${index}`) as HTMLElement).scrollIntoView(true)
+};
+
+// 防作弊
+async function sxes(type: number, content: string) {
+    if (type === 3) {
+        ElMessage.error(`禁止考试中切屏，请继续答题`)
+    } else {
+        ElMessage.error(`禁止浏览器调试，请正常答题`)
+    }
+
+    const { data: { data } } = await myExamSxe({ examId: route.params.examId, type, content })
+    if (data) {
+        ElMessage.error('多次检测到作弊，强制交卷')
+        router.push('/my-exam-list')
+    }
+
 };
 
 async function finish() {
@@ -328,7 +350,6 @@ async function finish() {
         }
         return
     }
-
 }
 
 </script>

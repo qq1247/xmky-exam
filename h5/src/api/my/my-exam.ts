@@ -21,3 +21,6 @@ export function myExamAnswer(parm: object) {
 export function myExamFinish(parm: object) {
     return request.post('/myExam/finish', parm);
 }
+export function myExamSxe(parm: object) {
+    return request.post('/myExam/sxe', parm);
+}

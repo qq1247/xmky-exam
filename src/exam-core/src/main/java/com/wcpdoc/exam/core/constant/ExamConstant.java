@@ -40,4 +40,10 @@ public class ExamConstant {
 	 */
 	public static final String MYQUESTION_CACHE = "MYQUESTION_CACHE";
 	public static final String MYQUESTION_LIST_KEY_PRE = "'MYQUESTION_LIST:' + ";
+	
+	/**
+	 * 防作弊缓存
+	 */
+	public static final String SXE_CACHE = "SXE_CACHE";
+	public static final String SXE_KEY_PRE = "'SXE_:' + ";
 }

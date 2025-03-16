@@ -20,6 +20,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
@@ -66,7 +67,7 @@ public class ApiUserController extends BaseController {
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
 					User user = baseCacheService.getUser(getCurUser().getId());
-					pageIn.addParm("examUserIds", user.getUserIds());
+					pageIn.addParm("ids", StringUtil.join(user.getUserIds(), ","));
 				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
 				}

@@ -83,14 +83,14 @@
                             }}</span>
                     </span>
                     <span class="exam__label">
+                        考试人数：<span class="exam__value">{{ exam.userNum || '-' }}</span>
+                    </span>
+                    <span class="exam__label exam__label-2">
                         防 作 弊：<span class="exam__value">
                             <template v-if="!exam.sxes.length">无</template>
                             <template v-else v-for="(sxe, index) in exam.sxes" :key="index">{{ index > 0 ? '、' : '' }}{{
-                                ['', '试题乱序', '选项乱序'][sxe] }}</template>
+                                dictStore.getValue('EXAM_SXES', sxe) }}</template>
                         </span>
-                    </span>
-                    <span class="exam__label">
-                        考试人数：<span class="exam__value">{{ exam.userNum || '-' }}</span>
                     </span>
                 </div>
             </div>
@@ -505,6 +505,10 @@ function examIn() {
                     .exam__value {
                         color: #333333;
                     }
+                }
+
+                .exam__label-2 {
+                    grid-column: span 2;
                 }
             }
 

@@ -86,4 +86,9 @@
 		maxEntriesLocalHeap="100000"
 		timeToIdleSeconds="7200">
     </cache>
+    <!-- 防作弊缓存，距第一次60秒后失效 -->
+	<cache name="SXE_CACHE"
+		maxEntriesLocalHeap="100000"
+		timeToLiveSeconds="60">
+    </cache>
 </ehcache>
