@@ -16,8 +16,6 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.SpringUtil;
@@ -176,11 +174,6 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		User examUser = baseCacheService.getUser(userId);
 		log.info("【{}-{}】进入【{}-{}】批阅【{}-{}】完成，得分{}", markUser.getLoginName(), markUser.getName(), exam.getId(),
 				exam.getName(), examUser.getLoginName(), examUser.getName(), myExam.getTotalScore());
-	}
-
-	@Override
-	public PageOut getUserListpage(PageIn pageIn) {
-		return myMarkDao.getUserListpage(pageIn);
 	}
 
 	@Override

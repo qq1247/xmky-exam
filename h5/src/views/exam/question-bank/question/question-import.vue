@@ -26,6 +26,7 @@ const route = useRoute()// 路由
 const router = useRouter()// 路由
 const questionEditorRef = ref<InstanceType<typeof QuestionEditor>>();
 
+/************************事件相关*****************************/
 // 完成导入
 function txtImport() {
     const result = questionEditorRef.value?.validate()

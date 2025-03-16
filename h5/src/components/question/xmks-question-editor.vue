@@ -467,7 +467,7 @@ function locationErr() {
     }
 }
 
-// 校验数据
+// 数据校验
 function validate(): { succ: boolean; msg: string, data?: Question[] } {
     return {
         succ: errNum.value === 0,

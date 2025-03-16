@@ -117,14 +117,14 @@ const props = withDefaults(defineProps<{
     title: string // 题干
     options?: string[] // 试题选项
     answers?: string[] // 标准答案
-    markType: number // 阅卷类型
+    markType: number // 阅卷类型（1：客观题；2：主观题）
     score: number // 分数
     scores?: number[] // 子分数
     analysis?: string // 解析
     userAnswers?: string[] //用户答案
     userScore?: number | null //用户分数
     editable?: boolean // 可编辑（true：是；false：否）
-    display?: string // 显示（paper：试卷；list：列表；paper-with-answer）
+    display?: string // 显示（paper：试卷；list：列表；paper-with-answer：列表带答案）
     answerShow?: boolean // 标准答案显示
     userAnswerShow?: boolean // 用户答案显示
     analysisShow?: boolean // 解析显示

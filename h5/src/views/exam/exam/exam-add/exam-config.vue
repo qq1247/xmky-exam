@@ -50,7 +50,7 @@
                     <el-checkbox-group v-model="form.sxes">
                         <el-checkbox :value="1">试题乱序</el-checkbox>
                         <el-checkbox :value="2">选项乱序</el-checkbox>
-                    </el-checkbox-group>
+                    </el-checkbox-group> 
                 </el-form-item>
                 <!-- <el-form-item v-if="form.genType === 1" label="匿名阅卷：" prop="anonState">
                 <el-radio-group v-model="form.anonState">

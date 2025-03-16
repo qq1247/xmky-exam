@@ -30,13 +30,13 @@ public interface ExamDao extends RBaseDao<Exam> {
 								"EXAM.MARK_TYPE", "EXAM.SXES", "EXAM.ANON_STATE","LOGIN_TYPE","LIMIT_MINUTE",
 								"(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM", //
 								"(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = EXAM.ID) AS MARK_USER_NUM") //
+						.like(pageIn.hasParm("name"), "EXAM.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("genType"), "EXAM.GEN_TYPE", pageIn.getParm("genType"))
 						.eq(pageIn.hasParm("loginType"), "EXAM.LOGIN_TYPE", pageIn.getParm("loginType"))
 						.eq(pageIn.hasParm("markState"), "EXAM.MARK_STATE", pageIn.getParm("markState"))
 						.eq(pageIn.hasParm("markType"), "EXAM.MARK_TYPE", pageIn.getParm("markType"))
 						.eq(pageIn.hasParm("isLimit") && "0".equals(pageIn.getParm("isLimit")), "EXAM.LIMIT_MINUTE", 0)
 						.gt(pageIn.hasParm("isLimit") && "1".equals(pageIn.getParm("isLimit")), "EXAM.LIMIT_MINUTE", 0)
-						.like(pageIn.hasParm("name"), "EXAM.NAME", pageIn.getParm("name"))//
 						.in(!pageIn.hasParm("state"), "EXAM.STATE", 1, 2)//
 						.in(pageIn.hasParm("state") && "0".equals(pageIn.getParm("state")), "EXAM.STATE", 1, 2)// 如果传入0，会导致查询到已删除的
 						.eq(pageIn.hasParm("state") && !"0".equals(pageIn.getParm("state")), "EXAM.STATE",

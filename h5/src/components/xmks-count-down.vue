@@ -14,7 +14,7 @@ const emit = defineEmits<{
 }>();
 const props = withDefaults(defineProps<{
     expireTime?: string; // 到期时间 yyyy-MM-dd HH:mm:ss
-    preTxt?: string // 前置文字
+    preTxt?: string // 前缀文字
     remind?: number // 剩余多久提醒（单位：秒）
     color?: string // 文字颜色
     remindColor?: string // 提醒文字颜色

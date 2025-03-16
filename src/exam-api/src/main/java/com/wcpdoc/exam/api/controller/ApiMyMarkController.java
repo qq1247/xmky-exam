@@ -125,26 +125,6 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 考试用户列表（请使用markList接口）
-	 * 
-	 * v1.0 zhanghc 2017-05-25 16:34:59
-	 * 
-	 * @param pageIn
-	 * @return PageResult
-	 */
-	@Deprecated
-	@RequestMapping("/userListpage")
-	public PageResult userListpage(PageIn pageIn) {
-		try {
-			PageOut pageOut = myMarkService.getUserListpage(pageIn);
-			return PageResultEx.ok().data(pageOut);
-		} catch (Exception e) {
-			log.error("我的阅卷用户列表：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
 	 * 阅卷列表
 	 * 
 	 * v1.0 zhanghc 2025年2月16日上午11:56:47
@@ -201,7 +181,7 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 阅卷信息
+	 * 领取信息
 	 * 
 	 * v1.0 zhanghc 2025年2月24日下午12:22:49
 	 * 
@@ -209,7 +189,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/claimInfo")
-	public PageResult markInfo(Integer examId) {
+	public PageResult claimInfo(Integer examId) {
 		try {
 			List<MyExam> myExamList = examCacheService.getMyExamList(examId);
 			int paperNum = myExamList.size();
