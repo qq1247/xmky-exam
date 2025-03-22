@@ -69,9 +69,25 @@ public interface FileService extends BaseService<File> {
 	 * 
 	 * v1.0 zhanghc 2021年10月14日下午5:03:01
 	 * 
-	 * @return String
+	 * @return File
 	 */
-	String getFileUploadDir();
+	java.io.File getUploadDir();
+	
+	/**
+	 * 获取临时目录
+	 * 
+	 * v1.0 zhanghc 2025年3月21日下午12:54:15
+	 * @return File
+	 */
+	java.io.File getTempDir();
+	
+	/**
+	 * 创建临时目录
+	 * 
+	 * v1.0 zhanghc 2025年3月21日下午12:54:15
+	 * @return File
+	 */
+	java.io.File createTempDirWithYMD();
 
 	/**
 	 * 拷贝附件

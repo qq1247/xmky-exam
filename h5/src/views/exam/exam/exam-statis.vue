@@ -112,9 +112,12 @@
                                 </el-table-column>
                                 <el-table-column prop="" label="操作" align="center" width="300">
                                     <template #default="scope">
-                                        <el-button v-if="scope.row.myExamState === 3" type="" link
+                                        <el-button v-if="scope.row.myExamMarkState === 3" type="" link
                                             @click="toPaper(scope.row.examId, scope.row.userId)"
                                             class="table__link">预览</el-button>
+                                        <el-button v-if="scope.row.myExamMarkState === 3" type="" link
+                                            @click="toPDF(scope.row.examId, scope.row.userId)"
+                                            class="table__link">导出PDF</el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -147,6 +150,8 @@ import { GridComponent } from 'echarts/components';
 import { reportExamRankListpage, reportExamStatis } from '@/api/report/report'
 import { diff } from '@/util/timeUtil'
 import type { Listpage } from '@/ts/common/listpage'
+import http from "@/request"
+import { ElMessage } from 'element-plus'
 
 /************************变量定义相关***********************/
 use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent, BarChart, GridComponent]);
@@ -349,6 +354,35 @@ async function examRankQuery() {
 
 function toPaper(examId: number, examUserId: number) {
     window.open(`/paper/${examId}/${examUserId}`, '_blank')
+}
+
+async function toPDF(examId: number, userId: number) {
+    let downloadLink = null;
+    let objectUrl = null;
+    try {
+        ElMessage.info('正在生成PDF，请稍后...')
+        const data = await http.post('report/paper/exportPDF', { examId, userId }, { responseType: 'blob' })
+        objectUrl = URL.createObjectURL(data.data)
+
+        const downloadLink = document.createElement('a');
+        downloadLink.download = decodeURIComponent(data.headers['content-disposition'].substr(20))
+        downloadLink.style.display = 'none'
+        downloadLink.href = objectUrl;
+        downloadLink.click();
+        URL.revokeObjectURL(downloadLink.href);
+    } catch (error) {
+        ElMessage.error('生成PDF失败：' + error,)
+    } finally {
+        ElMessage.success('下载完成')
+        if (downloadLink) {
+            document.removeChild(downloadLink);
+            downloadLink = null;
+        }
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+            objectUrl = null;
+        }
+    }
 }
 </script>
 

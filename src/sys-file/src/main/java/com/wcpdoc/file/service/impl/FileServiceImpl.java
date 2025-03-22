@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	protected HttpServletRequest request;
 	@Resource
 	protected HttpServletResponse response;
+	private static final String TEMP = "temp";
 
 	@Override
 	public RBaseDao<File> getDao() {
@@ -72,23 +74,13 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		// 创建临时上传目录
-		String baseDir = getFileUploadDir();
-		String tempPath = "/temp";
-		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
-				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
-		java.io.File tempUploadDir = new java.io.File(baseDir + tempPath + ymdPath);
-		if (!tempUploadDir.exists()) {
-			tempUploadDir.mkdirs();
-		}
+		java.io.File tempUploadDirWithYMD = createTempDirWithYMD();
 
 		// 保存临时上传附件（如果中间有失败，数据库事务会回滚，部分已上传的临时文件会采用定时任务清除）
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
-			Date curTime = new Date();
-			String fileId = curTime.getTime() + "";
-			java.io.File destFile = new java.io.File(
-					String.format("%s%s%s", tempUploadDir.getAbsolutePath(), java.io.File.separator, fileId));
+			java.io.File destFile = new java.io.File(String.format("%s%s%s", tempUploadDirWithYMD.getAbsolutePath(),
+					java.io.File.separator, UUID.randomUUID().toString()));
 			try {
 				multipartFile.transferTo(destFile);
 			} catch (Exception e) {
@@ -100,7 +92,9 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setName(FilenameUtils.getBaseName(multipartFile.getOriginalFilename()));
 			file.setExtName(FilenameUtils.getExtension(multipartFile.getOriginalFilename()));
 			file.setFileType(multipartFile.getContentType());
-			file.setPath(String.format("%s%s%s%s", tempPath, ymdPath, java.io.File.separator, fileId));
+			// file.setPath(destFile.getAbsolutePath().replaceAll(getTempDir().getAbsolutePath(),
+			// ""));// 斜杠为特殊符号
+			file.setPath(destFile.getAbsolutePath().substring(getUploadDir().getAbsolutePath().length()));
 			file.setIp(request.getRemoteHost());
 			file.setState(0);
 			file.setUpdateUserId(getCurUser().getId());
@@ -129,19 +123,17 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		// 数据库更新附件信息（如果先移动附件成功，而后数据库更新失败，恢复移动附件不好处理）
-		String baseDir = getFileUploadDir();
-		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, file.getPath()));
-		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
-				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
+		java.io.File tempFile = new java.io.File(
+				String.format("%s%s", getUploadDir().getAbsolutePath(), file.getPath()));
 		file.setState(1);
-		file.setPath(String.format("%s%s%s", ymdPath, java.io.File.separator, tempFile.getName()));
+		file.setPath(tempFile.getAbsolutePath().substring(getTempDir().getAbsolutePath().length()));
 		file.setIp(request.getRemoteHost());
 		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
 
 		// 移动临时附件到附件目录
-		java.io.File destDir = new java.io.File(baseDir + ymdPath);
+		java.io.File destDir = new java.io.File(String.format("%s%s", getUploadDir().getAbsolutePath(), file.getPath()))
+				.getParentFile();
 		try {
 			FileUtils.moveFileToDirectory(tempFile, destDir, true);
 		} catch (Exception e) {
@@ -160,9 +152,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		if (entity == null) {
 			throw new MyException("id不存在");// 测试切换数据库时，文件找不到，报错太多，转成自定义异常，log打印一行就可以。
 		}
-		String baseDir = getFileUploadDir();
-		java.io.File file = new java.io.File(
-				String.format("%s%s%s", baseDir, java.io.File.separator, entity.getPath()));
+		java.io.File file = new java.io.File(String.format("%s%s", getUploadDir().getAbsolutePath(), entity.getPath()));
 		if (!file.exists()) {
 			throw new MyException("附件不存在");
 		}
@@ -192,9 +182,33 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public String getFileUploadDir() {
-		java.io.File dbBakDir = new java.io.File(fileExService.getFileUploadDir());
-		return dbBakDir.getAbsolutePath();
+	public java.io.File getUploadDir() {
+		return new java.io.File(fileExService.getFileUploadDir());
+		/**
+		 * /bak：D:\bak <br/>
+		 * bak：D:\soft\eclipse\workspace\EXAM\exam\src\sys-file\bak <br/>
+		 * bak/：D:\soft\eclipse\workspace\EXAM\exam\src\sys-file\bak <br/>
+		 * bak/db：D:\soft\eclipse\workspace\EXAM\exam\src\sys-file\bak\db <br/>
+		 */
+		// return dbBakDir.getAbsolutePath().replaceAll("[\\\\/]+$", "");// 已斜杠结尾则删除
+	}
+
+	@Override
+	public java.io.File getTempDir() {
+		return new java.io.File(String.format("%s%s%s",
+				new java.io.File(fileExService.getFileUploadDir()).getAbsolutePath(), java.io.File.separator, TEMP));
+	}
+
+	@Override
+	public java.io.File createTempDirWithYMD() {
+		String timeStr = DateUtil.formatDateTime(new Date());
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
+				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
+		java.io.File tempUploadDir = new java.io.File(String.format("%s%s", getTempDir().getAbsolutePath(), ymdPath));
+		if (!tempUploadDir.exists()) {
+			tempUploadDir.mkdirs();
+		}
+		return tempUploadDir;
 	}
 
 	@Override
@@ -216,8 +230,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			log.error(e.getMessage());
 			throw new MyException("拷贝附件错误");
 		}
-		String baseDir = getFileUploadDir();
-		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, fileOld.getPath()));
+		java.io.File tempFile = new java.io.File(
+				String.format("%s%s", getUploadDir().getAbsolutePath(), fileOld.getPath()));
 		Date curTime = new Date();
 		String fileId = curTime.getTime() + "";
 		String timeStr = DateUtil.formatDateTime(curTime);
@@ -231,7 +245,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		save(fileNew);
 
 		// 复制文件
-		java.io.File destDir = new java.io.File(String.format("%s%s", baseDir, fileNew.getPath()));
+		java.io.File destDir = new java.io.File(
+				String.format("%s%s", getUploadDir().getAbsolutePath(), fileNew.getPath()));
 		try {
 			FileUtils.copyFile(tempFile, destDir);
 		} catch (Exception e) {
@@ -241,4 +256,5 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 
 		return fileNew.getId();
 	}
+
 }

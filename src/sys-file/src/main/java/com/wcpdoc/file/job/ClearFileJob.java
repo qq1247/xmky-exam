@@ -27,13 +27,12 @@ public class ClearFileJob implements Job {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		// 清理临时附件
-		String baseDir = fileService.getFileUploadDir();
-		java.io.File dirFile = new java.io.File(String.format("%s%s%s", baseDir, java.io.File.separator, "temp"));
-		if (!dirFile.exists()) {
-			log.info("清理临时附件：{}不存在", dirFile.getAbsolutePath());
+		java.io.File tempDir = fileService.getTempDir();
+		if (!tempDir.exists()) {
+			log.info("清理临时附件：{}不存在", tempDir.getAbsolutePath());
 			return;
 		}
-		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(dirFile, TrueFileFilter.INSTANCE,
+		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(tempDir, TrueFileFilter.INSTANCE,
 				TrueFileFilter.INSTANCE);
 		Date beforTime = DateUtil.getNextDay(new Date(), -7);
 
@@ -54,7 +53,7 @@ public class ClearFileJob implements Job {
 		List<File> delFileList = fileService.getDelList();
 		for (File fileEntity : delFileList) {
 			java.io.File delFile = new java.io.File(
-					String.format("%s%s%s", baseDir, java.io.File.separator, fileEntity.getPath()));
+					String.format("%s%s", fileService.getUploadDir().getAbsolutePath(), fileEntity.getPath()));
 			log.info("清理标记为删除的附件：{}", delFile.getAbsolutePath());
 			try {
 				delFile.delete();

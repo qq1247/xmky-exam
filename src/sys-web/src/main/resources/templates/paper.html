@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>试卷导出PDF</title>
+</head>
+
+<body>
+	<div class="paper">
+		<div class="paper__name">${exam.paperName}（${user.name}）</div>
+		<div class="total-question__score">
+			<div class="total-question__score__inner">
+				<span class="total-question__score__value">${myExam.totalScore}</span><span class="total-question__score__unit">分</span>
+			</div>
+			<svg class="total-question__score__icon" viewBox="0 0 1024 1024" width="100" height="100">
+                <path fill="#FF0000" d="M88.576 638.41523762c-11.026286-1.938286-14.134857-16.530286-12.946286-23.332571 1.206857-6.838857 9.124571-19.474286 14.628572-18.486857 276.516571-84.772571 564.278857-104.265143 836.918857-70.253714l-1.206857 6.802285c22.070857 3.894857 50.834286 1.956571 72.905143 5.851429l-2.413715 13.622857c-281.728-14.555429-563.986286 5.942857-841.216 62.445714-20.132571 17.517714-43.410286 20.443429-66.669714 23.369143z m-55.936-136.210285C308.114286 423.39352362 595.309714 406.97295262 867.84 441.60609562l-1.133714 6.528c27.556571 4.845714 50.779429 2.230857 72.832 6.125714l-2.285715 13.019428c-281.472-16.091429-563.2 1.28-839.588571 53.101715-24.374857 9.142857-42.057143 12.708571-65.261714 15.305143l-5.485715-0.969143c-5.540571-0.987429-9.892571-8.429714-7.606857-21.449143l13.330286-11.062857z"></path>
+            </svg>
+		</div>
+		<#list paperPartList as paperPart>
+		<div class="question">
+			<div class="question__title">
+				<#if paperPart.type==2 && paperPart.questionType!=3>
+				<span>1、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）</span>
+				<#else>
+				1、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）
+				</#if>
+				<#if paperPart.userScore==paperPart.score>
+				<span class="question__score question__score--right">
+					<svg viewBox="0 0 1024 1024">
+                		<path fill="#4FBF63" d="M942.08 230.4c-5.12-5.12-15.36-10.24-25.6-10.24s-20.48 5.12-25.6 10.24l-465.92 465.92-25.6 20.48-20.48-20.48-240.64-240.64c-5.12-10.24-15.36-15.36-25.6-15.36-20.48 0-40.96 20.48-40.96 40.96 0 10.24 5.12 20.48 10.24 25.6l281.6 281.6 5.12 5.12v5.12s0 5.12 5.12 5.12c10.24 10.24 15.36 10.24 30.72 10.24H409.6c10.24 0 20.48-5.12 25.6-10.24l5.12-5.12v-5.12l5.12-5.12 501.76-501.76c5.12-5.12 10.24-15.36 10.24-25.6s-10.24-20.48-15.36-30.72z"></path>
+                    </svg>${paperPart.score}分
+				</span>
+				<#elseif paperPart.userScore==0>
+				<span class="question__score question__score--wrong">
+					<svg viewBox="0 0 1024 1024">
+	                	<path fill="#FF0000" d="M501.76 573.44l-337.92 337.92c-20.48 15.36-46.08 10.24-61.44-10.24-10.24-15.36-10.24-40.96 0-56.32L440.32 512 107.52 174.08c-15.36-15.36-15.36-46.08 5.12-61.44 15.36-10.24 40.96-10.24 56.32 0l337.92 337.92 337.92-337.92c15.36-20.48 40.96-20.48 61.44-10.24s20.48 40.96 10.24 61.44c0 5.12-5.12 5.12-10.24 10.24L568.32 512l337.92 337.92c20.48 15.36 20.48 40.96 10.24 61.44s-40.96 20.48-61.44 10.24c-5.12 0-5.12-5.12-10.24-10.24l-343.04-337.92z"></path>
+	                </svg>${paperPart.userScore}分
+				</span>
+				<#else>
+				<span class="question__score question__score--half">
+					<svg viewBox="0 0 1024 1024">
+	                	<path fill="#FF6960" d="M997.08938114 213.73838222c-17.67476253-20.98878051-49.01984922-23.75046215-70.00862973-6.07569962L666.79225627 425.97361674l-89.34040125-106.46282747c-17.67476253-20.98878051-49.01984922-23.75046215-70.00862974-6.07569964-20.98878051 17.67476253-23.75046215 49.01984922-6.07569962 70.00862974L590.70792691 489.90654683 328.34817053 710.01257403 103.1330323 441.7152021c-17.67476253-20.98878051-49.01984922-23.75046215-70.00862973-6.07569961-20.98878051 17.67476253-23.75046215 49.01984922-6.07569962 70.00862972L282.6423393 810.26161778c10.21822208 12.15139925 24.9932189 18.22709886 39.7682157 17.67476252 11.87523108 0.41425225 24.02663031-3.31401797 33.96868425-11.5990629l298.26161778-250.34644122 102.32030499 121.92824468c17.67476253 20.98878051 49.01984922 23.75046215 70.00862971 6.07569961 20.98878051-17.67476253 23.75046215-49.01984922 6.07569963-70.00862972l-102.32030499-121.92824467 260.15041106-218.31093413C1011.86437793 266.21033349 1014.62605958 234.86524682 997.08938114 213.73838222z"></path>
+	                </svg>${paperPart.userScore}分
+				</span>
+				</#if>
+			</div>
+			<#if paperPart.type==2 && paperPart.questionType==1>
+			<div class="radio-group">
+				<#assign letter=[ 'A' , 'B' , 'C' , 'D' , 'E' , 'F' , 'G' ]>
+				<#list paperPart.options as option>
+				<label class="radio ${((paperPart.userAnswers![])?size > 0 && letter[option?index] == paperPart.userAnswers[0])?then('selected', '')}">
+					<span class="radio__button">
+						<span class="radio__inner"></span>
+					</span>
+					<span class="radio__label">${letter[option?index]}、${option}</span>
+				</label>
+				</#list>
+			</div>
+			<#elseif paperPart.type==2 && paperPart.questionType==2>
+			<div class="checkbox-group">
+				<#assign letter=[ 'A' , 'B' , 'C' , 'D' , 'E' , 'F' , 'G' ]>
+				<#list paperPart.options as option>
+					<#assign select=false>
+					<#list paperPart.userAnswers as userAnswer>
+						<#if userAnswer==letter[option?index]>
+							<#assign select=true>
+							<#break>
+						</#if>
+					</#list>
+				<label class="checkbox ${select?then('selected', '')}">
+					<span class="checkbox__button">
+						<svg class="checkbox__inner" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    		<path d="M4 9 L8 13 L14 5" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                		</svg>
+					</span>
+					<span class="checkbox__label">${letter[option?index]}、${option}</span>
+				</label>
+				</#list>
+			</div>
+			<#elseif paperPart.type==2 && paperPart.questionType==4>
+			<div class="radio-group">
+				<#assign letters=[ '对' , '错' ]>
+				<#list letters as letter>
+				<label class="radio ${((paperPart.userAnswers![])?size > 0 && letter == paperPart.userAnswers[0])?then('selected', '')}">
+					<span class="radio__button">
+						<span class="radio__inner"></span>
+					</span>
+					<span class="radio__label">${letter}</span>
+				</label>
+				</#list>
+			</div>
+			<#elseif paperPart.type==2 && paperPart.questionType==5>
+			<div class="question__qa">${((paperPart.userAnswers![])?size > 0)?then(paperPart.userAnswers[0], '')}</div>
+			</#if>
+		</div>
+		</#list>
+	</div>
+</body>
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #FFF;
+	font-family: '黑体', 'Heiti SC', 'Droidsansfallback';
+	font-size: 14px;
+	color: #303133;
+}
+
+.paper {
+	width: 210mm;
+	min-height: 297mm;
+	margin: 0 auto;
+	position: relative;
+	padding-top: 20px;
+}
+
+.paper__name {
+	text-align: center;
+	font-size: 24px;
+	color: #303133;
+	line-height: 45px;
+}
+
+.total-question__score {
+	position: absolute;
+	right: 30px;
+	top: 20px;
+	z-index: 1;
+}
+
+.total-question__score__inner {
+	position: absolute;
+	top: 0;
+	left: 20px;
+}
+
+.total-question__score__value {
+	font-weight: bold;
+	font-size: 36px;
+	color: #FF0000;
+	line-height: 45px;
+}
+
+.total-question__score__unit {
+	color: #FF0000;
+	font-size: 14px;
+	line-height: 30px;
+}
+
+.total-question__score__icon {
+	font-size: 88px;
+	text-align: center;
+	color: #FF0000;
+	line-height: 20px;
+}
+
+.question {
+	border-bottom: 1px dashed #E5E5E5;
+	padding: 20px 0px 10px 0px;
+}
+
+.question__title {
+	line-height: 28px;
+	word-break: break-all;
+}
+
+.question__score {
+	
+}
+
+.question__score svg {
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+}
+
+.question__score--right {
+	color: #4FBF63;
+}
+
+.question__score--wrong {
+	color: #FF0000;
+}
+
+.question__score--wrong svg {
+	width: 15px;
+	height: 15px;
+	color: #FF0000;
+}
+
+.question__score--half {
+	color: #FF6960;
+}
+
+.fillblank {
+	display: inline-block;
+	position: relative;
+}
+
+.fillblank .fillblank__txt {
+	width: 100%;
+	line-height: 38px;
+	background-color: #E0F9FF;
+	border: 0px;
+	outline: none;
+	border-radius: 10px;
+	text-align: center;
+}
+
+.fillblank .fillblank__underline {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: 10px;
+	width: 100%;
+	height: 1px;
+	background-color: #333333;
+}
+
+.radio-group {
+	
+}
+
+.radio {
+	display: block;
+	height: 38px;
+	line-height: 38px;
+	border-radius: 10px 10px 10px 10px;
+	margin-bottom: 6px;
+}
+
+.radio__button {
+	display: inline-block;
+	position: relative;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	vertical-align: middle;
+	border: 1px solid #CCCCCC;
+	border-radius: 50%;
+	margin-left: 6px;
+}
+
+.radio__inner {
+	display: none;
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	top: 50%;
+	left: 50%;
+	margin-top: -5px;
+	margin-left: -5px;
+	border-radius: 50%;
+	background-color: #04B7F2;
+}
+
+.radio__label {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.radio.selected {
+	background-color: #E0F9FF;
+}
+
+.radio.selected .radio__inner {
+	display: block;
+}
+
+.radio.selected .radio__button {
+	border: 1px solid #0292F8;
+}
+
+.checkbox-group {
+	
+}
+
+.checkbox {
+	display: block;
+	height: 38px;
+	line-height: 38px;
+	border-radius: 10px 10px 10px 10px;
+	margin-bottom: 6px;
+}
+
+.checkbox__button {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+	border: 1px solid #CCCCCC;
+	border-radius: 4px;
+	margin-left: 6px;
+}
+
+.checkbox__inner {
+	display: none;
+	width: 18px;
+	height: 18px;
+}
+
+.checkbox__label {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.checkbox.selected {
+	background-color: #E0F9FF;
+}
+
+.checkbox.selected .checkbox__button {
+	border: 0px;
+	background-color: #04B7F2;
+}
+
+.checkbox.selected .checkbox__inner {
+	display: block;
+}
+
+.question__qa {
+	min-height: 145px;
+	background-color: #E0F9FF;
+	padding: 20px;
+	border-radius: 10px;
+	color: #333;
+	line-height: 21px;
+}
+</style>
+</html>

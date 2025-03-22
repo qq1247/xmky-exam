@@ -145,7 +145,7 @@ public class ApiMyMarkController extends BaseController {
 								return true;
 							}
 						} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员
-							if ((exam.getMarkState() == 3 && exam.getCreateUserId().intValue() == getCurUser().getId())// 整场考试结束并且自己创建的
+							if ((exam.getMarkState() == 3 && exam.getCreateUserId().intValue() == getCurUser().getId().intValue())// 整场考试结束并且自己创建的
 									|| (myExam.getMarkUserId() != null
 											&& myExam.getMarkUserId().intValue() == getCurUser().getId().intValue())) {// 只看自己领取的
 								return true;
