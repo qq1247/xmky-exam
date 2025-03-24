@@ -2,11 +2,13 @@ package com.wcpdoc.exam.api.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -349,7 +351,7 @@ public class ApiReportController extends BaseController {
 			File tempHtmlFile = new File(tempDir, fileName + ".html");
 			Template template = cfg.getTemplate("paper.html");
 			
-			try (Writer writer = new FileWriter(tempHtmlFile)) {// 手动关闭流
+			try (Writer writer = new OutputStreamWriter(new FileOutputStream(tempHtmlFile), StandardCharsets.UTF_8)) {// 手动关闭流
 				template.process(data, writer);
 			}
 
