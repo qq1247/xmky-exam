@@ -30,7 +30,6 @@ runtime:
 token:
   expireMinute: 1440
   refreshMinute: 60
-
     
 sys:
-  ver: 5.0.0
+  ver: 5.1.0
