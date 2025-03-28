@@ -62,7 +62,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores) {
+	public synchronized void addEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores) {
 		// 数据校验
 		QuestionBank questionBank = addValid0(question);
 		addValid(question, options, answers, scores, questionBank);
