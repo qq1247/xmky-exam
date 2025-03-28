@@ -18,13 +18,23 @@
                 <path fill="#FF0000" d="M88.576 638.41523762c-11.026286-1.938286-14.134857-16.530286-12.946286-23.332571 1.206857-6.838857 9.124571-19.474286 14.628572-18.486857 276.516571-84.772571 564.278857-104.265143 836.918857-70.253714l-1.206857 6.802285c22.070857 3.894857 50.834286 1.956571 72.905143 5.851429l-2.413715 13.622857c-281.728-14.555429-563.986286 5.942857-841.216 62.445714-20.132571 17.517714-43.410286 20.443429-66.669714 23.369143z m-55.936-136.210285C308.114286 423.39352362 595.309714 406.97295262 867.84 441.60609562l-1.133714 6.528c27.556571 4.845714 50.779429 2.230857 72.832 6.125714l-2.285715 13.019428c-281.472-16.091429-563.2 1.28-839.588571 53.101715-24.374857 9.142857-42.057143 12.708571-65.261714 15.305143l-5.485715-0.969143c-5.540571-0.987429-9.892571-8.429714-7.606857-21.449143l13.330286-11.062857z"></path>
             </svg>
 		</div>
+		<#assign seq = 0>
 		<#list paperPartList as paperPart>
+		<#if paperPart.type==1>
+		<div class="chapter">
+            <span class="chapter__name">${ paperPart.chapterName }</span>
+            <span class="chapter__desc">
+                ${ paperPart.chapterTxt }
+            </span>
+        </div>
+		<#elseif paperPart.type==2>
 		<div class="question">
 			<div class="question__title">
-				<#if paperPart.type==2 && paperPart.questionType!=3>
-				<span>1、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）</span>
+				<#assign seq = seq + 1>
+				<#if paperPart.questionType!=3>
+				<span>${seq}、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）</span>
 				<#else>
-				1、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）
+				${seq}、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）
 				</#if>
 				<#if paperPart.userScore==paperPart.score>
 				<span class="question__score question__score--right">
@@ -46,7 +56,7 @@
 				</span>
 				</#if>
 			</div>
-			<#if paperPart.type==2 && paperPart.questionType==1>
+			<#if paperPart.questionType==1>
 			<div class="radio-group">
 				<#assign letter=[ 'A' , 'B' , 'C' , 'D' , 'E' , 'F' , 'G' ]>
 				<#list paperPart.options as option>
@@ -58,7 +68,7 @@
 				</label>
 				</#list>
 			</div>
-			<#elseif paperPart.type==2 && paperPart.questionType==2>
+			<#elseif paperPart.questionType==2>
 			<div class="checkbox-group">
 				<#assign letter=[ 'A' , 'B' , 'C' , 'D' , 'E' , 'F' , 'G' ]>
 				<#list paperPart.options as option>
@@ -79,7 +89,7 @@
 				</label>
 				</#list>
 			</div>
-			<#elseif paperPart.type==2 && paperPart.questionType==4>
+			<#elseif paperPart.questionType==4>
 			<div class="radio-group">
 				<#assign letters=[ '对' , '错' ]>
 				<#list letters as letter>
@@ -91,10 +101,11 @@
 				</label>
 				</#list>
 			</div>
-			<#elseif paperPart.type==2 && paperPart.questionType==5>
+			<#elseif paperPart.questionType==5>
 			<div class="question__qa">${((paperPart.userAnswers![])?size > 0)?then(paperPart.userAnswers[0], '')}</div>
 			</#if>
 		</div>
+		</#if>
 		</#list>
 	</div>
 </body>
@@ -331,5 +342,23 @@ body {
 	color: #333;
 	line-height: 21px;
 }
+
+.chapter {}
+
+    .chapter__name {
+        margin-top: 10px;
+        font-size: 16px;
+        font-size: 16px;
+        color: #303133;
+        line-height: 30px;
+    }
+
+    .chapter__desc {
+        display: block;
+        margin-top: 5px;
+        font-size: 14px;
+        color: #999999;
+        line-height: 22px;
+    }
 </style>
 </html>
