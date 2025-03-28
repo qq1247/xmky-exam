@@ -28,17 +28,19 @@ const questionEditorRef = ref<InstanceType<typeof QuestionEditor>>();
 
 /************************事件相关*****************************/
 // 完成导入
-function txtImport() {
+async function txtImport() {
     const result = questionEditorRef.value?.validate()
     if (!result?.succ) {
         ElMessage.error(result?.msg)
         return
     }
 
-    result?.data?.forEach(async (question) => {
-        question.questionBankId = Number(route.params.questionBankId)
-        await questionAdd({ ...question })
-    })
+    for (const index in result.data) {
+        const question = result.data[index as unknown as number];
+        question.questionBankId = Number(route.params.questionBankId);
+        await questionAdd({ ...question });
+    }
+
     router.push(`/question-bank/question-nav/list/${route.params.questionBankId}`)
 }
 </script>
