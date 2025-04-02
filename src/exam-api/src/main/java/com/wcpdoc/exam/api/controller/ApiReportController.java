@@ -9,6 +9,10 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -23,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.controller.BaseController;
@@ -31,6 +37,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.ex.PaperPart;
@@ -65,6 +72,17 @@ public class ApiReportController extends BaseController {
 	private MyPaperService myPaperService;
 	@Resource
 	private FileService fileService;
+
+	static Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
+	static {
+		cfg.setClassLoaderForTemplateLoading(ApiReportController.class.getClassLoader(), "/templates");
+		// cfg.setDirectoryForTemplateLoading(new
+		// File("D:\\soft\\eclipse\\workspace\\EXAM\\exam\\h5\\public"));
+		cfg.setDefaultEncoding("UTF-8");
+		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+		cfg.setLogTemplateExceptions(true);
+		cfg.setWrapUncheckedExceptions(true);
+	}
 
 	/**
 	 * 用户首页
@@ -302,15 +320,6 @@ public class ApiReportController extends BaseController {
 			}
 
 			// 获取试卷数据
-			Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-			cfg.setClassLoaderForTemplateLoading(this.getClass().getClassLoader(), "/templates");
-			// cfg.setDirectoryForTemplateLoading(new
-			// File("D:\\soft\\eclipse\\workspace\\EXAM\\exam\\h5\\public"));
-			cfg.setDefaultEncoding("UTF-8");
-			cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-			cfg.setLogTemplateExceptions(true);
-			cfg.setWrapUncheckedExceptions(true);
-
 			User user = baseCacheService.getUser(userId);
 			List<PaperPart> paperPartList = myPaperService.generatePaper(examId, userId, true, false);
 			for (PaperPart paperPart : paperPartList) {
@@ -349,8 +358,8 @@ public class ApiReportController extends BaseController {
 			File tempDir = fileService.createTempDirWithYMD();
 			String fileName = UUID.randomUUID().toString();
 			File tempHtmlFile = new File(tempDir, fileName + ".html");
-			Template template = cfg.getTemplate("paper.html");
-			
+			Template template = cfg.getTemplate("user-paper.html");
+
 			try (Writer writer = new OutputStreamWriter(new FileOutputStream(tempHtmlFile), StandardCharsets.UTF_8)) {// 手动关闭流
 				template.process(data, writer);
 			}
@@ -380,7 +389,9 @@ public class ApiReportController extends BaseController {
 
 			// 下载到客户端
 			response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
-			String encodedName = URLEncoder.encode(String.format("%s（%s）.pdf", exam.getPaperName(), user.getName()), "UTF-8").replace("+", "%20"); 
+			String encodedName = URLEncoder
+					.encode(String.format("%s（%s）.pdf", exam.getPaperName(), user.getName()), "UTF-8")
+					.replace("+", "%20");
 			response.setHeader("Content-Disposition", "attachment;filename=" + encodedName);
 
 			response.setContentType("application/force-download");
@@ -394,11 +405,141 @@ public class ApiReportController extends BaseController {
 		} catch (MyException e) {
 			log.error("导出试卷错误：{}", e.getMessage());
 		} catch (Exception e) {
-			if (e.getMessage().contains("Cannot run program \"wkhtmltopdf\"")) {
+			if (e.getMessage().contains("wkhtmltopdf")) {
 				log.error("导出试卷错误：{}", "请联系管理员安装wkhtmltopdf");
 			}
 
 			log.error("导出试卷错误：", e);
+		}
+	}
+
+	/**
+	 * 考试排名导出
+	 * 
+	 * v1.0 zhanghc 2025年4月2日下午5:05:31
+	 * 
+	 * @param examId void
+	 */
+	@RequestMapping("/rank/exportPDF")
+	public void rankExportPDF(Integer examId) {
+		try {
+			// 数据校验
+			Exam exam = examCacheService.getExam(examId);
+			if (exam.getMarkState() == 1) {
+				throw new MyException("未阅卷");
+			}
+			if (exam.getMarkState() == 2) {
+				throw new MyException("阅卷中");
+			}
+			if (getCurUser().getType() == 2 && exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+				throw new MyException("无权限");// 只有0、2有url权限，这里判断的是子管理员是否有数据权限
+			}
+
+			// 获取考试排名数据
+			PageIn pageIn = new PageIn();
+			pageIn.addParm("examId", examId);
+			List<Map<String, Object>> rankList = new ArrayList<>();
+			int curPage = 1;
+			Map<Integer, String> examStateCache = baseCacheService.getDictList().stream()
+					.filter(dict -> "EXAM_STATE".equals(dict.getDictIndex()))
+					.collect(Collectors.toMap(dict -> Integer.parseInt(dict.getDictKey()), Dict::getDictValue));
+			Map<Integer, String> markStateCache = baseCacheService.getDictList().stream()
+					.filter(dict -> "MARK_STATE".equals(dict.getDictIndex()))
+					.collect(Collectors.toMap(dict -> Integer.parseInt(dict.getDictKey()), Dict::getDictValue));
+			while (true) {
+				pageIn.setCurPage(curPage++);
+				pageIn.setPageSize(100);
+				PageOut pageOut = reportService.examRankListpage(pageIn);
+				rankList.addAll(pageOut.getList().stream().map(data -> {
+					data.put("myExamStateName", examStateCache.get(data.get("myExamState")));
+					data.put("myExamMarkStateName", markStateCache.get(data.get("myExamMarkState")));
+					if (data.get("myExamAnswerStartTime") != null && data.get("myExamAnswerEndTime") != null) {
+						data.put("answerTime", DateUtil.diffMinute(
+								Date.from(
+										((LocalDateTime) data.get("myExamAnswerStartTime")).toInstant(ZoneOffset.UTC)),
+								Date.from(((LocalDateTime) data.get("myExamAnswerStartTime"))
+										.toInstant(ZoneOffset.UTC))));
+					} else {
+						data.put("answerTime", "-");
+					}
+
+					if (data.get("myExamStartMarkime") != null && data.get("myExamEndMarkime") != null) {
+						data.put("answerTime", DateUtil.diffMinute(
+								Date.from(
+										((LocalDateTime) data.get("myExamStartMarkime")).toInstant(ZoneOffset.UTC)),
+								Date.from(((LocalDateTime) data.get("myExamEndMarkime"))
+										.toInstant(ZoneOffset.UTC))));
+					} else {
+						data.put("markTime", "-");
+					}
+
+					return data;
+				}).collect(Collectors.toList()));
+
+				if (rankList.size() >= pageOut.getTotal()) {
+					break;
+				}
+			}
+
+			// 填充模板
+			Map<String, Object> data = new HashMap<>();
+			data.put("exam", exam);
+			data.put("rankList", rankList);
+
+			File tempDir = fileService.createTempDirWithYMD();
+			String fileName = UUID.randomUUID().toString();
+			File tempHtmlFile = new File(tempDir, fileName + ".html");
+			Template template = cfg.getTemplate("exam-rank.html");
+
+			try (Writer writer = new OutputStreamWriter(new FileOutputStream(tempHtmlFile), StandardCharsets.UTF_8)) {// 手动关闭流
+				template.process(data, writer);
+			}
+
+			// html文件转pdf
+			String WK_PATH = "wkhtmltopdf";
+			File tempPdfFile = new File(tempDir, fileName + ".pdf");
+			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, tempHtmlFile.getAbsolutePath(),
+					tempPdfFile.getAbsolutePath());
+			processBuilder.redirectErrorStream(true);
+			Process process = processBuilder.start();
+			boolean success = process.waitFor(10, TimeUnit.SECONDS);
+			if (!success) {
+				throw new MyException("PDF生成超时");
+			}
+
+			StringBuilder consoleLog = new StringBuilder();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					consoleLog.append(line);
+				}
+			}
+			if (!consoleLog.toString().contains("Done")) {
+				throw new MyException(consoleLog.toString());
+			}
+
+			// 下载到客户端
+			response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+			String encodedName = URLEncoder.encode(String.format("%s（%s）.pdf", exam.getName(), "考试排名"), "UTF-8")
+					.replace("+", "%20");
+			response.setHeader("Content-Disposition", "attachment;filename=" + encodedName);
+
+			response.setContentType("application/force-download");
+			response.setCharacterEncoding("UTF-8");
+			try (OutputStream output = response.getOutputStream()) {
+				FileUtils.copyFile(tempPdfFile, output);
+			} catch (Exception e) {
+				throw new MyException("拷贝文件错误");
+			}
+
+		} catch (MyException e) {
+			log.error("导出考试排名错误：{}", e.getMessage());
+		} catch (Exception e) {
+			if (e.getMessage().contains("Cannot run program \"wkhtmltopdf\"")) {
+				log.error("导出考试排名错误：{}", "请联系管理员安装wkhtmltopdf");
+			}
+
+			log.error("导出考试排名错误：", e);
 		}
 	}
 

@@ -74,9 +74,22 @@
                 <div class="list-data__head">考试数据</div>
                 <div class="list-data__main">
                     <el-tabs v-model="curTab" class="tabs">
+                        <el-form :inline="true" size="large" class="query">
+                            <el-form-item label="">
+                                <el-input v-model="examRankForm.userName" placeholder="请输入姓名" />
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" class="query__btn" @click="examRankQuery">查询</el-button>
+                                <el-button v-if="exam.markState === 3" type="success"
+                                    class="query__btn query__btn--secondary" @click="examRankExport">
+                                    <span class="iconfont icon-xiazaimoban query__btn-icon"></span>
+                                    <span class="query__btn-txt">排名导出</span>
+                                </el-button>
+                            </el-form-item>
+                        </el-form>
                         <el-tab-pane label="考试排名" name="examRank">
                             <el-table :data="examRankListpage.list" size="small" row-key="id" height="450px"
-                                class="table">
+                                :row-class-name="setRowClassName" class="table">
                                 <el-table-column prop="" label="排名" align="center">
                                     <template #default="scope">
                                         {{ scope.row.myExamNo || '-' }}
@@ -169,6 +182,12 @@ const statis = reactive({// 统计信息
     maxScore: 0,// 平均分数
     sdScore: 0,// 标准差值
 })
+
+const examRankForm = reactive({// 考试排名查询表单
+    examId: route.params.id,
+    userName: '',
+})
+
 const examRankListpage = reactive<Listpage>({// 考试排名分页列表
     curPage: 1,
     pageSize: 100,
@@ -339,7 +358,7 @@ async function examStatisQuery() {
 // 排名查询
 async function examRankQuery() {
     const { data: { code, data } } = await reportExamRankListpage({
-        examId: exam.id,
+        ...examRankForm,
         curPage: examRankListpage.curPage,
         pageSize: examRankListpage.pageSize,
     })
@@ -350,6 +369,37 @@ async function examRankQuery() {
 
     examRankListpage.list = data.list
     examRankListpage.total = data.total
+}
+
+// 考试排名导出
+async function examRankExport() {
+    let downloadLink = null;
+    let objectUrl = null;
+    try {
+        ElMessage.info('正在生成PDF，请稍后...')
+        const data = await http.post('report/rank/exportPDF', { examId: examRankForm.examId }, { responseType: 'blob' })
+        objectUrl = URL.createObjectURL(data.data)
+
+        const downloadLink = document.createElement('a');
+        downloadLink.download = decodeURIComponent(data.headers['content-disposition'].substr(20)) // attachment; filename="example.pdf
+        downloadLink.style.display = 'none'
+        downloadLink.href = objectUrl;
+        downloadLink.click();
+        URL.revokeObjectURL(downloadLink.href);
+    } catch (error) {
+        ElMessage.error('生成PDF失败：' + error,)
+    } finally {
+        ElMessage.success('下载完成')
+        if (downloadLink) {
+            document.removeChild(downloadLink);
+            downloadLink = null;
+        }
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+            objectUrl = null;
+        }
+    }
+
 }
 
 function toPaper(examId: number, examUserId: number) {
@@ -383,6 +433,14 @@ async function toPDF(examId: number, userId: number) {
             objectUrl = null;
         }
     }
+}
+
+function setRowClassName({ rowIndex }: { rowIndex: number }) {
+    if (rowIndex < 3 && examRankListpage.curPage === 1) {
+        console.log(rowIndex, examRankListpage.curPage)
+        return `row${rowIndex + 1}`;
+    }
+    return '';
 }
 </script>
 
@@ -708,15 +766,15 @@ async function toPDF(examId: number, userId: number) {
                                 .el-table__row {
                                     height: 38px;
 
-                                    &:nth-child(1) {
+                                    &.row1 {
                                         background: #FFFBED;
                                     }
 
-                                    &:nth-child(2) {
+                                    &.row2 {
                                         background: #E7F8F9;
                                     }
 
-                                    &:nth-child(3) {
+                                    &.row3 {
                                         background: #FEF0EA;
                                     }
 
@@ -754,6 +812,33 @@ async function toPDF(examId: number, userId: number) {
                                 }
                             }
 
+                        }
+                    }
+
+                    .query {
+                        .query__btn {
+                            height: 40px;
+                            padding: 0px 30px;
+                            border-radius: 6px;
+                            border: 0px;
+                            font-size: 16px;
+                            color: #FFFFFF;
+                            background-image: linear-gradient(to right, #04C7F2, #259FF8);
+                        }
+
+                        .query__btn--secondary {
+                            padding: 0px 25px;
+                            border: 1px solid #04C7F2;
+                            background-image: linear-gradient(to right, #FFFFFF, #FFFFFF);
+                            margin-left: 10px;
+
+                            .query__btn-icon {
+                                color: #04C7F2;
+                            }
+
+                            .query__btn-txt {
+                                color: #04C7F2;
+                            }
                         }
                     }
                 }

@@ -78,6 +78,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/report/exam/rankListpage", "jwt,anyRolesEx[0,2]");// 报表相关
 		filterChainMap.put("/api/report/exam/statis", "jwt,anyRolesEx[0,2]");// 报表相关
 		filterChainMap.put("/api/report/paper/exportPDF", "jwt,anyRolesEx[0,2]");// 报表导出相关
+		filterChainMap.put("/api/report/rank/exportPDF", "jwt,anyRolesEx[0,2]");// 报表导出相关
 		filterChainMap.put("/api/parm/get", "jwt,anyRolesEx[0,2]");// 参数获取
 
 		// 考试用户权限
