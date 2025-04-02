@@ -240,7 +240,7 @@ async function login() {
                 display: flex;
                 align-items: center;
                 transform: translateY(-50px);
-
+                z-index: 1;
 
                 .login-win {
                     display: flex;
