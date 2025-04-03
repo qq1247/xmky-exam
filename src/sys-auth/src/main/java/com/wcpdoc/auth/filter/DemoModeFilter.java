@@ -9,9 +9,9 @@ import org.apache.shiro.web.util.WebUtils;
 import org.springframework.http.HttpStatus;
 
 /**
- * jwt过滤器
+ * 演示模式过滤器
  * 
- * v1.0 zhanghc 2021年3月2日上午9:52:04
+ * v1.0 zhanghc 2025年4月3日上午9:10:02
  */
 public class DemoModeFilter extends AccessControlFilter {
 
