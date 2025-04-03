@@ -42,6 +42,9 @@ http.interceptors.response.use(
             // ElMessage.error(response.data.msg) // 不要提示，体验不好
             console.info(`鉴权失败：${response.data.msg}`)
             router.replace('/login')
+        } else if (response.data.code === 403) {// 禁止访问
+            ElMessage.error(response.data.msg)
+            console.info(`${response.data.msg}`)
         } else if (response.data.code === 500) {// 接口错误，提示错误
             ElMessage.error(response.data.msg)
         } else if (response.headers.authorization) {// 携带刷新令牌，替代当前令牌

@@ -1,9 +1,10 @@
 package com.wcpdoc.auth.cfg;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.Filter;
 
 import org.apache.shiro.cache.ehcache.EhCacheManager;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.wcpdoc.auth.filter.AnyRolesEx;
+import com.wcpdoc.auth.filter.DemoModeFilter;
 import com.wcpdoc.auth.filter.JWTFilter;
 import com.wcpdoc.auth.realm.JWTRealm;
 
@@ -28,6 +30,9 @@ import net.sf.ehcache.CacheManager;
  */
 @Configuration
 public class ShiroCfg {
+	@Resource
+	private ShiroFilterCfg shiroFilterCfg;
+
 	/**
 	 * 集成jwt过滤器
 	 * 
@@ -36,7 +41,6 @@ public class ShiroCfg {
 	 * @param securityManager
 	 * @return ShiroFilterFactoryBean
 	 */
-
 	@Bean
 	public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
 		// 设置安全管理器
@@ -44,53 +48,30 @@ public class ShiroCfg {
 		shiroFilterFactory.setSecurityManager(securityManager);
 
 		// 注册jwt过滤器
-		Map<String, Filter> jwtFilterMap = new HashMap<>(2);
+		Map<String, Filter> jwtFilterMap = new LinkedHashMap<>(3);
+		jwtFilterMap.put("demoModeFilter", new DemoModeFilter());
 		jwtFilterMap.put("anyRolesEx", new AnyRolesEx());
 		jwtFilterMap.put("jwt", new JWTFilter());
 		shiroFilterFactory.setFilters(jwtFilterMap);
 
-		// 公共请求
+		// 注册权限
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
-		
-		filterChainMap.put("/api/login/*", "anon");// 登录相关功能免登录
-		filterChainMap.put("/api/file/download", "anon");// 下载免登录
-		filterChainMap.put("/api/dict/indexList", "jwt");// 数据字典列表需登录
-		filterChainMap.put("/api/dict/listpage", "jwt");// 数据字典分页列表需登录
-		filterChainMap.put("/api/bulletin/listpage", "jwt");// 公告分页列表需登录
-		filterChainMap.put("/api/bulletin/get", "jwt");// 公告详情列表需登录
-		filterChainMap.put("/api/user/get", "jwt");// 用户信息需登录
-		filterChainMap.put("/api/progressBar/*", "jwt");// 用户信息需登录
+		if (shiroFilterCfg.getDemo().isMode()) {
+			filterChainMap.putAll(shiroFilterCfg.getDemo().getUrls().keySet().stream()//
+					.map(url -> url.substring(1, url.length() - 1)) // 去掉首尾的[]
+					.map(entry -> entry.split("=")) // 按=分割
+					.collect(Collectors.toMap(parts -> parts[0], // URL路径作为key
+							parts -> parts[1] // 权限规则作为value
+					)));
+		}
 
-		// 子管理员权限
-		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[0,2]");// 用户添加
-		filterChainMap.put("/api/user/add", "jwt,anyRolesEx[0,2]");// 用户添加
-		filterChainMap.put("/api/user/edit", "jwt,anyRolesEx[0,2]");// 用户修改
-		filterChainMap.put("/api/user/del", "jwt,anyRolesEx[0,2]");// 用户删除
-		filterChainMap.put("/api/user/pwdInit", "jwt,anyRolesEx[0,2]");// 用户密码初始化
-		filterChainMap.put("/api/user/frozen", "jwt,anyRolesEx[0,2]");// 用户冻结
-		filterChainMap.put("/api/questionBank/*", "jwt,anyRolesEx[0,2]");// 题库
-		filterChainMap.put("/api/question/*", "jwt,anyRolesEx[0,2]");// 题库
-		filterChainMap.put("/api/exer/*", "jwt,anyRolesEx[0,2]");// 练习
-		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[0,2,3]");// 考试详情
-		filterChainMap.put("/api/exam/*", "jwt,anyRolesEx[0,2]");// 考试
-		filterChainMap.put("/api/myMark/*", "jwt,anyRolesEx[0,2,3]");// 我的阅卷（管理员、子管理员、阅卷用户都有权限，只是数据权限不一样）
-		filterChainMap.put("/api/report/subAdmin/home", "jwt,anyRolesEx[2]");// 考试
-		filterChainMap.put("/api/report/exam/rankListpage", "jwt,anyRolesEx[0,2]");// 报表相关
-		filterChainMap.put("/api/report/exam/statis", "jwt,anyRolesEx[0,2]");// 报表相关
-		filterChainMap.put("/api/report/paper/exportPDF", "jwt,anyRolesEx[0,2]");// 报表导出相关
-		filterChainMap.put("/api/report/rank/exportPDF", "jwt,anyRolesEx[0,2]");// 报表导出相关
-		filterChainMap.put("/api/parm/get", "jwt,anyRolesEx[0,2]");// 参数获取
-
-		// 考试用户权限
-		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[1,4]");// 我的考试
-		filterChainMap.put("/api/myExer/*", "jwt,anyRolesEx[1]");// 我的练习
-		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[1]");// 用户首页
-
-		// 阅卷用户权限
-		filterChainMap.put("/api/report/markUser/home", "jwt,anyRolesEx[3]");// 阅卷用户首页
-
-		// 管理员权限
-		filterChainMap.put("/api/**", "jwt,anyRolesEx[0]");// 剩余都是
+		filterChainMap.putAll(shiroFilterCfg.getUrls().keySet().stream()//
+				.map(url -> url.substring(1, url.length() - 1)) // 去掉首尾的[]
+				.map(entry -> entry.split("=")) // 按=分割
+				.filter(parts -> !filterChainMap.containsKey(parts[0])) // 演示模式的key优先
+				.collect(Collectors.toMap(parts -> parts[0], // URL路径作为key
+						parts -> parts[1] // 权限规则作为value
+				)));
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}
