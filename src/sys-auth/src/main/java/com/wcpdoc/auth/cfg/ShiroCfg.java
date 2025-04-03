@@ -50,8 +50,8 @@ public class ShiroCfg {
 		// 注册jwt过滤器
 		Map<String, Filter> jwtFilterMap = new LinkedHashMap<>(3);
 		jwtFilterMap.put("demoModeFilter", new DemoModeFilter());
-		jwtFilterMap.put("anyRolesEx", new AnyRolesEx());
 		jwtFilterMap.put("jwt", new JWTFilter());
+		jwtFilterMap.put("anyRolesEx", new AnyRolesEx());
 		shiroFilterFactory.setFilters(jwtFilterMap);
 
 		// 注册权限
@@ -61,7 +61,9 @@ public class ShiroCfg {
 					.map(url -> url.substring(1, url.length() - 1)) // 去掉首尾的[]
 					.map(entry -> entry.split("=")) // 按=分割
 					.collect(Collectors.toMap(parts -> parts[0], // URL路径作为key
-							parts -> parts[1] // 权限规则作为value
+							parts -> parts[1], // 权限规则作为value
+							(oldKey, newKey) -> oldKey, 
+							LinkedHashMap::new
 					)));
 		}
 
@@ -70,7 +72,9 @@ public class ShiroCfg {
 				.map(entry -> entry.split("=")) // 按=分割
 				.filter(parts -> !filterChainMap.containsKey(parts[0])) // 演示模式的key优先
 				.collect(Collectors.toMap(parts -> parts[0], // URL路径作为key
-						parts -> parts[1] // 权限规则作为value
+						parts -> parts[1], // 权限规则作为value
+						(oldKey, newKey) -> oldKey, 
+						LinkedHashMap::new
 				)));
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
