@@ -44,7 +44,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void emailUpdate(String host, String userName, String pwd, String protocol, String encode) {
+	public void email(String host, String userName, String pwd, String protocol, String encode) {
 		// 数据校验
 		if (!ValidateUtil.isValid(host)) {
 			throw new MyException("参数错误：host");
@@ -83,7 +83,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void entUpdate(Integer logoFileId, String name) throws Exception {
+	public void ent(Integer logoFileId, String name) throws Exception {
 		// 数据校验
 		// if (!ValidateUtil.isValid(logoFileId)) {// 不是每次都替换
 		// throw new MyException("参数错误：logoFileId");
@@ -105,7 +105,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void pwdUpdate(Integer type, String value) {
+	public void pwd(Integer type, String value) {
 		// 数据校验
 		if (type != 1 && type != 2) {
 			throw new MyException("参数错误：type");
@@ -124,7 +124,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void fileUpdate(String uploadDir) {
+	public void file(String uploadDir) {
 		// 数据校验
 		if (!ValidateUtil.isValid(uploadDir)) {
 			throw new MyException("参数错误：uploadDir");
@@ -158,7 +158,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void dbUpdate(String bakDir) {
+	public void db(String bakDir) {
 		// 数据校验
 		if (!ValidateUtil.isValid(bakDir)) {
 			throw new MyException("参数错误：bakDir");
@@ -193,7 +193,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void customUpdate(String title, String content) {
+	public void custom(String title, String content) {
 		// 数据校验
 		if (!ValidateUtil.isValid(title)) {
 			throw new MyException("参数错误：title");
@@ -211,7 +211,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void mUpdate(String host) {
+	public void m(String host) {
 		// 数据校验
 		if (!ValidateUtil.isValid(host)) {
 			throw new MyException("参数错误：host");
@@ -220,6 +220,28 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		// 自定义内容修改
 		Parm parm = baseCacheService.getParm();
 		parm.setMHost(host);
+		updateById(parm);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
+	public void app(String relVer, Date relTime, String verhubUrl) {
+		// 数据校验
+		if (!ValidateUtil.isValid(relVer)) {
+			throw new MyException("参数错误：relVer");
+		}
+		if (!ValidateUtil.isValid(relTime)) {
+			throw new MyException("参数错误：relTime");
+		}
+		if (!ValidateUtil.isValid(verhubUrl)) {
+			throw new MyException("参数错误：verhubUrl");
+		}
+
+		// 自定义内容修改
+		Parm parm = baseCacheService.getParm();
+		parm.setVerhubUrl(verhubUrl);
+		parm.setAppRelVer(relVer);
+		parm.setAppRelTime(relTime);
 		updateById(parm);
 	}
 }

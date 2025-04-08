@@ -35,6 +35,9 @@ public class Parm {
 	private String customTitle;
 	private String customContent;
 	private String mHost;
+	private String verhubUrl;
+	private String appRelVer;
+	private Date appRelTime;
 
 	public String getFileUploadDir() {
 		if (ValidateUtil.isValid(fileUploadDir)) {

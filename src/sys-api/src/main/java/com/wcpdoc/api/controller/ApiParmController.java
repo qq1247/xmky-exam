@@ -42,7 +42,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/ent")
 	public PageResult ent(Integer logoFileId, String name) {
 		try {
-			parmService.entUpdate(logoFileId, name);
+			parmService.ent(logoFileId, name);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("企业修改错误：{}", e.getMessage());
@@ -64,7 +64,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/email")
 	public PageResult email(String host, String userName, String pwd, String protocol, String encode) {
 		try {
-			parmService.emailUpdate(host, userName, pwd, protocol, encode);
+			parmService.email(host, userName, pwd, protocol, encode);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加邮件错误：{}", e.getMessage());
@@ -86,7 +86,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/file")
 	public PageResult file(String uploadDir) {
 		try {
-			parmService.fileUpdate(uploadDir);
+			parmService.file(uploadDir);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("上传目录修改错误：{}", e.getMessage());
@@ -108,7 +108,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/db")
 	public PageResult db(String bakDir) {
 		try {
-			parmService.dbUpdate(bakDir);
+			parmService.db(bakDir);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("DB目录修改错误：{}", e.getMessage());
@@ -131,7 +131,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/pwd")
 	public PageResult pwd(Integer type, String value) {
 		try {
-			parmService.pwdUpdate(type, value);
+			parmService.pwd(type, value);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("默认密码修改错误：{}", e.getMessage());
@@ -154,7 +154,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/custom")
 	public PageResult custom(String title, String content) {
 		try {
-			parmService.customUpdate(title, content);
+			parmService.custom(title, content);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("自定义信息修改错误：{}", e.getMessage());
@@ -176,7 +176,7 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/m")
 	public PageResult m(String host) {
 		try {
-			parmService.mUpdate(host);
+			parmService.m(host);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("移动端设置修改错误：{}", e.getMessage());

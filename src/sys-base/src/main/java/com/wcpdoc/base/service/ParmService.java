@@ -1,5 +1,7 @@
 package com.wcpdoc.base.service;
 
+import java.util.Date;
+
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.core.service.BaseService;
 
@@ -16,7 +18,7 @@ public interface ParmService extends BaseService<Parm> {
 	 * 
 	 * @param parm void
 	 */
-	void emailUpdate(String host, String userName, String pwd, String protocol, String encode);
+	void email(String host, String userName, String pwd, String protocol, String encode);
 
 	/**
 	 * 企业修改
@@ -26,7 +28,7 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param logoFileId logo附件ID
 	 * @param name       名称
 	 */
-	void entUpdate(Integer logoFileId, String name) throws Exception;
+	void ent(Integer logoFileId, String name) throws Exception;
 
 	/**
 	 * 密码修改
@@ -36,7 +38,7 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param type  密码类型（1：随机；2：固定）
 	 * @param value void
 	 */
-	void pwdUpdate(Integer type, String value);
+	void pwd(Integer type, String value);
 
 	/**
 	 * 上传目录修改
@@ -45,7 +47,7 @@ public interface ParmService extends BaseService<Parm> {
 	 * 
 	 * @param uploadDir void
 	 */
-	void fileUpdate(String uploadDir);
+	void file(String uploadDir);
 
 	/**
 	 * DB备份目录修改
@@ -54,7 +56,7 @@ public interface ParmService extends BaseService<Parm> {
 	 * 
 	 * @param bakDir void
 	 */
-	void dbUpdate(String bakDir);
+	void db(String bakDir);
 
 	/**
 	 * 自定义内容修改
@@ -64,7 +66,7 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param title
 	 * @param content void
 	 */
-	void customUpdate(String title, String content);
+	void custom(String title, String content);
 
 	/**
 	 * 移动端设置
@@ -73,6 +75,15 @@ public interface ParmService extends BaseService<Parm> {
 	 * 
 	 * @param host void
 	 */
-	void mUpdate(String host);
-
+	void m(String host);
+	
+	/**
+	 * 应用设置
+	 * 
+	 * v1.0 zhanghc 2025年4月8日下午6:42:52
+	 * @param relVer
+	 * @param relTime
+	 * @param verhubUrl void
+	 */
+	void app(String relVer, Date relTime, String verhubUrl);
 }
