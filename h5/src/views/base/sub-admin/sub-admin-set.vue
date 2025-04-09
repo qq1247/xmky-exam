@@ -9,10 +9,19 @@
                     <el-form-item label="登录账号" prop="loginName">
                         <el-input v-model="form.loginName" placeholder="请输入登录账号" />
                     </el-form-item>
+                    <el-form-item label="管理机构" prop="orgIds">
+                        <xmks-select v-model="form.orgIds" url="org/listpage" :params="{ state: 1 }"
+                            search-parm-name="name" option-label="name" option-value="id" :options="orgs"
+                            :multiple="true" clearable search-placeholder="请输入机构名称进行筛选">
+                            <template #default="{ option }">
+                                {{ option.name }} - {{ option.parentName }}
+                            </template>
+                        </xmks-select>
+                    </el-form-item>
                     <el-form-item label="管理用户" prop="userIds">
                         <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
-                            search-parm-name="name" option-label="name" option-value="id" :options="examUsers"
-                            :multiple="true" clearable search-placeholder="请输入机构用户名称进行筛选">
+                            search-parm-name="name" option-label="name" option-value="id" :options="users"
+                            :multiple="true" clearable search-placeholder="请输入机构名称或用户名称进行筛选">
                             <template #default="{ option }">
                                 {{ option.name }} - {{ option.orgName }}
                             </template>
@@ -67,6 +76,7 @@ import { userListpage, userAdd, userDel, userEdit, userFrozen, userGet, userPwdI
 import XmksSelect from '@/components/xmks-select.vue'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import { useDictStore } from '@/stores/dict'
+import { orgListpage } from '@/api/base/org'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -78,6 +88,7 @@ const form = reactive<User>({
     name: '',
     loginName: '',
     userIds: [],
+    orgIds: [],
     type: 2,
     state: 1
 })
@@ -91,11 +102,9 @@ const formRules = reactive<FormRules>({// 表单规则
         { required: true, message: '请输入子管理姓名', trigger: 'blur' },
         { min: 1, max: 8, message: '长度介于1-8', trigger: 'blur' },
     ],
-    userIds: [
-        { required: true, message: '请选择管理用户', trigger: 'blur' },
-    ],
 })
-const examUsers = ref<User[]>([])// 考试用户
+const users = ref<any[]>([])// 考试用户
+const orgs = ref<any[]>([])// 机构
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -107,22 +116,41 @@ onMounted(async () => {
         form.name = data.name
         form.loginName = data.loginName
         form.userIds = data.userIds
+        form.orgIds = data.orgIds
         form.state = data.state
     }
 
-    let curPage = 1
-    while (true) {
-        const { data: { data } } = await userListpage({
-            ids: form.userIds?.join(),
-            state: 1, // 状态正常
-            type: 1,// 考试用户
-            curPage: curPage++,
-            pageSize: 100,
-        })
+    if (form.userIds.length) {
+        let curPage = 1
+        while (true) {
+            const { data: { data } } = await userListpage({
+                ids: form.userIds.join(),
+                state: 1, // 状态正常
+                type: 1,// 考试用户
+                curPage: curPage++,
+                pageSize: 100,
+            })
 
-        examUsers.value.push(...data.list)
-        if (examUsers.value.length >= data.total) {// 分批次取出
-            break
+            users.value.push(...data.list)
+            if (users.value.length >= data.total) {// 分批次取出
+                break
+            }
+        }
+    }
+
+    if (form.orgIds.length) {
+        let curPage = 1
+        while (true) {
+            const { data: { data } } = await orgListpage({
+                ids: form.orgIds.join(),
+                curPage: curPage++,
+                pageSize: 100,
+            })
+
+            orgs.value.push(...data.list)
+            if (orgs.value.length >= data.total) {// 分批次取出
+                break
+            }
         }
     }
 })

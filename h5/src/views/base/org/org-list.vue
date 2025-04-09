@@ -15,7 +15,7 @@
                 height="calc(100vh - 428px)" class="table">
                 <el-table-column prop="name" label="名称" align="left" />
                 <el-table-column prop="no" label="排序" align="center" />
-                <el-table-column prop="" label="操作" align="center" width="300">
+                <el-table-column v-if="userStore.type === 0" prop="" label="操作" align="center" width="300">
                     <template #default="scope">
                         <el-tooltip effect="dark" content="添加">
                             <span class="iconfont icon-icon-01 table__btn"
@@ -35,8 +35,10 @@
 import { reactive, onMounted, } from 'vue'
 import type { Listpage } from '@/ts/common/listpage'
 import { orgListpage } from '@/api/base/org'
+import { useUserStore } from '@/stores/user'
 
 /************************变量定义相关***********************/
+const userStore = useUserStore()// 用户缓存
 const queryForm = reactive({// 查询表单
     name: '',
 })

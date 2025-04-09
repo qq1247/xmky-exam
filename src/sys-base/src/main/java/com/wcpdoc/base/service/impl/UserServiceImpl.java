@@ -80,6 +80,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			entity.setOrgId(ValidateUtil.isValid(user.getOrgId()) ? user.getOrgId() : 1);// 页面没选机构，默认根机构
 		} else if (getCurUser().getType() == 0 && user.getType() == 2) {// 如果是管理员修改子管理员
 			entity.setUserIds(user.getUserIds());// 更新可管理的用户
+			entity.setOrgIds(user.getOrgIds());// 更新可管理的机构
 		} else if (getCurUser().getType() == 2) {// 如果是子管理员，
 			// 没有特殊需要处理的
 		}

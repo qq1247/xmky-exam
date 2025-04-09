@@ -40,9 +40,14 @@ public class Exam {
 	private Integer genType;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> sxes;
-	private Integer userNum;
 	private Integer state;
 	private Integer limitMinute;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> orgIds;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> userIds;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> markUserIds;
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;

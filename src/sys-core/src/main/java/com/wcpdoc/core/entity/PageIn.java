@@ -41,9 +41,6 @@ public class PageIn {
 		if (ValidateUtil.isValid(parameter)) {
 			return (T) parameter;
 		}
-		if (request == null) {// 非前端调用时，request会为空
-			return null;
-		}
 		return (T) request.getAttribute(key);
 	}
 
@@ -51,9 +48,6 @@ public class PageIn {
 		String parameter = request.getParameter(key);
 		if (ValidateUtil.isValid(parameter)) {
 			return true;
-		}
-		if (request == null) {// 非前端调用时，request会为空
-			return false;
 		}
 		return request.getAttribute(key) != null;
 	}

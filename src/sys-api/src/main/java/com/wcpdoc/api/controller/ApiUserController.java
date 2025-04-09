@@ -20,7 +20,6 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
-import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
@@ -67,7 +66,7 @@ public class ApiUserController extends BaseController {
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
 					User user = baseCacheService.getUser(getCurUser().getId());
-					pageIn.addParm("ids", StringUtil.join(user.getUserIds(), ","));
+					pageIn.addParm("_ids", user.getUserIds());// 只看自己可以管理的考试用户，不用用ids，这个是页面过滤用的，如考试选择用户回显。
 				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
@@ -195,7 +194,9 @@ public class ApiUserController extends BaseController {
 					.addAttr("orgId", user.getOrgId())//
 					.addAttr("orgName", org == null ? null : org.getName())//
 					.addAttr("state", user.getState())//
-					.addAttr("userIds", user.getUserIds());//
+					.addAttr("userIds", user.getUserIds())//
+					.addAttr("orgIds", user.getOrgIds())//
+			;
 			return pageResult;
 		} catch (MyException e) {
 			log.error("用户获取错误：{}", e.getMessage());
@@ -287,7 +288,7 @@ public class ApiUserController extends BaseController {
 			log.error("用户模板导出失败：", e);
 		}
 	}
-	
+
 	/**
 	 * 用户导入
 	 * 

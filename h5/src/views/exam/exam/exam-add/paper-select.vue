@@ -90,7 +90,7 @@ async function copy(id: number) {
     } else {
         form.examRules = data.examRules
     }
-    form.examUserIds = []
+    form.userIds = []
     form.markUserIds = []
     form.limitMinute = data.limitMinute
 

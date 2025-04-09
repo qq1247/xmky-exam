@@ -113,7 +113,7 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("state", myExam.getState())//
 					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getUserNum());
+					.addAttr("userNum", exam.getUserIds().size());
 		} catch (MyException e) {
 			log.error("获取我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -159,7 +159,7 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
-					.addAttr("userNum", exam.getUserNum())//
+					.addAttr("userNum", exam.getUserIds().size())//
 					.addAttr("limitMinute", exam.getLimitMinute());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());

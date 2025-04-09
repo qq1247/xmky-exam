@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Org;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.OrgExService;
 import com.wcpdoc.base.service.OrgService;
@@ -45,6 +46,16 @@ public class ApiOrgController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
+			if (getCurUser().getType() == 0) {// 如果是管理员
+				// 看全部
+			} else if (getCurUser().getType() == 2) {// 如果是子管理
+				User user = baseCacheService.getUser(getCurUser().getId());
+				pageIn.addParm("_ids", user.getOrgIds());
+			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限
+
+			} else if (getCurUser().getType() == 1) {// 考试用户没有角色权限
+
+			}
 			return PageResultEx.ok().data(orgService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("机构列表错误：", e);

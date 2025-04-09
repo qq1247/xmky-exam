@@ -114,7 +114,7 @@ public class ApiMyMarkController extends BaseController {
 					.addAttr("state", myExam.getState())//
 					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getUserNum());
+					.addAttr("userNum", exam.getUserIds().size());
 		} catch (MyException e) {
 			log.error("我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

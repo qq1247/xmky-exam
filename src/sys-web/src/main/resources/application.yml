@@ -43,6 +43,7 @@ shiro-filter:
     ? /api/progressBar/**: jwt
     
     ? /api/user/listpage: jwt,anyRolesEx[0,2]
+    ? /api/org/listpage: jwt,anyRolesEx[0,2]
     ? /api/user/add: jwt,anyRolesEx[0,2]
     ? /api/user/edit: jwt,anyRolesEx[0,2]
     ? /api/user/del: jwt,anyRolesEx[0,2]

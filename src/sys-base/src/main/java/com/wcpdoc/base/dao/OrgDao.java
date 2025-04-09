@@ -10,6 +10,7 @@ import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.StringUtil;
 
 /**
  * 机构数据访问层接口
@@ -25,6 +26,8 @@ public interface OrgDao extends RBaseDao<Org> {
 						.select("ORG.ID", "ORG.NAME", "ORG.PARENT_ID", "PARENT_ORG.NAME AS PARENT_NAME", "ORG.NO")//
 						.leftJoin("SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID")
 						.eq(pageIn.hasParm("parentId"), "ORG.PARENT_ID", pageIn.getParm("parentId"))//
+						.in(pageIn.hasParm("ids"), "ORG.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))// 页面过滤
+						.in(pageIn.hasParm("_ids"), "ORG.ID", pageIn.getParm("_ids", List.class)) // 控制层控制子管理员只能过滤自己的机构
 						.like(pageIn.hasParm("name"), "ORG.NAME", pageIn.getParm("name"))//
 						.eq("ORG.STATE", 1)//
 						.orderByAsc("ORG.NO", "ORG.ID"));// no值一样，导致分页错误，添加id排序

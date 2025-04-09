@@ -7,16 +7,28 @@
                         <span class="iconfont icon-tubiaoziti-10 user-select__tip-icon"></span>
                         <div class="user-select__tip-wrap">
                             <span class="user-select__tip-title">
-                                选择考试用户，已选<span class="user-select__tip-num">{{ form.examUserIds.length }}</span>人
+                                已选<span class="user-select__tip-num">{{ form.orgIds.length }}</span>机构、
+                                已选<span class="user-select__tip-num">{{ form.userIds.length }}</span>用户
                             </span>
-                            <span class=" user-select__tip-desc">只能选择可管理的用户。</span>
+                            <span class=" user-select__tip-desc">只能选择可管理的机构或用户</span>
                         </div>
                     </div>
                     <el-form v-if="form.loginType === 1" ref="formRef" :model="form" :rules="formRules" label-width="0">
-                        <el-form-item label="" prop="examUserIds">
-                            <xmks-select v-model="form.examUserIds" url="user/listpage" :params="{ state: 1, type: 1 }"
-                                search-parm-name="name" option-label="name" option-value="id" :options="examUsers"
-                                :multiple="true" clearable search-placeholder="请输入机构用户名称进行筛选">
+                        <el-form-item label="" prop="orgIds">
+                            <xmks-select v-model="form.orgIds" url="org/listpage" :params="{}" search-parm-name="name"
+                                option-label="name" option-value="id" :options="orgs" :multiple="true" clearable
+                                :page-size="100" search-placeholder="请输入机构名称进行筛选">
+                                <template #default="{ option }">
+                                    {{ option.name }} - {{ option.orgName }}
+                                </template>
+                            </xmks-select>
+                        </el-form-item>
+                    </el-form>
+                    <el-form v-if="form.loginType === 1" ref="formRef" :model="form" :rules="formRules" label-width="0">
+                        <el-form-item label="" prop="userIds">
+                            <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
+                                search-parm-name="name" option-label="name" option-value="id" :options="users"
+                                :multiple="true" clearable :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }}
                                 </template>
@@ -46,6 +58,7 @@ import { useExamStore } from '@/stores/exam'
 import xmksSelect from '@/components/xmks-select.vue'
 import { userListpage } from '@/api/base/user'
 import { useUserStore } from '@/stores/user'
+import { orgListpage } from '@/api/base/org'
 
 /************************变量定义相关***********************/
 defineExpose({ next })
@@ -53,30 +66,48 @@ const userStore = useUserStore()
 const formRef = ref<FormInstance>()// 表单引用
 const form = useExamStore()
 const formRules = reactive<FormRules>({// 表单校验规则
-    examUserIds: [
+    userIds: [
         { required: true, message: '请选择考试用户', trigger: 'blur' },
     ]
 })
 
-const examUsers = ref<any[]>([]) // 考试用户
+const users = ref<any[]>([]) // 考试用户
+const orgs = ref<any[]>([]) // 机构
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
-    let curPage = 1
-    const pageSize = 100
-    while (true) {
-        const { data: { data } } = await userListpage({
-            ids: form.examUserIds.join(),
-            curPage: curPage++,
-            pageSize: pageSize,
-        })
+    if (form.userIds.length) {
+        let curPage = 1
+        const pageSize = 100
+        while (true) {
+            const { data: { data } } = await userListpage({
+                ids: form.userIds.join(),
+                curPage: curPage++,
+                pageSize: pageSize,
+            })
 
-        examUsers.value.push(...data.list)
-        if (examUsers.value.length >= data.total) {// 分批次取出
-            break
+            users.value.push(...data.list)
+            if (users.value.length >= data.total) {// 分批次取出
+                break
+            }
         }
     }
+    if (form.orgIds.length) {
+        let curPage = 1
+        const pageSize = 100
+        while (true) {
+            const { data: { data } } = await orgListpage({
+                ids: form.orgIds.join(),
+                curPage: curPage++,
+                pageSize: pageSize,
+            })
 
+            orgs.value.push(...data.list)
+            if (orgs.value.length >= data.total) {// 分批次取出
+                break
+            }
+        }
+    }
 })
 
 /************************事件相关*****************************/

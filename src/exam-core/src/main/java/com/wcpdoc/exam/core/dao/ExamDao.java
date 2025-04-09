@@ -28,7 +28,7 @@ public interface ExamDao extends RBaseDao<Exam> {
 								"EXAM.MARK_END_TIME", "EXAM.PASS_SCORE", "EXAM.TOTAL_SCORE", "EXAM.STATE",
 								"EXAM.MARK_STATE", "EXAM.SCORE_STATE", "EXAM.RANK_STATE", "EXAM.GEN_TYPE",
 								"EXAM.MARK_TYPE", "EXAM.SXES", "EXAM.ANON_STATE","LOGIN_TYPE","LIMIT_MINUTE",
-								"(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM", //
+								"LENGTH(EXAM.USER_IDS) - LENGTH(REPLACE(EXAM.USER_IDS, ',', '')) - 1 AS USER_NUM", //
 								"(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = EXAM.ID) AS MARK_USER_NUM") //
 						.like(pageIn.hasParm("name"), "EXAM.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("genType"), "EXAM.GEN_TYPE", pageIn.getParm("genType"))

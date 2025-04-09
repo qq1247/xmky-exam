@@ -3,8 +3,10 @@ package com.wcpdoc.exam.api.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.ProgressBarService;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
@@ -30,6 +33,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
@@ -70,6 +74,8 @@ public class ApiExamController extends BaseController {
 	private BaseCacheService baseCacheService;
 	@Resource
 	private ProgressBarService progressBarService;
+	@Resource
+	private UserService userService;
 
 	/**
 	 * 考试列表
@@ -123,7 +129,19 @@ public class ApiExamController extends BaseController {
 
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
 			progressBarService.setProgressBar(processBarId, 0.0, 1.0, HttpStatus.OK.value(), "发布开始", null);// 放在前面，可能的问题为下面的线程执行慢，没有进度数据，前端显示空
-			Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+userNum
+
+			Set<Integer> userIds = new HashSet<>();// 合并用户
+			if (ValidateUtil.isValid(examInfo.getUserIds())) {
+				userIds.addAll(examInfo.getUserIds());
+			}
+			if (ValidateUtil.isValid(examInfo.getOrgIds())) {
+				examInfo.getOrgIds().stream().forEach(orgId -> {
+					userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1)
+							.map(User::getId).collect(Collectors.toSet()));
+				});
+			}
+
+			Double processLen = (5 + userIds.size()) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+(userNum+org.userNum)交集
 			LoginUser loginUser = getCurUser();
 			new Thread(new Runnable() {
 				public void run() {
@@ -330,7 +348,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("genType", exam.getGenType())//
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
-					.addAttr("userNum", exam.getUserNum())//
+					.addAttr("userNum", exam.getUserIds().size())//
 					.addAttr("limitMinute", exam.getLimitMinute());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());

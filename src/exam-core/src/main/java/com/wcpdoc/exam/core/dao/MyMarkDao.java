@@ -32,7 +32,7 @@ public interface MyMarkDao extends RBaseDao<MyMark> {
 								"EXAM.MARK_TYPE AS EXAM_MARK_TYPE", "EXAM.SXES AS EXAM_SXES",
 								"EXAM.ANON_STATE AS EXAM_ANON_STATE", "EXAM.LIMIT_MINUTE AS EXAM_LIMIT_MINUTE",
 								"EXAM.LOGIN_TYPE AS EXAM_LOGIN_TYPE",
-								"(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS EXAM_USER_NUM",
+								"LENGTH(EXAM.USER_IDS) - LENGTH(REPLACE(EXAM.USER_IDS, ',', '')) - 1 AS EXAM_USER_NUM",
 								"(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = EXAM.ID) AS EXAM_MARK_USER_NUM")//
 						.like(pageIn.hasParm("examName"), "EXAM.NAME", pageIn.getParm("examName"))//
 						.and(pageIn.hasParm("startTime") && pageIn.hasParm("endTime"),

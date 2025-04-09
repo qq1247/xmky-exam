@@ -13,8 +13,6 @@ import com.wcpdoc.exam.core.entity.ExamRule;
 public class ExamInfo extends Exam {
 	private List<ExamQuestionEx> examQuestions;// 固定组卷使用
 	private List<ExamRule> examRules;// 随机组卷使用
-	private List<Integer> examUserIds;// 考试用户
-	private List<Integer> markUserIds;// 阅卷用户
 
 	public List<ExamQuestionEx> getExamQuestions() {
 		return examQuestions;
@@ -30,22 +28,6 @@ public class ExamInfo extends Exam {
 
 	public void setExamRules(List<ExamRule> examRules) {
 		this.examRules = examRules;
-	}
-
-	public List<Integer> getExamUserIds() {
-		return examUserIds;
-	}
-
-	public void setExamUserIds(List<Integer> examUserIds) {
-		this.examUserIds = examUserIds;
-	}
-
-	public List<Integer> getMarkUserIds() {
-		return markUserIds;
-	}
-
-	public void setMarkUserIds(List<Integer> markUserIds) {
-		this.markUserIds = markUserIds;
 	}
 
 }

@@ -29,7 +29,8 @@ export const useExamStore = defineStore('exam', () => {
     const state = ref(1) // 状态（1：发布；2：暂停；）
     const examQuestions = ref<ExamQuestion[]>([])// 试卷信息
     const examRules = ref<ExamRule[]>([])// 试卷规则
-    const examUserIds = ref<number[]>([])// 考试用户
+    const userIds = ref<number[]>([])// 考试用户
+    const orgIds = ref<number[]>([])// 机构
     const markUserIds = ref<number[]>([])// 阅卷用户
     const limitMinute = 0 // 限制分钟
 
@@ -52,7 +53,7 @@ export const useExamStore = defineStore('exam', () => {
             return examRules.value.filter(examRule => (examRule.type === 2 && examRule?.markType === 2))
         }
     })
-    const examUserNum = computed(() => examUserIds.value.length)// 考试人数
+    const examUserNum = computed(() => userIds.value.length)// 考试人数
     const markUserNum = computed(() => markUserIds.value.length)// 阅卷人数
     const objectiveQuestionNum = computed(() => { // 客观题数
         if (genType.value === 1) {
@@ -169,7 +170,7 @@ export const useExamStore = defineStore('exam', () => {
     }
     return {
         // 属性
-        id, name, paperName, examTimes, markTimes, limitMinute, genType, loginType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, examUserIds, markUserIds,
+        id, name, paperName, examTimes, markTimes, limitMinute, genType, loginType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, userIds, markUserIds, orgIds,
         // 计算属性
         totalScore, markQuestions, markType, examUserNum, markUserNum, objectiveQuestionNum, subjectiveQuestionNum, examTimeDiff, chapterNum, singleChoiceNum, multipleChoiceNum, fillblankNum, judgeNum, qaNum,
 

@@ -101,20 +101,28 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	/**
-	 * 数据格式： { "id": 1, "name": "考试-20221020", "paperName": "点击这里输入试卷名称",
-	 * "startTime": "2022-10-20 08:00:00", "endTime": "2022-10-20 10:00:00",
-	 * "markStartTime": "2022-10-20 14:00:00", "markEndTime": "2022-10-20 18:00:00"
-	 * "genType": 1, "passScore": 14, "sxes": [1, 2], "showType": 1, "anonState": 1,
-	 * "scoreState": 2, "rankState": 2, "state": 1, "markType": 2, "totalScore": 24,
-	 * "examQuestions": [{ // 固定组卷使用 "type": 2,// 类型 （1：章节；2：试题） "chapterName":
-	 * "单选题",// type==2有效 "chapterTxt": "每题2分，一共10题20分",// type==2有效 "questionId":
-	 * 1, "questionType": 1, "markType": 1, "title": "这是一道单选题的题干，简单写法", "options":
-	 * ["单选题的A选项", "单选题的B选项", "单选题的C选项", "单选题的D选项"], "markOptions": [], "score": 2,
-	 * "answers": ["B"], "scores": [], "analysis": "", }], "examRules": [ "type": 2,
-	 * "chapterName": "单选题",// type==2有效 "chapterTxt": "每题2分，一共10题20分",// type==2有效
-	 * "questionBankId": 1, "questionType": 2, "markType": 1, "markOptions": [],
-	 * "num": 10, "score": 1, "scores": [], ] "examUserIds": [2, 3], "markUserId":
-	 * 2, }
+	 ** { "id": null, // 考试ID（修改时用） "name": "考试-2023-04-01",// 考试名称 "loginType": 1,//
+	 * 登录方式（1：正常登录；2：免登录；） "paperName": "试卷-2023-04-01",// 试卷试卷名称 "genType": 1, //
+	 * 组卷方式（1：人工组卷；2：随机组卷） "passScore": 14,// 及格分数 "sxes": [2, 1],// genType == 1有效
+	 * "scoreState": 3,// 成绩查询状态（1：考试结束后；2：不公布；3：交卷后） "rankState": 1,//
+	 * 排名状态（1：公布；2：不公布） "examQuestions": [{// genType == 1有效（固定组卷） "type": 1,// 类型
+	 * （1：章节；2：试题） "chapterName": "单选题",// 章节名称 "chapterTxt": ""// 章节描述（非必填） }, {
+	 * "type": 2,// 类型 （1：章节；2：试题） 试题数据格式参考question/add接口 "questionType": 1,//
+	 * 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答） "markType": 1,// 阅卷类型（1：客观题；2：主观题） "title":
+	 * "这是一道单选题的题干，简单写法",// 题干 "score": 1,// 分数 "answers": ["B"],// 答案 "scores":
+	 * [],// 分数（非必填，默认为1分） "options": ["单选题的A选项", "单选题的B选项", "单选题的C选项",
+	 * "单选题的D选项"],// 选项 },], "examRules": [{// genType == 1有效（随机组卷） "type": 1,// 类型
+	 * （1：章节；2：试题） "chapterName": "单选题",// 章节名称 "chapterTxt": ""// 章节描述 }, { "type":
+	 * 2,// 类型 （1：章节；2：试题） "questionBankId": 5,// 题库ID "questionType": 1,//
+	 * 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答） "markType": 1,// 阅卷类型（1：客观题；2：主观题），1有效
+	 * "markOptions": [],// 阅卷选项（2：答案无顺序；3：不分大小写；) questionType ==
+	 * 3，23有效；questionType == 5,3有效 "num": 10,// 题数 "score": 1,// 分数 "scores": []//
+	 * questionType == 2有效，漏选分数 }], "userIds": [1229, 1228, 1193, 1201, 1209],//
+	 * 用户IDS "orgIds": [3, 69],// 机构IDS "makrUser": [3, 69],// 阅卷用户IDS "totalScore":
+	 * 24,// 总分 "markType": 2,// 阅卷类型（1：客观题；2：主观题） "startTime": "2023-04-01
+	 * 08:00:00",// 考试开始时间 "endTime": "2023-04-01 10:00:00",// 考试结束时间
+	 * "markStartTime": "2023-04-01 14:00:00",// 阅卷开始时间 "markEndTime": "2023-04-01
+	 * 18:00:00",// 阅卷结束时间 "limitMinute": 60 // 限制分钟（考试开始时间由用户第一次打开试卷时计时）） }
 	 */
 	@Override
 	@Caching(evict = { //
@@ -127,7 +135,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		 * 1：如果是人工组卷，且从题库抽题，试题类型等重新查一遍数据库，不要依赖前端，用于检测包含主观题等 <br/>
 		 * 2：如果是随机组卷，提前返回需要的题库，用于随机抽题
 		 */
-		Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;
+		Double processLen = (examInfo.getUserIds().size() + 5) * 1.0;
 		Map<Integer, List<Question>> questionListCache = publishHandle(examInfo);
 		progressBarService.setProgressBar(processBarId, 1.0, processLen, HttpStatus.OK.value(), "校验前数据处理完成", null);
 
@@ -143,7 +151,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		publishPaper(examInfo);
 		progressBarService.setProgressBar(processBarId, 4.0, processLen, HttpStatus.OK.value(), "生成试卷完成", null);
 
-		// 考试用户发卷
+		// 用户发卷
 		publishUser(examInfo, questionListCache, processBarId);
 	}
 
@@ -534,11 +542,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		log.info("【{}-{}】变更【{}-{}】考试开始时间，{} -> {}", curUser.getLoginName(), curUser.getName(), exam.getId(),
 				exam.getName(), DateUtil.formatDateTime(oldStartTime), DateUtil.formatDateTime(exam.getStartTime()));
 	}
-	
-	public static void main(String[] args) {
-		System.err.println(Integer.MAX_VALUE);
-		System.err.println(Long.MAX_VALUE);
-	}
 
 	private void timeValid(Integer id, Integer timeType, Integer minute) {
 		if (!ValidateUtil.isValid(id)) {
@@ -581,7 +584,21 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setState(examInfo.getState());
 		exam.setLimitMinute(examInfo.getLimitMinute());
 		exam.setMarkState(1);// 标记为未阅卷
-		exam.setUserNum(examInfo.getExamUserIds().size());
+		{
+			Set<Integer> userIds = new HashSet<>();// 合并用户
+			if (ValidateUtil.isValid(examInfo.getUserIds())) {
+				userIds.addAll(examInfo.getUserIds());
+			}
+			if (ValidateUtil.isValid(examInfo.getOrgIds())) {
+				examInfo.getOrgIds().stream().forEach(orgId -> {
+					userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1)
+							.map(User::getId).collect(Collectors.toSet()));
+				});
+			}
+			exam.setUserIds(new ArrayList<>(userIds));
+		}
+		exam.setOrgIds(examInfo.getOrgIds());
+		exam.setMarkUserIds(examInfo.getMarkUserIds());
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
 
@@ -676,11 +693,23 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
 		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
 		int curProgressNum = 1;// 当前保存进度
-		Double processLen = (examInfo.getExamUserIds().size() + 5) * 1.0;// 说明参考控制层
-		for (Integer examUserId : examInfo.getExamUserIds()) {
+
+		Set<Integer> userIds = new HashSet<>();// 合并用户
+		if (ValidateUtil.isValid(examInfo.getUserIds())) {
+			userIds.addAll(examInfo.getUserIds());
+		}
+		if (ValidateUtil.isValid(examInfo.getOrgIds())) {
+			examInfo.getOrgIds().stream().forEach(orgId -> {
+				userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1).map(User::getId)
+						.collect(Collectors.toSet()));
+			});
+		}
+
+		Double processLen = (userIds.size() + 5) * 1.0;// 说明参考控制层
+		for (Integer userId : userIds) {
 			MyExam myExam = new MyExam();// 生成我的考试信息
 			myExam.setExamId(examInfo.getId());
-			myExam.setUserId(examUserId);
+			myExam.setUserId(userId);
 			// myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
 			myExam.setState(1);// 未考试
 			myExam.setMarkState(1);// 未阅卷
@@ -701,7 +730,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					myQuestion.setMarkOptions(examQuestion.getMarkOptions());
 					myQuestion.setExamId(examQuestion.getExamId());
 					myQuestion.setQuestionId(examQuestion.getQuestionId());
-					myQuestion.setUserId(examUserId);
+					myQuestion.setUserId(userId);
 					myQuestion.setNo(i + 1);
 					myQuestion.setUpdateUserId(getCurUser().getId());
 					myQuestion.setUpdateTime(new Date());
@@ -742,7 +771,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						myQuestion.setType(examRule.getType());
 						myQuestion.setChapterName(examRule.getChapterName());
 						myQuestion.setChapterTxt(examRule.getChapterTxt());
-						myQuestion.setUserId(examUserId);
+						myQuestion.setUserId(userId);
 						myQuestion.setExamId(examInfo.getId());
 						myQuestion.setNo(no++);
 						myQuestionService.save(myQuestion);
@@ -767,7 +796,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							myQuestion.setScore(examRule.getScore());
 							myQuestion.setMarkOptions(examRule.getMarkOptions());
 							myQuestion.setQuestionId(question.getId());
-							myQuestion.setUserId(examUserId);
+							myQuestion.setUserId(userId);
 							myQuestion.setExamId(examInfo.getId());
 							myQuestion.setNo(no++); // 试题乱序无效，因为本身就是随机的
 
@@ -796,7 +825,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 
 			progressBarService.setProgressBar(processBarId, 4.0 + curProgressNum++, processLen, HttpStatus.OK.value(),
-					"生成用户-" + examUserId + "试卷完成", null);
+					"生成用户-" + userId + "试卷完成", null);
 		}
 	}
 
@@ -805,27 +834,34 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		publishValidExam(examInfo);
 		// 校验试卷信息
 		publishValidPaper(examInfo, questionListCache);
-		// 校验考试用户信息
+		// 校验用户信息
 		publishValidUser(examInfo);
 	}
 
 	private void publishValidUser(ExamInfo examInfo) {
-		if (examInfo.getLoginType() == 1 && !ValidateUtil.isValid(examInfo.getExamUserIds())) {
+		if (examInfo.getLoginType() == 1 && examInfo.getUserIds().isEmpty() && examInfo.getOrgIds().isEmpty()) {
+			throw new MyException("考试用户或机构必须要选一个");
+		}
+
+		if (examInfo.getLoginType() == 1 && !ValidateUtil.isValid(examInfo.getUserIds())) {
 			throw new MyException("最少添加一个考试用户");
 		}
 
-		if (examInfo.getLoginType() == 2 && ValidateUtil.isValid(examInfo.getExamUserIds())) {
+		if (examInfo.getLoginType() == 2 && ValidateUtil.isValid(examInfo.getUserIds())) {
 			throw new MyException("免登录考试不能添加考试用户");
 		}
 
-		if (examInfo.getExamUserIds().size() != new HashSet<Integer>(examInfo.getExamUserIds()).size()) {
+		if (examInfo.getUserIds().size() != new HashSet<Integer>(examInfo.getUserIds()).size()) {
 			throw new MyException("考试用户重复");
 		}
 
-		if (getCurUser().getType() != 0) {
+		if (getCurUser().getType() != 0) {// 验证子管理员（考试用户、阅卷用户没有权限）
 			User curUser = baseCacheService.getUser(getCurUser().getId());
-			if (!curUser.getUserIds().containsAll(examInfo.getExamUserIds())) {
+			if (!curUser.getUserIds().containsAll(examInfo.getUserIds())) {
 				throw new MyException("无用户操作权限");
+			}
+			if (!curUser.getOrgIds().containsAll(examInfo.getOrgIds())) {
+				throw new MyException("无机构操作权限");
 			}
 		}
 
@@ -834,7 +870,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("阅卷用户重复");
 			}
 			if (examInfo.getMarkType() == 1) {
-				throw new MyException("自动阅卷，无需子管理员参与");// 需要人工阅卷也不一定需要子管理员，admin就可以
+				throw new MyException("自动阅卷，无需阅卷用户参与");
 			}
 		}
 	}

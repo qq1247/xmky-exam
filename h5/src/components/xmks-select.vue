@@ -15,8 +15,9 @@
             <!-- 分页条件 -->
             <el-pagination v-model:current-page="listpage.curPage" v-model:page-size="listpage.pageSize"
                 :total="listpage.total" background layout="prev, pager, next, sizes" :page-sizes="[5, 20, 100]"
-                :pager-count="5" class="pagination" @size-change="listpage.curPage = 1; query()" @current-change="query"
-                @prev-click="query" @next-click="query" />
+                :default-page-size="props.pageSize" :pager-count="5" class="pagination"
+                @size-change="listpage.curPage = 1; query()" @current-change="query" @prev-click="query"
+                @next-click="query" />
             <!-- 工具条 -->
             <div class="toolbar">
                 <el-button v-if="multiple" type="info" link class="toolbar__btn" @click="selectAll">
@@ -56,11 +57,12 @@ const props = defineProps({
     options: { type: [Array], required: false, default: () => [] },// 用于解决回显数据时，只显示option-value的值的问题。解决方式为本地先缓存一份数据
     placeholder: { type: [String], required: false, default: '请选择' },
     searchPlaceholder: { type: [String], required: false, default: '请输入查询条件' },
+    pageSize: { type: [Number], required: false, default: 5 },
 })
 const selectedValue = ref(props.modelValue)// 单选为字符串或数字，多选为列表数据
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,// 当前第几页
-    pageSize: 5,// 每页显示多少条
+    pageSize: props.pageSize,// 每页显示多少条
     total: 0,// 总条数
     list: props.options,// 下拉选项
     searchParmValue: '' // 搜索框文本

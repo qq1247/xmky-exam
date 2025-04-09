@@ -33,7 +33,8 @@ public interface MyExamDao extends RBaseDao<MyExam> {
 								"USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "MY_EXAM.ANSWER_START_TIME",
 								"MY_EXAM.ANSWER_END_TIME", "MY_EXAM.TOTAL_SCORE", "MY_EXAM.STATE", "MY_EXAM.MARK_STATE",
 								"MY_EXAM.ANSWER_STATE", "MY_EXAM.NO", //
-								"EXAM.LIMIT_MINUTE AS EXAM_LIMIT_MINUTE", "EXAM.USER_NUM")// 用户数量（排名使用）
+								"EXAM.LIMIT_MINUTE AS EXAM_LIMIT_MINUTE", //
+								"LENGTH(EXAM.USER_IDS) - LENGTH(REPLACE(EXAM.USER_IDS, ',', '')) - 1 AS USER_NUM")// 用户数量（排名使用）
 						.like(pageIn.hasParm("examName"), "EXAM.NAME", pageIn.getParm("examName"))//
 						.eq(pageIn.hasParm("curUserId"), "MY_EXAM.USER_ID", pageIn.getParm("curUserId"))//
 						.and(pageIn.hasParm("startTime") && pageIn.hasParm("endTime"),
