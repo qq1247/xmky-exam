@@ -32,6 +32,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -130,18 +131,21 @@ public class ApiExamController extends BaseController {
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
 			progressBarService.setProgressBar(processBarId, 0.0, 1.0, HttpStatus.OK.value(), "发布开始", null);// 放在前面，可能的问题为下面的线程执行慢，没有进度数据，前端显示空
 
-			Set<Integer> userIds = new HashSet<>();// 合并用户
-			if (ValidateUtil.isValid(examInfo.getUserIds())) {
-				userIds.addAll(examInfo.getUserIds());
-			}
-			if (ValidateUtil.isValid(examInfo.getOrgIds())) {
-				examInfo.getOrgIds().stream().forEach(orgId -> {
-					userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1)
-							.map(User::getId).collect(Collectors.toSet()));
-				});
+			{
+				Set<Integer> userIds = new HashSet<>();// 合并用户
+				if (ValidateUtil.isValid(examInfo.getUserIds())) {
+					userIds.addAll(examInfo.getUserIds());
+				}
+				if (ValidateUtil.isValid(examInfo.getOrgIds())) {
+					examInfo.getOrgIds().stream().forEach(orgId -> {
+						userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1)
+								.map(User::getId).collect(Collectors.toSet()));
+					});
+				}
+				examInfo.setUserIds(new ArrayList<>(userIds));
 			}
 
-			Double processLen = (5 + userIds.size()) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+(userNum+org.userNum)交集
+			Double processLen = (5 + examInfo.getUserIds().size()) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+(userNum+org.userNum)交集
 			LoginUser loginUser = getCurUser();
 			new Thread(new Runnable() {
 				public void run() {
@@ -349,6 +353,8 @@ public class ApiExamController extends BaseController {
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
 					.addAttr("userNum", exam.getUserIds().size())//
+					.addAttr("userIds", exam.getUserIds())//
+					.addAttr("orgIds", exam.getOrgIds())//
 					.addAttr("limitMinute", exam.getLimitMinute());//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
@@ -401,6 +407,37 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("考试暂停错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 考试用户添加
+	 * 
+	 * v1.0 zhanghc 2025年4月9日下午9:21:53
+	 * 
+	 * @param id
+	 * @param orgIds
+	 * @param userIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/userAdd")
+	public PageResult userAdd(Integer id, Integer[] orgIds, Integer[] userIds) {
+		try {
+			Set<Integer> orgIdSet = CollectionUtil.toSet(orgIds);
+			Set<Integer> userIdSet = CollectionUtil.toSet(userIds);
+			orgIdSet.stream().forEach(orgId -> {
+				userIdSet.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1).map(User::getId)
+						.collect(Collectors.toSet()));
+			});
+
+			examService.userAdd(id, orgIdSet, userIdSet);
+			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("考试用户添加错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试用户添加错误：", e);
 			return PageResult.err();
 		}
 	}

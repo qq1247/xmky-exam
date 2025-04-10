@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -52,6 +53,17 @@ public interface ExamService extends BaseService<Exam> {
 	 * @return void
 	 */
 	void pause(Integer id);
+	
+	/**
+	 * 考试用户添加
+	 * 
+	 * v1.0 zhanghc 2025年4月9日下午9:21:53
+	 * @param id
+	 * @param orgIds
+	 * @param userIds
+	 * @return PageResult
+	 */
+	void userAdd(Integer id, Set<Integer> orgIds, Set<Integer> userIds);
 
 	/**
 	 * 考试列表
@@ -72,17 +84,6 @@ public interface ExamService extends BaseService<Exam> {
 	 * @param content    void
 	 */
 	void mail(Exam exam, Integer notifyType, String content);
-
-	/**
-	 * 添加用户
-	 * 
-	 * v1.0 zhanghc 2017年6月19日下午3:10:24
-	 * 
-	 * @param id
-	 * @param examUserIds 考试用户IDS
-	 * @param markUserIds 阅卷用户IDS void
-	 */
-	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
 
 	/**
 	 * 阅卷协助
@@ -113,4 +114,6 @@ public interface ExamService extends BaseService<Exam> {
 	 * @param scoreState void
 	 */
 	void rank(Integer id, Integer rankState);
+
+	
 }

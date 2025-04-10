@@ -30,7 +30,8 @@
         </div>
         <!-- 选项 -->
         <el-option v-for="option in listpage.list" :key="option[optionValue]" :label="option[optionLabel]"
-            :value="option[optionValue]" class="xmks-select__option">
+            :value="option[optionValue]" :disabled="disabledValues.includes(option[optionValue])"
+            class="xmks-select__option">
             <slot :option="option"></slot>
         </el-option>
         <!-- 无选项时显示 -->
@@ -58,6 +59,7 @@ const props = defineProps({
     placeholder: { type: [String], required: false, default: '请选择' },
     searchPlaceholder: { type: [String], required: false, default: '请输入查询条件' },
     pageSize: { type: [Number], required: false, default: 5 },
+    disabledValues: { type: [Array], required: false, default: () => [] },// 禁用选项的值
 })
 const selectedValue = ref(props.modelValue)// 单选为字符串或数字，多选为列表数据
 const listpage = reactive<Listpage>({// 分页列表

@@ -32,7 +32,12 @@ public interface UserDao extends RBaseDao<User> {
 						.eq(pageIn.hasParm("state"), "USER.STATE", pageIn.getParm("state"))//
 						.eq(pageIn.hasParm("type"), "USER.TYPE", pageIn.getParm("type"))//
 						.in(pageIn.hasParm("ids"), "USER.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))// 页面过滤
-						.in(pageIn.hasParm("_ids"), "USER.ID", pageIn.getParm("_ids", List.class))// 控制层控制子管理员只能过滤自己的考试用户
+						.in(pageIn.hasParm("_ids") && !pageIn.hasParm("_orgIds"), "USER.ID",
+								pageIn.getParm("_ids", List.class))// 控制层控制子管理员只能过滤自己的考试用户
+						.and(pageIn.hasParm("_ids") && pageIn.hasParm("_orgIds"),
+								i -> i.in("USER.ID", pageIn.getParm("_ids", List.class)).or().in("USER.ORG_ID",
+										pageIn.getParm("_orgIds", List.class)))
+
 						.eq(pageIn.hasParm("parentId"), "USER.PARENT_ID", pageIn.getParm("parentId"))//
 						.ne("USER.STATE", 0)//
 						.orderByDesc("USER.ID"));// bug：导入用户时，按时间倒序，分页错误

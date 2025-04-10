@@ -192,6 +192,40 @@
                         style="margin-bottom: 40px;">保存设置</el-button>
                 </template>
             </xmks-edit-card>
+            <xmks-edit-card title="考试用户" desc="考试未结束允许添加人员">
+                <template #card-main>
+                    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" inline label-width="100"
+                        size="large" class="form">
+                        <el-form-item label="" prop="orgIds" style="width: 100%;">
+                            <xmks-select v-model="userForm.orgIds" url="org/listpage" :params="{}"
+                                search-parm-name="name" option-label="name" option-value="id" :options="orgs"
+                                :multiple="true" clearable :page-size="100" :disabled-values="disabledOrgIds"
+                                search-placeholder="请输入机构名称进行筛选">
+                                <template #default="{ option }">
+                                    {{ option.name }} - {{ option.orgName }} {{ disabledOrgIds.includes(option.id) ?
+                                        '（不可选）' : '' }}
+                                </template>
+                            </xmks-select>
+                        </el-form-item>
+                        <el-form-item label="" prop="userIds" style="width: 100%;">
+                            <xmks-select v-model="userForm.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
+                                search-parm-name="name" option-label="name" option-value="id" :options="users"
+                                :multiple="true" clearable :page-size="100" :disabled-values="disabledUserIds"
+                                search-placeholder="请输入机构名称或用户名称进行筛选">
+                                <template #default="{ option }">
+                                    {{ option.name }} - {{ option.orgName }} {{ disabledUserIds.includes(option.id) ?
+                                        '（不可选）' : '' }}
+
+                                </template>
+                            </xmks-select>
+                        </el-form-item>
+                    </el-form>
+                </template>
+                <template #card-side>
+                    <el-button type="primary" class="form__btn" @click="userAdd"
+                        style="margin-bottom: 40px;">保存设置</el-button>
+                </template>
+            </xmks-edit-card>
             <xmks-edit-card v-if="assistForm.markType === 2" title="协助阅卷" desc="协助管理员阅卷">
                 <template #card-main>
                     <el-form ref="assistFormRef" :model="assistForm" :rules="assistFormRules" inline label-width="100"
@@ -239,7 +273,7 @@ import { type FormInstance, type FormRules } from 'element-plus'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Exam } from '@/ts/exam/exam'
-import { examAssist, examDel, examGet, examMarkUserList, examPause, examRank, examScore, examTime } from '@/api/exam/exam'
+import { examAssist, examDel, examGet, examMarkUserList, examPause, examRank, examScore, examTime, examUserAdd } from '@/api/exam/exam'
 import { useDictStore } from '@/stores/dict'
 import { useUserStore } from '@/stores/user'
 import XmksSelect from '@/components/xmks-select.vue'
@@ -247,6 +281,8 @@ import type { User } from '@/ts/base/user'
 import VueQrcode from 'vue-qrcode'
 import { parmGet } from '@/api/sys/parm'
 import { loginSysTime } from '@/api/login'
+import { userListpage } from '@/api/base/user'
+import { orgListpage } from '@/api/base/org'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -338,6 +374,21 @@ const mForm = reactive({
     uri: '',
 })
 
+
+const users = ref<any[]>([]) // 考试用户
+const disabledUserIds = ref<number[]>([]) // 禁用用户IDS
+const orgs = ref<any[]>([]) // 机构
+const disabledOrgIds = ref<number[]>([]) // 禁用机构IDS
+const userFormRef = ref<FormInstance>()// 表单引用
+const userForm = reactive({// 表单
+    id: null, // ID
+    userIds: [],// 考试用户IDS
+    orgIds: [],// 机构IDS
+})
+const userFormRules = reactive<FormRules>({// 表单校验规则
+
+})
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     load()
@@ -395,6 +446,49 @@ async function load() {
 
     const { data: { data: data4 } } = await loginSysTime({})
     curTime.value = data4
+
+    userForm.id = data.id
+    userForm.userIds = data.userIds
+    userForm.orgIds = data.orgIds
+
+    if (userForm.userIds.length) {
+        let curPage = 1
+        const pageSize = 100
+        while (true) {
+            const { data: { data: data5 } } = await userListpage({
+                ids: userForm.userIds.join(),
+                curPage: curPage++,
+                pageSize: pageSize,
+            })
+            users.value.push(...data5.list)
+            users.value.forEach((user: any) => {
+                disabledUserIds.value.push(user.id)
+            })
+
+            if (users.value.length >= data5.total) {// 分批次取出
+                break
+            }
+        }
+    }
+    if (userForm.orgIds.length) {
+        let curPage = 1
+        const pageSize = 100
+        while (true) {
+            const { data: { data: data5 } } = await orgListpage({
+                ids: userForm.orgIds.join(),
+                curPage: curPage++,
+                pageSize: pageSize,
+            })
+
+            orgs.value.push(...data5.list)
+            orgs.value.forEach((org: any) => {
+                disabledOrgIds.value.push(org.id)
+            })
+            if (orgs.value.length >= data5.total) {// 分批次取出
+                break
+            }
+        }
+    }
 }
 
 // 暂停
@@ -473,6 +567,23 @@ async function rank() {
     router.push("/exam-list")
 }
 
+// 用户添加
+async function userAdd() {
+    // 数据校验
+    try {
+        await userFormRef.value?.validate()
+    } catch (e) {
+        return
+    }
+
+    // 用户添加
+    const { data: { code } } = await examUserAdd({ ...userForm })
+    if (code !== 200) {
+        return
+    }
+
+    router.push("/exam-list")
+}
 // 协助阅卷
 async function assist() {
     // 数据校验

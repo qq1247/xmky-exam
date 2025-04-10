@@ -23,8 +23,6 @@
                                 </template>
                             </xmks-select>
                         </el-form-item>
-                    </el-form>
-                    <el-form v-if="form.loginType === 1" ref="formRef" :model="form" :rules="formRules" label-width="0">
                         <el-form-item label="" prop="userIds">
                             <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
                                 search-parm-name="name" option-label="name" option-value="id" :options="users"
@@ -66,9 +64,7 @@ const userStore = useUserStore()
 const formRef = ref<FormInstance>()// 表单引用
 const form = useExamStore()
 const formRules = reactive<FormRules>({// 表单校验规则
-    userIds: [
-        { required: true, message: '请选择考试用户', trigger: 'blur' },
-    ]
+
 })
 
 const users = ref<any[]>([]) // 考试用户
@@ -117,13 +113,20 @@ function toUserAdd() {
 
 // 下一步
 async function next() {
-    try {
-        await formRef.value?.validate()
-        return true
-    } catch (e) {
-        ElMessage.error(`部分信息填写错误，请检查`)
+    if (form.userIds.length === 0 && form.orgIds.length === 0) {
+        ElMessage.error(`请选择机构或用户`)
         return false
     }
+
+    return true
+
+    // try {
+    //     await formRef.value?.validate()
+    //     return true
+    // } catch (e) {
+    //     ElMessage.error(`部分信息填写错误，请检查`)
+    //     return false
+    // }
 }
 
 </script>

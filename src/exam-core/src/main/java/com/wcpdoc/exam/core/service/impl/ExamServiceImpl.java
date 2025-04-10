@@ -43,8 +43,8 @@ import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionBank;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 import com.wcpdoc.exam.core.entity.ex.ExamQuestionEx;
 import com.wcpdoc.exam.core.service.ExamCacheService;
@@ -54,8 +54,8 @@ import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
-import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
+import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
@@ -208,6 +208,155 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
+	public void userAdd(Integer id, Set<Integer> orgIds, Set<Integer> userIds) {
+		// 数据校验
+		userAddValid(id, orgIds, userIds);
+
+		// 更新考试信息
+		Exam exam = examCacheService.getExam(id);
+		Set<Integer> userIdsOld = new HashSet<>(exam.getUserIds());
+		exam.setUserIds(new ArrayList<>(userIds));
+		exam.setOrgIds(new ArrayList<>(orgIds));
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		updateById(exam);
+
+		// 找到需要添加的用户（只添加多出来的用户，因为如果减员会造成成绩不合格，删掉重新考试的bug。页面也做了限制，已添加的用户不可选）
+		userIds.removeAll(userIdsOld);
+
+		// 生成考试用户试卷
+		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
+		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
+
+		for (Integer userId : userIds) {
+			MyExam myExam = new MyExam();// 生成我的考试信息
+			myExam.setExamId(id);
+			myExam.setUserId(userId);
+			// myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
+			myExam.setState(1);// 未考试
+			myExam.setMarkState(1);// 未阅卷
+			myExam.setUpdateTime(new Date());
+			myExam.setUpdateUserId(getCurUser().getId());
+			myExamService.save(myExam);
+
+			if (exam.getGenType() == 1) {// 如果是人工组卷，直接生成我的试卷
+				List<MyQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
+				List<ExamQuestion> examQuestionList = examQuestionService.getList(id);
+				for (int i = 0; i < examQuestionList.size(); i++) {
+					ExamQuestion examQuestion = examQuestionList.get(i);
+					MyQuestion myQuestion = new MyQuestion();
+					myQuestion.setChapterName(examQuestion.getChapterName());
+					myQuestion.setChapterTxt(examQuestion.getChapterTxt());
+					myQuestion.setType(examQuestion.getType());
+					myQuestion.setScore(examQuestion.getScore());
+					myQuestion.setScores(examQuestion.getScores());
+					myQuestion.setMarkOptions(examQuestion.getMarkOptions());
+					myQuestion.setExamId(examQuestion.getExamId());
+					myQuestion.setQuestionId(examQuestion.getQuestionId());
+					myQuestion.setUserId(userId);
+					myQuestion.setNo(i + 1);
+					myQuestion.setUpdateUserId(getCurUser().getId());
+					myQuestion.setUpdateTime(new Date());
+					myQuestionService.save(myQuestion);
+
+					if (ExamUtil.hasQuestionRand(exam)) {// 如果是试题乱序（章节不能乱序；试题不能跨章节乱序）
+						if (ExamUtil.hasQuestion(myQuestion)) {// 1章节；2试题；3试题；4试题；5章节；6试题；7试题；8：试题
+							shuffleCacheList.add(myQuestion); // 2试题；3试题；4试题；
+						}
+						if (ExamUtil.hasChapter(myQuestion) || i >= examQuestionList.size() - 1) {// 5章节；（如果是章节或最后一道题，乱序已经缓存的试题，前面不要加else，最后一道题的情况不处理）
+							Collections.shuffle(shuffleCacheList);// 3试题；2试题；4试题；
+							Integer maxNo = ExamUtil.hasChapter(myQuestion) ? myQuestion.getNo() - 1
+									: myQuestion.getNo();// 5章节
+							for (MyQuestion shuffleCache : shuffleCacheList) {
+								shuffleCache.setNo(maxNo--);
+								myQuestionService.updateById(myQuestion);// 1章节；4试题；2试题；3试题；
+							}
+							shuffleCacheList.clear();
+						}
+					}
+					if (ExamUtil.hasOptionRand(exam)) {// 如果是选项乱序
+						if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
+							questionOptionCache.put(myQuestion.getQuestionId(),
+									examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
+						}
+						List<QuestionOption> questionOptionList = questionOptionCache.get(myQuestion.getQuestionId());// A,B,C,D
+						myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
+						myQuestionService.updateById(myQuestion);
+					}
+				}
+			} else if (exam.getGenType() == 2) {// 如果是随机组卷，按抽题规则生成我的试卷（校验里判断过规则是否满足，不用在判断）
+				List<ExamRule> examRuleList = examRuleService.getList(id);
+				Set<Question> questionOfUsed = new HashSet<>();
+				Map<Integer, List<Question>> questionListCache = new HashMap<>();
+				examRuleList.stream()//
+						.map(ExamRule::getQuestionBankId)// 提取需要的题库
+						.collect(Collectors.toSet()).stream()// 去重
+						.forEach(questionBankId -> questionListCache.put(questionBankId,
+								questionService.getList(questionBankId)));// 把题库缓存起来，用于模拟随机抽题
+				int no = 1;
+				for (int i = 0; i < examRuleList.size(); i++) {
+					ExamRule examRule = examRuleList.get(i);
+					if (examRule.getType() == 1) {// 如果是章节
+						MyQuestion myQuestion = new MyQuestion();
+						myQuestion.setType(examRule.getType());
+						myQuestion.setChapterName(examRule.getChapterName());
+						myQuestion.setChapterTxt(examRule.getChapterTxt());
+						myQuestion.setUserId(userId);
+						myQuestion.setExamId(exam.getId());
+						myQuestion.setNo(no++);
+						myQuestionService.save(myQuestion);
+					} else {// 如果是规则
+						List<Question> questionList = questionListCache.get(examRule.getQuestionBankId());
+						Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
+						Integer ruleRemainNum = examRule.getNum();// 该规则试题数量，找到一个数量减一
+						for (Question question : questionList) {
+							if (ruleRemainNum <= 0) {// 满足规则，处理下一个规则
+								break;
+							}
+							if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+								continue;
+							}
+							if (examRule.getQuestionType() != question.getType() // 当前试题不符合当前抽题规则，继续找下一个
+									|| examRule.getMarkType() != question.getMarkType()) {
+								continue;
+							}
+
+							MyQuestion myQuestion = new MyQuestion();
+							myQuestion.setType(examRule.getType());
+							myQuestion.setScore(examRule.getScore());
+							myQuestion.setMarkOptions(examRule.getMarkOptions());
+							myQuestion.setQuestionId(question.getId());
+							myQuestion.setUserId(userId);
+							myQuestion.setExamId(exam.getId());
+							myQuestion.setNo(no++); // 试题乱序无效，因为本身就是随机的
+
+							if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
+								myQuestion.setScores(Stream.of(examRule.getScores()).collect(Collectors.toList()));
+							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
+									&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
+								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
+									questionAnswerCache.put(myQuestion.getQuestionId(),
+											examCacheService.getQuestionAnswerList(myQuestion.getQuestionId()));
+								}
+								List<QuestionAnswer> questionAnswerList = questionAnswerCache
+										.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
+								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
+							}
+
+							myQuestion.setUpdateTime(new Date());
+							myQuestion.setUpdateUserId(getCurUser().getId());
+							myQuestionService.save(myQuestion);
+
+							questionOfUsed.add(question);
+							ruleRemainNum--;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Override
 	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
 	public void score(Integer id, Integer scoreState) {
 		// 数据校验
@@ -229,11 +378,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		Exam exam = examCacheService.getExam(id);
 		exam.setRankState(rankState);
 		updateById(exam);
-	}
-
-	@Override
-	public void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
-
 	}
 
 	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
@@ -584,19 +728,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setState(examInfo.getState());
 		exam.setLimitMinute(examInfo.getLimitMinute());
 		exam.setMarkState(1);// 标记为未阅卷
-		{
-			Set<Integer> userIds = new HashSet<>();// 合并用户
-			if (ValidateUtil.isValid(examInfo.getUserIds())) {
-				userIds.addAll(examInfo.getUserIds());
-			}
-			if (ValidateUtil.isValid(examInfo.getOrgIds())) {
-				examInfo.getOrgIds().stream().forEach(orgId -> {
-					userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1)
-							.map(User::getId).collect(Collectors.toSet()));
-				});
-			}
-			exam.setUserIds(new ArrayList<>(userIds));
-		}
+		exam.setUserIds(examInfo.getUserIds());
 		exam.setOrgIds(examInfo.getOrgIds());
 		exam.setMarkUserIds(examInfo.getMarkUserIds());
 		exam.setUpdateUserId(getCurUser().getId());
@@ -694,19 +826,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
 		int curProgressNum = 1;// 当前保存进度
 
-		Set<Integer> userIds = new HashSet<>();// 合并用户
-		if (ValidateUtil.isValid(examInfo.getUserIds())) {
-			userIds.addAll(examInfo.getUserIds());
-		}
-		if (ValidateUtil.isValid(examInfo.getOrgIds())) {
-			examInfo.getOrgIds().stream().forEach(orgId -> {
-				userIds.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1).map(User::getId)
-						.collect(Collectors.toSet()));
-			});
-		}
-
-		Double processLen = (userIds.size() + 5) * 1.0;// 说明参考控制层
-		for (Integer userId : userIds) {
+		Double processLen = (examInfo.getUserIds().size() + 5) * 1.0;// 说明参考控制层
+		for (Integer userId : examInfo.getUserIds()) {
 			MyExam myExam = new MyExam();// 生成我的考试信息
 			myExam.setExamId(examInfo.getId());
 			myExam.setUserId(userId);
@@ -857,9 +978,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 		if (getCurUser().getType() != 0) {// 验证子管理员（考试用户、阅卷用户没有权限）
 			User curUser = baseCacheService.getUser(getCurUser().getId());
-			if (!curUser.getUserIds().containsAll(examInfo.getUserIds())) {
-				throw new MyException("无用户操作权限");
-			}
+			examInfo.getUserIds().forEach(userId -> {// 控制层把机构下的用户合并到了userIds
+				User user = baseCacheService.getUser(userId);
+				if (!curUser.getUserIds().contains(user.getId()) && !curUser.getOrgIds().contains(user.getOrgId())) {
+					throw new MyException("无用户操作权限");
+				}
+			});
+
 			if (!curUser.getOrgIds().containsAll(examInfo.getOrgIds())) {
 				throw new MyException("无机构操作权限");
 			}
@@ -1368,6 +1493,34 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //				throw new MyException("阅卷已结束");
 //			}
 //		}
+	}
+
+	private void userAddValid(Integer id, Set<Integer> orgIds, Set<Integer> userIds) {
+		Exam exam = examCacheService.getExam(id);
+		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
+		}
+		if (exam.getState() == 0) {
+			throw new MyException("已删除");
+		}
+
+		if (exam.getMarkState() >= 2) {// 只要考试没结束就可以添加
+			throw new MyException("考试已结束");
+		}
+
+		if (getCurUser().getType() != 0) {// 验证子管理员（考试用户、阅卷用户没有权限）
+			User curUser = baseCacheService.getUser(getCurUser().getId());
+			userIds.forEach(userId -> {// 控制层把机构下的用户合并到了userIds
+				User user = baseCacheService.getUser(userId);
+				if (!curUser.getUserIds().contains(user.getId()) && !curUser.getOrgIds().contains(user.getOrgId())) {
+					throw new MyException("无用户操作权限");
+				}
+			});
+
+			if (!curUser.getOrgIds().containsAll(orgIds)) {
+				throw new MyException("无机构操作权限");
+			}
+		}
 	}
 
 	private void scoreValid(Integer id) {
