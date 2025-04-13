@@ -28,21 +28,31 @@
             </div>
         </div>
         <!-- 试卷样式 -->
-        <div v-else-if="display === 'paper'" class="paper">
+        <div v-else-if="display === 'paper'" class="question">
             <!-- 题干 -->
-            <div class="paper-title">
-                <span class="paper-title__pre-txt">
+            <div class="question__title">
+                <span class="question__title-pre">
                     <slot name="title-pre"></slot>
                 </span>
                 <xmks-question-title :type="type" :title="title" :answers="answers" :user-answers="userAnswers"
                     :editable="editable" :user-answer-show="userAnswerShow" :answerShow="answerShow" :score="score"
                     :user-score="userScore" @change="(value: string[]) => emit('change', value)"></xmks-question-title>
             </div>
+            <div v-if="imgIds.length" class="question__img-group">
+                <photo-provider :default-backdrop-opacity="0.6">
+                    <photo-consumer v-for="(imgId, index) in imgIds" :key="index" :src="`${downloadUrl}?id=${imgId}`">
+                        <div class="question_img-inner">
+                            <el-image :src="`${downloadUrl}?id=${imgId}`" fit="contain" />
+                            <span class="question_img-desc">图{{ toChinaNum(index + 1) }}</span>
+                        </div>
+                    </photo-consumer>
+                </photo-provider>
+            </div>
             <!-- 单选题选项 -->
             <el-radio-group v-if="type === 1"
                 :modelValue="userAnswerShow ? (userAnswers[0] || '') : (answerShow ? (answers[0] || '') : '')"
                 @change="(value: string) => emit('change', [value])" :disabled="!editable"
-                class="question__single-select__wrap">
+                class="question__single-select-group">
                 <el-radio v-for="(option, index) in options" :key="index" :value="toLetter(index)"
                     class="question__single-select" :class="{
                         'question__single-select--succ': isCorrectSelect(toLetter(index)),
@@ -55,7 +65,7 @@
             <el-checkbox-group v-else-if="type === 2"
                 :modelValue="userAnswerShow ? userAnswers : (answerShow ? answers : [])"
                 @change="(value: string[]) => emit('change', value)" :disabled="!editable"
-                class="question__multiple-select__wrap">
+                class="question__multiple-select-group">
                 <el-checkbox v-for="(option, index) in options" :key="index" :value="`${toLetter(index)}`"
                     class="question__multiple-select" :class="{
                         'question__multiple-select--succ': isCorrectSelect(toLetter(index)),
@@ -69,7 +79,7 @@
             <el-radio-group v-else-if="type === 4"
                 :modelValue="userAnswerShow ? (userAnswers[0] || '') : (answerShow ? (answers[0] || '') : '')"
                 @change="(value: string) => emit('change', [value])" :disabled="!editable"
-                class="question__single-select__wrap">
+                class="question__single-select-group">
                 <el-radio v-for="(option, index) in ['对', '错']" :key="index" :value="option"
                     class="question__single-select" :class="{
                         'question__single-select--succ': isCorrectSelect(option),
@@ -106,6 +116,7 @@ import { useDictStore } from '@/stores/dict'
 import type { CardBtn } from '@/ts/common/card-btn'
 import { toChinaNum, toLetter } from '@/util/numberUtil'
 import { escape2Html } from '@/util/htmlUtil'
+import http from '@/request'
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{
@@ -115,6 +126,7 @@ const emit = defineEmits<{
 const props = withDefaults(defineProps<{
     type: number // 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）
     title: string // 题干
+    imgIds?: number[] // 图片附件IDS
     options?: string[] // 试题选项
     answers?: string[] // 标准答案
     markType: number // 阅卷类型（1：客观题；2：主观题）
@@ -133,6 +145,7 @@ const props = withDefaults(defineProps<{
 }>(), {
     editable: false,
     display: 'paper',
+    imgIds: () => [],
     answers: () => [],
     userAnswers: () => [],
     options: () => [],
@@ -144,6 +157,7 @@ const props = withDefaults(defineProps<{
 
 const dictStore = useDictStore()// 字典缓存
 const userAnswers = ref(props.userAnswers) // 用户答案
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 
 /************************计算属性相关*************************/
 const qaAnswer = computed(() => {// 标准问答答案
@@ -321,23 +335,54 @@ watch(() => props.userAnswers, () => {
         }
     }
 
-    :deep(.paper) {
+    :deep(.question) {
         border-bottom: 1px dashed #E5E5E5;
         padding-bottom: 10px;
         margin-top: 10px;
 
-        .paper-title {
+        .question__title {
             display: flex;
             align-items: flex-start;
 
-            .paper-title__pre-txt {
+            .question__title-pre {
                 font-size: 14px;
                 color: #303133;
                 line-height: 28px;
             }
         }
 
-        .question__single-select__wrap {
+        .question__img-group {
+            margin-bottom: 8px;
+
+            :deep(.PhotoSlider__Backdrop) {
+                opacity: 0.6;
+            }
+
+            .el-image__inner {
+                background-color: #fff;
+                border: 1px solid #dcdfe6;
+                border-radius: 6px;
+                height: 148px;
+                width: 148px;
+                margin: 0 8px 4px 0;
+                overflow: hidden;
+                padding: 0px;
+
+            }
+
+            .question_img-inner {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .question_img-desc {
+                font-size: 14px;
+                color: #000000;
+            }
+        }
+
+        .question__single-select-group {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -367,7 +412,7 @@ watch(() => props.userAnswers, () => {
             }
         }
 
-        .question__multiple-select__wrap {
+        .question__multiple-select-group {
             display: flex;
             flex-direction: column;
             align-items: flex-start;

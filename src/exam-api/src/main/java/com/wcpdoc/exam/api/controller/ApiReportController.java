@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +39,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.ex.PaperPart;
@@ -304,7 +306,7 @@ public class ApiReportController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/paper/exportPDF")
-	public void paper(Integer examId, Integer userId) {
+	public void paperExportPDF(Integer examId, Integer userId) {
 		try {
 			// 数据校验
 			MyExam myExam = examCacheService.getMyExam(examId, userId);
@@ -354,6 +356,8 @@ public class ApiReportController extends BaseController {
 			data.put("exam", exam);
 			data.put("myExam", myExam);
 			data.put("paperPartList", paperPartList);
+			data.put("host", String.format("http://127.0.0.1:%s",
+					SpringUtil.getBean(Environment.class).getProperty("server.port", String.class)));
 
 			File tempDir = fileService.createTempDirWithYMD();
 			String fileName = UUID.randomUUID().toString();
@@ -465,10 +469,8 @@ public class ApiReportController extends BaseController {
 
 					if (data.get("myExamStartMarkime") != null && data.get("myExamEndMarkime") != null) {
 						data.put("answerTime", DateUtil.diffMinute(
-								Date.from(
-										((LocalDateTime) data.get("myExamStartMarkime")).toInstant(ZoneOffset.UTC)),
-								Date.from(((LocalDateTime) data.get("myExamEndMarkime"))
-										.toInstant(ZoneOffset.UTC))));
+								Date.from(((LocalDateTime) data.get("myExamStartMarkime")).toInstant(ZoneOffset.UTC)),
+								Date.from(((LocalDateTime) data.get("myExamEndMarkime")).toInstant(ZoneOffset.UTC))));
 					} else {
 						data.put("markTime", "-");
 					}

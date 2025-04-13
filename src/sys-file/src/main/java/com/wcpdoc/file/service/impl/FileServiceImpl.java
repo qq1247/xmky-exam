@@ -130,6 +130,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		file.setIp(request.getRemoteHost());
 		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
+		updateById(file);
 
 		// 移动临时附件到附件目录
 		java.io.File destDir = new java.io.File(String.format("%s%s", getUploadDir().getAbsolutePath(), file.getPath()))
@@ -222,6 +223,16 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new MyException("参数错误：id");
 		}
 
+		// 复制文件
+		java.io.File sourceFile = new java.io.File(String.format("%s%s", getUploadDir().getAbsolutePath(), fileOld.getPath()));
+		java.io.File destFile = new java.io.File(String.format("%s%s%s", sourceFile.getAbsoluteFile().getParent(), java.io.File.separator, UUID.randomUUID().toString()));
+		try {
+			FileUtils.copyFile(sourceFile, destFile);
+		} catch (Exception e) {
+			log.error("拷贝附件失败：{} 到 {}", sourceFile.getAbsolutePath(), destFile.getAbsolutePath());
+			throw new MyException("拷贝附件失败");
+		}
+
 		// 保存记录
 		File fileNew = new File();
 		try {
@@ -230,29 +241,13 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			log.error(e.getMessage());
 			throw new MyException("拷贝附件错误");
 		}
-		java.io.File tempFile = new java.io.File(
-				String.format("%s%s", getUploadDir().getAbsolutePath(), fileOld.getPath()));
-		Date curTime = new Date();
-		String fileId = curTime.getTime() + "";
-		String timeStr = DateUtil.formatDateTime(curTime);
-		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4),
-				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
-		fileNew.setState(1);
-		fileNew.setPath(String.format("%s%s%s", ymdPath, java.io.File.separator, fileId));
+		
+		fileNew.setId(null);
+		fileNew.setPath(destFile.getAbsolutePath().substring(getUploadDir().getAbsolutePath().length()));
 		fileNew.setIp(request.getRemoteHost());
 		fileNew.setUpdateUserId(getCurUser().getId());
 		fileNew.setUpdateTime(new Date());
 		save(fileNew);
-
-		// 复制文件
-		java.io.File destDir = new java.io.File(
-				String.format("%s%s", getUploadDir().getAbsolutePath(), fileNew.getPath()));
-		try {
-			FileUtils.copyFile(tempFile, destDir);
-		} catch (Exception e) {
-			log.error("拷贝附件失败：{} 到 {}", tempFile.getAbsolutePath(), destDir.getAbsolutePath());
-			throw new MyException("拷贝附件失败");
-		}
 
 		return fileNew.getId();
 	}

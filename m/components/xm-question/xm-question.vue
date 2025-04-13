@@ -22,6 +22,12 @@
 			</template>
 			<slot name="title-post"></slot>
 		</view>
+		<view class="question__img-group">
+			<view  v-for="(imgId, index) in imgIds" :key="index" class="question__img-inner">
+				<image :src="`${host}/file/download?id=${imgId}`" mode="aspectFit" view  @click="preview(index)" class="question__img"></image>
+				<text>图{{ toChinaNum(index + 1) }}</text>
+			</view>
+		</view>
 		<!-- 单选题选项 -->
 		<radio-group
 			v-if="type === 1"
@@ -154,12 +160,7 @@
 				<view class="question-analysis__title-icon1"></view>
 				<text class="question-analysis__title">解析</text>
 			</view>
-			<!-- <text class="question-analysis__content">{{ analysis || '无' }}</text> -->
-			<text class="question-analysis__content">
-				各民族在政治、经济、文化艺术、语言文字、 风俗习惯、心理素质等方面的特点。在长期的 历史发展中形成，并随着社会的发展，自然环 各民族在政治、经济、文化艺术、语言文字、
-				风俗习惯、心理素质等方面的特点。在长期的 历史发展中形成，并随着社会的发展，自然环 各民族在政治、经济、文化艺术、语言文字、 风俗习惯、心理素质等方面的特点。在长期的
-				历史发展中形成，并随着社会的发展，自然环 各民族在政治、经济、文化艺术、语言文字、 风俗习惯、心理素质等方面的特点。在长期的 历史发展中形成，并随着社会的发展，自然环
-			</text>
+			<text class="question-analysis__content">{{ analysis || '无' }}</text>
 		</view>
 	</view>
 </template>
@@ -168,6 +169,7 @@
 import { computed, ref, watch } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { Title } from '@/ts/question.d';
+import { toChinaNum, toLetter } from '@/util/numberUtil'
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{
@@ -179,6 +181,7 @@ const props = withDefaults(
 	defineProps<{
 		modelValue?: string[]; //用户答案
 		title: string; // 题干
+		imgIds?: number[]; // 图片IDS
 		options?: string[]; // 试题选项
 		type: number; // 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）
 		markType: number; // 阅卷方式（1：客观题；2：主观题；
@@ -193,6 +196,7 @@ const props = withDefaults(
 	{
 		modelValue: () => [],
 		title: '',
+		imgIds: () => [],
 		type: 1,
 		markType: 1,
 		score: 0,
@@ -206,6 +210,7 @@ const props = withDefaults(
 
 const judges = ['对', '错']; // 判断题使用
 const userAnswers = ref(escape2Html(props.modelValue)); // 用户答案
+const host = ref(uni.getStorageSync('BASE_URL'));
 
 /************************组件生命周期相关*********************/
 onLoad(async () => {
@@ -326,6 +331,15 @@ function escape2Html(txt: string | string[]) {
 
 	return '';
 }
+
+// 预览图片
+function preview(index: number) {
+	let urls = props.imgIds.map(imgId => `${host.value}/file/download?id=${imgId}`)
+	uni.previewImage({
+		current: index,
+		urls: urls
+	})
+}
 </script>
 
 <style lang="scss" scoped>
@@ -367,6 +381,24 @@ function escape2Html(txt: string | string[]) {
 			}
 			.question-title__score--err {
 				color: #e43d33;
+			}
+		}
+	}
+	.question__img-group {
+		display: flex;
+		
+		.question__img-inner {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			.question__img {
+				display: inline-block;
+				height: 140rpx;
+				width: 140rpx;
+				background-color: #fff;
+				border: 1px solid #dcdfe6;
+				border-radius: 6px;
+				margin-left: 10rpx;
 			}
 		}
 	}

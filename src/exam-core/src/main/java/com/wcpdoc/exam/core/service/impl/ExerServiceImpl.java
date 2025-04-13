@@ -171,11 +171,12 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		}
 		if (getCurUser().getType() != 0) {
 			User curUser = baseCacheService.getUser(getCurUser().getId());
-			List<Integer> haveUsers = curUser.getUserIds();
-			List<Integer> exerUsers = exer.getUserIds();
-			if (!haveUsers.containsAll(exerUsers)) {// 只能练习自己的考试用户
-				throw new MyException("无操作权限");
-			}
+			exer.getUserIds().forEach(userId -> {
+				User user = baseCacheService.getUser(userId);
+				if (!curUser.getUserIds().contains(user.getId()) && !curUser.getOrgIds().contains(user.getOrgId())) {
+					throw new MyException("无用户操作权限");
+				}
+			});
 		}
 
 		List<Exer> exerList = exerDao.getList(exer.getQuestionBankId());

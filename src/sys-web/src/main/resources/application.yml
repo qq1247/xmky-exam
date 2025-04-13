@@ -34,8 +34,9 @@ token:
 shiro-filter:
   urls: 
     ? "/api/login/**": anon
+    ? /api/file/download: anon
   
-    ? /api/file/download: jwt
+    ? /api/file/upload: jwt
     ? /api/dict/indexList: jwt
     ? /api/bulletin/listpage: jwt
     ? /api/bulletin/get: jwt

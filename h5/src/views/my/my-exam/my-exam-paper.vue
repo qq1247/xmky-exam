@@ -81,13 +81,14 @@
                             </span>
                         </div>
                         <xmks-question v-else :id="`q${index}`" :type="examQuestion.questionType as number"
-                            :title="examQuestion.title as string" :options="examQuestion.options"
-                            :answers="examQuestion.answers" :markType="examQuestion.markType as number"
-                            :score="examQuestion.score as number" :scores="examQuestion.scores"
-                            :analysis="examQuestion.analysis" :userAnswers="examQuestion.userAnswers"
-                            :userScore="examQuestion.userScore" :answer-show="toolbars.answerShow"
-                            :user-answer-show="true" :analysisShow="toolbars.analysisShow" :display="'paper'"
-                            :editable="examing" class="paper-question"
+                            :title="examQuestion.title as string" :img-ids="examQuestion.imgFileIds"
+                            :options="examQuestion.options" :answers="examQuestion.answers"
+                            :markType="examQuestion.markType as number" :score="examQuestion.score as number"
+                            :scores="examQuestion.scores" :analysis="examQuestion.analysis"
+                            :userAnswers="examQuestion.userAnswers" :userScore="examQuestion.userScore"
+                            :answer-show="toolbars.answerShow" :user-answer-show="true"
+                            :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="examing"
+                            class="paper-question"
                             @change="(answers: string[]) => { examQuestion.userAnswers = answers; answerUpdate(examQuestion, answers) }">
                             <template #title-pre>{{ examQuestion.no }}、</template>
                         </xmks-question>
@@ -274,7 +275,7 @@ async function finish() {
     if (exam.scoreState === 2) {
         load.text = `考试已结束`
         await delay(2000)
-        console.log(`考试已结束`)
+        // console.log(`考试已结束`)
         router.push('/home')
         return
     }
@@ -292,7 +293,7 @@ async function finish() {
             if (i >= 5) {
                 load.text = `查询失败，请稍后再次查询`
                 await delay(1000)
-                console.log(`查询失败，请稍后再次查询`)
+                // console.log(`查询失败，请稍后再次查询`)
                 router.push('/home')
                 return
             }
@@ -303,7 +304,7 @@ async function finish() {
             if (myExam.markState as number === 3) { // 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）
                 load.text = `考试已结束`
                 await delay(1000)
-                console.log(`考试已结束`)
+                // console.log(`考试已结束`)
                 router.push(`/my-exam/read/${route.params.examId}`)
                 return
             }
@@ -319,7 +320,7 @@ async function finish() {
     if (exam.scoreState === 1 && remainSecond > 3) {
         load.text = `整场考试未结束，请于${exam.endTime}后查询`
         await delay(1000)
-        console.log(`整场考试未结束，请于${exam.endTime}后查询`)
+        // console.log(`整场考试未结束，请于${exam.endTime}后查询`)
         router.push('/home')
         return
     }
@@ -331,7 +332,7 @@ async function finish() {
             if (i >= 5) {
                 load.text = `查询失败，请稍后再次查询`
                 await delay(1000)
-                console.log('查询失败，请稍后再次查询')
+                // console.log('查询失败，请稍后再次查询')
                 router.push('/home')
                 return
             }
@@ -342,7 +343,7 @@ async function finish() {
             if (myExam.markState as number >= 2) { // 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）
                 load.text = `考试已结束`
                 await delay(1000)
-                console.log('如果考试成绩是考试结束后公布，并且在接近整场考试结束时交卷，查询成绩')
+                // console.log('如果考试成绩是考试结束后公布，并且在接近整场考试结束时交卷，查询成绩')
                 router.push(`/my-exam/read/${route.params.examId}`)
                 return
             }

@@ -209,6 +209,7 @@ public class ApiExamController extends BaseController {
 								examQuestion.put("questionType", _question.getType());
 								examQuestion.put("markType", _question.getMarkType());
 								examQuestion.put("title", _question.getTitle());
+								examQuestion.put("imgFileIds", _question.getImgFileIds());
 								examQuestion.put("markOptions", _examQuestion.getMarkOptions());
 								examQuestion.put("score", _examQuestion.getScore());
 								examQuestion.put("scores", _examQuestion.getScores());

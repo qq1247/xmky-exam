@@ -143,11 +143,11 @@
                                 </span>
                             </div>
                             <xmks-question v-else :id="`q${index}`" :type="examQuestion.questionType as number"
-                                :title="examQuestion.title as string" :options="examQuestion.options"
-                                :answers="examQuestion.answers" :markType="examQuestion.markType as number"
-                                :score="examQuestion.score as number" :scores="examQuestion.scores"
-                                :analysis="examQuestion.analysis" :userAnswers="[]" :userScore="0"
-                                :answer-show="toolbars.answerShow" :user-answer-show="false"
+                                :title="examQuestion.title as string" :img-ids="examQuestion.imgFileIds"
+                                :options="examQuestion.options" :answers="examQuestion.answers"
+                                :markType="examQuestion.markType as number" :score="examQuestion.score as number"
+                                :scores="examQuestion.scores" :analysis="examQuestion.analysis" :userAnswers="[]"
+                                :userScore="0" :answer-show="toolbars.answerShow" :user-answer-show="false"
                                 :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="false"
                                 class="paper-question">
                                 <template #title-pre>{{ examQuestion.no }}、</template>

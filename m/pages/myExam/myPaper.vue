@@ -37,6 +37,7 @@
 							:type="examQuestion.questionType"
 							:markType="examQuestion.markType"
 							:title="examQuestion.title"
+							:imgIds="examQuestion.imgFileIds"
 							:score="examQuestion.score"
 							:answers="examQuestion.answers"
 							:userScore="examQuestion.userScore"

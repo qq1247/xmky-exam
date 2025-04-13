@@ -142,6 +142,7 @@ public class ApiMyExerController extends BaseController {
 			questionMap.put("type", question.getType());
 			questionMap.put("markType", question.getMarkType());
 			questionMap.put("title", question.getTitle());
+			questionMap.put("imgFileIds", question.getImgFileIds());
 			questionMap.put("markOptions", question.getMarkOptions());
 			questionMap.put("score", question.getScore());
 			questionMap.put("analysis", question.getAnalysis());
@@ -256,6 +257,7 @@ public class ApiMyExerController extends BaseController {
 						questionMap.put("type", question.getType());
 						questionMap.put("markType", question.getMarkType());
 						questionMap.put("title", question.getTitle());
+						questionMap.put("imgFileIds", question.getImgFileIds());
 						questionMap.put("markOptions", question.getMarkOptions());
 						questionMap.put("score", question.getScore());
 						questionMap.put("analysis", question.getAnalysis());

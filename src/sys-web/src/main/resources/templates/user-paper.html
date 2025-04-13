@@ -56,6 +56,19 @@
 				</span>
 				</#if>
 			</div>
+			<#if (paperPart.imgFileIds??) && (paperPart.imgFileIds?size > 0)>
+			<div>
+				<#assign chineseNumbers = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]>
+				<#list paperPart.imgFileIds as imgFileId>
+				<div class="question__img-wrap">
+					<div class="question__img-inner">
+		                <img src="${host}/api/file/download?id=${imgFileId}" class="question__img">
+	                </div>
+	                <span class="question__img-txt">图${chineseNumbers[imgFileId?index]}</span>
+                </div>
+				</#list>
+            </div>
+            </#if>
 			<#if paperPart.questionType==1>
 			<div class="radio-group">
 				<#assign letter=[ 'A' , 'B' , 'C' , 'D' , 'E' , 'F' , 'G' ]>
@@ -102,7 +115,7 @@
 				</#list>
 			</div>
 			<#elseif paperPart.questionType==5>
-			<div class="question__qa">${((paperPart.userAnswers![])?size > 0)?then(paperPart.userAnswers[0], '')}</div>
+			<div class="question__qa">${((paperPart.userAnswers![])?size > 0)?then(paperPart.userAnswers[0]?replace('\n', '<br/>', 'r'), '')}</div>
 			</#if>
 		</div>
 		</#if>
@@ -179,6 +192,37 @@ body {
 .question__title {
 	line-height: 28px;
 	word-break: break-all;
+}
+
+.question__img-wrap {
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.question__img-inner {
+    display: block;
+    line-height: 148px;
+    background-color: #fff;
+    border: 1px solid #dcdfe6;
+    border-radius: 6px;
+    height: 148px;
+    width: 148px;
+    margin: 0 8px 4px 0;
+    overflow: hidden;
+    padding: 0px;
+    font-size: 0;
+}
+
+.question__img {
+    max-width: 100%;
+    max-height: 100%;
+    vertical-align: middle;
+}
+
+.question__img-txt {
+	font-size: 14px;
+	color: #000000;
 }
 
 .question__score {

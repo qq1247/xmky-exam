@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -62,7 +63,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public synchronized void addEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores) {
+	public synchronized void addEx(Question question, List<String> options, List<String> answers,
+			List<BigDecimal> scores) {
 		// 数据校验
 		QuestionBank questionBank = addValid0(question);
 		addValid(question, options, answers, scores, questionBank);
@@ -117,7 +119,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_ANSWER_KEY_PRE
 					+ "#question.id"),//
 	})
-	public void updateEx(Question question, List<String> options, List<String> answers, List<BigDecimal> scores) {
+	public synchronized void updateEx(Question question, List<String> options, List<String> answers,
+			List<BigDecimal> scores) {
 		// 数据校验
 		QuestionBank questionBank = updateValie0(question);
 		addValid(question, options, answers, scores, questionBank);
@@ -128,6 +131,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		Integer oldMarkType = entity.getMarkType();
 
 		entity.setTitle(question.getTitle());
+		entity.setImgFileIds(question.getImgFileIds());
 		entity.setMarkType(question.getMarkType());
 		entity.setScore(question.getScore());
 		// entity.setType(question.getType());// 类型不能改
@@ -186,7 +190,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_OPTION_KEY_PRE + "#id"), //
 			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_ANSWER_KEY_PRE + "#id"),//
 	})
-	public void delEx(Integer id) {
+	public synchronized void delEx(Integer id) {
 		// 数据校验
 		QuestionBank questionBank = delValid(id);
 
@@ -224,7 +228,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void copy(Integer id) throws Exception {
+	public synchronized void copy(Integer id) throws Exception {
 		// 数据校验
 		QuestionBank questionBank = copyValid(id);
 
@@ -236,6 +240,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		questionNew.setId(null);
 		questionNew.setUpdateTime(new Date());
 		questionNew.setUpdateUserId(getCurUser().getId());
+		questionNew.setImgFileIds(questionNew.getImgFileIds().stream().map(fileId -> {
+			return fileService.copyFile(fileId);
+		}).collect(Collectors.toList()));
+
 		save(questionNew);
 
 		// 答案复制
@@ -377,7 +385,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	private void addFile(Question question, List<String> options) {
-		// 之后做带附件题使用
+		if (ValidateUtil.isValid(question.getImgFileIds())) {
+			question.getImgFileIds().forEach(fileId -> fileService.upload(fileId));
+		}
 	}
 
 	private void addValid(Question question, List<String> options, List<String> answers, List<BigDecimal> scores,

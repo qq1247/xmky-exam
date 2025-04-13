@@ -2,6 +2,7 @@ export interface Question {
     id?: number | null // 试题ID
     type: number// 试题类型 （1：单选；2：多选；3：填空；4：判断；5：问答）
     title: string// 标题
+    imgFileIds?: number[]// 图片
     options: string[]// 选项
     markType: number// （阅卷类型 1：客观题；2：主观题）
     markOptions: number[] //（2：答案无顺序；3：不区分大小写；)

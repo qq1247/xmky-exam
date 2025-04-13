@@ -64,7 +64,10 @@ public class ApiQuestionController extends BaseController {
 				Integer id = (Integer) result.get("id");
 				Integer type = (Integer) result.get("type");
 				Integer markType = (Integer) result.get("markType");
-
+				if (result.get("imgFileIds") != null) {
+					result.put("imgFileIds", StringUtil.toIntList((String)result.get("imgFileIds")));
+				}
+				
 				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
 					result.put("markOptions", StringUtil.toIntList((String) result.get("markOptions")));
 				} else {
@@ -235,7 +238,9 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("markOptions", question.getMarkOptions())//
 					.addAttr("answers", answers)//
 					.addAttr("scores", scores)//
-					.addAttr("state", question.getState());
+					.addAttr("state", question.getState())//
+					.addAttr("imgFileIds", question.getImgFileIds())//
+					;
 			return pageResult;
 		} catch (MyException e) {
 			log.error("试题获取错误：{}", e.getMessage());

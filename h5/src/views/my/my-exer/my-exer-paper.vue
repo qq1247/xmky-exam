@@ -54,8 +54,8 @@
                     </div>
                     <xmks-question v-if="curQuestion.index >= 0" :id="`q${curQuestion.index}`"
                         :type="curQuestion.question.type as number" :title="curQuestion.question.title as string"
-                        :options="curQuestion.question.options" :answers="curQuestion.question.answers"
-                        :markType="curQuestion.question.markType as number"
+                        :img-ids="curQuestion.question.imgFileIds" :options="curQuestion.question.options"
+                        :answers="curQuestion.question.answers" :markType="curQuestion.question.markType as number"
                         :score="curQuestion.question.score as number" :scores="[]"
                         :analysis="curQuestion.question.analysis" :userAnswers="curQuestion.question.userAnswers"
                         :userScore="curQuestion.question.userScore" :answer-show="toolbars.answerShow"
@@ -80,9 +80,7 @@ import XmksQuestion from '@/components/question/xmks-question.vue'
 import xmksCountDown from '@/components/xmks-count-down.vue'
 import type { ExamQuestion } from '@/ts/exam/exam'
 import type { Exer } from '@/ts/exam/exer'
-import type { Question } from '@/ts/exam/question'
 import { delay } from '@/util/timeUtil'
-import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
 import _ from 'lodash'
 import { computed, onMounted, reactive, ref } from 'vue'

@@ -16,6 +16,42 @@
                     <el-form-item label="题干" prop="title">
                         <el-input v-model="form.title" placeholder="请输入题干" :autosize="{ minRows: 3 }" type="textarea" />
                     </el-form-item>
+                    <!-- 图片 -->
+                    <el-form-item label="图片" prop="imgFileIds">
+                        <div class="question__img-group">
+                            <vue-draggable v-model="imgFileList">
+                                <photo-provider :default-backdrop-opacity="0.6">
+                                    <photo-consumer v-for="(file, index) in imgFileList" :key="index"
+                                        :src="`${downloadUrl}?id=${file.uid}`">
+                                        <div class="question_img-outer">
+                                            <el-image :src="`${downloadUrl}?id=${file.uid}`" fit="contain" />
+                                            <div class="question_img-inner">
+                                                <span class="question_img-txt">图{{ toChinaNum(index + 1) }}</span>
+                                                <span @click.stop="imgFileList.splice(index, 1)"
+                                                    class="iconfont icon-shanchu question_img-btn"></span>
+                                            </div>
+                                        </div>
+                                    </photo-consumer>
+                                </photo-provider>
+                            </vue-draggable>
+                            <el-upload v-model:file-list="imgFileList" :action="uploadUrl"
+                                :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
+                                accept=".jpg,.png,.jpeg,JPG,JPEG" :limit="4" :before-upload="uploadBefore"
+                                :multiple="true" :on-success="uploadSuccess" class="">
+                                <span class="iconfont icon-tubiaoziti2-02"></span>
+                            </el-upload>
+                        </div>
+                        <!-- <el-upload v-model:file-list="imgFileList" :action="uploadUrl"
+                            :headers="{ Authorization: userStore.accessToken }" name="files" list-type="picture-card"
+                            :show-file-list="false" accept=".jpg,.png,.jpeg,JPG,JPEG" :limit="4"
+                            :before-upload="uploadBefore" :multiple="true" :on-success="uploadSuccess"
+                            :on-preview="uploadPreview">
+                            <span class="iconfont icon-tubiaoziti2-02"></span>
+                        </el-upload> -->
+                        <!-- <el-dialog v-model="dialogVisible">
+                            <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                        </el-dialog> -->
+                    </el-form-item>
                     <!-- 选项（单多选有效） -->
                     <template v-if="hasSingleChoice(form) || hasMultipleChoice(form)">
                         <el-form-item v-for="(option, index) in form.options" :key="index"
@@ -170,19 +206,23 @@
 <script lang="ts" setup>
 import { questionAdd, questionCopy, questionDel, questionEdit, questionGet } from '@/api/exam/question'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
+import http from '@/request'
 import { useDictStore } from '@/stores/dict'
+import { useUserStore } from '@/stores/user'
 import type { Question } from '@/ts/exam/question'
 import { escape2Html } from '@/util/htmlUtil'
 import { toChinaNum, toLetter } from '@/util/numberUtil'
 import { hasFillBlank, hasJudge, hasMultipleChoice, hasObjective, hasQA, hasSingleChoice, hasSubjective } from '@/util/questionUtil'
 import { Decimal } from 'decimal.js-light'
-import { type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile, type UploadUserFile } from 'element-plus'
 import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { VueDraggable } from 'vue-draggable-plus'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
 const router = useRouter()// 路由
+const userStore = useUserStore()// 用户缓存
 const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
 const form = reactive<Question>({
@@ -196,7 +236,8 @@ const form = reactive<Question>({
     answers: [],
     scores: [],
     analysis: '',
-    questionBankId: null
+    questionBankId: null,
+    imgFileIds: [],
 })
 const formRules = reactive<FormRules>({// 表单规则
     title: [{
@@ -277,6 +318,13 @@ const formRules = reactive<FormRules>({// 表单规则
 })
 const delConfirm = ref(false) // 删除确认
 
+const uploadUrl = `${http.defaults.baseURL}file/upload`// 上传地址
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
+const imgFileList = ref<UploadUserFile[]>([])
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加
@@ -316,6 +364,15 @@ onMounted(async () => {
         form.options = data.options.map((op: string) => escape2Html(op))
         form.analysis = escape2Html(data.analysis)
         form.questionBankId = data.questionBankId
+        form.imgFileIds = data.imgFileIds
+
+        form.imgFileIds?.forEach(fileId => {
+            imgFileList.value.push({
+                uid: fileId,
+                url: `${downloadUrl}?id=${fileId}`,
+                name: `${fileId}`
+            })
+        })
     }
 })
 
@@ -444,7 +501,7 @@ async function add() {
             return self[index] = answer.join('\n')
         })
     }
-
+    params.imgFileIds = imgFileList.value.map((file: UploadUserFile) => file.uid)
     const { data: { code } } = await questionAdd({ ...params })
     if (code !== 200) {
         return
@@ -469,6 +526,7 @@ async function edit() {
             return self[index] = answer.join('\n')
         })
     }
+    params.imgFileIds = imgFileList.value.map((file: UploadUserFile) => file.uid)
     const { data: { code } } = await questionEdit({ ...params })
     if (code !== 200) {
         return
@@ -524,6 +582,35 @@ function delKeyword() {
     form.scores.pop()
 }
 
+// 上传之前处理
+function uploadBefore(rawFile: UploadRawFile) {
+    if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+        ElMessage.error('只允许 jpg和png 格式')
+        return false
+    }
+    if (rawFile.size / 1024 > 2048) {
+        ElMessage.error('图片最大支持2兆')
+        return false
+    }
+
+    return true
+}
+
+// 上传成功处理
+function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) {
+    if (response.code === 200) {
+        uploadFile.uid = response.data.fileIds
+        uploadFile.url = `${downloadUrl}?id=${response.data.fileIds}`
+    } else {
+        uploadFiles.splice(uploadFiles.indexOf(uploadFile), 1)
+    }
+}
+// 上传预览
+function uploadPreview(uploadFile: UploadFile) {
+    dialogImageUrl.value = uploadFile.url!
+    dialogVisible.value = true
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -574,6 +661,72 @@ function delKeyword() {
             .form__option-btn-txt {
                 margin-left: 4px;
                 font-size: 12px;
+            }
+        }
+
+        :deep(.question__img-group) {
+            display: flex;
+
+            .el-upload {
+                width: 148px;
+                height: 148px;
+                border: 1px dashed var(--el-border-color);
+                border-radius: 6px;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: var(--el-transition-duration-fast);
+            }
+
+            .el-upload:hover {
+                border-color: #3AA8EF;
+                background-color: #FAFAFA;
+            }
+
+            .iconfont {
+                font-size: 20px;
+                color: #8c939d;
+            }
+
+            .PhotoSlider__Backdrop {
+                opacity: 0.6;
+            }
+
+            .el-image__inner {
+                background-color: #fff;
+                border: 1px solid #dcdfe6;
+                border-radius: 6px;
+                height: 148px;
+                width: 148px;
+                margin: 0 8px 8px 0;
+                overflow: hidden;
+                padding: 0px;
+            }
+
+            .question_img-outer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                .el-image {
+                    cursor: move;
+                }
+
+                .question_img-inner {
+                    line-height: 0px;
+
+                    .question_img-txt {
+                        line-height: 14px;
+                        font-size: 14px;
+                        color: #000000;
+                    }
+
+                    .question_img-btn {
+                        cursor: pointer;
+                        margin-left: 5px;
+                        font-size: 16px;
+                    }
+                }
             }
         }
 

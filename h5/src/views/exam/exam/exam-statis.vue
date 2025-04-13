@@ -437,7 +437,6 @@ async function toPDF(examId: number, userId: number) {
 
 function setRowClassName({ rowIndex }: { rowIndex: number }) {
     if (rowIndex < 3 && examRankListpage.curPage === 1) {
-        console.log(rowIndex, examRankListpage.curPage)
         return `row${rowIndex + 1}`;
     }
     return '';
