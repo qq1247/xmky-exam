@@ -40,14 +40,14 @@ public class Parm {
 	private Date appRelTime;
 
 	public String getFileUploadDir() {
-		if (ValidateUtil.isValid(fileUploadDir)) {
+		if (!ValidateUtil.isValid(fileUploadDir)) {
 			return "";
 		}
 		return fileUploadDir.replace("\\", File.separator).replace("/", File.separator);
 	}
 
 	public String getDbBakDir() {
-		if (ValidateUtil.isValid(dbBakDir)) {
+		if (!ValidateUtil.isValid(dbBakDir)) {
 			return "";
 		}
 		return dbBakDir.replace("\\", File.separator).replace("/", File.separator);

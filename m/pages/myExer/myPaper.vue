@@ -34,6 +34,7 @@
 							:type="question.type"
 							:markType="question.markType"
 							:title="question.title"
+							:imgIds="question.imgFileIds"
 							:score="question.score"
 							:answers="question.answers"
 							:userScore="question.userScore"
