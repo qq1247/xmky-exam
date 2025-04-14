@@ -46,8 +46,8 @@
                 <el-form ref="mFormRef" :model="mForm" :rules="mFormRules" label-width="100" size="large" :inline="true"
                     class="form">
                     <el-form-item label="移动端主机" prop="host">
-                        <el-input v-model="mForm.host"
-                            placeholder="如：http://192.168.1.99:8080 或 https://exam.xxx.com/m" />
+                        <el-input v-model="mForm.host" placeholder="如：http://192.168.1.99:8080 或 https://exam.xxx.com/m"
+                            style="width: 500px;" />
                     </el-form-item>
                 </el-form>
             </template>

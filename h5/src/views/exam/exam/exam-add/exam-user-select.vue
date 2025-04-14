@@ -17,7 +17,7 @@
                         <el-form-item label="" prop="orgIds">
                             <xmks-select v-model="form.orgIds" url="org/listpage" :params="{}" search-parm-name="name"
                                 option-label="name" option-value="id" :options="orgs" :multiple="true" clearable
-                                :page-size="100" search-placeholder="请输入机构名称进行筛选">
+                                :page-size="100" search-placeholder="请输入机构名称进行筛选" placeholder="请输入机构名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }}
                                 </template>
@@ -26,7 +26,8 @@
                         <el-form-item label="" prop="userIds">
                             <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
                                 search-parm-name="name" option-label="name" option-value="id" :options="users"
-                                :multiple="true" clearable :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选">
+                                :multiple="true" clearable :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选"
+                                placeholder="请输入机构名称或用户名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }}
                                 </template>

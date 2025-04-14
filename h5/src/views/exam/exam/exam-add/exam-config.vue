@@ -6,7 +6,7 @@
                     基础配置
                 </div>
                 <el-form-item label="登录方式：" prop="loginType"
-                    @mouseover="tipShow('登录方式', '正常登录：一般用于企业内部考试，需要企业用户输入账号密码登录进行考试。<br/>免登录考试：一般用于临时考试，如面试。无须登录，输入手机号就可以考试。')">
+                    @mouseover="tipShow('登录方式', '正常登录：一般用于企业内部考试，需要企业用户输入账号密码登录进行考试。<br/>免登录考试：一般用于临时考试，如面试。无须登录，输入考试名称、姓名和手机号就可以考试。')">
                     <el-radio-group v-model="form.loginType">
                         <el-radio v-for="(option, index) in dictStore.getList('LOGIN_TYPE')" :key="index"
                             :value="parseInt(option.dictKey)" border>

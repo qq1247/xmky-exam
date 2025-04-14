@@ -73,33 +73,33 @@ shiro-filter:
   demo:
     mode: false
     urls:
-      ? /api/**/del: demoModeFilter
-      ? /api/parm/ent: demoModeFilter
-      ? /api/parm/email: demoModeFilter
-      ? /api/parm/file: demoModeFilter
-      ? /api/parm/db: demoModeFilter
-      ? /api/parm/pwd: demoModeFilter
-      ? /api/parm/custom: demoModeFilter
-      ? /api/parm/m: demoModeFilter
+      ? /api/**/del: demoMode
+      ? /api/parm/ent: demoMode
+      ? /api/parm/email: demoMode
+      ? /api/parm/file: demoMode
+      ? /api/parm/db: demoMode
+      ? /api/parm/pwd: demoMode
+      ? /api/parm/custom: demoMode
+      ? /api/parm/m: demoMode
        
-      ? /api/cron/add: demoModeFilter
-      ? /api/cron/edit: demoModeFilter
-      ? /api/cron/startTask: demoModeFilter
-      ? /api/cron/stopTask: demoModeFilter
-      ? /api/cron/runOnceTask: demoModeFilter
+      ? /api/cron/add: demoMode
+      ? /api/cron/edit: demoMode
+      ? /api/cron/startTask: demoMode
+      ? /api/cron/stopTask: demoMode
+      ? /api/cron/runOnceTask: demoMode
        
-      ? /api/dict/add: demoModeFilter
-      ? /api/dict/edit: demoModeFilter
+      ? /api/dict/add: demoMode
+      ? /api/dict/edit: demoMode
        
-      ? /api/org/add: demoModeFilter
-      ? /api/org/edit: demoModeFilter
-      ? /api/org/move: demoModeFilter
+      ? /api/org/add: demoMode
+      ? /api/org/edit: demoMode
+      ? /api/org/move: demoMode
        
-      ? /api/user/edit: demoModeFilter
-      ? /api/user/frozen: demoModeFilter
+      ? /api/user/edit: demoMode
+      ? /api/user/frozen: demoMode
        
-      ? /api/questionBank/edit: demoModeFilter
-      ? /api/questionBank/clear: demoModeFilter
+      ? /api/questionBank/edit: demoMode
+      ? /api/questionBank/clear: demoMode
       
 sys:
   ver: 5.1.1

@@ -49,7 +49,7 @@ public class ShiroCfg {
 
 		// 注册jwt过滤器
 		Map<String, Filter> jwtFilterMap = new LinkedHashMap<>(3);
-		jwtFilterMap.put("demoModeFilter", new DemoModeFilter());
+		jwtFilterMap.put("demoMode", new DemoModeFilter());
 		jwtFilterMap.put("jwt", new JWTFilter());
 		jwtFilterMap.put("anyRolesEx", new AnyRolesEx());
 		shiroFilterFactory.setFilters(jwtFilterMap);

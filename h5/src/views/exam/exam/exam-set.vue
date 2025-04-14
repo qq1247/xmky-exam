@@ -15,7 +15,7 @@
                             <span class="iconfont icon-fabu-10 exam-info__tag-icon"></span>
                             <span class="exam-info__tag-txt">{{ dictStore.getValue('LOGIN_TYPE', form.loginType as
                                 number)
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-11 exam-info__tag-icon"></span>
@@ -200,7 +200,7 @@
                             <xmks-select v-model="userForm.orgIds" url="org/listpage" :params="{}"
                                 search-parm-name="name" option-label="name" option-value="id" :options="orgs"
                                 :multiple="true" clearable :page-size="100" :disabled-values="disabledOrgIds"
-                                search-placeholder="请输入机构名称进行筛选">
+                                search-placeholder="请输入机构名称进行筛选" placeholder="请输入机构名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }} {{ disabledOrgIds.includes(option.id) ?
                                         '（不可选）' : '' }}
@@ -211,7 +211,7 @@
                             <xmks-select v-model="userForm.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
                                 search-parm-name="name" option-label="name" option-value="id" :options="users"
                                 :multiple="true" clearable :page-size="100" :disabled-values="disabledUserIds"
-                                search-placeholder="请输入机构名称或用户名称进行筛选">
+                                search-placeholder="请输入机构名称或用户名称进行筛选" placeholder="请输入机构名称或用户名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }} {{ disabledUserIds.includes(option.id) ?
                                         '（不可选）' : '' }}
