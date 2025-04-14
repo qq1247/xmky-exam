@@ -388,13 +388,19 @@ watch(() => props.userAnswers, () => {
             align-items: flex-start;
 
             .question__single-select {
-                width: 100%;
-                height: 38px;
+                display: flex;
+                min-height: 38px;
                 border-radius: 10px 10px 10px 10px;
                 margin-bottom: 6px;
 
                 .el-radio__input {
                     margin-left: 6px;
+                }
+
+                .el-radio__label {
+                    white-space: normal;
+                    word-wrap: break-word;
+                    line-height: initial;
                 }
             }
 
@@ -419,12 +425,18 @@ watch(() => props.userAnswers, () => {
 
             .el-checkbox {
                 width: 100%;
-                height: 38px;
+                min-height: 38px;
                 border-radius: 10px 10px 10px 10px;
                 margin-bottom: 6px;
 
                 .el-checkbox__input {
                     margin-left: 6px;
+                }
+
+                .el-checkbox__label {
+                    white-space: normal;
+                    word-wrap: break-word;
+                    line-height: initial;
                 }
             }
 
