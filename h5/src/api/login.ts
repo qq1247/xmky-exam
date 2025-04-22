@@ -15,3 +15,6 @@ export function loginSysTime(parm: object) {
 export function loginPwd(parm: object) {
     return request.post('/login/pwd', parm);
 }
+export function loginNoLogin(parm: object) {
+    return request.post('/login/noLogin', parm);
+}

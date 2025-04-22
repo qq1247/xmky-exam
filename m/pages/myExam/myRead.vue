@@ -291,13 +291,6 @@ const questionStatisOpts = reactive({
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	examId.value = options.examId;
-	if (options.loginType === '2') {
-		let { code, msg } = await myExamGeneratePaper({ examId: examId.value });
-		if (code !== 200) {
-			return;
-		}
-	}
-
 	examQuery();
 	userQuery();
 	myExamQuery();

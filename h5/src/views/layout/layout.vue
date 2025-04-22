@@ -18,7 +18,8 @@
                         <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
                             index="/exam-list">考试</el-menu-item>
                         <el-menu-item v-if="userStore.type === 3" index="/my-mark-list">阅卷</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 1" index="/my-exam-list">考试</el-menu-item>
+                        <el-menu-item v-if="userStore.type === 1 || userStore.type === 4"
+                            index="/my-exam-list">考试</el-menu-item>
                         <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
                             index="/base-nav/exam-user-list">用户</el-menu-item>
                         <el-menu-item v-if="userStore.type === 0" index="/sys-nav/bulletin-list">系统</el-menu-item>

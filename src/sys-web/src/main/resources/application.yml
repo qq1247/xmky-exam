@@ -35,6 +35,7 @@ shiro-filter:
   urls: 
     ? "/api/login/**": anon
     ? /api/file/download: anon
+    ? /api/exam/examGet: anon
   
     ? /api/file/upload: jwt
     ? /api/dict/indexList: jwt

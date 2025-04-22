@@ -64,7 +64,7 @@
                     </span>
                     <span class="exam__label">
                         成绩查询：<span class="exam__value">{{ dictStore.getValue('SCORE_STATE', exam.scoreState as number)
-                            }}</span>
+                        }}</span>
                     </span>
                     <span class="exam__label">
                         公布排名：<span class="exam__value">{{ dictStore.getValue('STATE_ON', exam.rankState as number) ||
@@ -75,12 +75,12 @@
                     </span>
                     <span class="exam__label">
                         试卷类型：<span class="exam__value">{{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType as number)
-                            }}试卷</span>
+                        }}试卷</span>
                     </span>
 
                     <span class="exam__label">
                         组卷方式：<span class="exam__value">{{ dictStore.getValue('PAPER_GEN_TYPE', exam.genType as number)
-                            }}</span>
+                        }}</span>
                     </span>
                     <span class="exam__label">
                         考试人数：<span class="exam__value">{{ exam.userNum || '-' }}</span>

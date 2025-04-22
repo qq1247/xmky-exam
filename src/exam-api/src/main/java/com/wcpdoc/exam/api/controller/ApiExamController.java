@@ -367,6 +367,35 @@ public class ApiExamController extends BaseController {
 	}
 
 	/**
+	 * 考试获取
+	 * 
+	 * v1.0 zhanghc 2021年12月21日下午4:36:14
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/examGet")
+	public PageResult examGet(String name) {
+		try {
+			Exam exam = examService.getExam(name);
+			return PageResultEx.ok()//
+					.addAttr("id", exam == null ? null : exam.getId())//
+					.addAttr("name", exam == null ? null : exam.getName())//
+					.addAttr("loginType", exam == null ? null : exam.getLoginType())//
+					.addAttr("loginType", exam == null ? null : exam.getLoginType())//
+					.addAttr("startTime", exam == null ? null : exam.getStartTime())//
+					.addAttr("endTime", exam == null ? null : exam.getEndTime())//
+			;
+		} catch (MyException e) {
+			log.error("考试获取错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试获取错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
 	 * 考试变更时间
 	 * 
 	 * v1.0 zhanghc 2022年4月17日下午6:52:08
@@ -428,8 +457,8 @@ public class ApiExamController extends BaseController {
 			Set<Integer> orgIdSet = CollectionUtil.toSet(orgIds);
 			Set<Integer> userIdSet = CollectionUtil.toSet(userIds);
 			orgIdSet.stream().forEach(orgId -> {
-				userIdSet.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1).map(User::getId)
-						.collect(Collectors.toSet()));
+				userIdSet.addAll(userService.getList(orgId).stream().filter(user -> user.getState() == 1)
+						.map(User::getId).collect(Collectors.toSet()));
 			});
 
 			examService.userAdd(id, orgIdSet, userIdSet);

@@ -7,8 +7,8 @@
         <div class="login__main">
             <div class="login__main-wrap">
                 <div class="login-illust">
-                    <span class="login-illust__title">&nbsp;</span>
-                    <span class="login-illust__desc">&nbsp;</span>
+                    <span class="login-illust__title"></span>
+                    <span class="login-illust__desc"></span>
                     <img src="/img/login/login_illust.png" class="login-illust__img">
                 </div>
                 <div class="login-win-wrap">
@@ -18,7 +18,8 @@
                             <span class="login-win__sysname">{{ userStore.sysName }}</span>
                             <span class="login-win__welcome">欢迎登录</span>
                         </div>
-                        <el-form ref="formRef" :model="form" :rules="formRules" class="login-win__main" size="large">
+                        <el-form v-if="loginType == 1" ref="formRef" :model="form" :rules="formRules"
+                            class="login-win__main" size="large">
                             <el-form-item label="" prop="loginName">
                                 <el-input v-model.trim="form.loginName" placeholder="请输入账号" class="login-win__input">
                                     <template #prefix>
@@ -35,7 +36,36 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" class="login-win__btn" @click="login">登录</el-button>
+                                <div class="login-win__btn-group">
+                                    <span @click="loginType = 2" class="login-win__switch‌-btn">临时考试</span>
+                                    <el-button type="primary" class="login-win__login-btn" @click="login">登录</el-button>
+                                </div>
+                            </el-form-item>
+                        </el-form>
+                        <el-form v-if="loginType == 2" ref="anonFormRef" :model="anonForm" :rules="anonFormRules"
+                            class="login-win__main" size="large">
+                            <el-form-item label="" prop="userName">
+                                <el-input v-model.trim="anonForm.userName" placeholder="请输入姓名和手机号"
+                                    class="login-win__input">
+                                    <template #prefix>
+                                        <span class="iconfont icon-fabu-11 login-win__input-icon"></span>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="" prop="examName">
+                                <el-input v-model.trim="anonForm.examName" placeholder="请输入考试名称"
+                                    class="login-win__input">
+                                    <template #prefix>
+                                        <span class="iconfont icon-tubiaoziti-35 login-win__input-icon"></span>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <div class="login-win__btn-group">
+                                    <span @click="loginType = 1" class="login-win__switch‌-btn">账号登录</span>
+                                    <el-button type="primary" class="login-win__login-btn"
+                                        @click="anonLogin">登录</el-button>
+                                </div>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -47,14 +77,16 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useDictStore } from '@/stores/dict'
 import { useCustomStore } from '@/stores/custom'
-import { loginIn, loginEnt, loginCustom } from '@/api/login'
+import { loginIn, loginEnt, loginCustom, loginNoLogin, loginSysTime } from '@/api/login'
 import { dictIndexList } from '@/api/sys/dict'
 import http from '@/request'
+import { examExamGet } from '@/api/exam/exam'
+import { myExamGeneratePaper } from '@/api/my/my-exam'
 
 /************************变量定义相关***********************/
 const router = useRouter()// 路由
@@ -76,9 +108,30 @@ const formRules = reactive<FormRules>({// 表单规则
         { required: true, message: '请输入密码', trigger: 'blur' },
     ],
 })
+
+const anonForm = reactive({// 表单
+    userName: '',
+    examName: '',
+})
+const anonFormRef = ref<FormInstance>()// 表单引用
+const anonFormRules = reactive<FormRules>({// 表单规则
+    userName: [
+        { required: true, message: '请输入姓名和手机号', trigger: 'blur' },
+    ],
+    examName: [
+        { required: true, message: '请输入考试名称', trigger: 'blur' },
+    ],
+})
+
+const loginType = ref(1)// 登录类型（1：账号登录；2：匿名登录）
+
 const keyDown = (e: KeyboardEvent) => {// 回车登录
     if (e.key === 'Enter') {
-        login()
+        if (loginType.value === 1) {
+            login()
+        } else {
+            anonLogin()
+        }
     }
 }
 
@@ -143,6 +196,69 @@ async function login() {
 
     // 跳转到首页
     router.push("/home")
+}
+
+
+// 匿名登录
+async function anonLogin() {
+    // 数据校验
+    try {
+        await anonFormRef.value?.validate()
+    } catch (e) {
+        return
+    }
+
+    const { data: { code, data: examData } } = await examExamGet({
+        name: anonForm.examName,
+    })
+    if (code !== 200) {
+        return
+    }
+    if (!examData.id) {
+        ElMessage.warning('未找到该考试，请重新输入')
+        return
+    }
+    if (examData.loginType === 1) {
+        ElMessage.warning('企业内部考试，请使用账号密码登录')
+        return
+    }
+
+    const { data: { data: curTime } } = await loginSysTime({})
+    if (examData.startTime > curTime) {
+        ElMessage.warning('考试未开始')
+        return
+    }
+    if (examData.endTime < curTime) {
+        ElMessage.warning('考试已结束')
+        return
+    }
+
+    // 登录
+    const { data: { code: code1, data: userData } } = await loginNoLogin({
+        name: anonForm.userName
+    })
+    if (code1 !== 200) {
+        return
+    }
+
+    // 令牌缓存
+    userStore.id = userData.userId
+    userStore.name = userData.userName
+    userStore.type = userData.type
+    userStore.accessToken = userData.accessToken
+
+    // 字典缓存
+    const { data: { data: dict } } = await dictIndexList({})
+    dictStore.dicts = dict
+
+    // 生成试卷
+    const { data: { code: myExamCode } } = await myExamGeneratePaper({ examId: examData.id });
+    if (myExamCode !== 200) {
+        return;
+    }
+
+    // 进入试卷页面
+    router.push(`/my-exam/read/${examData.id}`)
 }
 
 </script>
@@ -283,10 +399,17 @@ async function login() {
                     .login-win__main {
                         flex: 1;
                         width: 310px;
-                        margin-top: 30px;
 
                         .el-form-item {
-                            margin-bottom: 40px;
+                            margin-top: 40px;
+
+                            &:first-child {
+                                margin-top: 30px;
+                            }
+
+                            &:last-child {
+                                margin-top: 20px;
+                            }
 
 
                             :deep(.el-form-item__content) {
@@ -320,14 +443,32 @@ async function login() {
                                     }
                                 }
 
-                                .login-win__btn {
+                                .login-win__btn-group {
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: flex-end;
                                     width: 100%;
-                                    height: 48px;
-                                    border-radius: 24px;
-                                    border: 0px;
-                                    color: #FFFFFF;
-                                    font-size: 18px;
-                                    background-image: linear-gradient(to right, #04C7F2, #259FF8);
+
+                                    .login-win__switch‌-btn {
+                                        line-height: initial;
+                                        margin: 0px 10px 10px 0px;
+                                        cursor: pointer;
+                                        color: #0D9DF6;
+
+                                        &:hover {
+                                            color: #04C7F2;
+                                        }
+                                    }
+
+                                    .login-win__login-btn {
+                                        width: 100%;
+                                        height: 48px;
+                                        border-radius: 24px;
+                                        border: 0px;
+                                        color: #FFFFFF;
+                                        font-size: 18px;
+                                        background-image: linear-gradient(to right, #04C7F2, #259FF8);
+                                    }
                                 }
                             }
                         }

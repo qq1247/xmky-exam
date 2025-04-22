@@ -268,7 +268,7 @@ public class ApiMyExamController extends BaseController {
 	public PageResult generatePaper(Integer examId) {
 		try {
 			myExamService.generatePaper(examId, getCurUser().getId());
-			return PageResultEx.ok();
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("我的试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

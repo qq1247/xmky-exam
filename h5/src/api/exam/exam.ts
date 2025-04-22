@@ -45,3 +45,6 @@ export function examPaper(parm: object) {
 export function examUserAdd(parm: object) {
     return request.post('/exam/userAdd', parm);
 }
+export function examExamGet(parm: object) {
+    return request.post('/exam/examGet', parm);
+}

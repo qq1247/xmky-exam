@@ -406,6 +406,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public List<Exam> getExamingList() {
 		return examDao.getExamingList();
 	}
+	
+	@Override
+	public Exam getExam(String examName) {
+		return examDao.getExam(examName);
+	}
 
 	@Override
 	public void mail(Exam exam, Integer notifyType, String content) {
@@ -1222,21 +1227,25 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	private void publishValidExam(ExamInfo examInfo) {
-		if (ValidateUtil.isValid(examInfo.getId())) {// 如果是二次修改，校验考试是否结束
-			Exam exam = examCacheService.getExam(examInfo.getId());
-			if (exam.getMarkType() == 3) {
-				throw new MyException("已阅卷");
-			}
-			if (exam.getEndTime().getTime() <= System.currentTimeMillis()) {
-				throw new MyException("考试已结束");
-			}
-			if (exam.getStartTime().getTime() <= System.currentTimeMillis()) {
-				throw new MyException("考试已开始");// 考试结束放在考试开始前校验，可能的问题为考试已结束，提示的是考试已开始。
-			}
-		}
+//		if (ValidateUtil.isValid(examInfo.getId())) {// 如果是二次修改，校验考试是否结束
+//			Exam exam = examCacheService.getExam(examInfo.getId());
+//			if (exam.getMarkType() == 3) {
+//				throw new MyException("已阅卷");
+//			}
+//			if (exam.getEndTime().getTime() <= System.currentTimeMillis()) {
+//				throw new MyException("考试已结束");
+//			}
+//			if (exam.getStartTime().getTime() <= System.currentTimeMillis()) {
+//				throw new MyException("考试已开始");// 考试结束放在考试开始前校验，可能的问题为考试已结束，提示的是考试已开始。
+//			}
+//		}
 
 		if (!ValidateUtil.isValid(examInfo.getName())) {
 			throw new MyException("参数错误：name");
+		}
+		Exam exam = examDao.getExam(examInfo.getName());
+		if (exam != null) {
+			throw new MyException("考试名称已存在");
 		}
 
 		BigDecimal paperTotalScore = BigDecimal.ZERO;// 试卷总分
@@ -1542,5 +1551,4 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException("已删除");
 		}
 	}
-
 }

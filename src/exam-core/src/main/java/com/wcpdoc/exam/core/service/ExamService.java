@@ -115,5 +115,14 @@ public interface ExamService extends BaseService<Exam> {
 	 */
 	void rank(Integer id, Integer rankState);
 
+	/**
+	 * 考试信息
+	 * 
+	 * v1.0 zhanghc 2025年4月22日下午12:10:13
+	 * @param examName
+	 * @return Exam
+	 */
+	Exam getExam(String examName);
+
 	
 }

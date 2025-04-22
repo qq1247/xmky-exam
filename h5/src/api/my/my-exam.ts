@@ -24,3 +24,6 @@ export function myExamFinish(parm: object) {
 export function myExamSxe(parm: object) {
     return request.post('/myExam/sxe', parm);
 }
+export function myExamGeneratePaper(parm: object) {
+    return request.post('/myExam/generatePaper', parm);
+}
