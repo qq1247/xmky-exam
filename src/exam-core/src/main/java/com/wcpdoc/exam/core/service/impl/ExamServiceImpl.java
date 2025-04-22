@@ -406,7 +406,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public List<Exam> getExamingList() {
 		return examDao.getExamingList();
 	}
-	
+
 	@Override
 	public Exam getExam(String examName) {
 		return examDao.getExam(examName);
@@ -1492,10 +1492,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getMarkState() == 3) {
 			throw new MyException("已结束");
 		}
-//		if (exam.getMarkType() == 1) {
-		if (exam.getEndTime().getTime() < System.currentTimeMillis()) {// 只限制答题就可以
-			throw new MyException("已结束");
-		}
+//		if (exam.getMarkType() == 1) {// bug：先暂停，考试时间已过，在发布，提示已结束。只判断MarkState=3就可以了
+//		if (exam.getEndTime().getTime() < System.currentTimeMillis()) {// 只限制答题就可以
+//			throw new MyException("已结束");
+//		}
 //		}
 //		if (exam.getMarkType() == 2) {
 //			if (exam.getMarkEndTime().getTime() < System.currentTimeMillis()) {
