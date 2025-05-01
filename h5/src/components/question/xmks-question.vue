@@ -388,6 +388,7 @@ watch(() => props.userAnswers, () => {
             align-items: flex-start;
 
             .question__single-select {
+                width: 100%;
                 display: flex;
                 min-height: 38px;
                 border-radius: 10px 10px 10px 10px;
