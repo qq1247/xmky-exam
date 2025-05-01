@@ -36,6 +36,8 @@ public class Parm {
 	private String customContent;
 	private String mHost;
 	private String verhubUrl;
+	private String appId;
+	private String appVer;
 	private String appRelVer;
 	private Date appRelTime;
 

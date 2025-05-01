@@ -150,7 +150,7 @@ async function login() {
 	if (code !== 200) {
 		return;
 	}
-	if (data.type !== 1 || data.type !== 4) {
+	if (!(data.type === 1 || data.type === 4)) {
 		uni.showToast({ title: '暂不支持管理员登录', icon: 'error' });
 		return;
 	}
@@ -216,7 +216,7 @@ async function anonLogin() {
 	if (code !== 200) {
 		return;
 	}
-	if (data.type !== 1 && data.type !== 4) {
+	if (!(data.type === 1 || data.type === 4)) {
 		uni.showToast({ title: '暂不支持管理员登录', icon: 'error' });
 		return;
 	}

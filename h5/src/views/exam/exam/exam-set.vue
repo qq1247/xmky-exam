@@ -15,7 +15,7 @@
                             <span class="iconfont icon-fabu-10 exam-info__tag-icon"></span>
                             <span class="exam-info__tag-txt">{{ dictStore.getValue('LOGIN_TYPE', form.loginType as
                                 number)
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-11 exam-info__tag-icon"></span>
@@ -192,7 +192,7 @@
                         style="margin-bottom: 40px;">保存设置</el-button>
                 </template>
             </xmks-edit-card>
-            <xmks-edit-card title="考试用户" desc="考试未结束允许添加人员">
+            <xmks-edit-card title="考试用户" desc="考试未结束允许添加人员或机构">
                 <template #card-main>
                     <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" inline label-width="100"
                         size="large" class="form">
@@ -251,8 +251,8 @@
                 :desc="`移动端扫码答题时使用。${userStore?.type === 0 ? '<a href=\'/parm-nav/set/1\'>去设置</a>' : '请联系管理员设置'}`">
                 <template #card-main>
                     <div class="m">
-                        <vue-qrcode v-if="mForm.host" :value="`${mForm.host}${mForm.uri}`" type="image/png"
-                            :color="{ color: '' }" :options="{ width: 400 }"></vue-qrcode>
+                        <vue-qrcode v-if="mForm.host" :value="`${mForm.host}`" type="image/png" :color="{ color: '' }"
+                            :options="{ width: 400 }"></vue-qrcode>
                         {{ mForm.host }}{{ mForm.uri }}
                     </div>
                 </template>
@@ -439,9 +439,9 @@ async function load() {
     const { data: { data: data3 } } = await parmGet({ id: 1 })
     mForm.host = data3.mHost
     if (form.loginType === 2) {
-        mForm.uri = `/pages/login/noLogin?redirectPath=` + encodeURIComponent(`/pages/myExam/myRead?examId=${form.id}&loginType=2`)
+        // mForm.uri = `/pages/login/noLogin?redirectPath=` + encodeURIComponent(`/pages/myExam/myRead?examId=${form.id}&loginType=2`)
     } else {
-        mForm.uri = `/pages/login/login?redirectPath=` + encodeURIComponent(`/pages/myExam/myRead?examId=${form.id}&loginType=1`)
+        // mForm.uri = `/pages/login/login?redirectPath=` + encodeURIComponent(`/pages/myExam/myRead?examId=${form.id}&loginType=1`)
     }
 
     const { data: { data: data4 } } = await loginSysTime({})

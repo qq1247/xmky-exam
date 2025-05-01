@@ -45,7 +45,7 @@
                     :class="{ 'editor-toolbar__btn--active': toolbars.totalScoreShow }"
                     @click="toolbars.totalScoreShow = !toolbars.totalScoreShow">
                     <span class="iconfont icon-icon-07 editor-toolbar__btn-icon"></span>
-                    <span class="editor-toolbar__btn-txt">{{ toolbars.totalScoreShow ? '隐藏成绩' : '显示成绩' }}</span>
+                    <span class="editor-toolbar__btn-txt">{{ toolbars.totalScoreShow ? '隐藏总分' : '显示总分' }}</span>
                 </el-button>
                 <el-button type='' class="editor-toolbar__btn"
                     :class="{ 'editor-toolbar__btn--active': toolbars.answerShow }"
@@ -64,7 +64,7 @@
                     @click="toolbars.markOptionShow = !toolbars.markOptionShow">
                     <span class="iconfont icon-icon-05 editor-toolbar__btn-icon"></span>
                     <span class="editor-toolbar__btn-txt">{{ toolbars.markOptionShow ? '隐藏阅卷选项和删除' : '显示阅卷选项和删除'
-                        }}</span>
+                    }}</span>
                 </el-button>
             </div>
             <div class="paper__wrap">

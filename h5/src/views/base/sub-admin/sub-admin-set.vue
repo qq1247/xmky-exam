@@ -120,7 +120,7 @@ onMounted(async () => {
         form.state = data.state
     }
 
-    if (form.userIds.length) {
+    if (form.userIds?.length) {
         let curPage = 1
         while (true) {
             const { data: { data } } = await userListpage({
@@ -138,7 +138,7 @@ onMounted(async () => {
         }
     }
 
-    if (form.orgIds.length) {
+    if (form.orgIds?.length) {
         let curPage = 1
         while (true) {
             const { data: { data } } = await orgListpage({

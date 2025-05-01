@@ -19,7 +19,7 @@
                         icon: 'icon-liebiao-01',
                         event: () => $router.push(`/question-bank/set/${questionBank.id}`)
                     }, {
-                        name: '题库列表',
+                        name: '试题列表',
                         icon: 'icon-a-16ri-05',
                         event: () => $router.push(`/question-bank/question-nav/list/${questionBank.id}`)
                     }]" class="question-bank">

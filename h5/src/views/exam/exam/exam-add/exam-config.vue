@@ -33,7 +33,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="限时答题：" prop="limitMinute"
-                    @mouseover="tipShow('限时答题', '等于0：不限时<br/>大于0：表示限时，但不超过120分钟<br/>限时计算时间策略：从用户第一次打开试卷开始计时，限时60分钟，但不超过考试结束时间。如：限时60分钟，但考试用户最后半小时进入，最多只能答题半小时。')">
+                    @mouseover="tipShow('限时答题', '等于0：不限时，只要考试时间范围内任意时间，考试用户都可以进入<br/>大于0：表示限时，但不超过120分钟<br/>限时计算时间策略：从用户第一次打开试卷开始计时，限时60分钟，但不超过考试结束时间。如：限时60分钟，但考试用户最后半小时进入，最多只能答题半小时。')">
                     <el-input-number v-model="form.limitMinute" controls-position="right" :min="0"
                         :max="form.examTimeDiff - 1" :step="10" :precision="0" />&nbsp;/ {{ form.examTimeDiff }}分钟
                 </el-form-item>

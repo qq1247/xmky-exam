@@ -1,12 +1,10 @@
 package com.wcpdoc.base.job;
 
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,13 +32,14 @@ public class VerCheckJob implements Job {
 			try {
 				new Thread();
 				// 一分钟内随机时间请求，消除并发
-				Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
+//				Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
 
 				// 获取最新版本
 				MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
 				requestParams.add("appSeries", "小猫开源");
 				requestParams.add("appName", "在线考试");
-				requestParams.add("appVer", SpringUtil.getBean(Environment.class).getProperty("sys.ver"));
+				requestParams.add("appId", SpringUtil.getBean(BaseCacheService.class).getParm().getAppId());
+				requestParams.add("appVer", SpringUtil.getBean(BaseCacheService.class).getParm().getAppVer());
 				requestParams.add("osName", System.getProperty("os.name"));
 				requestParams.add("osVer", System.getProperty("os.version"));
 				requestParams.add("osArch", System.getProperty("os.arch"));

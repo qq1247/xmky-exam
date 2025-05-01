@@ -237,7 +237,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：verhubUrl");
 		}
 
-		// 自定义内容修改
+		// 版本信息修改
 		Parm parm = baseCacheService.getParm();
 		parm.setVerhubUrl(verhubUrl);
 		parm.setAppRelVer(relVer);

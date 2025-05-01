@@ -14,10 +14,10 @@
                 </el-form>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="form.id" title="清空题库" desc="清空题库">
+        <xmks-edit-card v-if="form.id" title="清空试题" desc="清空试题">
             <template #card-side>
                 <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': clearConfirm }"
-                    style="margin-bottom: 14px;" @click="clear">清空题库</el-button>
+                    style="margin-bottom: 14px;" @click="clear">清空试题</el-button>
             </template>
         </xmks-edit-card>
         <xmks-edit-card v-if="form.id" title="删除题库" desc="删除题库">
