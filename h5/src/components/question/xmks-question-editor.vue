@@ -42,8 +42,9 @@
         </div>
         <div class="xmks-question-editor__main">
             <el-scrollbar max-height="calc(100vh - 370px)" class="edit-area">
-                <el-input v-model="txt" :autosize="{ minRows: 50, maxRows: 10000 }" type="textarea" resize="none"
-                    maxlength="5000" :readonly="toolbars.egShow" class="edit-area__input " />
+                <el-input ref="txtRef" v-model="txt" :autosize="{ minRows: 50, maxRows: 10000 }" type="textarea"
+                    resize="none" maxlength="5000" :readonly="toolbars.egShow" class="edit-area__input "
+                    @paste="handlePaste" />
                 <div v-if="!txt.length" class="edit-area__tip">
                     <span class="iconfont icon-bianjibanli-93 edit-area__tip-icon"></span>
                     <span class="edit-area__tip-title">快去编辑试题吧！</span>
@@ -54,10 +55,10 @@
                 <template v-for="(question, index) in questions" :key="index">
                     <el-alert v-if="question.errs" :title="`${index + 1}、${question.errs}`" type="error"
                         :closable="false" />
-                    <xmks-question v-else :type="question.type" :title="question.title" :options="question.options"
-                        :answers="question.answers" :markType="question.markType" :score="question.score"
-                        :scores="question.scores" :analysis="question.analysis" :userAnswers="[]" :userScore="0"
-                        :answer-show="toolbars.answerShow" :user-answer-show="false"
+                    <xmks-question v-else :type="question.type" :title="question.title" :img-ids="question.imgFileIds"
+                        :options="question.options" :answers="question.answers" :markType="question.markType"
+                        :score="question.score" :scores="question.scores" :analysis="question.analysis"
+                        :userAnswers="[]" :userScore="0" :answer-show="toolbars.answerShow" :user-answer-show="false"
                         :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="false">
                         <template #title-pre>{{ index + 1 }}、</template>
                         <template #foot>
@@ -110,9 +111,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import XmksQuestion from '@/components/question/xmks-question.vue'
 import type { Question } from '@/ts/exam/question'
+import { ElMessage } from 'element-plus';
+import axios from 'axios';
+import http from "@/request"
+import { useUserStore } from '@/stores/user';
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{// 定义事件
@@ -127,6 +132,9 @@ const toolbars = reactive({// 工具条状态
     egShow: false,// 示例显示
 })
 
+const userScore = useUserStore()// 用户信息
+
+const txtRef = ref()// 编辑器文本引用
 const txt = ref('') // 编辑器文本
 const txtBak = ref('') // 文本备份（用于切换示例）
 const txtEg = ref(`1.这是一道单选题的题干，简单写法
@@ -142,15 +150,16 @@ B。多选题的B选项
 C、多选题的C选项
 D多选题的D选项
 [AB][3分][1分]
-[解析]中括号内【字母】表示答案，一个答案表示单选题，一个以上答案表示多选题
+[解析]中括号内【A-G】表示答案，一个答案表示单选题，一个以上答案表示多选题
 中括号内【数字分】表示该题分数，第一项为该题分数，不填默认1分，第二项为漏选分数，多选题有效，不填默认为总分一半
+截图或复制图片到题干下一行，会显示图片，最多4张，单张图片不大于2兆
 
 3、这是一道填空题_____，_____，简单写法
 [北京 上海][主观题]
 
 3、这是一道填空题________，________，可选写法
 [山西 山西省 晋][老婆 媳妇 内人][2分][2分][答案无顺序][不区分大小写]
-[解析]连续五个或五个以上的下划线，表示一个填空
+[解析]连续五个或五个以上的下划线，表示一个填空，下划线越长，填空越长
 中括号内【主观题】表示这道题需要人工阅卷，[答案无顺序][不区分大小写]无效
 中括号内【答案无顺序】【不区分大小写】，表示智能阅卷时判分规则，默认答案有顺序，区分大小写
 中括号内【数字分】表示该题分数，一个空对应一个分数，不填或少填，对应的空默认为1分
@@ -435,8 +444,16 @@ function parseQuestion(questionTxt: string[]) {
         }
     }
 
+    const imgFileIds: number[] = [];
+    const _title = title.replace(/\[图片:(\d+)]/g, (_, num) => {
+        imgFileIds.push(parseInt(num) ^ 0x55AA);
+        return '';
+    });
+
     question.type = type
-    question.title = title
+    question.title = _title.replace(/(\r\n|\n|\r)$/, '') //剔除图片后去掉末尾的换行
+    question.imgFileIds = imgFileIds.slice(0, 4) // 最多4张图片
+
     question.options = options
     question.answers = answers
     question.score = score
@@ -473,6 +490,78 @@ function validate(): { succ: boolean; msg: string, data?: Question[] } {
         succ: errNum.value === 0,
         msg: `共编辑${questions.value.length}题，其中格式错误${errNum.value}题，请检查`,
         data: errNum.value === 0 ? questions.value : []
+    }
+}
+
+async function handlePaste(e: ClipboardEvent) {
+    // 检查是否有图片
+    const items = e.clipboardData?.items
+    if (!items) return
+
+    const imageItems = Array.from(items).filter(item => item.type.includes('image'))
+    if (imageItems.length === 0) return
+
+
+    // 上传图片
+    e.preventDefault()
+    for (const item of imageItems) {
+        const file = item.getAsFile()
+        if (!file) continue
+
+        try {
+            const attachmentId = await uploadImage(file)
+
+            // 插入附件标记
+            if (attachmentId) {
+                insertAtCursor(`[图片:${attachmentId ^ 0x55AA}]`)
+            }
+
+        } catch (e) {
+            ElMessage.error(e.message)
+        }
+    }
+}
+
+// 在光标位置插入文本
+const insertAtCursor = (imgSymbol: string) => {
+    const textarea = txtRef.value?.textarea
+    if (!textarea) return
+
+    const startPos = textarea.selectionStart
+    const endPos = textarea.selectionEnd
+
+    txt.value = txt.value.substring(0, startPos) + imgSymbol + txt.value.substring(endPos)
+
+    // 更新光标位置
+    nextTick(() => {
+        textarea.selectionStart = textarea.selectionEnd = startPos + imgSymbol.length
+        textarea.focus()
+    })
+}
+
+// 图片上传
+async function uploadImage(file: File) {
+    const MAX_SIZE = 2 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+        ElMessage.error('图片最大2兆');
+        return null;
+    }
+
+    const formData = new FormData()
+    formData.append('files', file)
+
+    try {
+        const response = await axios.post(`${http.defaults.baseURL}file/upload`,
+            formData,
+            {
+                headers: {
+                    'Authorization': userScore.accessToken,
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+        return response.data.data.fileIds
+    } catch (e) {
+        ElMessage.error(e.message)
     }
 }
 

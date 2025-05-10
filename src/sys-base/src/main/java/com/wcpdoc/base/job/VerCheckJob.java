@@ -1,6 +1,7 @@
 package com.wcpdoc.base.job;
 
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -32,7 +33,7 @@ public class VerCheckJob implements Job {
 			try {
 				new Thread();
 				// 一分钟内随机时间请求，消除并发
-//				Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
+				Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
 
 				// 获取最新版本
 				MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
