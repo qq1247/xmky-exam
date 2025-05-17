@@ -103,4 +103,4 @@ shiro-filter:
       ? /api/questionBank/clear: demoMode
       
 sys:
-  ver: 5.2.0
+  ver: 5.2.1
