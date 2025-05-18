@@ -265,10 +265,6 @@ public class ApiExamController extends BaseController {
 						});
 			}
 
-			List<Integer> examUserIdList = examCacheService.getMyExamList(id).stream()//
-					.map(myExam -> myExam.getUserId())//
-					.collect(Collectors.toList());
-
 			return PageResultEx.ok()//
 					.addAttr("id", exam.getId())//
 					.addAttr("name", exam.getName())//
@@ -289,13 +285,44 @@ public class ApiExamController extends BaseController {
 					.addAttr("state", exam.getState())//
 					.addAttr("examQuestions", examQuestions)//
 					.addAttr("examRules", examRules)//
-					.addAttr("examUserIds", examUserIdList)//
 					.addAttr("limitMinute", exam.getLimitMinute());
 		} catch (MyException e) {
 			log.error("考试获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("考试获取错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 考试用户
+	 * 
+	 * v1.0 zhanghc 2025年5月19日上午12:14:16
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/user")
+	public PageResult user(Integer id) {
+		try {
+			Exam exam = examCacheService.getExam(id);
+			if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+
+			List<Map<String, Integer>> resultList = examCacheService.getMyExamList(id).stream().map(myExam -> {
+				Map<String, Integer> map = new HashMap<>();
+				map.put("userId", myExam.getUserId());
+				map.put("answerState", myExam.getAnswerState());
+				return map;
+			}).collect(Collectors.toList());
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("考试用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试用户错误：", e);
 			return PageResult.err();
 		}
 	}

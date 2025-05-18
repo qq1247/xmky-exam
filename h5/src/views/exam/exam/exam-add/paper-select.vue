@@ -21,16 +21,16 @@
             </div>
         </div>
         <div class="paper-select__foot">
-            <div class="paper-copy__wrap">
-                <div class="paper-copy__inner">
-                    <div class="paper-copy-tip">
-                        <span class="iconfont icon-tubiaoziti-10 paper-copy-tip__icon"></span>
-                        <div class="paper-copy-tip__content">
-                            <span class="paper-copy-tip__title">复制试卷</span>
-                            <span class="paper-copy-tip__desc">从已有试卷创建一份副本，随后进行灵活调整。</span>
+            <div class="exam-copy__wrap">
+                <div class="exam-copy__inner">
+                    <div class="exam-copy-tip">
+                        <span class="iconfont icon-tubiaoziti-10 exam-copy-tip__icon"></span>
+                        <div class="exam-copy-tip__content">
+                            <span class="exam-copy-tip__title">复制考试</span>
+                            <span class="exam-copy-tip__desc">从已有考试创建一份副本，随后进行灵活调整。</span>
                         </div>
                     </div>
-                    <div class="paper-copy-select">
+                    <div class="exam-copy-select">
                         <xmks-select v-model="copyExamId" url="exam/listpage" :params="{}" search-parm-name="name"
                             option-label="name" option-value="id" :options="[]" :multiple="false" clearable
                             search-placeholder="请输入考试名称进行筛选">
@@ -39,13 +39,20 @@
                             </template>
                         </xmks-select>
                     </div>
+                    <div class="exam-copy-extract">
+                        <el-radio-group v-model="importUser">
+                            <el-radio value="none">无</el-radio>
+                            <el-radio value="all">导入考试用户</el-radio>
+                            <el-radio value="retake">导入补考用户</el-radio>
+                        </el-radio-group>
+                    </div>
                 </div>
             </div>
         </div>
     </el-scrollbar>
 </template>
 <script lang="ts" setup>
-import { examPaper } from '@/api/exam/exam';
+import { examPaper, examUser } from '@/api/exam/exam';
 import xmksSelect from '@/components/xmks-select.vue';
 import { useExamStore } from '@/stores/exam';
 import { ref, watch } from 'vue';
@@ -57,6 +64,7 @@ const emit = defineEmits<{
 
 const form = useExamStore() // 表单
 const copyExamId = ref()
+const importUser = ref('none')
 
 /************************监听相关*****************************/
 watch(() => copyExamId.value, () => {
@@ -95,6 +103,20 @@ async function copy(id: number) {
     form.limitMinute = data.limitMinute
 
     form.questionNoUpdate()
+    if (importUser.value === 'all') {
+        const { data: { data: myExams } } = await examUser({ id })
+        myExams.forEach((myExam: { userId: number; answerState: number; }) => {
+            form.userIds.push(myExam.userId)
+        });
+    } else if (importUser.value === 'retake') {
+        const { data: { data: myExams } } = await examUser({ id })
+        myExams.forEach((myExam: { userId: number; answerState: number; }) => {
+            console.log(myExam);
+            if (myExam.answerState === 2) {
+                form.userIds.push(myExam.userId)
+            }
+        });
+    }
 
     if (data.genType === 1) {
         emit('select', 'blank')
@@ -192,7 +214,7 @@ async function copy(id: number) {
             height: 228px;
             border-radius: 15px 15px 15px 15px;
 
-            .paper-copy__wrap {
+            .exam-copy__wrap {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
@@ -202,14 +224,14 @@ async function copy(id: number) {
                 border: 1px dashed #E5E5E5;
                 border-radius: 15px 15px 15px 15px;
 
-                .paper-copy__inner {
+                .exam-copy__inner {
                     width: 460px;
 
-                    .paper-copy-tip {
+                    .exam-copy-tip {
                         display: flex;
                         margin-bottom: 20px;
 
-                        .paper-copy-tip__icon {
+                        .exam-copy-tip__icon {
                             display: flex;
                             justify-content: center;
                             align-items: center;
@@ -221,28 +243,32 @@ async function copy(id: number) {
                             border: 1px dashed #E5E5E5;
                         }
 
-                        .paper-copy-tip__content {
+                        .exam-copy-tip__content {
                             display: flex;
                             flex-direction: column;
                             justify-content: space-between;
                             margin-left: 20px;
 
-                            .paper-copy-tip__title {
+                            .exam-copy-tip__title {
                                 font-size: 14px;
                                 color: #000000;
                             }
 
-                            .paper-copy-tip__desc {
+                            .exam-copy-tip__desc {
                                 font-size: 14px;
                                 color: #999999;
                             }
                         }
                     }
 
-                    .paper-copy-select {
+                    .exam-copy-select {
                         .el-select__selection {
                             height: 34px;
                         }
+                    }
+
+                    .exam-copy-extract {
+                        margin-top: 10px;
                     }
                 }
 
