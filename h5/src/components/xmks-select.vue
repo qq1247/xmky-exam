@@ -2,7 +2,7 @@
     <!-- 下拉选择框（popper-class：class是页面外层的） -->
     <el-select v-model="selectedValue" :multiple="multiple" filterable remote :automatic-dropdown="true"
         :placeholder="placeholder" collapse-tags collapse-tags-tooltip :max-collapse-tags="3" remote-show-suffix
-        popper-class="xmks-select" @visible-change="(visible: boolean) => { visible && query() }"
+        clearable popper-class="xmks-select" @visible-change="(visible: boolean) => { visible && query() }"
         @change="emit('update:modelValue', selectedValue)">
         <!-- 搜索框 -->
         <el-input v-model="listpage.searchParmValue" :placeholder="searchPlaceholder" class="xmks-select__search"

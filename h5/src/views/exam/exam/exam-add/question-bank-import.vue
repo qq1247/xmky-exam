@@ -10,8 +10,17 @@
             <div class="question-list">
                 <div class="question-list__head">
                     <el-form :model="queryForm" :inline="true" size="large" class="query">
-                        <el-form-item>
-                            <el-input v-model="queryForm.questionBankName" placeholder="请输入题库名称" />
+                        <el-form-item label="">
+                            <xmks-select v-model="queryForm.questionBankId" url="questionBank/listpage" :params="{}"
+                                search-parm-name="name" option-value="id" option-label="name" :multiple="false"
+                                search-placeholder="请输入题库名称进行筛选" placeholder="请选择题库"
+                                class="paper-question__question-bank">
+                                <template #default="{ option }">
+                                    {{ option.name }} （单选{{ option.singleNum }} / 多选{{ option.multipleNum }} /
+                                    客观填空{{ option.multipleNum }} / 判断{{ option.judgeNum }} / 客观问答{{
+                                        option.qaObjNum }}）
+                                </template>
+                            </xmks-select>
                         </el-form-item>
                         <el-form-item label="">
                             <el-input v-model="queryForm.id" placeholder="请输入编号" />
@@ -84,7 +93,8 @@ import { useDictStore } from '@/stores/dict'
 import type { Listpage } from '@/ts/common/listpage'
 import { questionListpage } from '@/api/exam/question'
 import type { Question } from '@/ts/exam/question'
-import xmksQuestion from '@/components/question/xmks-question.vue'
+import XmksQuestion from '@/components/question/xmks-question.vue'
+import XmksSelect from '@/components/xmks-select.vue'
 
 /************************变量定义相关***********************/
 const emit = defineEmits(['back'])
@@ -93,7 +103,7 @@ const form = useExamStore() // 考试表单
 const dictStore = useDictStore()// 字典缓存
 const display = ref('list') // 显示样式
 const queryForm = reactive({// 查询表单
-    questionBankName: '',
+    questionBankId: '',
     id: '',
     title: '',
     type: null,
