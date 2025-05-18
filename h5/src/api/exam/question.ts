@@ -18,3 +18,6 @@ export function questionGet(parm: object) {
 export function questionCopy(parm: object) {
     return request.post('/question/copy', parm);
 }
+export function questionMove(parm: object) {
+    return request.post('/question/move', parm);
+}

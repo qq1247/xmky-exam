@@ -295,6 +295,77 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
+	@Caching(evict = { //
+			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_KEY_PRE + "#id"), //
+			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_OPTION_KEY_PRE + "#id"), //
+			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_ANSWER_KEY_PRE + "#id"),//
+	})
+	public synchronized void move(Integer id, Integer questionBankId) {
+		// 数据校验
+		moveValid(id, questionBankId);
+
+		// 移动
+		QuestionBank destQuestionBank = questionBankService.getById(questionBankId);
+
+		Question question = examCacheService.getQuestion(id);
+		QuestionBank sourceQuestionBank = questionBankService.getById(question.getQuestionBankId());
+		
+		question.setQuestionBankId(destQuestionBank.getId());
+		question.setCreateUserId(destQuestionBank.getCreateUserId());// 不要用当前用户ID，可能是管理员操作
+		question.setUpdateTime(new Date());
+		question.setUpdateUserId(getCurUser().getId()); // 保留移动前的
+		updateById(question);
+		
+		// 目标题库数量更新
+		destQuestionBank.setQuestionNum(destQuestionBank.getQuestionNum() + 1);
+		if (QuestionUtil.hasObjective(question)) {
+			destQuestionBank.setObjectiveNum(destQuestionBank.getObjectiveNum() + 1);
+		} else if (QuestionUtil.hasSubjective(question)) {
+			destQuestionBank.setSubjectiveNum(destQuestionBank.getSubjectiveNum() + 1);
+		}
+		if (QuestionUtil.hasSingleChoice(question)) {
+			destQuestionBank.setSingleNum(destQuestionBank.getSingleNum() + 1);
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			destQuestionBank.setMultipleNum(destQuestionBank.getMultipleNum() + 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasObjective(question)) {
+			destQuestionBank.setFillBlankObjNum(destQuestionBank.getFillBlankObjNum() + 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasSubjective(question)) {
+			destQuestionBank.setFillBlankSubNum(destQuestionBank.getFillBlankSubNum() + 1);
+		} else if (QuestionUtil.hasJudge(question)) {
+			destQuestionBank.setJudgeNum(destQuestionBank.getJudgeNum() + 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question)) {
+			destQuestionBank.setQaObjNum(destQuestionBank.getQaObjNum() + 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
+			destQuestionBank.setQaSubNum(destQuestionBank.getQaSubNum() + 1);
+		}
+		questionBankService.updateById(destQuestionBank);
+		
+		// 源题库数量更新
+		sourceQuestionBank.setQuestionNum(sourceQuestionBank.getQuestionNum() - 1);
+		if (QuestionUtil.hasObjective(question)) {
+			sourceQuestionBank.setObjectiveNum(sourceQuestionBank.getObjectiveNum() - 1);
+		} else if (QuestionUtil.hasSubjective(question)) {
+			sourceQuestionBank.setSubjectiveNum(sourceQuestionBank.getSubjectiveNum() - 1);
+		}
+		if (QuestionUtil.hasSingleChoice(question)) {
+			sourceQuestionBank.setSingleNum(sourceQuestionBank.getSingleNum() - 1);
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			sourceQuestionBank.setMultipleNum(sourceQuestionBank.getMultipleNum() - 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasObjective(question)) {
+			sourceQuestionBank.setFillBlankObjNum(sourceQuestionBank.getFillBlankObjNum() - 1);
+		} else if (QuestionUtil.hasFillBlank(question) && QuestionUtil.hasSubjective(question)) {
+			sourceQuestionBank.setFillBlankSubNum(sourceQuestionBank.getFillBlankSubNum() - 1);
+		} else if (QuestionUtil.hasJudge(question)) {
+			sourceQuestionBank.setJudgeNum(sourceQuestionBank.getJudgeNum() - 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question)) {
+			sourceQuestionBank.setQaObjNum(sourceQuestionBank.getQaObjNum() - 1);
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
+			sourceQuestionBank.setQaSubNum(sourceQuestionBank.getQaSubNum() - 1);
+		}
+		questionBankService.updateById(sourceQuestionBank);
+	}
+
+	@Override
 	public List<Question> getListByDel() {
 		return questionDao.getListByDel();
 	}
@@ -614,5 +685,24 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("无操作权限");
 		}
 		return questionBankService.getById(question.getQuestionBankId());
+	}
+
+	private void moveValid(Integer id, Integer questionBankId) {
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误：id");
+		}
+		if (!ValidateUtil.isValid(questionBankId)) {
+			throw new MyException("参数错误：questionBankId");
+		}
+
+		Question question = examCacheService.getQuestion(id);
+		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
+		}
+
+		QuestionBank questionBank = questionBankService.getById(questionBankId);
+		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
+		}
 	}
 }

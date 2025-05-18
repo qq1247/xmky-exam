@@ -21,7 +21,7 @@
                     <el-form-item label="管理用户" prop="userIds">
                         <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
                             search-parm-name="name" option-label="name" option-value="id" :options="users"
-                            :multiple="true" clearable search-placeholder="请输入机构名称或用户名称进行筛选">
+                            :multiple="true" :page-size="100" clearable search-placeholder="请输入机构名称或用户名称进行筛选">
                             <template #default="{ option }">
                                 {{ option.name }} - {{ option.orgName }}
                             </template>

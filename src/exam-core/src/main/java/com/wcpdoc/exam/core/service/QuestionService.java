@@ -85,4 +85,13 @@ public interface QuestionService extends BaseService<Question> {
 	 * @return List<Question>
 	 */
 	List<Question> getList(Integer questionBankId);
+
+	/**
+	 * 试题移动
+	 * 
+	 * v1.0 zhanghc 2025年5月18日下午4:24:28
+	 * @param id
+	 * @param questionBankId void
+	 */
+	void move(Integer id, Integer questionBankId);
 }

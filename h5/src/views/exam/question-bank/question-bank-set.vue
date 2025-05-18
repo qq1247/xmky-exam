@@ -14,6 +14,36 @@
                 </el-form>
             </template>
         </xmks-edit-card>
+        <xmks-edit-card v-if="form.id" title="移动试题" desc="移动试题">
+            <template #card-main>
+                <el-form ref="moveFormRef" :model="moveForm" :rules="moveFormRules" inline label-width="100"
+                    size="large" class="form">
+                    <el-form-item label="选试题：" prop="questionIds" style="width: 100%;">
+                        <xmks-select v-model="moveForm.questionIds" url="question/listpage"
+                            :params="{ questionBankId: moveForm.id }" search-parm-name="title" option-label="title"
+                            option-value="id" :multiple="true" clearable :page-size="100" search-placeholder="请输入题干进行筛选"
+                            placeholder="请输入题干进行筛选">
+                            <template #default="{ option }">
+                                {{ option.id }} - {{ option.title }}
+                            </template>
+                        </xmks-select>
+                    </el-form-item>
+                    <el-form-item label="移动到：" prop="questionBankId" style="width: 100%;">
+                        <xmks-select v-model="moveForm.questionBankId" url="questionBank/listpage" :params="{}"
+                            search-parm-name="name" option-label="name" option-value="id" :multiple="false" clearable
+                            :page-size="100" :disabled-values=[form.id] search-placeholder="请输入题库名称进行筛选"
+                            placeholder="请输入题库名称进行筛选">
+                            <template #default="{ option }">
+                                {{ option.name }} {{ form.id == option.id ? '（不可选）' : '' }}
+                            </template>
+                        </xmks-select>
+                    </el-form-item>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-button type="primary" class="form__btn" @click="move" style="margin-bottom: 40px;">移动试题</el-button>
+            </template>
+        </xmks-edit-card>
         <xmks-edit-card v-if="form.id" title="清空试题" desc="清空试题">
             <template #card-side>
                 <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': clearConfirm }"
@@ -36,6 +66,8 @@ import { useRouter, useRoute } from 'vue-router'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import type { QuestionBank } from '@/ts/exam/question-bank'
 import { questionBankAdd, questionBankDel, questionBankEdit, questionBankGet, questionBankClear } from '@/api/exam/question-bank'
+import XmksSelect from '@/components/xmks-select.vue'
+import { questionMove } from '@/api/exam/question'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -54,6 +86,20 @@ const formRules = reactive<FormRules>({// 表单规则
 const delConfirm = ref(false) // 删除确认
 const clearConfirm = ref(false) // 清空确认
 
+const moveFormRef = ref<FormInstance>()// 表单引用
+const moveForm = reactive({// 表单
+    id: null,// ID
+    questionIds: [],// 试题IDS
+    questionBankId: [],// 题库ID
+})
+const moveFormRules = reactive<FormRules>({// 表单校验规则
+    questionIds: [
+        { required: true, message: '请选择试题', trigger: 'blur' },
+    ],
+    questionBankId: [
+        { required: true, message: '请选择题库', trigger: 'blur' },
+    ],
+})
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -63,6 +109,8 @@ onMounted(async () => {
         const { data: { data } } = await questionBankGet({ id: route.params.id })
         form.id = data.id
         form.name = data.name
+
+        moveForm.id = data.id
     }
 })
 
@@ -111,6 +159,24 @@ async function del() {
     }
 
     const { data: { code } } = await questionBankDel({ id: form.id })
+    if (code !== 200) {
+        return
+    }
+
+    router.push("/question-bank-list")
+}
+
+// 移动
+async function move() {
+    // 数据校验
+    try {
+        await moveFormRef.value?.validate()
+    } catch (e) {
+        return
+    }
+
+    // 修改
+    const { data: { code } } = await questionMove({ ids: moveForm.questionIds, questionBankId: moveForm.questionBankId })
     if (code !== 200) {
         return
     }

@@ -15,7 +15,7 @@
                             <span class="iconfont icon-fabu-10 exam-info__tag-icon"></span>
                             <span class="exam-info__tag-txt">{{ dictStore.getValue('LOGIN_TYPE', form.loginType as
                                 number)
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-11 exam-info__tag-icon"></span>

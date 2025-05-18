@@ -48,42 +48,6 @@ public class QuestionBankExServiceImpl extends BaseServiceImp<QuestionBank> impl
 	}
 
 	@Override
-	public void move(Integer sourceId, Integer targetId) {
-		// 数据校验
-		if (sourceId == null) {
-			throw new MyException("参数错误：sourceId");
-		}
-		if (targetId == null) {
-			throw new MyException("参数错误：targetId");
-		}
-
-		QuestionBank source = questionBankService.getById(sourceId);
-		if (source == null) {
-			throw new MyException(String.format("参数错误：sourceId"));
-		}
-		QuestionBank target = questionBankService.getById(targetId);
-		if (target == null) {
-			throw new MyException(String.format("参数错误：targetId"));
-		}
-
-		if (source.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("无操作权限");
-		}
-		if (target.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("无操作权限");
-		}
-
-		// 合并
-		List<Question> questionList = questionService.getList(sourceId);
-		for (Question question : questionList) {
-			question.setQuestionBankId(targetId);
-			// question.setUpdateTime(new Date());
-			// question.setUpdateUserId(getCurUser().getId()); // 保留移动前的
-			questionService.updateById(question);
-		}
-	}
-
-	@Override
 	public void clear(Integer id) {
 		// 数据校验
 		if (!ValidateUtil.isValid(id)) {

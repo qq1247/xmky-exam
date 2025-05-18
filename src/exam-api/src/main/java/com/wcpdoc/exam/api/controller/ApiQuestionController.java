@@ -272,4 +272,28 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 试题移动
+	 * 
+	 * v1.0 zhanghc 2025年5月18日下午4:23:23
+	 * @param ids
+	 * @param questionBankId
+	 * @return PageResult
+	 */
+	@RequestMapping("/move")
+	public PageResult move(Integer[] ids, Integer questionBankId) {
+		try {
+			for (Integer id : ids) {
+				questionService.move(id, questionBankId);
+			}
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("试题移动错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("试题移动错误：", e);
+			return PageResult.err();
+		}
+	}
 }

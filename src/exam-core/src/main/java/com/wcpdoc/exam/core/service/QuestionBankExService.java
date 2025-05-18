@@ -19,16 +19,6 @@ public interface QuestionBankExService {
 	void delEx(QuestionBank questionBank);
 
 	/**
-	 * 题库合并
-	 * 
-	 * v1.0 zhanghc 2022年6月16日下午4:44:00
-	 * 
-	 * @param sourceId
-	 * @param targetId void
-	 */
-	void move(Integer sourceId, Integer targetId);
-
-	/**
 	 * 题库清空
 	 * 
 	 * v1.0 zhanghc 2022年9月15日上午9:28:44

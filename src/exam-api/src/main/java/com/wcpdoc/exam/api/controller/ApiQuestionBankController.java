@@ -185,27 +185,6 @@ public class ApiQuestionBankController extends BaseController {
 		}
 	}
 
-//	/**
-//	 * 题库合并
-//	 * 
-//	 * v1.0 zhanghc 2017-05-07 14:56:29
-//	 * @param id
-//	 * @return pageOut
-//	 */
-//	@RequestMapping("/move")
-//	public PageResult move(Integer sourceId, Integer targetId) {
-//		try {
-//			questionBankService.move(sourceId, targetId);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("题库合并错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		}  catch (Exception e) {
-//			log.error("题库合并错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-
 	/**
 	 * 题库清空
 	 * 

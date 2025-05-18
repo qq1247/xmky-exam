@@ -194,6 +194,26 @@
                 <el-button type="primary" class="form__btn" style="margin-bottom: 14px;" @click="copy">复制试题</el-button>
             </template>
         </xmks-edit-card>
+        <xmks-edit-card v-if="form.id" title="移动试题" desc="移动试题" class="form">
+            <template #card-main>
+                <el-form ref="moveFormRef" :model="moveForm" :rules="moveFormRules" inline label-width="100"
+                    size="large" class="form">
+                    <el-form-item label="" prop="questionBankId" style="width: 100%;">
+                        <xmks-select v-model="moveForm.questionBankId" url="questionBank/listpage" :params="{}"
+                            search-parm-name="name" option-label="name" option-value="id" :multiple="false" clearable
+                            :page-size="100" :disabled-values=[form.id] search-placeholder="请输入题库名称进行筛选"
+                            placeholder="请输入题库名称进行筛选">
+                            <template #default="{ option }">
+                                {{ option.name }} {{ form.id == option.id ? '（不可选）' : '' }}
+                            </template>
+                        </xmks-select>
+                    </el-form-item>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-button type="primary" class="form__btn" @click="move" style="margin-bottom: 40px;">移动试题</el-button>
+            </template>
+        </xmks-edit-card>
         <xmks-edit-card v-if="form.id" title="删除试题" desc="删除试题" class="form">
             <template #card-side>
                 <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': delConfirm }" @click="de1"
@@ -204,7 +224,7 @@
 </template>
 
 <script lang="ts" setup>
-import { questionAdd, questionCopy, questionDel, questionEdit, questionGet } from '@/api/exam/question'
+import { questionAdd, questionCopy, questionDel, questionEdit, questionGet, questionMove } from '@/api/exam/question'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import http from '@/request'
 import { useDictStore } from '@/stores/dict'
@@ -218,6 +238,7 @@ import { ElMessage, type FormInstance, type FormRules, type UploadFile, type Upl
 import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { VueDraggable } from 'vue-draggable-plus'
+import XmksSelect from '@/components/xmks-select.vue'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -325,6 +346,17 @@ const imgFileList = ref<UploadUserFile[]>([])
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 
+const moveFormRef = ref<FormInstance>()// 表单引用
+const moveForm = reactive({// 表单
+    id: null,// ID
+    questionBankId: [],// 题库ID
+})
+const moveFormRules = reactive<FormRules>({// 表单校验规则
+    questionBankId: [
+        { required: true, message: '请选择题库', trigger: 'blur' },
+    ],
+})
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加
@@ -373,6 +405,8 @@ onMounted(async () => {
                 name: `${fileId}`
             })
         })
+
+        moveForm.id = data.id
     }
 })
 
@@ -580,6 +614,25 @@ function addKeyword() {
 function delKeyword() {
     form.answers.pop()
     form.scores.pop()
+}
+
+
+// 移动
+async function move() {
+    // 数据校验
+    try {
+        await moveFormRef.value?.validate()
+    } catch (e) {
+        return
+    }
+
+    // 修改
+    const { data: { code } } = await questionMove({ ids: moveForm.id, questionBankId: moveForm.questionBankId })
+    if (code !== 200) {
+        return
+    }
+
+    router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
 }
 
 // 上传之前处理

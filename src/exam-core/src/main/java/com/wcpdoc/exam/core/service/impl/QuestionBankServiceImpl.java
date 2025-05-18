@@ -50,11 +50,6 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 	}
 
 	@Override
-	public void move(Integer sourceId, Integer targetId) {
-		questionBankExService.move(sourceId, targetId);
-	}
-
-	@Override
 	public void clear(Integer id) {
 		// 题库清理
 		QuestionBank questionBank = getById(id);
