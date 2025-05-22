@@ -34,6 +34,8 @@ public interface UserDao extends RBaseDao<User> {
 						.in(pageIn.hasParm("ids"), "USER.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))// 页面过滤
 						.in(pageIn.hasParm("_ids") && !pageIn.hasParm("_orgIds"), "USER.ID",
 								pageIn.getParm("_ids", List.class))// 控制层控制子管理员只能过滤自己的考试用户
+						.in(!pageIn.hasParm("_ids") && pageIn.hasParm("_orgIds"), "USER.ORG_ID",
+								pageIn.getParm("_orgIds", List.class))
 						.and(pageIn.hasParm("_ids") && pageIn.hasParm("_orgIds"),
 								i -> i.in("USER.ID", pageIn.getParm("_ids", List.class)).or().in("USER.ORG_ID",
 										pageIn.getParm("_orgIds", List.class)))

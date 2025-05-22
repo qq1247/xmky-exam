@@ -66,8 +66,12 @@ public class ApiUserController extends BaseController {
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
 					User user = baseCacheService.getUser(getCurUser().getId());
-					pageIn.addParm("_ids", user.getUserIds());// 只看自己可以管理的考试用户，不要用ids，这个是页面过滤用的，如考试选择用户回显。
-					pageIn.addParm("_orgIds", user.getOrgIds());
+					if (ValidateUtil.isValid(user.getUserIds())) {
+						pageIn.addParm("_ids", user.getUserIds());// 只看自己可以管理的考试用户，不要用ids，这个是页面过滤用的，如考试选择用户回显。
+					}
+					if (ValidateUtil.isValid(user.getOrgIds())) {
+						pageIn.addParm("_orgIds", user.getOrgIds());
+					}
 				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
