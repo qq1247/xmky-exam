@@ -783,6 +783,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					Question question = new Question();
 					question.setType(examQuestionEx.getQuestionType());
 					question.setTitle(examQuestionEx.getTitle());
+					question.setImgFileIds(examQuestionEx.getImgFileIds());
 					question.setMarkType(examQuestionEx.getMarkType());
 					question.setMarkOptions(examQuestionEx.getMarkOptions());
 					question.setAnalysis(examQuestionEx.getAnalysis());
