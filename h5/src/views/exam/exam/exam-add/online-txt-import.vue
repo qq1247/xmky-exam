@@ -47,6 +47,7 @@ function txtImport() {
             questionType: question.type,
             markType: question.markType,
             title: question.title,
+            imgFileIds: question.imgFileIds,
             score: question.score,
             answers: question.answers,
             scores: question.scores,

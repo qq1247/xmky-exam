@@ -256,7 +256,7 @@ function parseQuestion(questionTxt: string[]) {
             analysisIndex = index
         } else if (/^\[(?!解析)/.test(txt)) {// 已[号开头，并且不包含解析
             answerIndex = index
-        } else if (/^[A-Za-z][.。、]?/.test(txt)) {// 已abcdefg中的一个开头，后面跟.。、或没有
+        } else if (/^[A-Za-z][.。、]/.test(txt)) {// 已abcdefg中的一个开头，后面跟.。、或没有
             optionIndexArr.push(index)
         }
     })
@@ -335,7 +335,7 @@ function parseQuestion(questionTxt: string[]) {
         for (let i = 0; i < optionIndexArr.length - 1; i++) {
             let optionContent = questionTxt.slice(optionIndexArr[i], optionIndexArr[i + 1]).join("<br/>") // 回车行转br标签
             const optionIndex = optionContent.substring(0, 1).toUpperCase().charCodeAt(0) - 65
-            optionContent = optionContent.replace(/^[A-Za-z][.。、]?/, '')
+            optionContent = optionContent.replace(/^[A-Za-z][.。、]/, '')
             options.push(optionContent)
 
             if (i !== optionIndex) {
@@ -345,7 +345,7 @@ function parseQuestion(questionTxt: string[]) {
         }
         let optionContent = questionTxt.slice(optionIndexArr[optionIndexArr.length - 1], answerIndex).join("<br/>") // 最后一个选项从当前行到答案行之间的都是
         const optionIndex = optionContent.substring(0, 1).toUpperCase().charCodeAt(0) - 65
-        optionContent = optionContent.replace(/^[A-Za-z][.。、]?/, '')
+        optionContent = optionContent.replace(/^[A-Za-z][.。、]/, '')
         options.push(optionContent)
         if (optionIndexArr.length - 1 !== optionIndex) {
             question.errs = `选项顺序错误：${questionTxt.join('')}`

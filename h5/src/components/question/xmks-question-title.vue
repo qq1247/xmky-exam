@@ -1,6 +1,7 @@
 <template>
     <div class="xmks-question-title">
         <template v-if="type !== 3">
+            <!--不需要escape2Html，转义有代码注入风险-->
             <span v-html="titles[0].value"></span>
             <span>（{{ score }}分）</span>
         </template>
@@ -42,9 +43,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
-import { escape2Html } from '@/util/htmlUtil'
-
+import { escape2Html } from '@/util/htmlUtil';
+import Prism from 'prismjs';
+import 'prismjs/plugins/match-braces/prism-match-braces';
+import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+import 'prismjs/themes/prism-tomorrow.css';
+import { computed, nextTick, ref, watch } from 'vue';
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{
@@ -70,14 +75,6 @@ const props = withDefaults(defineProps<{
 const userAnswers = ref(props.userAnswers) // 用户答案
 const userAnswerShow = ref(props.userAnswerShow) // 用户答案显示
 
-/************************监听相关*****************************/
-watch(() => props.userAnswerShow, () => {
-    userAnswerShow.value = props.userAnswerShow
-})
-watch(() => props.userAnswers, () => {
-    userAnswers.value = props.userAnswers
-})
-
 /************************计算属性相关*************************/
 const isHalf = computed(() => props.userScore != null && props.userScore > 0 && props.userScore !== props.score); // 是否半对
 const isRight = computed(() => props.userScore != null && props.userScore === props.score); // 是否答对
@@ -91,17 +88,27 @@ const answers = computed(() => { // 标准答案
 })
 
 const titles = computed(() => {// 题干
+    const titleWithHeight = props.title.replace(/```([a-z]*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
+        const highlighted = Prism.highlight(
+            escape2Html(code.trim()),// 没有注入风险，插件把特殊符号拆分了。如alert(1) 变为 <span class="token function">alert</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+            Prism.languages[lang] || Prism.languages.plaintext,
+            lang
+        );
+        return `<pre><code class="language-${lang} line-numbers match-braces">${highlighted}</code></pre>`;
+    });
+
+
     // 如果不是填空题，正常返回
     if (props.type !== 3) {
         return [{
             type: 'txt',
-            value: props.title?.replaceAll('\n', '<br/>'),
+            value: titleWithHeight,
             index: -1,
         },]
     }
 
     // 如果是填空题，按下划线分割，用于转化为输入框
-    let title = props.title.replaceAll('\n', '<br/>')// '______AAAAA_____BBBBB____________CCCCC__DDDDD______'
+    let title = titleWithHeight// '______AAAAA_____BBBBB____________CCCCC__DDDDD______'
     const titles = []
     let pos = 0
     title.match(/[_]{5,}/g)?.forEach((value) => {
@@ -133,6 +140,19 @@ const titles = computed(() => {// 题干
     }
     return titles
 })
+
+/************************监听相关*****************************/
+watch(() => props.userAnswerShow, () => {
+    userAnswerShow.value = props.userAnswerShow
+})
+watch(() => props.userAnswers, () => {
+    userAnswers.value = props.userAnswers
+})
+watch(titles, () => {
+    nextTick(() => {
+        Prism.highlightAll();
+    })
+}, { immediate: true })
 
 </script>
 

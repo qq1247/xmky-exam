@@ -3,12 +3,14 @@ package com.wcpdoc.exam.api.controller;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -23,8 +25,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -74,6 +83,11 @@ public class ApiReportController extends BaseController {
 	private MyPaperService myPaperService;
 	@Resource
 	private FileService fileService;
+
+	@Value("classpath:templates/prism.js")
+	private org.springframework.core.io.Resource prismJsResource;
+	@Value("classpath:templates/prism.css")
+	private org.springframework.core.io.Resource prismCssResource;
 
 	static Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
 	static {
@@ -368,10 +382,57 @@ public class ApiReportController extends BaseController {
 				template.process(data, writer);
 			}
 
+			File prismJs = new File(tempDir, "prism.js");
+			File prismCss = new File(tempDir, "prism.css");
+			if (!prismJs.exists()) {
+				FileUtils.copyInputStreamToFile(prismJsResource.getInputStream(), prismJs);
+			}
+			if (!prismCss.exists()) {
+				FileUtils.copyInputStreamToFile(prismCssResource.getInputStream(), prismCss);
+			}
+
+			{// 如果有代码片段，则高亮并带行号（wkhtmltopdf对js支持不友好，比如代码高亮的背景色、行号，它更适合纯html解析
+				Document doc = Jsoup.parse(new String(Files.readAllBytes(tempHtmlFile.toPath())));
+				Elements titles = doc.select(".question__title");
+		        
+				ScriptEngineManager manager = new ScriptEngineManager();
+		        ScriptEngine engine = manager.getEngineByName("nashorn");
+		        try (FileReader reader = new FileReader(prismJs)) {
+		        	engine.eval(reader);
+		        
+					for (Element title : titles) {
+						Matcher matcher = Pattern.compile("```([a-z]*)<br>([\\s\\S]*?)<br>```").matcher(title.html());
+						StringBuffer result = new StringBuffer();
+	
+						while (matcher.find()) {
+							String lang = matcher.group(1);
+							String code = matcher.group(2).replaceAll("<br>", "\n");
+
+							engine.put("lang", lang);
+							engine.put("code", code);
+							String higCode = (String) engine.eval(
+									"Prism.highlight(code, Prism.languages[lang] || Prism.languages.plaintext, lang);");
+							int lineCount = higCode.split("\n").length;
+							StringBuilder lineNumbersRows = new StringBuilder();
+							lineNumbersRows.append("<span aria-hidden=\"true\" class=\"line-numbers-rows\">");
+							for (int i = 0; i < lineCount; i++) {
+								lineNumbersRows.append("<span></span>");
+							}
+							lineNumbersRows.append("</span>");
+							matcher.appendReplacement(result, "<pre class=\"line-numbers language-java\"><code class=\"match-braces language-java\">"
+									+ higCode + lineNumbersRows.toString() + "</code></pre>");
+						}
+						matcher.appendTail(result);
+						title.html(result.toString());
+					}
+		        }
+		        Files.write(tempHtmlFile.toPath(), doc.outerHtml().getBytes(StandardCharsets.UTF_8));
+			}
+
 			// html文件转pdf
 			String WK_PATH = "wkhtmltopdf";
 			File tempPdfFile = new File(tempDir, fileName + ".pdf");
-			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, tempHtmlFile.getAbsolutePath(),
+			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, "--enable-local-file-access", tempHtmlFile.getAbsolutePath(),
 					tempPdfFile.getAbsolutePath());
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
@@ -543,6 +604,26 @@ public class ApiReportController extends BaseController {
 
 			log.error("导出考试排名错误：", e);
 		}
+	}
+	
+	public static void main(String[] args) {
+		String input = "1、素质教育理念的核心是()（直接文本写入）<br>```java<br>File prismJs = new File(tempDir, \"prism.js\");<br>File prismCss = new File(tempDir, \"prism.css\");<br>```（4分）";
+		input =                                        "<br>```java<br>File prismJs = new File(tempDir, \"prism.js\");<br>File prismCss = new File(tempDir, \"prism.css\");<br>```（4分）";
+		Matcher matcher = Pattern.compile("```([a-z]*)<br>([\\s\\S]*?)<br>```").matcher(input);
+		StringBuffer result = new StringBuffer();
+
+		while (matcher.find()) {
+			String lang = matcher.group(1);
+			String code = matcher.group(2);
+
+			String processedLang = lang;
+			String processedCode = code;
+
+			matcher.appendReplacement(result, processedLang + ":" + processedCode);
+		}
+		matcher.appendTail(result);
+
+		System.out.println("处理后结果: " + result.toString());
 	}
 
 }

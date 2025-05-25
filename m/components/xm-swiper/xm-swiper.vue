@@ -1,5 +1,6 @@
 <template>
-	<swiper :current="curSwiperIndex" :circular="true" @change="(e: any) => e.detail.source === 'touch' && synIndex(e.detail.current)">
+	<!-- 题干有代码块超出屏幕滚动时，和此组件冲突；极小概率滑动时显示前半个和后半个；临时停用滑动，不影响功能。 -->
+	<swiper :current="curSwiperIndex" :circular="true" @change="(e: any) => e.detail.source === 'touch' && synIndex(e.detail.current)" :disable-touch="true">
 		<swiper-item v-for="(item, index) in swiperItems" :key="index">
 			<slot :item="item"></slot>
 		</swiper-item>

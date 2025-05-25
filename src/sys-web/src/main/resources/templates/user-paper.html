@@ -2,9 +2,11 @@
 <html lang="">
 
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>试卷导出PDF</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>试卷导出PDF</title>
+	<link rel="stylesheet" href="./prism.css">
+    <!-- <script src="./prism.js"></script> -->
 </head>
 
 <body>
@@ -32,9 +34,9 @@
 			<div class="question__title">
 				<#assign seq = seq + 1>
 				<#if paperPart.questionType!=3>
-				<span>${seq}、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）</span>
+				<span>${seq}、${(paperPart.title!)?replace('\n', '<br>','r')}（${paperPart.score}分）</span>
 				<#else>
-				${seq}、${(paperPart.title!)?replace('\n', '<br/>','r')}（${paperPart.score}分）
+				${seq}、${(paperPart.title!)?replace('\n', '<br>','r')}（${paperPart.score}分）
 				</#if>
 				<#if paperPart.userScore==paperPart.score>
 				<span class="question__score question__score--right">
@@ -121,6 +123,18 @@
 		</#if>
 		</#list>
 	</div>
+	<script>
+		/* document.querySelectorAll('.question__title').forEach(titleElement => {// 后台处理，wkhtmltopdf对js支持不友好
+		    titleElement.innerHTML = titleElement.innerHTML.replace(/```([a-z]*)<br>([\s\S]*?)<br>```/g, (match, lang, code) => {
+	        const hightCode = Prism.highlight(
+	                code.trim().replace('<br>', '\n'),
+	                Prism.languages[lang] || Prism.languages.plaintext,
+	                lang
+	            );
+	            return "<pre><code class='language-"+lang+" line-numbers match-braces'>"+hightCode+"</code></pre>";
+	        });
+		}) */
+	</script>
 </body>
 <style>
     * {
@@ -407,5 +421,4 @@
         line-height: 22px;
     }
 </style>
-
 </html>
