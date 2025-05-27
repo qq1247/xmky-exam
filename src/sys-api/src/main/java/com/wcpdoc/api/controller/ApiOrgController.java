@@ -1,5 +1,8 @@
 package com.wcpdoc.api.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,7 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +54,13 @@ public class ApiOrgController extends BaseController {
 				// 看全部
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				User user = baseCacheService.getUser(getCurUser().getId());
-				pageIn.addParm("_ids", user.getOrgIds());
+				if (ValidateUtil.isValid(user.getOrgIds())) {
+					pageIn.addParm("_ids", user.getOrgIds());
+				} else {
+					List<Integer> idList = new ArrayList<>();
+					idList.add(-1);// 没有就不显示
+					pageIn.addParm("_ids", idList);
+				}
 			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限
 
 			} else if (getCurUser().getType() == 1) {// 考试用户没有角色权限

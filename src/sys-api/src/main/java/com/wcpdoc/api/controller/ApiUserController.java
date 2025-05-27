@@ -1,6 +1,8 @@
 package com.wcpdoc.api.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -66,12 +68,19 @@ public class ApiUserController extends BaseController {
 			} else if (getCurUser().getType() == 2) {// 如果是子管理
 				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
 					User user = baseCacheService.getUser(getCurUser().getId());
-					if (ValidateUtil.isValid(user.getUserIds())) {
-						pageIn.addParm("_ids", user.getUserIds());// 只看自己可以管理的考试用户，不要用ids，这个是页面过滤用的，如考试选择用户回显。
+					if (!ValidateUtil.isValid(user.getUserIds()) && !ValidateUtil.isValid(user.getOrgIds())){
+						List<Integer> orgIds = new ArrayList<>();
+						orgIds.add(-1);
+						pageIn.addParm("_orgIds", orgIds);// 没有就不显示
+					} else {
+						if (ValidateUtil.isValid(user.getUserIds())) {
+							pageIn.addParm("_ids", user.getUserIds());// 只看自己可以管理的考试用户，不要用ids，这个是页面过滤用的，如考试选择用户回显。
+						} 
+						if (ValidateUtil.isValid(user.getOrgIds())) {
+							pageIn.addParm("_orgIds", user.getOrgIds());
+						} 
 					}
-					if (ValidateUtil.isValid(user.getOrgIds())) {
-						pageIn.addParm("_orgIds", user.getOrgIds());
-					}
+					
 				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
 				}

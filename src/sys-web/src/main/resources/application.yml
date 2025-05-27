@@ -98,9 +98,11 @@ shiro-filter:
        
       ? /api/user/edit: demoMode
       ? /api/user/frozen: demoMode
+      ? /api/user/pwdInit: demoMode
+      ? /api/login/pwd: demoMode
        
       ? /api/questionBank/edit: demoMode
       ? /api/questionBank/clear: demoMode
       
 sys:
-  ver: 5.2.1
+  ver: 5.3.0
