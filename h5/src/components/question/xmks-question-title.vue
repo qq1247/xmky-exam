@@ -159,6 +159,7 @@ watch(titles, () => {
 <style lang="scss">
 .xmks-question-title {
     display: flex-line;
+    width: 100%;
     font-size: 14px;
     color: #303133;
     line-height: 28px;

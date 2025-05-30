@@ -361,7 +361,7 @@ const moveFormRules = reactive<FormRules>({// 表单校验规则
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加
         if (hasSingleChoice(form)) {
-            form.title = '这是一道单选题的题干'
+            form.title = `这是一道单选题的题干，支持代码高亮，格式和markdown保持一致，如插入片段\`\`\`js\nalert('hello world'); \n\`\`\``
             addOption()
             addOption()
         } else if (hasMultipleChoice(form)) {
@@ -426,7 +426,7 @@ watch(() => form.type, (type) => {
     form.answers.splice(0)
     form.analysis = ''
     if (type === 1) {
-        form.title = '这是一道单选题的题干'
+        form.title = `这是一道单选题的题干，支持代码高亮，格式和markdown保持一致，如题干插入片段\`\`\`js\nalert('hello world'); \n\`\`\``
         addOption()
         addOption()
     } else if (type === 2) {

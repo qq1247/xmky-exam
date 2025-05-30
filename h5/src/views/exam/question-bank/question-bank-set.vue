@@ -18,7 +18,8 @@
             <template #card-main>
                 <el-form ref="moveFormRef" :model="moveForm" :rules="moveFormRules" inline label-width="100"
                     size="large" class="form">
-                    <el-form-item label="选试题：" prop="questionIds" style="width: 100%;">
+                    <!-- 100% 超出界面 -->
+                    <el-form-item label="选试题：" prop="questionIds" style="width: 880px;">
                         <xmks-select v-model="moveForm.questionIds" url="question/listpage"
                             :params="{ questionBankId: moveForm.id }" search-parm-name="title" option-label="title"
                             option-value="id" :multiple="true" clearable :page-size="100" search-placeholder="请输入题干进行筛选"
