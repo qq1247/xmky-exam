@@ -1,12 +1,7 @@
+import he from 'he'
 
 const escapeString = (str: string): string => {
-    return str?.replaceAll('&amp;', '&')
-        .replaceAll('&lt;', '<')
-        .replaceAll('&gt;', '>')
-        .replaceAll('&quot;', '"')
-        .replaceAll('&apos;', '\'')
-        .replaceAll('&ldquo;', '“')
-        .replaceAll('&rdquo;', '”');
+    return he.decode(str)
 };
 export const escape2Html = <T extends string | string[]>(txt: T): T => {
     if (Array.isArray(txt)) {
