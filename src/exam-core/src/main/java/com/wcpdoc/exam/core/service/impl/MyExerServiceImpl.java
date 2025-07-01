@@ -225,11 +225,20 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 			throw new MyException("无操作权限");
 		}
 		Question question = examCacheService.getQuestion(myExerQuestion.getQuestionId());
-		if (QuestionUtil.hasSubjective(question) && !ValidateUtil.isValid(userScore)) {// 主观题需要自评分数
-			throw new MyException("参数错误：userScore");
+		if (QuestionUtil.hasSubjective(question)) {// 主观题需要自评分数
+			if (!ValidateUtil.isValid(userScore)) {
+				throw new MyException("参数错误：userScore");
+			}
+			if (userScore.doubleValue() < 0) {
+				throw new MyException("自评最低0分");
+			}
+			if (userScore.doubleValue() > question.getScore().doubleValue()) {
+				throw new MyException(String.format("自评最高%s分", question.getScore().doubleValue()));
+			}
 		}
 
-		if (ValidateUtil.isValid(myExerQuestion.getUserAnswer())) {
+//		if (ValidateUtil.isValid(myExerQuestion.getUserAnswer())) {// 不知道答案作答，答案为空，分数为0。使用userScore更准确
+		if (ValidateUtil.isValid(myExerQuestion.getUserScore())) {
 			throw new MyException("已作答");
 		}
 

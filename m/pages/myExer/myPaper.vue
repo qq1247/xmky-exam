@@ -112,7 +112,7 @@
 			>
 				下一题
 			</button>
-			<button class="question-confirm" type="primary" @click="answer">确认作答</button>
+			<button v-show="!toolbars.answerShow && curExamQuestion?.userScore == null" class="question-confirm" type="primary" @click="answer">确认作答</button>
 
 			<xm-popup ref="answerSheet" name="答题卡" class="answer-sheet">
 				<view class="answer-sheet__head">
@@ -375,7 +375,13 @@ async function answer() {
 // 答题（主观题）
 async function answerOfObjective(val: string) {
 	const parsedValue = Number(val);
-	const userScore = isNaN(parsedValue) ? 0 : Math.round(parsedValue * 100) / 100;
+	let userScore: number = isNaN(parsedValue) ? 0 : Math.round(parsedValue * 100) / 100;
+	if (userScore < 0) {
+		userScore = 0
+	}
+	if (userScore > curExamQuestion.value.score) {
+		userScore = curExamQuestion.value.score
+	}
 
 	const { code, data } = await myExerAnswer({
 		exerId: pageParm.exerId,
