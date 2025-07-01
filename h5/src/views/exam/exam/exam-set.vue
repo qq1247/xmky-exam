@@ -192,7 +192,7 @@
                         style="margin-bottom: 40px;">保存设置</el-button>
                 </template>
             </xmks-edit-card>
-            <xmks-edit-card title="考试用户" desc="考试未结束允许添加人员或机构">
+            <xmks-edit-card v-if="form.loginType === 1" title="考试用户" desc="考试未结束允许添加人员或机构">
                 <template #card-main>
                     <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" inline label-width="100"
                         size="large" class="form">

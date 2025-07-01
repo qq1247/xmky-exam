@@ -208,13 +208,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
+	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
 	public void userAdd(Integer id, Set<Integer> orgIds, Set<Integer> userIds) {
 		// 数据校验
 		userAddValid(id, orgIds, userIds);
 
-		// 更新考试信息
+		// 考试更新
 		Exam exam = examCacheService.getExam(id);
-		Set<Integer> userIdsOld = new HashSet<>(exam.getUserIds());
+		Set<Integer> oldUserIds = new HashSet<>(exam.getUserIds());
 		exam.setUserIds(new ArrayList<>(userIds));
 		exam.setOrgIds(new ArrayList<>(orgIds));
 		exam.setUpdateTime(new Date());
@@ -222,7 +223,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		updateById(exam);
 
 		// 找到需要添加的用户（只添加多出来的用户，因为如果减员会造成成绩不合格，删掉重新考试的bug。页面也做了限制，已添加的用户不可选）
-		userIds.removeAll(userIdsOld);
+		userIds.removeAll(oldUserIds);
 
 		// 生成考试用户试卷
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
@@ -1507,11 +1508,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	private void userAddValid(Integer id, Set<Integer> orgIds, Set<Integer> userIds) {
 		Exam exam = examCacheService.getExam(id);
+		if (exam.getLoginType() == 2) {
+			throw new MyException("免登录考试");
+		}
+
 		if (!(CurLoginUserUtil.isSelf(exam.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
 		if (exam.getState() == 0) {
 			throw new MyException("已删除");
+		}
+		if (exam.getState() == 2) {
+			throw new MyException("已暂停");
 		}
 
 		if (exam.getMarkState() >= 2) {// 只要考试没结束就可以添加
@@ -1531,6 +1539,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("无机构操作权限");
 			}
 		}
+
+		userIds.forEach(userId -> {// 非考试用户校验
+			User user = baseCacheService.getUser(userId);
+			if (user.getType() != 1) {
+				throw new MyException(String.format("【%s-%s】非考试用户", user.getId(), user.getName()));
+			}
+		});
 	}
 
 	private void scoreValid(Integer id) {
