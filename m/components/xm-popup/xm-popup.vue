@@ -16,7 +16,7 @@
 import { ref } from 'vue';
 
 /************************变量定义相关***********************/
-defineExpose({ open });
+defineExpose({ open, close });
 const props = withDefaults(
 	defineProps<{
 		name: string;
@@ -32,6 +32,10 @@ const popup = ref(); // 答题卡
 // 打开
 function open() {
 	popup.value.open();
+}
+// 关闭
+function close() {
+	popup.value.close();
 }
 </script>
 

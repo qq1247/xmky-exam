@@ -1,4 +1,4 @@
-e<template>
+<template>
     <div class="exam-progress">
         <!-- <div v-if="navShow" class="exam-progress__head">
             <el-button type="primary" class="exam-progress__btn" @click="publish">

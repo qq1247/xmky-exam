@@ -3,16 +3,18 @@ package com.wcpdoc.exam.api.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -21,14 +23,16 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exer;
-import com.wcpdoc.exam.core.entity.ExerRmk;
+import com.wcpdoc.exam.core.entity.MyExerQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.ex.QuestionPart;
 import com.wcpdoc.exam.core.service.ExamCacheService;
-import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
-import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.service.MyExerQuestionService;
+import com.wcpdoc.exam.core.service.MyExerService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
@@ -37,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 我的练习控制层
  * 
- * v1.0 chenyun 2021-03-02 13:43:21
+ * v1.0 zhanghc 2025年6月8日下午9:22:47
  */
 @RestController
 @RequestMapping("/api/myExer")
@@ -45,20 +49,22 @@ import lombok.extern.slf4j.Slf4j;
 public class ApiMyExerController extends BaseController {
 
 	@Resource
-	private ExerService exerService;
+	private MyExerService myExerService;
 	@Resource
-	private QuestionService questionService;
+	private ExerService exerService;
 	@Resource
 	private QuestionBankService questionBankService;
 	@Resource
-	private ExerRmkService exerRmkService;
+	private BaseCacheService baseCacheService;
+	@Resource
+	private MyExerQuestionService myExerQuestionService;
 	@Resource
 	private ExamCacheService examCacheService;
 
 	/**
 	 * 我的练习列表
 	 * 
-	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * v1.0 zhanghc 2025年6月8日下午9:22:47
 	 * 
 	 * @param pageIn
 	 * @return pageOut
@@ -66,11 +72,8 @@ public class ApiMyExerController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			pageIn.addParm("examUserId", getCurUser().getId());
-			PageOut pageOut = exerService.getListpage(pageIn);
-			for (Map<String, Object> map : pageOut.getList()) {
-				map.remove("userIds");// 我的练习不需要该字段
-			}
+			pageIn.addParm("curUserId", getCurUser().getId());
+			PageOut pageOut = myExerService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的练习列表错误：", e);
@@ -79,33 +82,58 @@ public class ApiMyExerController extends BaseController {
 	}
 
 	/**
-	 * 练习获取
+	 * 我的练习拉取
 	 * 
-	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * v1.0 zhanghc 2025年6月15日上午10:04:37
 	 * 
 	 * @param exerId
+	 * @param userId
 	 * @return PageResult
 	 */
-	@RequestMapping("/get")
-	public PageResult get(Integer exerId) {
+	@RequestMapping("/pull")
+	public PageResult pull(Integer exerId) {
 		try {
-			Exer exer = exerService.getById(exerId);
-			if (!exer.getUserIds().contains(getCurUser().getId())) {
-				throw new MyException("无操作权限");
-			}
-			return PageResultEx.ok()//
-					.addAttr("id", exer.getId())//
-					.addAttr("name", exer.getName())//
-					.addAttr("questionBankId", exer.getQuestionBankId())//
-					.addAttr("questionBankName", questionBankService.getById(exer.getQuestionBankId()).getName())//
-					.addAttr("startTime", exer.getStartTime())//
-					.addAttr("endTime", exer.getEndTime())//
-					.addAttr("rmkState", exer.getRmkState());
+			return PageResultEx.ok().data(myExerService.pull(exerId, getCurUser().getId()));
 		} catch (MyException e) {
-			log.error("练习删除错误：{}", e.getMessage());
+			log.error("我的练习拉取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("练习删除错误：", e);
+			log.error("我的练习拉取错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的练习生成
+	 * 
+	 * v1.0 zhanghc 2025年6月15日下午4:39:09
+	 * 
+	 * @param exerId
+	 * @param type
+	 * @return PageResult
+	 */
+	@RequestMapping("/generate")
+	public PageResult generate(Integer exerId, Integer type) {
+		try {
+			List<MyExerQuestion> myExerQuestionList = myExerService.generate(exerId, getCurUser().getId(), type);
+			List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+			for (MyExerQuestion myExerQuestion : myExerQuestionList) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("questionId", myExerQuestion.getQuestionId());
+				map.put("no", myExerQuestion.getNo());
+				map.put("shuffleNo", myExerQuestion.getShuffleNo());
+				map.put("score", myExerQuestion.getScore());// 如果不是第一次显示，答题卡需要颜色标记分数状态
+				map.put("userScore", myExerQuestion.getUserScore());// 至于每道题的答案，由前端用滑动窗口的方式批量加载。
+				map.put("fav", myExerQuestion.getFav());
+				map.put("wrongAnswerNum", myExerQuestion.getWrongAnswerNum());
+				resultList.add(map);
+			}
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("我的练习生成错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习生成错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -113,7 +141,7 @@ public class ApiMyExerController extends BaseController {
 	/**
 	 * 我的练习试题
 	 * 
-	 * v1.0 zhanghc 2021年7月1日下午2:18:05
+	 * v1.0 zhanghc 2025年6月8日下午9:22:47
 	 * 
 	 * @param exerId
 	 * @param questionId
@@ -127,57 +155,71 @@ public class ApiMyExerController extends BaseController {
 			if (exer.getState() == 0) {
 				throw new MyException("已删除");
 			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
+			if (exer.getState() == 2) {
+				throw new MyException("已暂停");
 			}
-			if (ValidateUtil.isValid(exer.getUserIds()) && !exer.getUserIds().contains(getCurUser().getId())) {
-				throw new MyException("无权限");
+			User curUser = baseCacheService.getUser(getCurUser().getId());
+			if (!(exer.getOrgIds().contains(curUser.getOrgId()) || exer.getUserIds().contains(curUser.getId()))) {
+				throw new MyException("无操作权限");
 			}
 
-			// 试题获取
-			Map<String, Object> questionMap = new HashMap<>();
-			Question question = examCacheService.getQuestion(questionId);
-			questionMap.put("id", question.getId());
-			questionMap.put("type", question.getType());
-			questionMap.put("markType", question.getMarkType());
-			questionMap.put("title", question.getTitle());
-			questionMap.put("imgFileIds", question.getImgFileIds());
-			questionMap.put("markOptions", question.getMarkOptions());
-			questionMap.put("score", question.getScore());
-			questionMap.put("analysis", question.getAnalysis());
-			{// 试题选项
-				List<String> options = new ArrayList<>();
-				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
-					List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(question.getId());
-					for (QuestionOption questionOption : questionOptionList) {
-						options.add(questionOption.getOptions());
-					}
+			// 查询练习试题
+			MyExerQuestion myExerQuestion = myExerQuestionService.getMyExerQuestion(exerId, getCurUser().getId(),
+					questionId);
+			Question question = examCacheService.getQuestion(myExerQuestion.getQuestionId());
+			QuestionPart questionPart = new QuestionPart();
+			questionPart.setType(2);
+			questionPart.setQuestionId(question.getId());
+			questionPart.setQuestionType(question.getType());
+			questionPart.setMarkType(question.getMarkType());
+			questionPart.setTitle(question.getTitle());
+			questionPart.setImgFileIds(question.getImgFileIds());
+			questionPart.setMarkOptions(myExerQuestion.getMarkOptions());// 使用练习的阅卷选项
+			questionPart.setScore(myExerQuestion.getScore());// 使用练习的分数
+			questionPart.setUserScore(myExerQuestion.getUserScore());// 使用练习的用户分数
+			if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 组装试题选项
+				List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(question.getId());
+				for (QuestionOption questionOption : questionOptionList) {
+					questionPart.getOptions().add(questionOption.getOptions());
 				}
-				questionMap.put("options", options);
+
 			}
-			{// 试题答案
+
+			{// 组装标准答案
+				questionPart.setAnalysis(question.getAnalysis());
 				List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(question.getId());
-				List<Object> answers = new ArrayList<>();
-				List<BigDecimal> scores = new ArrayList<>();
-				for(QuestionAnswer answer : questionAnswerList) {
-					if (QuestionUtil.hasSingleChoice(question) 
-							|| QuestionUtil.hasJudge(question)
+				for (QuestionAnswer answer : questionAnswerList) {
+					if (QuestionUtil.hasJudge(question)
 							|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
-						answers.add(answer.getAnswer());
+						questionPart.getAnswers().add(answer.getAnswer());
+					} else if (QuestionUtil.hasSingleChoice(question)) {
+						questionPart.getAnswers().add(answer.getAnswer());
 					} else if (QuestionUtil.hasMultipleChoice(question)) {
-						Collections.addAll(answers, answer.getAnswer().split(","));
-						scores.add(answer.getScore());
+						String[] answers = answer.getAnswer().split(",");
+						Collections.addAll(questionPart.getAnswers(), answers);
 					} else if (QuestionUtil.hasFillBlank(question)
 							|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
-						answers.add(answer.getAnswer());
-						scores.add(answer.getScore());
+						questionPart.getAnswers().add(answer.getAnswer());
 					}
 				}
-				questionMap.put("answers", answers);
-				questionMap.put("scores", scores);
 			}
-			return PageResultEx.ok().data(questionMap);
+
+			{// 组装用户答案
+				if (ValidateUtil.isValid(myExerQuestion.getUserAnswer())) {
+					if (QuestionUtil.hasJudge(question) || QuestionUtil.hasQA(question)) {
+						questionPart.getUserAnswers().add(myExerQuestion.getUserAnswer());
+					} else if (QuestionUtil.hasSingleChoice(question)) {
+						questionPart.getUserAnswers().add(myExerQuestion.getUserAnswer());
+					} else if (QuestionUtil.hasMultipleChoice(question)) {
+						String[] userAnswers = myExerQuestion.getUserAnswer().split(",");
+						Collections.addAll(questionPart.getUserAnswers(), userAnswers);
+					} else if (QuestionUtil.hasFillBlank(question)) {
+						Collections.addAll(questionPart.getUserAnswers(),
+								myExerQuestion.getUserAnswer().split("\n", -1));
+					}
+				}
+			}
+			return PageResultEx.ok().data(questionPart);
 		} catch (MyException e) {
 			log.error("我的练习试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -188,192 +230,272 @@ public class ApiMyExerController extends BaseController {
 	}
 
 	/**
-	 * 我的练习试题列表
+	 * 我的练习答题
 	 * 
-	 * v1.0 zhanghc 2022年3月18日上午10:32:57
-	 * 
-	 * @param exerId
-	 * @return PageResult
-	 */
-	@RequestMapping("/questionList")
-	public PageResult questionList(Integer exerId) {
-		try {
-			// 数据有效性校验
-			Exer exer = exerService.getById(exerId);
-			if (exer.getState() == 0) {
-				throw new MyException("练习已删除");
-			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
-			}
-			if (!exer.getUserIds().contains(getCurUser().getId())) {
-				throw new MyException("无权限");
-			}
-
-			// 试题列表
-			List<Integer> questionIds = questionService.getIds(exer.getQuestionBankId());
-			return PageResultEx.ok().data(questionIds);
-		} catch (MyException e) {
-			log.error("我的练习试题列表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("我的练习试题列表错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 我的练习试题列表（临时，后期改为提前缓存数据）
-	 * 
-	 * v1.0 zhanghc 2024年9月24日下午6:17:39
+	 * v1.0 zhanghc 2025年6月17日下午7:01:26
 	 * 
 	 * @param exerId
+	 * @param questionId
+	 * @param userAnswers
+	 * @param userScore
 	 * @return PageResult
 	 */
-	@RequestMapping("/questionList2")
-	public PageResult questionList2(Integer exerId) {
+	@RequestMapping("/answer")
+	public PageResult answer(Integer exerId, Integer questionId, String[] userAnswers, BigDecimal userScore) {
 		try {
-			// 数据有效性校验
-			Exer exer = exerService.getById(exerId);
-			if (exer.getState() == 0) {
-				throw new MyException("练习已删除");
-			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
-			}
-			if (!exer.getUserIds().contains(getCurUser().getId())) {
-				throw new MyException("无权限");
-			}
-
-			// 试题列表
-			List<Map<String, Object>> list = questionService.getIds(exer.getQuestionBankId()).stream()
-					.map(questionId -> {
-						// 试题获取
-						Map<String, Object> questionMap = new HashMap<>();
-						Question question = examCacheService.getQuestion(questionId);
-						questionMap.put("id", question.getId());
-						questionMap.put("type", question.getType());
-						questionMap.put("markType", question.getMarkType());
-						questionMap.put("title", question.getTitle());
-						questionMap.put("imgFileIds", question.getImgFileIds());
-						questionMap.put("markOptions", question.getMarkOptions());
-						questionMap.put("score", question.getScore());
-						questionMap.put("analysis", question.getAnalysis());
-						{// 试题选项
-							List<String> options = new ArrayList<>();
-							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
-								List<QuestionOption> questionOptionList = examCacheService
-										.getQuestionOptionList(question.getId());
-								for (QuestionOption questionOption : questionOptionList) {
-									options.add(questionOption.getOptions());
-								}
-							}
-							questionMap.put("options", options);
-						}
-						{// 试题答案
-							List<QuestionAnswer> questionAnswerList = examCacheService
-									.getQuestionAnswerList(question.getId());
-							List<Object> answers = new ArrayList<>();
-							List<BigDecimal> scores = new ArrayList<>();
-							for (QuestionAnswer answer : questionAnswerList) {
-								if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasJudge(question)
-										|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
-									answers.add(answer.getAnswer());
-								} else if (QuestionUtil.hasMultipleChoice(question)) {
-									Collections.addAll(answers, answer.getAnswer().split(","));
-									scores.add(answer.getScore());
-								} else if (QuestionUtil.hasFillBlank(question)
-										|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
-									answers.add(answer.getAnswer());
-									scores.add(answer.getScore());
-								}
-							}
-							questionMap.put("answers", answers);
-							questionMap.put("scores", scores);
-						}
-						return questionMap;
-					}).collect(Collectors.toList());
-
-			return PageResultEx.ok().data(list);
+			return PageResultEx.ok()
+					.data(myExerService.answer(exerId, getCurUser().getId(), questionId, userAnswers, userScore));
 		} catch (MyException e) {
-			log.error("我的练习试题列表错误：{}", e.getMessage());
+			log.error("我的练习答题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("我的练习试题列表错误：", e);
+			log.error("我的练习答题错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 评论列表
+	 * 我的练习重新练习
 	 * 
-	 * v1.0 chenyun 2021年8月31日上午9:54:28
+	 * v1.0 zhanghc 2025年6月25日下午12:27:39
 	 * 
-	 * @param pageIn
+	 * @param exerId 练习ID
+	 * @param type 类型（1：单选题；2多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
 	 * @return PageResult
 	 */
-	@RequestMapping("/rmkListpage")
-	public PageResult rmkListpage(PageIn pageIn) {
+	@RequestMapping("/exerReset")
+	public PageResult exerReset(Integer exerId, Integer type) {
 		try {
-			PageOut pageOut = exerRmkService.getListpage(pageIn);
-			for (Map<String, Object> map : pageOut.getList()) {
-				if (map.get("likeUserIds") != null
-						&& map.get("likeUserIds").toString().contains(String.format(",%s,", getCurUser().getId()))) {
-					map.put("hasLike", true);
-				} else {
-					map.put("hasLike", false);
-				}
-			}
-			return PageResultEx.ok().data(pageOut);
-		} catch (Exception e) {
-			log.error("评论列表错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 评论
-	 * 
-	 * v1.0 chenyun 2021年8月31日上午9:54:28
-	 * 
-	 * @param exerRmk 评论
-	 * @param anon    是否匿名（true：是；false：否）
-	 * @return PageResult
-	 */
-	@RequestMapping("/rmk")
-	public PageResult rmk(ExerRmk exerRmk, Boolean anon) {
-		try {
-			exerRmkService.rmk(exerRmk, anon);
-			return PageResultEx.ok().addAttr("id", exerRmk.getId());
-		} catch (MyException e) {
-			log.error("评论错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("评论错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 评论点赞
-	 * 
-	 * v1.0 zhanghc 2023年4月17日下午7:52:03
-	 * 
-	 * @param exerRmkId 评论ID
-	 * @return PageResult
-	 */
-	@RequestMapping("/rmkLike")
-	public PageResult rmkLike(Integer exerRmkId) {
-		try {
-			exerRmkService.like(exerRmkId);
+			myExerService.exerReset(exerId, getCurUser().getId(), type);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("评论点赞错误：{}", e.getMessage());
+			log.error("我的练习重新练习错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("评论点赞错误：", e);
+			log.error("我的练习重新练习错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的练习收藏
+	 * 
+	 * v1.0 zhanghc 2025年6月25日下午9:53:21
+	 * 
+	 * @param exerId
+	 * @param questionId
+	 * @return PageResult
+	 */
+	@RequestMapping("/fav")
+	public PageResult fav(Integer exerId, Integer questionId) {
+		try {
+			MyExerQuestion myExerQuestion = myExerQuestionService.getMyExerQuestion(exerId, getCurUser().getId(),
+					questionId);
+			if (myExerQuestion.getFav() == 1) {
+				myExerQuestion.setFav(2);
+			} else {
+				myExerQuestion.setFav(1);
+			}
+			myExerQuestionService.updateById(myExerQuestion);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("我的练习收藏错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习收藏错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的练习错题重置
+	 * 
+	 * v1.0 zhanghc 2025年6月25日下午11:26:03
+	 * 
+	 * @param exerId
+	 * @param type
+	 * @return PageResult
+	 */
+	@RequestMapping("/wrongReset")
+	public PageResult wrongReset(Integer exerId, Integer questionId) {
+		try {
+			MyExerQuestion myExerQuestion = myExerQuestionService.getMyExerQuestion(exerId, getCurUser().getId(),
+					questionId);
+			myExerQuestion.setAnswerTime(null);
+			myExerQuestion.setUserAnswer(null);
+			myExerQuestion.setUserScore(null);
+			myExerQuestion.setWrongAnswerNum(0);
+			myExerQuestion.setUpdateTime(new Date());
+			myExerQuestion.setUpdateUserId(getCurUser().getId());
+			myExerQuestionService.updateById(myExerQuestion);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("我的练习错题重置错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习错题重置错误：", e);
+			return PageResult.err();
+		}
+	}
+
+//	/**
+//	 * 评论列表
+//	 * 
+//	 * v1.0 chenyun 2021年8月31日上午9:54:28
+//	 * 
+//	 * @param pageIn
+//	 * @return PageResult
+//	 */
+//	@RequestMapping("/rmkListpage")
+//	public PageResult rmkListpage(PageIn pageIn) {
+//		try {
+//			PageOut pageOut = exerRmkService.getListpage(pageIn);
+//			for (Map<String, Object> map : pageOut.getList()) {
+//				if (map.get("likeUserIds") != null
+//						&& map.get("likeUserIds").toString().contains(String.format(",%s,", getCurUser().getId()))) {
+//					map.put("hasLike", true);
+//				} else {
+//					map.put("hasLike", false);
+//				}
+//			}
+//			return PageResultEx.ok().data(pageOut);
+//		} catch (Exception e) {
+//			log.error("评论列表错误：", e);
+//			return PageResult.err();
+//		}
+//	}
+//
+//	/**
+//	 * 评论
+//	 * 
+//	 * v1.0 chenyun 2021年8月31日上午9:54:28
+//	 * 
+//	 * @param exerRmk 评论
+//	 * @param anon    是否匿名（true：是；false：否）
+//	 * @return PageResult
+//	 */
+//	@RequestMapping("/rmk")
+//	public PageResult rmk(ExerRmk exerRmk, Boolean anon) {
+//		try {
+//			exerRmkService.rmk(exerRmk, anon);
+//			return PageResultEx.ok().addAttr("id", exerRmk.getId());
+//		} catch (MyException e) {
+//			log.error("评论错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("评论错误：", e);
+//			return PageResult.err();
+//		}
+//	}
+//
+//	/**
+//	 * 评论点赞
+//	 * 
+//	 * v1.0 zhanghc 2023年4月17日下午7:52:03
+//	 * 
+//	 * @param exerRmkId 评论ID
+//	 * @return PageResult
+//	 */
+//	@RequestMapping("/rmkLike")
+//	public PageResult rmkLike(Integer exerRmkId) {
+//		try {
+//			exerRmkService.like(exerRmkId);
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("评论点赞错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("评论点赞错误：", e);
+//			return PageResult.err();
+//		}
+//	}
+
+	/**
+	 * 练习获取
+	 * 
+	 * v1.0 zhanghc 2025年6月10日下午8:05:41
+	 * 
+	 * @param exerId
+	 * @return PageResult
+	 */
+	@RequestMapping("/exerGet")
+	public PageResult exerGet(Integer exerId) {
+		try {
+			Exer exer = exerService.getById(exerId);
+			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
+			return PageResultEx.ok()//
+					.addAttr("id", exer.getId())//
+					.addAttr("name", exer.getName())//
+					.addAttr("questionBankId", exer.getQuestionBankId())//
+					.addAttr("questionBankName", questionBank.getName())//
+					.addAttr("state", exer.getState())//
+					.addAttr("rmkState", exer.getRmkState())//
+			;
+		} catch (MyException e) {
+			log.error("练习获取错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("练习获取错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 zhanghc 2025年6月9日下午9:02:28
+	 * 
+	 * @param exerId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionStatis")
+	public PageResult questionStatis(Integer exerId) {
+		try {
+			Exer exer = exerService.getById(exerId);
+			User curUser = baseCacheService.getUser(getCurUser().getId());
+			if (!(exer.getUserIds().contains(curUser.getId()) || exer.getOrgIds().contains(curUser.getOrgId()))) {
+				throw new MyException("无操作权限");
+			}
+			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
+
+			List<Map<String, Object>> typeStatis = new ArrayList<>();
+			Map<String, Object> typeMap = new HashMap<String, Object>();
+			typeMap.put("type", 1);
+			typeMap.put("count", questionBank.getSingleNum());
+			typeStatis.add(typeMap);
+
+			typeMap = new HashMap<String, Object>();
+			typeMap.put("type", 2);
+			typeMap.put("count", questionBank.getMultipleNum());
+			typeStatis.add(typeMap);
+
+			typeMap = new HashMap<String, Object>();
+			typeMap.put("type", 3);
+			typeMap.put("count", questionBank.getFillBlankObjNum() + questionBank.getFillBlankSubNum());
+			typeStatis.add(typeMap);
+
+			typeMap = new HashMap<String, Object>();
+			typeMap.put("type", 4);
+			typeMap.put("count", questionBank.getJudgeNum());
+			typeStatis.add(typeMap);
+
+			typeMap = new HashMap<String, Object>();
+			typeMap.put("type", 5);
+			typeMap.put("count", questionBank.getQaObjNum() + questionBank.getQaSubNum());
+			typeStatis.add(typeMap);
+
+			Map<String, Object> markTypeStatis = new HashMap<String, Object>();
+			markTypeStatis.put("objective", questionBank.getObjectiveNum());
+			markTypeStatis.put("subjective", questionBank.getSubjectiveNum());
+			markTypeStatis.put("chapter", 0);
+			return PageResultEx.ok()//
+					.addAttr("markTypeStatis", markTypeStatis)//
+					.addAttr("typeStatis", typeStatis);
+		} catch (MyException e) {
+			log.error("获取试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题统计错误：", e);
 			return PageResult.err();
 		}
 	}

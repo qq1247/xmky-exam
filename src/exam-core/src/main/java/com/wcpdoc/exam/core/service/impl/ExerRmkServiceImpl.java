@@ -59,10 +59,10 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 		if (exer.getState() == 0) {
 			throw new MyException("无权限");
 		}
-		long curTime = System.currentTimeMillis();
-		if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-			throw new MyException("时间已过期");
-		}
+//		long curTime = System.currentTimeMillis();
+//		if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
+//			throw new MyException("时间已过期");
+//		}
 		if (!exer.getUserIds().contains(getCurUser().getId())) {
 			throw new MyException("无权限");
 		}

@@ -23,6 +23,7 @@
                                 </template>
                             </xmks-select>
                         </el-form-item>
+                        <!-- state：不查询冻结用户 -->
                         <el-form-item label="" prop="userIds">
                             <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
                                 search-parm-name="name" option-label="name" option-value="id" :options="users"

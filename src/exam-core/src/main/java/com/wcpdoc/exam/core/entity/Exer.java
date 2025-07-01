@@ -23,13 +23,12 @@ public class Exer {
 	private Integer id;
 	private String name;
 	private Integer questionBankId;
-	private Date startTime;
-	private Date endTime;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> userIds;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> orgIds;
 	private Integer state;
 	private Integer rmkState;
-	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;
 }

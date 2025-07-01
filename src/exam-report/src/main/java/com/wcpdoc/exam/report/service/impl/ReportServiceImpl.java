@@ -167,16 +167,16 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 				.eq(Question::getState, 1)//
 				.eq(Question::getCreateUserId, subAdminUserId));
 		// 首页展示练习数量
-		long exerNum = exerService.count(new LambdaQueryWrapper<Exer>()//
-				.eq(Exer::getState, 1)//
-				.eq(Exer::getCreateUserId, subAdminUserId));
+//		long exerNum = exerService.count(new LambdaQueryWrapper<Exer>()//
+//				.eq(Exer::getState, 1)//
+//				.eq(Exer::getCreateUserId, subAdminUserId));
 		// 首页展示考试用户数量
 		int examUserNum = baseCacheService.getUser(subAdminUserId).getUserIds().size();
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("examNum", examNum);
 		result.put("questionNum", questionNum);
-		result.put("exerNum", exerNum);
+//		result.put("exerNum", exerNum);
 		result.put("userNum", examUserNum);
 		return result;
 	}

@@ -64,7 +64,7 @@
                     @click="toolbars.markOptionShow = !toolbars.markOptionShow">
                     <span class="iconfont icon-icon-05 editor-toolbar__btn-icon"></span>
                     <span class="editor-toolbar__btn-txt">{{ toolbars.markOptionShow ? '隐藏阅卷选项和删除' : '显示阅卷选项和删除'
-                    }}</span>
+                        }}</span>
                 </el-button>
             </div>
             <div class="paper__wrap">

@@ -127,21 +127,36 @@
                     <div class="task__main">
                         <xmks-card-empty v-if="exerList.length === 0" name="暂无练习"
                             icon="icon-icon_xiugaishijian"></xmks-card-empty>
-                        <xmks-card-data v-for="exer in exerList" :key="exer.id" :title="exer.name" tag-name="练习"
-                            :btns="[]" class=" exer">
-                            <div class="exer__exam-time">
-                                <span>
-                                    {{ exer.startTime }} - {{ exer.endTime }}
+                        <xmks-card-data v-for="exer in exerList" :key="exer.id" :title="exer.name" tag-name="练习" :btns="[{
+                            name: '设置',
+                            icon: 'icon-liebiao-01',
+                            event: () => $router.push(`/exer/set/${exer.id}`)
+                        }]" class="exer">
+                            <div class="exer__state">
+                                <span class="exer__pre-txt">
+                                    发布练习：<span class="exer__num">{{ dictStore.getValue('STATE_PS', exer.state) }}</span>
                                 </span>
+                                <!-- <span class="exer__pre-txt">
+                        允许评论：<span class="exer__num">{{ dictStore.getValue('STATE_YN', exer.rmkState) }}</span>
+                    </span> -->
                             </div>
                             <div class="exer__outer">
                                 <div class="exer__inner">
                                     <span class="exer__num">
-                                        {{ exer.userIds.length == 0 ? '全部' : exer.userIds.length }}<span
-                                            class="exer__unit">人</span>
+                                        {{ exer.orgIds.length }}<span class="exer__unit">个</span>
+                                    </span>
+                                    <span class="exer__after-txt">练习机构</span>
+                                </div>
+                                <div class="exer__inner">
+                                    <span class="exer__num">
+                                        {{ exer.userIds.length }}<span class="exer__unit">人</span>
                                     </span>
                                     <span class="exer__after-txt">练习人数</span>
                                 </div>
+                            </div>
+                            <div class="exer__other">
+                                <span class="exer__time">{{ exer.updateTime }}</span>
+                                <span class="exer__username">{{ exer.createUserName }}</span>
                             </div>
                         </xmks-card-data>
                     </div>
@@ -170,14 +185,14 @@
                                     <span class="my-exam__num">
                                         {{ myExam.totalScore || '-' }}<span class="my-exam__unit">/{{
                                             myExam.examTotalScore
-                                            }}</span>
+                                        }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的分数</span>
                                 </div>
                                 <div class="my-exam__inner">
                                     <span class="my-exam__num">
                                         {{ myExam.no || '-' }}<span class="my-exam__unit">/{{ myExam.userNum || '-'
-                                            }}</span>
+                                        }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的排名</span>
                                 </div>
@@ -216,21 +231,18 @@
                 <div v-if="userStore.type === 1" class="task">
                     <xmks-card-guide title="我的练习" icon="icon-icon_xiugaishijian" class="task__head"></xmks-card-guide>
                     <div class="task__main">
-                        <xmks-card-empty v-if="myExerList.length === 0" name="暂无练习"
+                        <xmks-card-empty v-if="exerList.length === 0" name="暂无练习"
                             icon="icon-tubiaoziti22-22"></xmks-card-empty>
-                        <xmks-card-data v-else v-for="myExer in myExerList" :key="myExer.id" :title="myExer.name"
+                        <xmks-card-data v-else v-for="myExer in exerList" :key="myExer.id" :title="myExer.name"
                             tag-name="练习" class="my-exer">
                             <div class="my-exer__exam-time">
-                                <span>
-                                    {{ myExer.startTime }} - {{ myExer.endTime }}
-                                </span>
                             </div>
                             <div class="my-exer__outer">
                             </div>
                             <div class="my-exer__other">
                                 <div></div>
                                 <el-button type="primary" class="my-exer__btn"
-                                    @click="$router.push(`/my-exer/paper/${myExer.id}`)">
+                                    @click="$router.push(`/my-exer/read/${myExer.id}`)">
                                     进入练习
                                 </el-button>
                             </div>
@@ -328,23 +340,6 @@
                                 </span>
                             </div>
                         </div>
-                        <div v-for="(myExer, index) in myExerGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
-                            class="calendar-task">
-                            <div class="calendar-task__outer">
-                                <span class="calendar-task__name">{{ myExer.name }}</span>
-                                <div class="calendar-task__inner">
-                                    <span class="calendar-task__type">练习</span>
-                                    <!-- <span class="calendar-task__state calendar__date--ongoing">
-                                        练习
-                                    </span> -->
-                                </div>
-                            </div>
-                            <div class="calendar-task__content">
-                                <span class="calendar-task__time">
-                                    {{ myExer.startTime }} - {{ myExer.endTime }}
-                                </span>
-                            </div>
-                        </div>
                     </div>
                     <div v-if="userStore.type === 3" class="calendar__task-list">
                         <div v-for="(myMark, index) in myMarkGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
@@ -386,7 +381,6 @@ import { myMarkListpage } from '@/api/my/my-mark';
 import { myExamListpage } from '@/api/my/my-exam';
 import { loginSysTime } from '@/api/login';
 import { exerListpage } from '@/api/exam/exer';
-import { myExerListpage } from '@/api/my/my-exer';
 import { bulletinListpage } from '@/api/sys/bulletin';
 import { useDictStore } from '@/stores/dict';
 import xmksCardData from '@/components/card/xmks-card-data.vue';
@@ -405,7 +399,6 @@ const calendar = ref<Date>()// 日历当前日期
 const myMarkList = ref<any[]>([])// 我的待阅卷列表
 const exerList = ref<any[]>([])// 待练习列表
 const myExamList = ref<any[]>([])// 我的考试列表
-const myExerList = ref<any[]>([])// 我的练习列表
 const bulletinList = ref<any[]>([])// 公告列表
 
 // 组件挂载完成后，执行如下方法
@@ -424,7 +417,7 @@ onMounted(async () => {
         exerListQuery();
     } else if (userStore.type === 1) {
         myExamListQuery()
-        myExerListQuery()
+        exerListQuery()
     } else if (userStore.type === 3) {
         myMarkListQuery()
     }
@@ -470,16 +463,6 @@ const myExamGroup = computed(() => {
         return groups;
     }, {});
 });
-const myExerGroup = computed(() => {
-    return myExerList.value.reduce((groups, myExer) => {
-        const date = myExer.startTime.substring(0, 10);
-        if (!groups[date]) {
-            groups[date] = [];
-        }
-        groups[date].push(myExer);
-        return groups;
-    }, {});
-});
 const hasFinishedTask = computed(() => (date: string): boolean => {
     if (userStore.type === 0 || userStore.type === 2) {
         if (!myMarkGroup.value[date] && !exerGroup.value[date]) {// 当天没有任务
@@ -490,11 +473,10 @@ const hasFinishedTask = computed(() => (date: string): boolean => {
     }
 
     if (userStore.type === 1) {
-        if (!myExamGroup.value[date] && !myExerGroup.value[date]) {// 当天没有任务
+        if (!myExamGroup.value[date]) {// 当天没有任务
             return false
         }
         return (myExamGroup.value[date] == null || myExamGroup.value[date].every((myExam: any) => myExam.markState === 3)) // 当天考试任务都完成
-            && myExerGroup.value[date] == null // 并且当天练习任务都完成
     }
     if (userStore.type === 3) {
         if (!myMarkGroup.value[date]) {// 当天没有任务
@@ -515,12 +497,12 @@ const hasOngoingTask = computed(() => (date: string): boolean => {
     }
 
     if (userStore.type === 1) {
-        if (!myExamGroup.value[date] && !myExerGroup.value[date]) {// 当天没有任务
+        if (!myExamGroup.value[date]) {// 当天没有任务
             return false
         }
 
         return (myExamGroup.value[date] != null && myExamGroup.value[date]?.some((myExam: any) => myExam.markState !== 3)) // 只要有一个考试任务未完成
-            || myExerGroup.value[date] != null // 或者有一个练习任务未完成
+
     }
     if (userStore.type === 3) {
         if (!myMarkGroup.value[date]) {// 当天没有任务
@@ -563,6 +545,7 @@ async function exerListQuery() {
     const pageSize = 100
     while (true) {
         const { data: { data } } = await exerListpage({
+            state: 1,
             curPage: curPage++,
             pageSize: pageSize,
         })
@@ -584,22 +567,6 @@ async function myExamListQuery() {
         })
         myExamList.value.push(...data.list)
         if (myExamList.value.length >= data.total) {
-            break
-        }
-    }
-}
-
-// 我的练习列表
-async function myExerListQuery() {
-    let curPage = 1
-    const pageSize = 100
-    while (true) {
-        const { data: { data } } = await myExerListpage({
-            curPage: curPage++,
-            pageSize: pageSize,
-        })
-        myExerList.value.push(...data.list)
-        if (myExerList.value.length >= data.total) {
             break
         }
     }
@@ -951,17 +918,27 @@ function bulletinDetail(bulletin: Bulletin) {
                         flex-direction: column;
                         height: 220px;
 
-                        .exer__exam-time {
+                        .exer__state {
                             display: flex;
                             justify-content: center;
-                            margin-top: 10px;
-                            font-size: 14px;
-                            color: #8F939C;
+                            align-items: baseline;
+                            margin-top: 15px;
+
+                            .exer__pre-txt {
+                                font-size: 12px;
+                                color: #8F939C;
+                                margin-right: 20px;
+
+                                .exer__num {
+                                    font-size: 12px;
+                                    color: #333333;
+                                }
+                            }
                         }
 
                         .exer__outer {
                             display: grid;
-                            grid-template-columns: repeat(1, 1fr);
+                            grid-template-columns: repeat(2, 1fr);
                             height: 74px;
                             justify-content: center;
                             align-items: center;
@@ -1016,39 +993,9 @@ function bulletinDetail(bulletin: Bulletin) {
                         .exer__other {
                             display: flex;
                             justify-content: space-between;
-                            align-items: center;
-                            margin-top: 16px;
+                            margin-top: 20px;
                             font-size: 12px;
                             color: #8F939C;
-
-                            .exer__tag {
-                                font-size: 12px;
-                                padding: 2px 4px;
-                                border-radius: 4px 4px 4px 4px;
-                                margin-right: 10px;
-
-                                &.exer__tag--state {
-                                    color: #FE7068;
-                                    background: #FFE6E6;
-                                    border: 1px solid #FFCAC7;
-                                }
-
-                                &.exer__tag--mark-state {
-                                    color: #1AC693;
-                                    background: #E8F9F4;
-                                    border: 1px solid #AFE7D6;
-                                }
-                            }
-
-                            .exer__btn {
-                                height: 30px;
-                                padding: 0px 20px;
-                                border-radius: 6px;
-                                border: 0px;
-                                color: #FFFFFF;
-                                font-size: 14px;
-                                background-image: linear-gradient(to right, #04C7F2, #259FF8);
-                            }
                         }
                     }
 

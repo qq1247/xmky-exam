@@ -9,30 +9,32 @@
                     <el-form-item label="题库" prop="questionBankId">
                         <xmks-select v-model="form.questionBankId" url="questionBank/listpage" :params="{}"
                             search-parm-name="name" option-value="id" option-label="name" :multiple="false"
-                            search-placeholder="请输入题库名称进行筛选" :options="questionBanks" placeholder="请选择题库"
-                            class="paper-question__question-bank">
+                            :page-size="100" :disabled-values="questionBankIds" search-placeholder="请输入题库名称进行筛选"
+                            :options="questionBanks" :disabled="form.id != null" placeholder="请选择题库">
                             <template #default="{ option }">
-                                {{ option.name }} - {{ option.questionNum }}题
+                                {{ option.name }} （单选{{ option.singleNum }} / 多选{{ option.multipleNum }} /
+                                客观填空{{ option.multipleNum }} / 判断{{ option.judgeNum }} / 客观问答{{
+                                    option.qaObjNum }}）
+                                {{ questionBankIds.includes(option.id) ? '（已存在）' : '' }}
                             </template>
                         </xmks-select>
                     </el-form-item>
-                    <el-form-item label="练习时间">
-                        <el-form-item label="" prop="startTime">
-                            <el-date-picker v-model="form.startTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss"
-                                placeholder="请选择开始时间" />
-                        </el-form-item>
-                        <div class="form__divide">-</div>
-                        <el-form-item label="" prop="endTime">
-                            <el-date-picker v-model="form.endTime" type="datetime" value-format="YYYY-MM-DD HH:mm:ss"
-                                placeholder="请选择结束时间" />
-                        </el-form-item>
-                    </el-form-item>
-                    <el-form-item label="考试用户" prop="userIds">
-                        <xmks-select v-model="form.userIds" url="user/listpage" :params="{}" search-parm-name="name"
-                            option-value="id" option-label="name" :multiple="true" search-placeholder="请输入机构名称或用户名称进行筛选"
-                            :options="users" placeholder="请选择考试用户" class="paper-question__question-bank">
+                    <el-form-item label="练习机构" prop="orgIds">
+                        <xmks-select v-model="form.orgIds" url="org/listpage" :params="{}" search-parm-name="name"
+                            option-label="name" option-value="id" :options="orgs" :multiple="true" clearable
+                            :page-size="100" search-placeholder="请输入机构名称进行筛选" placeholder="请选择机构">
                             <template #default="{ option }">
-                                {{ option.name }} - {{ option.questionNum }}题
+                                {{ option.name }} - {{ option.orgName }}
+                            </template>
+                        </xmks-select>
+                    </el-form-item>
+                    <el-form-item label="练习用户" prop="userIds">
+                        <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
+                            search-parm-name="name" option-label="name" option-value="id" :options="users"
+                            :multiple="true" clearable :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选"
+                            placeholder="请选择用户">
+                            <template #default="{ option }">
+                                {{ option.name }} - {{ option.orgName }}
                             </template>
                         </xmks-select>
                     </el-form-item>
@@ -47,21 +49,46 @@
                 </el-form>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="form.id" title="删除练习" desc="删除练习">
+        <xmks-edit-card v-if="form.id" title="发布练习" desc="考试期间请暂停练习">
+            <template #card-main>
+                <el-form size="large" class="form">
+                    <el-radio-group v-model="form.state">
+                        <el-radio v-for="(dict, index) in dictStore.getList('STATE_PS')" :key="index"
+                            :value="parseInt(dict.dictKey)">
+                            {{ dict.dictValue }}
+                        </el-radio>
+                    </el-radio-group>
+                </el-form>
+            </template>
             <template #card-side>
-                <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': delConfirm }" @click="del"
-                    style="margin-bottom: 14px;">删除练习</el-button>
+                <el-button type="primary" class="form__btn" @click="state" style="margin-bottom: 30px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
+        <!-- <xmks-edit-card v-if="form.id" title="允许评论" desc="解题技巧互评，用同伴视角发现解题盲点">
+            <template #card-main>
+                <el-form size="large" class="form">
+                    <el-radio-group v-model="form.rmkState">
+                        <el-radio v-for="(dict, index) in dictStore.getList('STATE_YN')" :key="index"
+                            :value="parseInt(dict.dictKey)">
+                            {{ dict.dictValue }}
+                        </el-radio>
+                    </el-radio-group>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-button type="primary" class="form__btn" @click="rmk" style="margin-bottom: 30px;">保存设置</el-button>
+            </template>
+        </xmks-edit-card> -->
     </el-scrollbar>
 </template>
 
 <script lang="ts" setup>
+import { orgListpage } from '@/api/base/org'
 import { userListpage } from '@/api/base/user'
-import { exerAdd, exerDel, exerEdit, exerGet } from '@/api/exam/exer'
-import { questionBankListpage } from '@/api/exam/question-bank'
+import { exerAdd, exerEdit, exerGet, exerListpage, exerRmk, exerState } from '@/api/exam/exer'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import xmksSelect from '@/components/xmks-select.vue'
+import { useDictStore } from '@/stores/dict'
 import type { Exer } from '@/ts/exam/exer'
 import { type FormInstance, type FormRules } from 'element-plus'
 import { onMounted, reactive, ref } from 'vue'
@@ -70,14 +97,15 @@ import { useRoute, useRouter } from 'vue-router'
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
 const router = useRouter()// 路由
+const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
 const form = reactive<Exer>({
     id: null,
     name: '',
-    startTime: '',
-    endTime: '',
     questionBankId: undefined,
     userIds: [],
+    orgIds: [],
+    state: 1,
     rmkState: 1,
 })
 
@@ -89,28 +117,24 @@ const formRules = reactive<FormRules>({// 表单规则
     questionBankId: [
         { required: true, message: '请选择题库', trigger: 'blur' },
     ],
-    startTime: [
-        { required: true, message: '请选择开始时间', trigger: 'blur' },
-    ],
-    endTime: [
-        { required: true, message: '请选择结束时间', trigger: 'blur' },
+    userIds: [
         {
-            trigger: 'blur',
-            validator: (rule: any, value: any, callback: any) => {
-                if (form.startTime > form.endTime) {
-                    return callback(new Error('不能大于开始时间'))
+            validator: (rule: any, value: number[], callback: any) => {
+                if (!form.userIds.length && !form.orgIds?.length) {
+                    return callback(new Error("请选择练习用户"))
                 }
                 return callback()
             }
-        }
+        },
     ],
-    userIds: [
-        { required: true, message: '请选择考试用户', trigger: 'blur' },
+    orgIds: [
+        { required: false, message: '请选择练习机构', trigger: 'blur' },
     ],
 })
 const questionBanks = ref<any[]>([]) // 题库列表
+const questionBankIds = ref<number[]>([]) // 已存在的题库
 const users = ref<any[]>([]) // 用户列表
-const delConfirm = ref(false) // 删除确认
+const orgs = ref<any[]>([]) // 机构列表
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -121,17 +145,12 @@ onMounted(async () => {
         form.id = data.id
         form.name = data.name
         form.questionBankId = data.questionBankId
-        form.startTime = data.startTime
-        form.endTime = data.endTime
         form.userIds = data.userIds
+        form.orgIds = data.orgIds
+        form.state = data.state
         form.rmkState = data.rmkState
 
-        const { data: { data: data2 } } = await questionBankListpage({
-            id: form.questionBankId,
-            curPage: 1,
-            pageSize: 1,
-        })
-        questionBanks.value.push(...data2.list)
+        questionBanks.value.push({ id: data.questionBankId, name: data.questionBankName })
 
         if (form.userIds.length) {
             let curPage = 1
@@ -139,7 +158,7 @@ onMounted(async () => {
             while (true) {
                 const { data: { data } } = await userListpage({
                     ids: form.userIds.join(),
-                    //state: 1, 只查询1就丢了2的数据
+                    //state: 1, 冻结也显示，否则丢数据
                     curPage: curPage++,
                     pageSize: pageSize,
                 })
@@ -149,6 +168,38 @@ onMounted(async () => {
                     break
                 }
             }
+        }
+        if (form.orgIds.length) {
+            let curPage = 1
+            const pageSize = 100
+            while (true) {
+                const { data: { data } } = await orgListpage({
+                    ids: form.orgIds.join(),
+                    curPage: curPage++,
+                    pageSize: pageSize,
+                })
+
+                orgs.value.push(...data.list)
+                if (orgs.value.length >= data.total) {
+                    break
+                }
+            }
+        }
+    }
+
+    let curPage = 1
+    const pageSize = 100
+    while (true) {
+        const { data: { data: data2 } } = await exerListpage({
+            curPage: curPage++,
+            pageSize: pageSize,
+        })
+
+        data2.list.forEach((exer: any) => {
+            questionBankIds.value.push(exer.questionBankId)
+        })
+        if (questionBankIds.value.length >= data2.total) {// 分批次取出
+            break
         }
     }
 })
@@ -190,14 +241,19 @@ async function edit() {
     router.push("/exer-list")
 }
 
-// 删除
-async function del() {
-    if (!delConfirm.value) {
-        delConfirm.value = true
+// 发布
+async function state() {
+    const { data: { code } } = await exerState({ id: form.id })
+    if (code !== 200) {
         return
     }
 
-    const { data: { code } } = await exerDel({ id: form.id })
+    router.push("/exer-list")
+}
+
+// 评论
+async function rmk() {
+    const { data: { code } } = await exerRmk({ id: form.id })
     if (code !== 200) {
         return
     }

@@ -43,7 +43,7 @@
                     @click="toolbars.markOptionShow = !toolbars.markOptionShow">
                     <span class="iconfont icon-icon-05 paper-toolbar__btn-icon"></span>
                     <span class="paper-toolbar__btn-txt">{{ toolbars.markOptionShow ? '隐藏删除' : '显示删除'
-                    }}</span>
+                        }}</span>
                 </el-button>
             </div>
             <div class="paper__wrap">
@@ -305,7 +305,7 @@ const formRules = reactive<FormRules>({// 表单校验规则
     }],
 })
 
-const toolbars = reactive({// 工具条
+const toolbars = reactive({// 工具栏
     analysisShow: false,
     markOptionShow: false,
     questionSort: false,

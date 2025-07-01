@@ -41,8 +41,6 @@ export interface ExamQuestion {
     userScore?: number | null// 用户分数
     analysis?: string// 解析
     [key: string]: any // 扩展字段
-
-
 }
 
 // 抽题规则接口

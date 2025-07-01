@@ -30,7 +30,7 @@
 			<uv-tabs
 				:list="[
 					{ name: '我的考试', badge: { value: todoExamList?.length } },
-					{ name: '我的练习', badge: { value: todoExerList?.length } }
+					{ name: '我的练习', badge: { value: myExerList?.length } }
 				]"
 				:current="curTabIndex"
 				:scrollable="false"
@@ -81,29 +81,24 @@
 				</xm-card>
 				<xm-empty v-if="curTabIndex === 0 && !todoExamList?.length"></xm-empty>
 				<xm-card
-					v-if="curTabIndex === 1 && todoExerList.length"
-					v-for="(exer, index) in todoExerList"
+					v-if="curTabIndex === 1 && myExerList.length"
+					v-for="(exer, index) in myExerList"
 					:key="index"
 					:preTxt="(index + 1).toString().padStart(2, '0')"
 					:name="exer.name"
 					tag-name="练习"
 				>
 					<template #content>
-						<view>
-							<text>{{ exer.startTime }} 至 {{ exer.endTime }}</text>
-						</view>
+						<view></view>
 					</template>
 					<template #opt>
 						<view class="home-foot__opt">
-							<view>
-								<text>距离练习开始：</text>
-								<xm-count-down :expireTime="exer.startTime"></xm-count-down>
-							</view>
+							<view></view>
 							<button type="primary" @click="toExer(exer)" class="home-foot__exam-in">进入练习</button>
 						</view>
 					</template>
 				</xm-card>
-				<xm-empty v-if="curTabIndex === 1 && !todoExerList?.length"></xm-empty>
+				<xm-empty v-if="curTabIndex === 1 && !myExerList?.length"></xm-empty>
 			</scroll-view>
 		</view>
 	</view>
@@ -113,13 +108,13 @@ import { ref } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { myExamListpage } from '@/api/myExam';
-import { myExerListpage } from '@/api/myExer';
 import { bulletinListpage } from '@/api/bulletin';
+import { exerListpage } from '@/api/exer';
 
 /************************变量定义相关***********************/
 const userStore = useUserStore(); // 用户存储
 const todoExamList = ref<any[]>(); // 未完成考试列表
-const todoExerList = ref<any[]>(); // 未完成练习列表
+const myExerList = ref<any[]>(); // 我的练习列表
 const bulletinList = ref<any[]>(); // 公告列表
 const curTabIndex = ref(0); // 当前选择标签页
 const navBtnList = ref([
@@ -161,8 +156,8 @@ async function myExamQuery() {
 
 // 我的练习查询
 async function myExerQuery() {
-	let { data } = await myExerListpage({ todo: true, pageSize: 20 });
-	todoExerList.value = data.list;
+	let { data } = await exerListpage({ state: 1, todo: true, pageSize: 20 });
+	myExerList.value = data.list;
 }
 
 // 公告查询
@@ -195,8 +190,8 @@ async function toExam(todoExam: any) {
 }
 
 // 去练习
-async function toExer(todoExer: any) {
-	uni.navigateTo({ url: `/pages/myExer/myPaper?exerId=${todoExer.id}` });
+async function toExer(myExer: any) {
+	uni.navigateTo({ url: `/pages/myExer/myRead?exerId=${myExer.id}` });
 }
 
 // 快速导航

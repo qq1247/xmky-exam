@@ -17,24 +17,31 @@
                 icon: 'icon-liebiao-01',
                 event: () => $router.push(`/exer/set/${exer.id}`)
             }]" class="exer">
-                <div class="exer__exam-time">
-                    <span>
-                        {{ exer.startTime }} - {{ exer.endTime }}
+                <div class="exer__state">
+                    <span class="exer__pre-txt">
+                        发布练习：<span class="exer__num">{{ dictStore.getValue('STATE_PS', exer.state) }}</span>
                     </span>
+                    <!-- <span class="exer__pre-txt">
+                        允许评论：<span class="exer__num">{{ dictStore.getValue('STATE_YN', exer.rmkState) }}</span>
+                    </span> -->
                 </div>
                 <div class="exer__outer">
-                    <!-- <div class="exer__inner">
-                        <span class="exer__num">
-                            {{ dictStore.getValue('STATE_YN', exer.rmkState) }}<span class="exer__unit"></span>
-                        </span>
-                        <span class="exer__after-txt">允许评论</span>
-                    </div> -->
                     <div class="exer__inner">
                         <span class="exer__num">
-                            {{ exer.userIds.length == 0 ? '全部' : exer.userIds.length }}<span class="exer__unit">人</span>
+                            {{ exer.orgIds.length }}<span class="exer__unit">个</span>
+                        </span>
+                        <span class="exer__after-txt">练习机构</span>
+                    </div>
+                    <div class="exer__inner">
+                        <span class="exer__num">
+                            {{ exer.userIds.length }}<span class="exer__unit">人</span>
                         </span>
                         <span class="exer__after-txt">练习人数</span>
                     </div>
+                </div>
+                <div class="exer__other">
+                    <span class="exer__time">{{ exer.updateTime }}</span>
+                    <span class="exer__username">{{ exer.createUserName }}</span>
                 </div>
             </xmks-card-data>
         </el-scrollbar>
@@ -132,17 +139,27 @@ async function query() {
                 flex-direction: column;
                 height: 220px;
 
-                .exer__exam-time {
+                .exer__state {
                     display: flex;
                     justify-content: center;
-                    margin-top: 10px;
-                    font-size: 14px;
-                    color: #8F939C;
+                    align-items: baseline;
+                    margin-top: 15px;
+
+                    .exer__pre-txt {
+                        font-size: 12px;
+                        color: #8F939C;
+                        margin-right: 20px;
+
+                        .exer__num {
+                            font-size: 12px;
+                            color: #333333;
+                        }
+                    }
                 }
 
                 .exer__outer {
                     display: grid;
-                    grid-template-columns: repeat(1, 1fr);
+                    grid-template-columns: repeat(2, 1fr);
                     height: 74px;
                     justify-content: center;
                     align-items: center;
@@ -197,39 +214,9 @@ async function query() {
                 .exer__other {
                     display: flex;
                     justify-content: space-between;
-                    align-items: center;
-                    margin-top: 16px;
+                    margin-top: 20px;
                     font-size: 12px;
                     color: #8F939C;
-
-                    .exer__tag {
-                        font-size: 12px;
-                        padding: 2px 4px;
-                        border-radius: 4px 4px 4px 4px;
-                        margin-right: 10px;
-
-                        &.exer__tag--state {
-                            color: #FE7068;
-                            background: #FFE6E6;
-                            border: 1px solid #FFCAC7;
-                        }
-
-                        &.exer__tag--mark-state {
-                            color: #1AC693;
-                            background: #E8F9F4;
-                            border: 1px solid #AFE7D6;
-                        }
-                    }
-
-                    .exer__btn {
-                        height: 30px;
-                        padding: 0px 20px;
-                        border-radius: 6px;
-                        border: 0px;
-                        color: #FFFFFF;
-                        font-size: 14px;
-                        background-image: linear-gradient(to right, #04C7F2, #259FF8);
-                    }
                 }
             }
         }

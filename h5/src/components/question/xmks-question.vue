@@ -93,7 +93,7 @@
                 type="textarea" :autosize="{ minRows: 5 }" :readonly="true" resize="none" class="question__qa" />
             <el-input v-else-if="type === 5 && answerShow" :modelValue="qaAnswer" placeholder="请输入答案" type="textarea"
                 :autosize="{ minRows: 5 }" :readonly="true" resize="none" class="question__qa question__qa--answer" />
-            <el-input v-else-if="type === 5 && userAnswerShow" :modelValue="escape2Html(userAnswers[0]) || ''"
+            <el-input v-else-if="type === 5 && userAnswerShow" :modelValue="escape2Html(userAnswers[0] || '')"
                 placeholder="请输入答案" type="textarea" :autosize="{ minRows: 5 }"
                 @input="(value: string) => emit('change', [value])" :readonly="!editable" resize="none"
                 class="question__qa question__qa--user-answer" />

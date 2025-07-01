@@ -246,7 +246,7 @@ const router = useRouter()// 路由
 const userStore = useUserStore()// 用户缓存
 const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
-const form = reactive<Question>({
+const form = reactive<Question>({// 表单
     id: null,
     type: 1,
     title: '',

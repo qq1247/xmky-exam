@@ -15,3 +15,9 @@ export function exerDel(parm: object) {
 export function exerGet(parm: object) {
     return request.post('/exer/get', parm);
 }
+export function exerState(parm: object) {
+    return request.post('/exer/state', parm);
+}
+export function exerRmk(parm: object) {
+    return request.post('/exer/rmk', parm);
+}

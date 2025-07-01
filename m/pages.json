@@ -14,6 +14,8 @@
 	}, {
 		"path": "pages/myExer/myExer"
 	}, {
+		"path": "pages/myExer/myRead"
+	}, {
 		"path": "pages/myExer/myPaper"
 	}, {
 		"path": "pages/center/center"

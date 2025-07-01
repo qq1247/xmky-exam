@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.core.service;
 
-import java.util.List;
-
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exer;
 
@@ -19,7 +17,7 @@ public interface ExerService extends BaseService<Exer> {
 	 * 
 	 * @param exer void
 	 */
-	void addEx(Exer exer);
+	void add(Exer exer);
 
 	/**
 	 * 试题模拟修改
@@ -29,15 +27,5 @@ public interface ExerService extends BaseService<Exer> {
 	 * @param exer void
 	 */
 	void updateEx(Exer exer);
-
-	/**
-	 * 练习列表
-	 * 
-	 * v1.0 chenyun 2021年9月17日上午11:19:21
-	 * 
-	 * @param questionBankId
-	 * @return List<Exer>
-	 */
-	List<Exer> getList(Integer questionBankId);
 
 }

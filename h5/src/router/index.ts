@@ -358,7 +358,12 @@ const router = createRouter({
             component: () => import('@/views/my/my-exer/my-exer-nav.vue'),
             children: [
                 {
-                    path: 'paper/:exerId',
+                    path: 'read/:exerId',
+                    component: () => import('@/views/my/my-exer/my-exer-read.vue'),
+                    meta: { title: '练前阅读' },
+                },
+                {
+                    path: 'paper/:exerId/:type',
                     component: () => import('@/views/my/my-exer/my-exer-paper.vue'),
                     meta: { title: '我的练习' },
                 },

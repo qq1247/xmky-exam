@@ -15,9 +15,6 @@
             <xmks-card-data v-else v-for="myExer in listpage.list" :key="myExer.id" :title="myExer.name" tag-name="练习"
                 class="my-exer">
                 <div class="my-exer__exam-time">
-                    <span>
-                        {{ myExer.startTime }} - {{ myExer.endTime }}
-                    </span>
                 </div>
                 <div class="my-exer__outer">
                 </div>
@@ -42,11 +39,8 @@ import { reactive, onMounted, } from 'vue'
 import type { Listpage } from '@/ts/common/listpage'
 import XmksCardData from '@/components/card/xmks-card-data.vue'
 import XmksCardEmpty from '@/components/card/xmks-card-empty.vue'
-import { myExerListpage } from '@/api/my/my-exer'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { loginSysTime } from '@/api/login'
-
+import { exerListpage } from '@/api/exam/exer'
 
 /************************变量定义相关***********************/
 const router = useRouter()
@@ -55,7 +49,7 @@ const queryForm = reactive({// 查询表单
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,
-    pageSize: 5,
+    pageSize: 6,
     total: 0,
     list: [],
 })
@@ -68,8 +62,9 @@ onMounted(() => {
 /************************事件相关*****************************/
 // 查询
 async function query() {
-    const { data: { code, data } } = await myExerListpage({
+    const { data: { code, data } } = await exerListpage({
         ...queryForm,
+        state: 1,
         curPage: listpage.curPage,
         pageSize: listpage.pageSize,
     })
@@ -83,19 +78,8 @@ async function query() {
 }
 
 // 练习进入
-async function toExer(myExer: any) {
-    const { data: { data: curTime } } = await loginSysTime({})
-    if (myExer.startTime > curTime) {
-        ElMessage.error('练习未开始，请等待...')
-        return
-    }
-
-    if (curTime > myExer.endTime) {
-        ElMessage.error('练习已结束...')
-        return
-    }
-
-    router.push(`/my-exer/paper/${myExer.id}`)
+async function toExer(exer: any) {
+    router.push(`/my-exer/read/${exer.id}`)
 }
 
 </script>

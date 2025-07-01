@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -20,9 +19,9 @@ import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionBankService;
 
 /**
  * 练习服务层实现
@@ -52,15 +51,15 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 	}
 
 	@Override
-	public void addEx(Exer exer) {
+	public void add(Exer exer) {
 		// 数据校验
 		addValid(exer);
 
 		// 练习添加
-		exer.setCreateUserId(getCurUser().getId());
 		exer.setUpdateUserId(getCurUser().getId());
 		exer.setUpdateTime(new Date());
 		exer.setState(1);
+		exer.setRmkState(1);
 		save(exer);
 	}
 
@@ -72,12 +71,11 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 
 		// 练习修改
 		entity.setName(exer.getName());
-		entity.setQuestionBankId(exer.getQuestionBankId());
-		entity.setStartTime(exer.getStartTime());
-		entity.setEndTime(exer.getEndTime());
+		// entity.setQuestionBankId(exer.getQuestionBankId());// 不允许修改
 		entity.setUserIds(exer.getUserIds());
-		// entity.setState(exer.getState());
-		entity.setRmkState(exer.getRmkState());
+		entity.setOrgIds(exer.getOrgIds());
+		// entity.setState(exer.getState());// 单独接口控制
+		// entity.setRmkState(exer.getRmkState());// 单独接口控制
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setUpdateTime(new Date());
 		updateById(entity);
@@ -87,63 +85,42 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		if (!ValidateUtil.isValid(exer.getId())) {
 			throw new MyException("参数错误：id");
 		}
+		
 		if (!ValidateUtil.isValid(exer.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		if (!ValidateUtil.isValid(exer.getQuestionBankId())) {
-			throw new MyException("参数错误：questionBankId");
-		}
-		if (!ValidateUtil.isValid(exer.getStartTime())) {
-			throw new MyException("参数错误：startTime");
-		}
-		if (!ValidateUtil.isValid(exer.getEndTime())) {
-			throw new MyException("参数错误：endTime");
-		}
+		// if (!ValidateUtil.isValid(exer.getQuestionBankId())) {
+		// 	throw new MyException("参数错误：questionBankId");
+		// }// 不修改，无须校验
 		if (!ValidateUtil.isValid(exer.getRmkState())) {
 			throw new MyException("参数错误：rmkState");
 		}
-		if (entity.getState() == 0) {
-			throw new MyException("已删除");
+		if (exer.getRmkState().intValue() != 1 && exer.getRmkState().intValue() != 2) {
+			throw new MyException("值非法：rmkState");
 		}
-		if (entity.getEndTime().getTime() <= System.currentTimeMillis()) {
-			throw new MyException("练习已结束");
+		if (!ValidateUtil.isValid(exer.getOrgIds()) && !ValidateUtil.isValid(exer.getUserIds())) {
+			throw new MyException("参数错误：userIds");
 		}
-//		if (entity.getStartTime().getTime() <= System.currentTimeMillis()) {
-//			throw new MyException("练习已开始");// 考试结束放在考试开始前校验，可能的问题为考试已结束，提示的是考试已开始。
-//		}
-		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-			throw new MyException("无操作权限");
-		}
+
 		QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());// 只能练习自己的题库
 		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
-		if (getCurUser().getType() != 0) {
+		if (!CurLoginUserUtil.isAdmin()) {// 只能管理自己的用户
 			User curUser = baseCacheService.getUser(getCurUser().getId());
-			List<Integer> haveUsers = curUser.getUserIds();
-			List<Integer> exerUsers = exer.getUserIds();
-			if (!haveUsers.containsAll(exerUsers)) {// 只能练习自己的考试用户
-				throw new MyException("无操作权限");
+			if (ValidateUtil.isValid(exer.getUserIds())) {
+				exer.getUserIds().forEach(userId -> {
+					User user = baseCacheService.getUser(userId);
+					if (!curUser.getUserIds().contains(user.getId())
+							&& !curUser.getOrgIds().contains(user.getOrgId())) {
+						throw new MyException("无用户操作权限");
+					}
+				});
 			}
-		}
-
-		List<Exer> exerList = exerDao.getList(exer.getQuestionBankId());
-		for (Exer cur : exerList) {
-
-			if (cur.getId().intValue() == exer.getId().intValue()) {// 如果变更题库，该行无效；如果同一个题库，校验的时候排除自己。
-				continue;
-			}
-			if (exer.getStartTime().getTime() <= cur.getStartTime().getTime()
-					&& cur.getStartTime().getTime() <= exer.getEndTime().getTime()) {
-				throw new MyException("该时间段已存在");
-			}
-			if (exer.getStartTime().getTime() <= cur.getEndTime().getTime()
-					&& cur.getEndTime().getTime() <= exer.getEndTime().getTime()) {
-				throw new MyException("该时间段已存在");
-			}
-			if (exer.getStartTime().getTime() >= cur.getStartTime().getTime()
-					&& cur.getEndTime().getTime() >= exer.getEndTime().getTime()) {
-				throw new MyException("该时间段已存在");
+			if (ValidateUtil.isValid(exer.getOrgIds())) {
+				if (!curUser.getOrgIds().containsAll(exer.getOrgIds())) {
+					throw new MyException("无机构操作权限");
+				}
 			}
 		}
 	}
@@ -155,53 +132,41 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		if (!ValidateUtil.isValid(exer.getQuestionBankId())) {
 			throw new MyException("参数错误：questionBankId");
 		}
-		if (!ValidateUtil.isValid(exer.getStartTime())) {
-			throw new MyException("参数错误：startTime");
-		}
-		if (!ValidateUtil.isValid(exer.getEndTime())) {
-			throw new MyException("参数错误：endTime");
-		}
 		if (!ValidateUtil.isValid(exer.getRmkState())) {
 			throw new MyException("参数错误：rmkState");
+		}
+		if (exer.getRmkState().intValue() != 1 && exer.getRmkState().intValue() != 2) {
+			throw new MyException("值非法：rmkState");
+		}
+		if (!ValidateUtil.isValid(exer.getOrgIds()) && !ValidateUtil.isValid(exer.getUserIds())) {
+			throw new MyException("参数错误：userIds");
+		}
+		Exer exerDb = exerDao.getExer(exer.getQuestionBankId());
+		if (exerDb != null) {
+			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
+			throw new MyException(String.format("题库【%s】已存在", questionBank.getName()));
 		}
 
 		QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());// 只能练习自己的题库
 		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
-		if (getCurUser().getType() != 0) {
+		if (!CurLoginUserUtil.isAdmin()) {// 只能管理自己的用户
 			User curUser = baseCacheService.getUser(getCurUser().getId());
-			exer.getUserIds().forEach(userId -> {
-				User user = baseCacheService.getUser(userId);
-				if (!curUser.getUserIds().contains(user.getId()) && !curUser.getOrgIds().contains(user.getOrgId())) {
-					throw new MyException("无用户操作权限");
+			if (ValidateUtil.isValid(exer.getUserIds())) {
+				exer.getUserIds().forEach(userId -> {
+					User user = baseCacheService.getUser(userId);
+					if (!curUser.getUserIds().contains(user.getId())
+							&& !curUser.getOrgIds().contains(user.getOrgId())) {
+						throw new MyException("无用户操作权限");
+					}
+				});
+			}
+			if (ValidateUtil.isValid(exer.getOrgIds())) {
+				if (!curUser.getOrgIds().containsAll(exer.getOrgIds())) {
+					throw new MyException("无机构操作权限");
 				}
-			});
-		}
-
-		List<Exer> exerList = exerDao.getList(exer.getQuestionBankId());
-		for (Exer cur : exerList) {
-			if (cur.getCreateUserId().intValue() != getCurUser().getId().intValue()) {// 管理员和子管理，同一时间创建同一个题库，提示了错误但是相互看不见。改为自己的不允许重复
-				continue;
-			}
-
-			if (exer.getStartTime().getTime() <= cur.getStartTime().getTime()
-					&& cur.getStartTime().getTime() <= exer.getEndTime().getTime()) {
-				throw new MyException("该时间段已存在");
-			}
-			if (exer.getStartTime().getTime() <= cur.getEndTime().getTime()
-					&& cur.getEndTime().getTime() <= exer.getEndTime().getTime()) {
-				throw new MyException("该时间段已存在");
-			}
-			if (exer.getStartTime().getTime() >= cur.getStartTime().getTime()
-					&& cur.getEndTime().getTime() >= exer.getEndTime().getTime()) {
-				throw new MyException("该时间段已存在");
 			}
 		}
-	}
-
-	@Override
-	public List<Exer> getList(Integer questionBankId) {
-		return exerDao.getList(questionBankId);
 	}
 }

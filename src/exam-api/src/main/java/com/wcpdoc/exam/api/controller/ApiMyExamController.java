@@ -124,7 +124,7 @@ public class ApiMyExamController extends BaseController {
 	}
 
 	/**
-	 * 考试
+	 * 考试获取
 	 * 
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
 	 * 

@@ -53,6 +53,7 @@ shiro-filter:
     ? /api/user/frozen: jwt,anyRolesEx[0,2]
     ? /api/questionBank/**: jwt,anyRolesEx[0,2]
     ? /api/question/**: jwt,anyRolesEx[0,2]
+    ? /api/exer/listpage: jwt,anyRolesEx[0,1,2]
     ? /api/exer/**: jwt,anyRolesEx[0,2]
     ? /api/exam/get: jwt,anyRolesEx[0,2,3]
     ? /api/exam/**: jwt,anyRolesEx[0,2]

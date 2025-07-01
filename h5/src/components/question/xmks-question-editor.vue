@@ -125,7 +125,7 @@ const emit = defineEmits<{// 定义事件
 }>()
 defineExpose({ validate })// 定义暴露函数
 
-const toolbars = reactive({// 工具条状态
+const toolbars = reactive({// 工具栏状态
     answerShow: false,// 答案显示
     analysisShow: false,// 解析显示
     markOptionShow: false,// 阅卷选项显示

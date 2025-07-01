@@ -24,6 +24,7 @@ export interface ExamQuestion {
 	questionType?: number; // 试题类型 （1：单选；2：多选；3：填空；4：判断；5：问答）
 	markType?: number; // （阅卷类型 1：客观题；2：主观题）
 	title?: string; // 标题
+	imgFileIds?: number[]; // 图片IDS
 	options?: string[]; // 选项
 	markOptions?: number[]; //（2：答案无顺序；3：不区分大小写；)
 	score?: number; // 分数

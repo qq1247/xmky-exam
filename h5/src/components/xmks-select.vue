@@ -18,7 +18,7 @@
                 :default-page-size="props.pageSize" :pager-count="5" class="pagination"
                 @size-change="listpage.curPage = 1; query()" @current-change="query" @prev-click="query"
                 @next-click="query" />
-            <!-- 工具条 -->
+            <!-- 工具栏 -->
             <div class="toolbar">
                 <el-button v-if="multiple" type="info" link class="toolbar__btn" @click="selectAll">
                     <span class="iconfont icon-tubiaoziti-52">全选</span>
