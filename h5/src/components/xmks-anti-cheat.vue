@@ -7,7 +7,6 @@ import { onBeforeUnmount, onMounted, watch } from 'vue';
 import _ from 'lodash'
 import { onBeforeRouteLeave } from 'vue-router';
 import { addListener, launch, removeListener, stop } from 'devtools-detector';
-import { de } from 'element-plus/es/locales.mjs';
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{
