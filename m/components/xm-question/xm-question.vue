@@ -6,9 +6,15 @@
 			<template v-for="(title, index) in titles as Title[]" :key="index">
 				// #ifdef H5
 				<text v-if="title.type === 'txt'" class="question-title__text" v-html="title.value"></text>
-				// #endif
-				// #ifdef MP-WEIXIN
-				<text v-if="title.type === 'txt'" class="question-title__text">{{ title.value }}</text>
+				// #endif // #ifdef MP-WEIXIN
+				<text v-if="title.type === 'txt'" class="question-title__text" decode="true">
+					{{
+						title.value
+							.replace(/&amp;times;/g, '×')
+							.replace(/&amp;divide;/g, '÷')
+							.replace(/&amp;plusmn;/g, '±')
+					}}
+				</text>
 				// #endif
 				<view v-else class="question-title__fill-blank">
 					<input
@@ -28,8 +34,8 @@
 			<slot name="title-post"></slot>
 		</view>
 		<view class="question__img-group">
-			<view  v-for="(imgId, index) in imgIds" :key="index" class="question__img-inner">
-				<image :src="`${host}/file/download?id=${imgId}`" mode="aspectFit" view  @click="preview(index)" class="question__img"></image>
+			<view v-for="(imgId, index) in imgIds" :key="index" class="question__img-inner">
+				<image :src="`${host}/file/download?id=${imgId}`" mode="aspectFit" view @click="preview(index)" class="question__img"></image>
 				<text>图{{ toChinaNum(index + 1) }}</text>
 			</view>
 		</view>
@@ -48,7 +54,18 @@
 				<view class="question-option__radio">
 					<view class="question-option__radio-inner"></view>
 				</view>
-				<text class="question-option__content">{{ optionLabs(index) }}、{{ option }}</text>
+				// #ifdef H5
+				<text class="question-option__content" v-html="`${optionLabs(index)}、${option}`"></text>
+				// #endif // #ifdef MP-WEIXIN
+				<text class="question-option__content" decode="true">
+					{{ optionLabs(index) }}、{{
+						option
+							.replace(/&amp;times;/g, '×')
+							.replace(/&amp;divide;/g, '÷')
+							.replace(/&amp;plusmn;/g, '±')
+					}}
+				</text>
+				// #endif
 			</label>
 		</radio-group>
 		<!-- 多选题选项 -->
@@ -66,7 +83,18 @@
 				<view class="question-option__checkbox">
 					<view class="question-option__checkbox-inner"></view>
 				</view>
-				<text class="question-option__content">{{ optionLabs(index) }}、{{ option }}</text>
+				// #ifdef H5
+				<text class="question-option__content" v-html="`${optionLabs(index)}、${option}`"></text>
+				// #endif // #ifdef MP-WEIXIN
+				<text class="question-option__content" decode="true">
+					{{ optionLabs(index) }}、{{
+						option
+							.replace(/&amp;times;/g, '×')
+							.replace(/&amp;divide;/g, '÷')
+							.replace(/&amp;plusmn;/g, '±')
+					}}
+				</text>
+				// #endif
 			</label>
 		</checkbox-group>
 		<!-- 填空题（题干处填空） -->
@@ -174,39 +202,39 @@
 import { computed, ref, watch } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { Title } from '@/ts/question.d';
-import { toChinaNum } from '@/util/numberUtil'
+import { toChinaNum } from '@/util/numberUtil';
 // #ifdef H5
-import Prism from 'prismjs';// uniapp对prismjs支持不好，手动导入常见样式
+import Prism from 'prismjs'; // uniapp对prismjs支持不好，手动导入常见样式
 import 'prismjs/plugins/match-braces/prism-match-braces';
 import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 import 'prismjs/themes/prism-tomorrow.css';
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-markup'
-import 'prismjs/components/prism-css'
-import 'prismjs/components/prism-clike'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-c'
-import 'prismjs/components/prism-csharp'
-import 'prismjs/components/prism-cpp'
-import 'prismjs/components/prism-csv'
-import 'prismjs/components/prism-diff'
-import 'prismjs/components/prism-docker'
-import 'prismjs/components/prism-http'
-import 'prismjs/components/prism-java'
-import 'prismjs/components/prism-javadoclike'
-import 'prismjs/components/prism-javastacktrace'
-import 'prismjs/components/prism-json'
-import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-markup-templating'
-import 'prismjs/components/prism-php'
-import 'prismjs/components/prism-phpdoc'
-import 'prismjs/components/prism-python'
-import 'prismjs/components/prism-regex'
-import 'prismjs/components/prism-sass'
-import 'prismjs/components/prism-scss'
-import 'prismjs/components/prism-sql'
-import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-csharp';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-csv';
+import 'prismjs/components/prism-diff';
+import 'prismjs/components/prism-docker';
+import 'prismjs/components/prism-http';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-javadoclike';
+import 'prismjs/components/prism-javastacktrace';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-markup-templating';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-phpdoc';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-regex';
+import 'prismjs/components/prism-sass';
+import 'prismjs/components/prism-scss';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-typescript';
 // #endif
 /************************变量定义相关***********************/
 const emit = defineEmits<{
@@ -264,24 +292,19 @@ const titles = computed(() => {
 	let titleWithHeight = props.title;
 	// #ifdef H5
 	titleWithHeight = titleWithHeight.replace(/```([a-z]*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
-		const higCode = Prism.highlight(
-			escape2Html(code.trim()) as string,
-			Prism.languages[lang] || Prism.languages.plaintext,
-			lang
-		);
-		
-		const lineCount = higCode.split("\n").length;
+		const higCode = Prism.highlight(escape2Html(code.trim()) as string, Prism.languages[lang] || Prism.languages.plaintext, lang);
+
+		const lineCount = higCode.split('\n').length;
 		let lineNumbersRows = '<span aria-hidden="true" class="line-numbers-rows">';
 		for (let i = 0; i < lineCount; i++) {
-		  lineNumbersRows += '<span></span>';
+			lineNumbersRows += '<span></span>';
 		}
 		lineNumbersRows += '</span>';
-		
-		
+
 		return `<pre class="language-${lang} line-numbers match-braces"><code class="language-${lang} ">${higCode}${lineNumbersRows}</code></pre>`;
 	});
 	// #endif
-		
+
 	// 如果不是填空题，正常返回
 	if (props.type !== 3) {
 		return [{ type: 'txt', value: titleWithHeight, index: -1 }];
@@ -392,11 +415,11 @@ function escape2Html(txt: string | string[]) {
 
 // 预览图片
 function preview(index: number) {
-	let urls = props.imgIds.map(imgId => `${host.value}/file/download?id=${imgId}`)
+	let urls = props.imgIds.map((imgId) => `${host.value}/file/download?id=${imgId}`);
 	uni.previewImage({
 		current: index,
 		urls: urls
-	})
+	});
 }
 </script>
 
@@ -444,7 +467,7 @@ function preview(index: number) {
 	}
 	.question__img-group {
 		display: flex;
-		
+
 		.question__img-inner {
 			display: flex;
 			flex-direction: column;
