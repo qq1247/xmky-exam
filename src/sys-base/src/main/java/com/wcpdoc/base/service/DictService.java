@@ -19,7 +19,7 @@ public interface DictService extends BaseService<Dict> {
 	 * @param index
 	 * @return List<Dict>
 	 */
-	void addEx(Dict dict);
+	void add(Dict dict);
 
 	/**
 	 * 数据字典修改
@@ -39,7 +39,7 @@ public interface DictService extends BaseService<Dict> {
 	 * @param index
 	 * @return List<Dict>
 	 */
-	void delEx(Integer id);
+	void del(Integer id);
 
 	/**
 	 * 数据字典列表

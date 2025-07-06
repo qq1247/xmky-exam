@@ -121,7 +121,7 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/add")
 	public PageResult add(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.addEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers),
+			questionService.add(question, CollectionUtil.toList(options), CollectionUtil.toList(answers),
 					CollectionUtil.toList(scores));
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -147,7 +147,7 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/edit")
 	public PageResult edit(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.updateEx(question, CollectionUtil.toList(options), CollectionUtil.toList(answers),
+			questionService.update(question, CollectionUtil.toList(options), CollectionUtil.toList(answers),
 					CollectionUtil.toList(scores));
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -171,7 +171,7 @@ public class ApiQuestionController extends BaseController {
 	public PageResult del(Integer[] ids) {
 		try {
 			for (Integer id : ids) {
-				questionService.delEx(id);
+				questionService.del(id);
 			}
 			return PageResult.ok();
 		} catch (MyException e) {

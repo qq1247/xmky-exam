@@ -18,7 +18,7 @@ public interface UserService extends BaseService<User> {
 	 * 
 	 * @param user void
 	 */
-	void addEx(User user);
+	void add(User user);
 
 	/**
 	 * 用户修改
@@ -36,7 +36,7 @@ public interface UserService extends BaseService<User> {
 	 * 
 	 * @param id void
 	 */
-	void delEx(Integer id);
+	void del(Integer id);
 
 	/**
 	 * 获取用户

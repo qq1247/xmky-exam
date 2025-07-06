@@ -39,7 +39,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	}
 
 	@Override
-	public void addEx(Org org) {
+	public void add(Org org) {
 		// 数据校验
 		addValid(org);
 
@@ -74,7 +74,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 
 	@Override
 	@CacheEvict(value = BaseConstant.ORG_CACHE, key = BaseConstant.ORG_KEY_PRE + "#id")
-	public void delEx(Integer id) {
+	public void del(Integer id) {
 		// 数据校验
 		if (id == 1) { // 顶级机构保留，页面删除也不要报错
 			return;
@@ -82,7 +82,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		delValid(id);
 
 		// 机构删除
-		orgExService.delEx(id);
+		orgExService.del(id);
 		
 		Org org = baseCacheService.getOrg(id);
 		org.setState(0);

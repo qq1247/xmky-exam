@@ -63,7 +63,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public synchronized void addEx(Question question, List<String> options, List<String> answers,
+	public synchronized void add(Question question, List<String> options, List<String> answers,
 			List<BigDecimal> scores) {
 		// 数据校验
 		QuestionBank questionBank = addValid0(question);
@@ -119,7 +119,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_ANSWER_KEY_PRE
 					+ "#question.id"),//
 	})
-	public synchronized void updateEx(Question question, List<String> options, List<String> answers,
+	public synchronized void update(Question question, List<String> options, List<String> answers,
 			List<BigDecimal> scores) {
 		// 数据校验
 		QuestionBank questionBank = updateValie0(question);
@@ -190,7 +190,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_OPTION_KEY_PRE + "#id"), //
 			@CacheEvict(value = ExamConstant.QUESTION_CACHE, key = ExamConstant.QUESTION_ANSWER_KEY_PRE + "#id"),//
 	})
-	public synchronized void delEx(Integer id) {
+	public synchronized void del(Integer id) {
 		// 数据校验
 		QuestionBank questionBank = delValid(id);
 

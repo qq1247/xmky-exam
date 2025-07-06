@@ -30,7 +30,7 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 
 	@Override
 	@CacheEvict(value = BaseConstant.DICT_CACHE, allEntries = true)
-	public void addEx(Dict dict) {
+	public void add(Dict dict) {
 		save(dict);
 	}
 
@@ -47,7 +47,7 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 
 	@Override
 	@CacheEvict(value = BaseConstant.DICT_CACHE, allEntries = true)
-	public void delEx(Integer id) {
+	public void del(Integer id) {
 		removeById(id);
 	}
 

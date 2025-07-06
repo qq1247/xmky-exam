@@ -125,7 +125,7 @@ public class ApiCronController extends BaseController {
 	@RequestMapping("/edit")
 	public PageResult edit(Cron cron) {
 		try {
-			cronService.updateEx(cron);
+			cronService.update(cron);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("定时任务修改错误：{}", e.getMessage());
@@ -147,7 +147,7 @@ public class ApiCronController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			cronService.delEx(id);
+			cronService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("定时任务删除错误：{}", e.getMessage());

@@ -157,7 +157,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	@CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true)
-	public void delEx(Integer id) {
+	public void del(Integer id) {
 		// 数据校验
 		delValid(id);
 
@@ -792,7 +792,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					question.setQuestionBankId(questionBank.getId());
 					question.setUpdateUserId(getCurUser().getId());
 					question.setUpdateTime(new Date());
-					questionService.addEx(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
+					questionService.add(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
 							examQuestionEx.getScores());
 					examQuestionEx.setQuestionId(question.getId());
 				}

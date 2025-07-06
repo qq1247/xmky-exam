@@ -65,7 +65,7 @@ public class ApiDictController extends BaseController {
 	@RequestMapping("/add")
 	public PageResult add(Dict dict) {
 		try {
-			dictService.addEx(dict);
+			dictService.add(dict);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("数据字典添加错误：{}", e.getMessage());
@@ -109,7 +109,7 @@ public class ApiDictController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			dictService.delEx(id);
+			dictService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("数据字典删除错误：{}", e.getMessage());

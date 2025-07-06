@@ -14,5 +14,5 @@ public interface OrgExService {
 	 * 
 	 * @param orgId void
 	 */
-	void delEx(Integer orgId);
+	void del(Integer orgId);
 }

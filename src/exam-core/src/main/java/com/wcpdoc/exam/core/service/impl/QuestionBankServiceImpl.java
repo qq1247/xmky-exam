@@ -34,7 +34,7 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 	}
 
 	@Override
-	public void delEx(Integer id) {
+	public void del(Integer id) {
 		// 数据校验
 		QuestionBank entity = getById(id);
 		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
@@ -46,7 +46,7 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 		removeById(entity.getId());
 
 		// 题库扩展删除
-		questionBankExService.delEx(entity);
+		questionBankExService.del(entity);
 	}
 
 	@Override

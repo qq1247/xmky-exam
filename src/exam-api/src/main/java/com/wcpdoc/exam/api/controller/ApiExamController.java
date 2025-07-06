@@ -338,7 +338,7 @@ public class ApiExamController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			examService.delEx(id);
+			examService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除考试错误：{}", e.getMessage());
