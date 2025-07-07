@@ -39,6 +39,9 @@
 				<text>图{{ toChinaNum(index + 1) }}</text>
 			</view>
 		</view>
+		<view>
+			<video v-if="videoId" :src="`${host}/file/download?id=${videoId}`" class="question__video"></video>
+		</view>
 		<!-- 单选题选项 -->
 		<radio-group
 			v-if="type === 1"
@@ -247,6 +250,7 @@ const props = withDefaults(
 		modelValue?: string[]; //用户答案
 		title: string; // 题干
 		imgIds?: number[]; // 图片IDS
+		videoId?: number | null; // 图片IDS
 		options?: string[]; // 试题选项
 		type: number; // 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）
 		markType: number; // 阅卷方式（1：客观题；2：主观题；
@@ -482,6 +486,10 @@ function preview(index: number) {
 				margin-left: 10rpx;
 			}
 		}
+	}
+	.question__video {
+		width: 100%;
+		padding-top: 75%;
 	}
 	:deep(.question-user-answer) {
 		background-color: #f6f7fc;

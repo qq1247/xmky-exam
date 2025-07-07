@@ -34,23 +34,34 @@
                                     </photo-consumer>
                                 </photo-provider>
                             </vue-draggable>
+
                             <el-upload v-model:file-list="imgFileList" :action="uploadUrl"
                                 :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
-                                accept=".jpg,.png,.jpeg,JPG,JPEG" :limit="4" :before-upload="uploadBefore"
+                                accept=".jpg,.png,.jpeg,JPG,PNG,JPEG" :limit="4" :before-upload="uploadBefore"
                                 :multiple="true" :on-success="uploadSuccess" class="">
                                 <span class="iconfont icon-tubiaoziti2-02"></span>
                             </el-upload>
                         </div>
-                        <!-- <el-upload v-model:file-list="imgFileList" :action="uploadUrl"
-                            :headers="{ Authorization: userStore.accessToken }" name="files" list-type="picture-card"
-                            :show-file-list="false" accept=".jpg,.png,.jpeg,JPG,JPEG" :limit="4"
-                            :before-upload="uploadBefore" :multiple="true" :on-success="uploadSuccess"
-                            :on-preview="uploadPreview">
-                            <span class="iconfont icon-tubiaoziti2-02"></span>
-                        </el-upload> -->
-                        <!-- <el-dialog v-model="dialogVisible">
-                            <img w-full :src="dialogImageUrl" alt="Preview Image" />
-                        </el-dialog> -->
+                    </el-form-item>
+                    <!-- 视频 -->
+                    <el-form-item label="视频" prop="rideoFileIds">
+                        <div class="question__img-group">
+                            <div v-if="videoOptions.src" class="question_img-outer">
+                                <longze-video-play ref="videoPlayerRef" v-bind="videoOptions"></longze-video-play>
+                                <div class="question_img-inner" style="margin-top: 10px;">
+                                    <span class="question_img-txt">视频</span>
+                                    <span @click.stop="videoUploadRef!.clearFiles(); videoOptions.src = ''"
+                                        class="iconfont icon-shanchu question_img-btn"></span>
+                                </div>
+                            </div>
+                            <el-upload ref="videoUploadRef" v-model:file-list="videoFileList" :action="uploadUrl"
+                                :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
+                                accept=".mp4,.MP4" :limit="1" :before-upload="uploadBeforeOfVideo" :multiple="false"
+                                :on-success="uploadSuccessOfVideo" :on-exceed="uploadExceedOfVideo"
+                                :on-remove="uploadRemoveOfVideo">
+                                <span class="iconfont icon-tubiaoziti2-02"></span>
+                            </el-upload>
+                        </div>
                     </el-form-item>
                     <!-- 选项（单多选有效） -->
                     <template v-if="hasSingleChoice(form) || hasMultipleChoice(form)">
@@ -234,11 +245,13 @@ import { escape2Html } from '@/util/htmlUtil'
 import { toChinaNum, toLetter } from '@/util/numberUtil'
 import { hasFillBlank, hasJudge, hasMultipleChoice, hasObjective, hasQA, hasSingleChoice, hasSubjective } from '@/util/questionUtil'
 import { Decimal } from 'decimal.js-light'
-import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile, type UploadUserFile } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadInstance, type UploadProps, type UploadRawFile, type UploadUserFile } from 'element-plus'
 import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { VueDraggable } from 'vue-draggable-plus'
 import XmksSelect from '@/components/xmks-select.vue'
+import { genFileId } from 'element-plus'
+import { longzeVideoPlay } from "longze-vue3-video-player";
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -259,6 +272,7 @@ const form = reactive<Question>({// 表单
     analysis: '',
     questionBankId: null,
     imgFileIds: [],
+    videoFileId: null,
 })
 const formRules = reactive<FormRules>({// 表单规则
     title: [{
@@ -342,10 +356,6 @@ const delConfirm = ref(false) // 删除确认
 const uploadUrl = `${http.defaults.baseURL}file/upload`// 上传地址
 const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 const imgFileList = ref<UploadUserFile[]>([])
-
-const dialogImageUrl = ref('')
-const dialogVisible = ref(false)
-
 const moveFormRef = ref<FormInstance>()// 表单引用
 const moveForm = reactive({// 表单
     id: null,// ID
@@ -357,6 +367,32 @@ const moveFormRules = reactive<FormRules>({// 表单校验规则
     ],
 })
 
+const videoUploadRef = ref<UploadInstance>()
+const videoFileList = ref<UploadUserFile[]>([]) // 视频文件列表
+const videoPlayerRef = ref()
+const videoOptions = reactive({
+    width: "400px", //播放器宽度
+    height: "300px", //播放器高度
+    color: "#409eff", //主题色
+    title: "视频", //视频名称
+    src: "", //视频源
+    muted: false, //静音
+    webFullScreen: false,
+    speedRate: ["0.5", "1.0", "2.0"], //播放倍速
+    autoPlay: false, //自动播放
+    loop: false, //循环播放
+    mirror: false, //镜像画面
+    ligthOff: false, //关灯模式
+    volume: 0.3, //默认音量大小
+    control: true, //是否显示控制
+    controlBtns: [
+        "audioTrack",
+        "quality",
+        "speedRate",
+        "volume",
+        "fullScreen",
+    ], //显示所有按钮,
+});
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加
@@ -397,6 +433,7 @@ onMounted(async () => {
         form.analysis = escape2Html(data.analysis)
         form.questionBankId = data.questionBankId
         form.imgFileIds = data.imgFileIds
+        form.videoFileId = data.videoFileId
 
         form.imgFileIds?.forEach(fileId => {
             imgFileList.value.push({
@@ -405,6 +442,14 @@ onMounted(async () => {
                 name: `${fileId}`
             })
         })
+        if (form.videoFileId) {
+            videoOptions.src = `${downloadUrl}?id=${form.videoFileId}`
+            videoFileList.value.push({
+                uid: form.videoFileId,
+                url: `${downloadUrl}?id=${form.videoFileId}`,
+                name: `${form.videoFileId}`
+            })
+        }
 
         moveForm.id = data.id
     }
@@ -536,6 +581,7 @@ async function add() {
         })
     }
     params.imgFileIds = imgFileList.value.map((file: UploadUserFile) => file.uid)
+    params.videoFileId = videoFileList.value[0]?.uid || null
     const { data: { code } } = await questionAdd({ ...params })
     if (code !== 200) {
         return
@@ -561,6 +607,7 @@ async function edit() {
         })
     }
     params.imgFileIds = imgFileList.value.map((file: UploadUserFile) => file.uid)
+    params.videoFileId = videoFileList.value[0]?.uid || null
     const { data: { code } } = await questionEdit({ ...params })
     if (code !== 200) {
         return
@@ -648,6 +695,18 @@ function uploadBefore(rawFile: UploadRawFile) {
 
     return true
 }
+function uploadBeforeOfVideo(rawFile: UploadRawFile) {
+    if (rawFile.type !== 'video/mp4') {
+        ElMessage.error('只允许 mp4 格式')
+        return false
+    }
+    if (rawFile.size / 1024 > 10240) {
+        ElMessage.error('视频最大支持10兆')
+        return false
+    }
+
+    return true
+}
 
 // 上传成功处理
 function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) {
@@ -658,10 +717,29 @@ function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: Uploa
         uploadFiles.splice(uploadFiles.indexOf(uploadFile), 1)
     }
 }
-// 上传预览
-function uploadPreview(uploadFile: UploadFile) {
-    dialogImageUrl.value = uploadFile.url!
-    dialogVisible.value = true
+function uploadSuccessOfVideo(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) {
+    if (response.code === 200) {
+        uploadFile.uid = response.data.fileIds
+        uploadFile.url = `${downloadUrl}?id=${response.data.fileIds}`
+
+        videoOptions.src = uploadFile.url
+    } else {
+        uploadFiles.splice(uploadFiles.indexOf(uploadFile), 1)
+    }
+}
+
+// 上传超出限制处理（视频只允许上传一个）
+function uploadExceedOfVideo(files: File[], uploadFiles: UploadUserFile[]) {
+    videoUploadRef.value!.clearFiles()
+    const file = files[0] as UploadRawFile
+    file.uid = genFileId()
+    videoUploadRef.value!.handleStart(file)
+    videoUploadRef.value!.submit()
+}
+
+// 上传移除 
+function uploadRemoveOfVideo(uploadFile: UploadFile, uploadFiles: UploadFiles) {
+    videoOptions.src = ''
 }
 
 </script>
@@ -782,7 +860,6 @@ function uploadPreview(uploadFile: UploadFile) {
                 }
             }
         }
-
 
         :deep(.mark-option) {
             display: flex;

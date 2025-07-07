@@ -83,7 +83,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		addOption(question, options);
 
 		// 附件保存
-		addFile(question, options);
+		addFile(question);
 
 		// 题库数量更新
 		questionBank.setQuestionNum(questionBank.getQuestionNum() + 1);
@@ -132,6 +132,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		entity.setTitle(question.getTitle());
 		entity.setImgFileIds(question.getImgFileIds());
+		entity.setVideoFileId(question.getVideoFileId());
 		entity.setMarkType(question.getMarkType());
 		entity.setScore(question.getScore());
 		// entity.setType(question.getType());// 类型不能改
@@ -149,7 +150,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		updateOption(question, options);
 
 		// 附件保存
-		addFile(question, options);
+		addFile(question);
 
 		// 题库数量更新
 		if (oldMarkType.intValue() != entity.getMarkType().intValue()) {
@@ -243,6 +244,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		questionNew.setImgFileIds(questionNew.getImgFileIds().stream().map(fileId -> {
 			return fileService.copyFile(fileId);
 		}).collect(Collectors.toList()));
+		if (ValidateUtil.isValid(questionNew.getVideoFileId())) {
+			questionNew.setVideoFileId(fileService.copyFile(questionNew.getVideoFileId()));
+		}
 
 		save(questionNew);
 
@@ -309,13 +313,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		Question question = examCacheService.getQuestion(id);
 		QuestionBank sourceQuestionBank = questionBankService.getById(question.getQuestionBankId());
-		
+
 		question.setQuestionBankId(destQuestionBank.getId());
 		question.setCreateUserId(destQuestionBank.getCreateUserId());// 不要用当前用户ID，可能是管理员操作
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId()); // 保留移动前的
 		updateById(question);
-		
+
 		// 目标题库数量更新
 		destQuestionBank.setQuestionNum(destQuestionBank.getQuestionNum() + 1);
 		if (QuestionUtil.hasObjective(question)) {
@@ -339,7 +343,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			destQuestionBank.setQaSubNum(destQuestionBank.getQaSubNum() + 1);
 		}
 		questionBankService.updateById(destQuestionBank);
-		
+
 		// 源题库数量更新
 		sourceQuestionBank.setQuestionNum(sourceQuestionBank.getQuestionNum() - 1);
 		if (QuestionUtil.hasObjective(question)) {
@@ -455,9 +459,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		addOption(question, options);
 	}
 
-	private void addFile(Question question, List<String> options) {
+	private void addFile(Question question) {
 		if (ValidateUtil.isValid(question.getImgFileIds())) {
 			question.getImgFileIds().forEach(fileId -> fileService.upload(fileId));
+		}
+		if (ValidateUtil.isValid(question.getVideoFileId())) {
+			fileService.upload(question.getVideoFileId());
 		}
 	}
 

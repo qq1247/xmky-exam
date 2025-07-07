@@ -29,6 +29,7 @@ public class Question {
 	private List<Integer> markOptions;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> imgFileIds;
+	private Integer videoFileId;
 	private String analysis;
 	private BigDecimal score;
 	private Integer state;

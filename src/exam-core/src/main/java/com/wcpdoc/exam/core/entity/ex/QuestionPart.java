@@ -20,6 +20,7 @@ public class QuestionPart extends PaperPart {
 	private Integer markType;
 	private String title;
 	private List<Integer> imgFileIds;
+	private Integer videoFileId;
 	private List<Integer> markOptions;
 	private BigDecimal score;
 	private String analysis;

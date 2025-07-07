@@ -82,13 +82,13 @@
                         </div>
                         <xmks-question v-else :id="`q${index}`" :type="examQuestion.questionType as number"
                             :title="examQuestion.title as string" :img-ids="examQuestion.imgFileIds"
-                            :options="examQuestion.options" :answers="examQuestion.answers"
-                            :markType="examQuestion.markType as number" :score="examQuestion.score as number"
-                            :scores="examQuestion.scores" :analysis="examQuestion.analysis"
-                            :userAnswers="examQuestion.userAnswers" :userScore="examQuestion.userScore"
-                            :answer-show="toolbars.answerShow" :user-answer-show="true"
-                            :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="examing"
-                            class="paper-question"
+                            :video-id="examQuestion.videoFileId" :options="examQuestion.options"
+                            :answers="examQuestion.answers" :markType="examQuestion.markType as number"
+                            :score="examQuestion.score as number" :scores="examQuestion.scores"
+                            :analysis="examQuestion.analysis" :userAnswers="examQuestion.userAnswers"
+                            :userScore="examQuestion.userScore" :answer-show="toolbars.answerShow"
+                            :user-answer-show="true" :analysisShow="toolbars.analysisShow" :display="'paper'"
+                            :editable="examing" class="paper-question"
                             @change="(answers: string[]) => { examQuestion.userAnswers = answers; answerUpdate(examQuestion, answers) }">
                             <template #title-pre>{{ examQuestion.no }}、</template>
                         </xmks-question>

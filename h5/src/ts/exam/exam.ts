@@ -31,7 +31,8 @@ export interface ExamQuestion {
     questionType?: number | null// 试题类型 （1：单选；2：多选；3：填空；4：判断；5：问答）
     markType?: number | null// （阅卷类型 1：客观题；2：主观题）
     title?: string// 标题
-    imgFileIds?: number[]// 图片IDS
+    imgFileIds?: number[]// 图片附件IDS
+    videoFileId?: number | null// 视频附件ID
     options?: string[]// 选项
     markOptions?: number[] //（2：答案无顺序；3：不区分大小写；)
     score?: number | null// 分数

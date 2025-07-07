@@ -240,6 +240,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("scores", scores)//
 					.addAttr("state", question.getState())//
 					.addAttr("imgFileIds", question.getImgFileIds())//
+					.addAttr("videoFileId", question.getVideoFileId())//
 					;
 			return pageResult;
 		} catch (MyException e) {

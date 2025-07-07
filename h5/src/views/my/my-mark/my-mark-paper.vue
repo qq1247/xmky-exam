@@ -126,13 +126,14 @@
                         </div>
                         <xmks-question v-else-if="hasQuestionShow(examQuestion)" :id="`q${index}`"
                             :type="examQuestion.questionType as number" :title="examQuestion.title as string"
-                            :img-ids="examQuestion.imgFileIds" :options="examQuestion.options"
-                            :answers="examQuestion.answers" :markType="examQuestion.markType as number"
-                            :score="examQuestion.score as number" :scores="examQuestion.scores"
-                            :analysis="examQuestion.analysis" :userAnswers="examQuestion.userAnswers"
-                            :userScore="examQuestion.userScore" :answer-show="toolbars.answerShow"
-                            :user-answer-show="true" :analysisShow="toolbars.analysisShow" :display="'paper'"
-                            :editable="false" class="paper-question">
+                            :img-ids="examQuestion.imgFileIds" :video-id="examQuestion.videoFileId"
+                            :options="examQuestion.options" :answers="examQuestion.answers"
+                            :markType="examQuestion.markType as number" :score="examQuestion.score as number"
+                            :scores="examQuestion.scores" :analysis="examQuestion.analysis"
+                            :userAnswers="examQuestion.userAnswers" :userScore="examQuestion.userScore"
+                            :answer-show="toolbars.answerShow" :user-answer-show="true"
+                            :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="false"
+                            class="paper-question">
                             <template #title-pre>{{ examQuestion.no }}、</template>
                             <template #foot>
                                 <div v-if="toolbars.markOptionShow && examQuestion.markType === 2" class="mark-option">

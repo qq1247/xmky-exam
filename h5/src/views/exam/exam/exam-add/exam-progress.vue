@@ -61,8 +61,8 @@ async function publish() {
         state: form.state,
         examQuestions: form.examQuestions,
         examRules: form.examRules,
-        userIds: form.userIds,
-        orgIds: form.orgIds,
+        userIds: form.loginType == 1 ? form.userIds : [],// 免登录考试，不需要考试用户信息
+        orgIds: form.loginType == 1 ? form.orgIds : [],
         markUserIds: form.markUserIds,
         totalScore: form.totalScore,
         markType: form.markType,

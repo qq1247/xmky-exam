@@ -92,6 +92,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 				questionPart.setMarkType(question.getMarkType());
 				questionPart.setTitle(question.getTitle());
 				questionPart.setImgFileIds(question.getImgFileIds());
+				questionPart.setVideoFileId(question.getVideoFileId());
 				questionPart.setMarkOptions(myQuestion.getMarkOptions());
 				questionPart.setScore(myQuestion.getScore());
 				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 组装试题选项

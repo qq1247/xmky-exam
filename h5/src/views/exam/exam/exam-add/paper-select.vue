@@ -8,7 +8,7 @@
                 <el-button type="primary" class="paper-create__btn" @click="emit('select', 'blank')">创建</el-button>
             </div>
             <div class="paper-create">
-                <span class="iconfont icon-shijuan-13 paper-create__icon"></span>
+                <span class="iconfont icon-kuaisushengcheng paper-create__icon"></span>
                 <span class="paper-create__title">快速生成试卷</span>
                 <span class="paper-create__desc">即时编辑试题，快速导入</span>
                 <el-button type="primary" class="paper-create__btn" @click="emit('select', 'quick')">创建</el-button>

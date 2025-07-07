@@ -56,9 +56,10 @@
                     <el-alert v-if="question.errs" :title="`${index + 1}、${question.errs}`" type="error"
                         :closable="false" />
                     <xmks-question v-else :type="question.type" :title="question.title" :img-ids="question.imgFileIds"
-                        :options="question.options" :answers="question.answers" :markType="question.markType"
-                        :score="question.score" :scores="question.scores" :analysis="question.analysis"
-                        :userAnswers="[]" :userScore="0" :answer-show="toolbars.answerShow" :user-answer-show="false"
+                        :video-id="question.videoFileId" :options="question.options" :answers="question.answers"
+                        :markType="question.markType" :score="question.score" :scores="question.scores"
+                        :analysis="question.analysis" :userAnswers="[]" :userScore="0"
+                        :answer-show="toolbars.answerShow" :user-answer-show="false"
                         :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="false">
                         <template #title-pre>{{ index + 1 }}、</template>
                         <template #foot>
@@ -446,15 +447,21 @@ function parseQuestion(questionTxt: string[]) {
         }
     }
 
-    const imgFileIds: number[] = [];
-    const _title = title.replace(/\[图片:(\d+)]/g, (_, num) => {
-        imgFileIds.push(parseInt(num) ^ 0x55AA);
-        return '';
+    const imgFileIds: number[] = []
+    let _title = title.replace(/\[图片:(\d+)]/g, (_, num) => {
+        imgFileIds.push(parseInt(num) ^ 0x55AA)
+        return ''
+    });
+    const videoFileIds: number[] = []
+    _title = _title.replace(/\[视频:(\d+)]/g, (_, num) => {
+        videoFileIds.push(parseInt(num) ^ 0x55AA)
+        return ''
     });
 
     question.type = type
     question.title = _title.replace(/(\r\n|\n|\r)$/, '') //剔除图片后去掉末尾的换行
     question.imgFileIds = imgFileIds.slice(0, 4) // 最多4张图片
+    question.videoFileId = videoFileIds.slice(0, 1)[0] || null // 最多一个视频
 
     question.options = options
     question.answers = answers
@@ -496,30 +503,51 @@ function validate(): { succ: boolean; msg: string, data?: Question[] } {
 }
 
 async function handlePaste(e: ClipboardEvent) {
-    // 检查是否有图片
+    // 检查是否有附件粘贴事件
     const items = e.clipboardData?.items
     if (!items) return
 
-    const imageItems = Array.from(items).filter(item => item.type.includes('image'))
-    if (imageItems.length === 0) return
-
-
     // 上传图片
-    e.preventDefault()
-    for (const item of imageItems) {
-        const file = item.getAsFile()
-        if (!file) continue
+    const imageItems = Array.from(items).filter(item => item.type.includes('image'))
+    if (imageItems.length) {
+        e.preventDefault()
+        for (const item of imageItems) {
+            const file = item.getAsFile()
+            if (!file) continue
 
-        try {
-            const attachmentId = await uploadImage(file)
+            try {
+                const attachmentId = await uploadImage(file)
 
-            // 插入附件标记
-            if (attachmentId) {
-                insertAtCursor(`[图片:${attachmentId ^ 0x55AA}]`)
+                // 插入附件标记
+                if (attachmentId) {
+                    insertAtCursor(`[图片:${attachmentId ^ 0x55AA}]`)
+                }
+
+            } catch (e) {
+                ElMessage.error(e instanceof Error ? e.message : '上传图片异常')
             }
+        }
+    }
 
-        } catch (e) {
-            ElMessage.error(e instanceof Error ? e.message : '上传图片异常')
+    // 上传视频
+    const videoItems = Array.from(items).filter(item => item.type.includes('video/mp4'))
+    if (videoItems.length) {
+        e.preventDefault()
+        for (const item of videoItems) {
+            const file = item.getAsFile()
+            if (!file) continue
+
+            try {
+                const attachmentId = await uploadVideo(file)
+
+                // 插入附件标记
+                if (attachmentId) {
+                    insertAtCursor(`[视频:${attachmentId ^ 0x55AA}]`)
+                }
+
+            } catch (e) {
+                ElMessage.error(e instanceof Error ? e.message : '上传视频异常')
+            }
         }
     }
 }
@@ -564,6 +592,32 @@ async function uploadImage(file: File) {
         return response.data.data.fileIds
     } catch (e) {
         ElMessage.error(e instanceof Error ? e.message : '上传图片异常')
+    }
+}
+
+// 视频上传
+async function uploadVideo(file: File) {
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+        ElMessage.error('视频最大10兆');
+        return null;
+    }
+
+    const formData = new FormData()
+    formData.append('files', file)
+
+    try {
+        const response = await axios.post(`${http.defaults.baseURL}file/upload`,
+            formData,
+            {
+                headers: {
+                    'Authorization': userScore.accessToken,
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+        return response.data.data.fileIds
+    } catch (e) {
+        ElMessage.error(e instanceof Error ? e.message : '上传视频异常')
     }
 }
 
