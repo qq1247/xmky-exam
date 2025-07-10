@@ -131,7 +131,7 @@
                                         placeholder="请选择题库" class="paper-question__question-bank">
                                         <template #default="{ option }">
                                             {{ option.name }} （单选{{ option.singleNum }} / 多选{{ option.multipleNum }} /
-                                            客观填空{{ option.multipleNum }} / 判断{{ option.judgeNum }} / 客观问答{{
+                                            客观填空{{ option.fillBlankObjNum }} / 判断{{ option.judgeNum }} / 客观问答{{
                                                 option.qaObjNum }}）
                                         </template>
                                     </xmks-select>
