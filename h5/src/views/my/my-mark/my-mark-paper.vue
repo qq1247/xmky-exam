@@ -104,15 +104,6 @@
                     </el-scrollbar>
                 </div>
                 <el-scrollbar height="calc(100vh - 269px)" class="paper">
-                    <div v-if="myExam.totalScore" class="total-score">
-                        <div class="total-score__inner">
-                            <span class="total-score__value">
-                                {{ myExam.totalScore }}
-                            </span>
-                            <span class="total-score__unit">分</span>
-                        </div>
-                        <span class="iconfont icon-defen total-score__icon"></span>
-                    </div>
                     <div class="paper__name">
                         {{ exam.paperName }}
                     </div>
@@ -158,7 +149,6 @@ import type { Exam, ExamQuestion } from '@/ts/exam/exam'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import XmksQuestion from '@/components/question/xmks-question.vue'
-import type { MyExam } from '@/ts/exam/my-exam'
 import xmksCountDown from '@/components/xmks-count-down.vue'
 import _ from 'lodash'
 import { delay } from '@/util/timeUtil'
@@ -182,7 +172,7 @@ const toolbars = reactive({// 工具栏
     markOptionShow: true,
 })
 
-const exam = reactive<Exam>({// 考试
+const exam = reactive<Exam>({
     id: null,
     name: '',
     paperName: '',
@@ -201,21 +191,8 @@ const exam = reactive<Exam>({// 考试
     sxes: [],
     state: null,
     userNum: null,
-    limitMinute: null
-})
-const myExam = reactive<MyExam>({// 我的考试
-    examId: null,
-    userId: null,
-    answerStartTime: '',
-    answerEndTime: '',
-    markStartTime: '',
-    markEndTime: '',
-    objectiveScore: null,
-    totalScore: null,
-    state: null,
-    markState: null,
-    answerState: null,
-    no: null,
+    limitMinute: null,
+    retakeNum: null
 })
 const load = reactive({// 加载
     loading: false, // 显示加载页面
@@ -286,23 +263,24 @@ async function paperQuery() {
 async function examQuery() {
     const { data: { data } } = await examGet({ id: route.params.examId })
     exam.id = parseInt(route.params.examId as string)
-    exam.name = data.name;
-    exam.paperName = data.paperName;
-    exam.startTime = data.startTime;
-    exam.endTime = data.endTime;
-    exam.markStartTime = data.markStartTime;
-    exam.markEndTime = data.markEndTime;
-    exam.markState = data.markState;
-    exam.scoreState = data.scoreState;
-    exam.rankState = data.rankState;
-    exam.passScore = data.passScore;
-    exam.totalScore = data.totalScore;
-    exam.markType = data.markType;
-    exam.genType = data.genType;
-    exam.sxes = data.sxes;
-    exam.state = data.state;
-    exam.userNum = data.userNum;
-    exam.limitMinute = data.limitMinute;
+    exam.name = data.name
+    exam.paperName = data.paperName
+    exam.startTime = data.startTime
+    exam.endTime = data.endTime
+    exam.markStartTime = data.markStartTime
+    exam.markEndTime = data.markEndTime
+    exam.markState = data.markState
+    exam.scoreState = data.scoreState
+    exam.rankState = data.rankState
+    exam.passScore = data.passScore
+    exam.totalScore = data.totalScore
+    exam.markType = data.markType
+    exam.genType = data.genType
+    exam.sxes = data.sxes
+    exam.state = data.state
+    exam.userNum = data.userNum
+    exam.limitMinute = data.limitMinute
+    exam.retakeNum = data.retakeNum
 }
 
 // 滚动预览

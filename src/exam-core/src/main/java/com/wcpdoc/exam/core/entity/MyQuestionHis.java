@@ -16,13 +16,13 @@ import com.wcpdoc.core.mybatis.IntTypeHandler;
 import lombok.Data;
 
 /**
- * 我的试题实体
+ * 我的试题历史实体
  * 
- * v1.0 zhanghc 2017-06-19 16:28:29
+ * v1.0 zhanghc 2025年7月12日下午1:53:42
  */
 @Data
-@TableName(value = "EXM_MY_QUESTION", autoResultMap = true)
-public class MyQuestion {
+@TableName(value = "EXM_MY_QUESTION_HIS", autoResultMap = true)
+public class MyQuestionHis {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
 	private String chapterName;

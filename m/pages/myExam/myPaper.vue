@@ -124,7 +124,7 @@ const questionHeight = ref(0); // 试题滚动高度
 const timePercent = ref(0); // 时间进度条
 const curQuestionIndex = ref(0); // 当前试题索引
 const exam = reactive<Exam>({
-	id: null, // 考试信息
+	id: null,
 	name: '',
 	startTime: '',
 	endTime: '',
@@ -142,10 +142,11 @@ const exam = reactive<Exam>({
 	sxes: [],
 	state: null,
 	userNum: null,
-	limitMinute: null
+	limitMinute: null,
+	retakeNum: null
 });
 const myExam = reactive<MyExam>({
-	examId: null, // 我的考试信息
+	examId: null,
 	userId: null,
 	answerStartTime: '',
 	answerEndTime: '',
@@ -156,7 +157,8 @@ const myExam = reactive<MyExam>({
 	state: null,
 	markState: null,
 	answerState: null,
-	no: null
+	no: null,
+	ver: null
 });
 const examQuestions = ref([{}] as ExamQuestion[]);
 const timerId = ref(); // 延时器ID，用于防抖
@@ -228,6 +230,7 @@ async function examQuery() {
 	exam.state = data.state;
 	exam.userNum = data.userNum;
 	exam.limitMinute = data.limitMinute;
+	exam.retakeNum = data.retakeNum;
 }
 // 我的考试查询
 async function myExamQuery() {
@@ -244,6 +247,7 @@ async function myExamQuery() {
 	myExam.markState = data.markState;
 	myExam.answerState = data.answerState;
 	myExam.no = data.no;
+	myExam.ver = data.ver;
 }
 
 // 试卷查询

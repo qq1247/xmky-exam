@@ -101,6 +101,7 @@ async function copy(id: number) {
     form.userIds = []
     form.markUserIds = []
     form.limitMinute = data.limitMinute
+    form.retakeNum = data.retakeNum
 
     form.questionNoUpdate()
     if (form.loginType === 1) {// 匿名考试不需要导入考试用户
@@ -112,7 +113,6 @@ async function copy(id: number) {
         } else if (importUser.value === 'retake') {
             const { data: { data: myExams } } = await examUser({ id })
             myExams.forEach((myExam: { userId: number; answerState: number; }) => {
-                console.log(myExam);
                 if (myExam.answerState === 2) {
                     form.userIds.push(myExam.userId)
                 }

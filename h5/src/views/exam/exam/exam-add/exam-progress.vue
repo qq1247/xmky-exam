@@ -71,6 +71,7 @@ async function publish() {
         limitMinute: form.limitMinute,
         markStartTime: form.markType === 2 ? form?.markTimes[0] : '',
         markEndTime: form.markType === 2 ? form?.markTimes[1] : '',
+        retakeNum: form.markType === 1 ? form.retakeNum : 0, // 主观题试卷没有补考
     }),
         { headers: { 'Content-Type': 'application/json' } }
     )

@@ -19,6 +19,7 @@ export interface Exam {
     sxes: number[] // 防作弊
     userNum: number | null // 考试用户数量
     state: number | null  // 状态（1：发布；2：暂停；）
+    retakeNum: number | null  // 补考次数
 }
 
 // 试卷接口

@@ -10,13 +10,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * 我的考试实体
+ * 我的考试历史实体
  * 
- * v1.0 zhanghc 2017-06-19 16:28:29
+ * v1.0 zhanghc 2025年7月12日下午1:53:07
  */
 @Data
-@TableName(value = "EXM_MY_EXAM", autoResultMap = true)
-public class MyExam {
+@TableName(value = "EXM_MY_EXAM_HIS", autoResultMap = true)
+public class MyExamHis {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
 	private Integer examId;
@@ -40,7 +40,7 @@ public class MyExam {
 	 * 答题用时（毫秒）<br/>
 	 * 分数排名专用
 	 * 
-	 * v1.0 zhanghc 2023年5月10日上午9:22:57
+	 * v1.0 zhanghc 2025年7月12日下午1:53:07
 	 * 
 	 * @return Long 毫秒值
 	 */

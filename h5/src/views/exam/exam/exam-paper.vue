@@ -112,7 +112,7 @@ const toolbars = reactive({// 工具栏
     markOptionShow: false,
 })
 
-const exam = reactive<Exam>({// 考试
+const exam = reactive<Exam>({
     id: null,
     name: '',
     paperName: '',
@@ -131,9 +131,10 @@ const exam = reactive<Exam>({// 考试
     sxes: [],
     state: null,
     userNum: null,
-    limitMinute: null
+    limitMinute: null,
+    retakeNum: null
 })
-const myExam = reactive<MyExam>({// 我的考试
+const myExam = reactive<MyExam>({
     examId: null,
     userId: null,
     answerStartTime: '',
@@ -146,6 +147,7 @@ const myExam = reactive<MyExam>({// 我的考试
     markState: null,
     answerState: null,
     no: null,
+    ver: null
 })
 const user = reactive<User>({
     id: null,
@@ -214,41 +216,43 @@ async function paperQuery() {
 // 我的考试查询
 async function myExamQuery() {
     const { data: { data } } = await myMarkGet({ examId: route.params.examId, userId: route.params.userId })
-    myExam.examId = data.examId;
-    myExam.userId = data.userId;
-    myExam.answerStartTime = data.answerStartTime;
-    myExam.answerEndTime = data.answerEndTime;
-    myExam.markStartTime = data.markStartTime;
-    myExam.markEndTime = data.markEndTime;
-    myExam.objectiveScore = data.objectiveScore;
-    myExam.totalScore = data.totalScore;
-    myExam.state = data.state;
-    myExam.markState = data.markState;
-    myExam.answerState = data.answerState;
-    myExam.no = data.no;
+    myExam.examId = data.examId
+    myExam.userId = data.userId
+    myExam.answerStartTime = data.answerStartTime
+    myExam.answerEndTime = data.answerEndTime
+    myExam.markStartTime = data.markStartTime
+    myExam.markEndTime = data.markEndTime
+    myExam.objectiveScore = data.objectiveScore
+    myExam.totalScore = data.totalScore
+    myExam.state = data.state
+    myExam.markState = data.markState
+    myExam.answerState = data.answerState
+    myExam.no = data.no
+    myExam.ver = data.ver
 }
 
 // 考试查询
 async function examQuery() {
     const { data: { data } } = await examGet({ id: route.params.examId })
     exam.id = parseInt(route.params.examId as string)
-    exam.name = data.name;
-    exam.paperName = data.paperName;
-    exam.startTime = data.startTime;
-    exam.endTime = data.endTime;
-    exam.markStartTime = data.markStartTime;
-    exam.markEndTime = data.markEndTime;
-    exam.markState = data.markState;
-    exam.scoreState = data.scoreState;
-    exam.rankState = data.rankState;
-    exam.passScore = data.passScore;
-    exam.totalScore = data.totalScore;
-    exam.markType = data.markType;
-    exam.genType = data.genType;
-    exam.sxes = data.sxes;
-    exam.state = data.state;
-    exam.userNum = data.userNum;
-    exam.limitMinute = data.limitMinute;
+    exam.name = data.name
+    exam.paperName = data.paperName
+    exam.startTime = data.startTime
+    exam.endTime = data.endTime
+    exam.markStartTime = data.markStartTime
+    exam.markEndTime = data.markEndTime
+    exam.markState = data.markState
+    exam.scoreState = data.scoreState
+    exam.rankState = data.rankState
+    exam.passScore = data.passScore
+    exam.totalScore = data.totalScore
+    exam.markType = data.markType
+    exam.genType = data.genType
+    exam.sxes = data.sxes
+    exam.state = data.state
+    exam.userNum = data.userNum
+    exam.limitMinute = data.limitMinute
+    exam.retakeNum = data.retakeNum
 }
 // 用户查询
 async function userQuery() {

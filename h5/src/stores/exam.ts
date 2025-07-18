@@ -33,6 +33,7 @@ export const useExamStore = defineStore('exam', () => {
     const orgIds = ref<number[]>([])// 机构
     const markUserIds = ref<number[]>([])// 阅卷用户
     const limitMinute = 0 // 限制分钟
+    const retakeNum = 0 // 补考次数
 
     // 计算属性
     const totalScore = computed(() => {// 总分
@@ -170,7 +171,7 @@ export const useExamStore = defineStore('exam', () => {
     }
     return {
         // 属性
-        id, name, paperName, examTimes, markTimes, limitMinute, genType, loginType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, userIds, markUserIds, orgIds,
+        id, name, paperName, examTimes, markTimes, limitMinute, genType, loginType, passScore, sxes, showType, anonState, scoreState, rankState, state, examQuestions, examRules, userIds, markUserIds, orgIds, retakeNum,
         // 计算属性
         totalScore, markQuestions, markType, examUserNum, markUserNum, objectiveQuestionNum, subjectiveQuestionNum, examTimeDiff, chapterNum, singleChoiceNum, multipleChoiceNum, fillblankNum, judgeNum, qaNum,
 

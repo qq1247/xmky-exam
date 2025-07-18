@@ -149,7 +149,7 @@ public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements Exam
 
 	@Override
 	@Cacheable(value = ExamConstant.MYQUESTION_CACHE, key = ExamConstant.MYQUESTION_LIST_KEY_PRE
-			+ "#examId + ':' + #userId")
+			+ "#examId + ':' + #userId", sync = true)
 	public List<MyQuestion> getMyQuestionList(Integer examId, Integer userId) {
 		List<MyQuestion> myQuestionList = myQuestionDao.getList(examId, userId);
 		if (log.isDebugEnabled()) {

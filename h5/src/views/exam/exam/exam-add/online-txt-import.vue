@@ -40,7 +40,6 @@ function txtImport() {
         ElMessage.error(result?.msg)
         return
     }
-    console.log(result?.data, 666)
     result?.data?.forEach((question: Question) => {
         form.examQuestions.push({
             type: 2,

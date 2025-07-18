@@ -123,6 +123,4 @@ public interface ExamService extends BaseService<Exam> {
 	 * @return Exam
 	 */
 	Exam getExam(String examName);
-
-	
 }

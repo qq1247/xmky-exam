@@ -14,7 +14,7 @@
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-10 exam-info__tag-icon"></span>
                             <span class="exam-info__tag-txt">{{ dictStore.getValue('LOGIN_TYPE', form.loginType)
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-11 exam-info__tag-icon"></span>
@@ -32,9 +32,11 @@
                     <div>
                         <span class="exam-info__lab">防止作弊：
                             <span class="exam-info__value">
-                                {{ form.sxes.length ? '' : '无' }}
-                                {{ form.sxes.indexOf(1) !== -1 ? '试题乱序' : '' }}
-                                {{ form.sxes.indexOf(2) !== -1 ? '选项乱序' : '' }}
+                                <template v-if="!form.sxes.length">无</template>
+                                <template v-else v-for="(sxe, index) in form.sxes">
+                                    {{ index > 0 ? '、' : '' }}
+                                    {{ dictStore.getValue('EXAM_SXES', sxe) }}
+                                </template>
                             </span>
                         </span>
                     </div>
@@ -83,6 +85,12 @@
                             <span class="exam-info__lab">公布排名</span>
                             <span class="exam-info__value">
                                 {{ dictStore.getValue('STATE_ON', form.rankState) }}
+                            </span>
+                        </div>
+                        <div class="exam-info__column">
+                            <span class="exam-info__lab">重考次数</span>
+                            <span class="exam-info__value">
+                                {{ form.retakeNum }}次
                             </span>
                         </div>
                     </div>
@@ -254,7 +262,7 @@ const form = useExamStore() // 表单
 
                 .exam-info__row1 {
                     display: grid;
-                    grid-template-columns: repeat(6, 1fr);
+                    grid-template-columns: repeat(7, 1fr);
                     margin-top: 10px;
 
                     .exam-info__column {
