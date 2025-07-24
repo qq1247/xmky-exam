@@ -120,8 +120,8 @@ const curTabIndex = ref(0); // 当前选择标签页
 const navBtnList = ref([
 	{ name: '考试', icon: 'icon-icon-pen' },
 	{ name: '练习', icon: 'icon-icon-pencil' },
-	{ name: '错题', icon: 'icon-icon-top_01' },
-	{ name: '收藏', icon: 'icon-icon-top-05' },
+	/* { name: '错题', icon: 'icon-icon-top_01' },
+	{ name: '收藏', icon: 'icon-icon-top-05' }, */
 	{ name: '个人中心', icon: 'icon-icon-people' }
 ]); // 导航按钮列表
 const taskListHeight = ref(0); // 下侧列表沾满剩余空间

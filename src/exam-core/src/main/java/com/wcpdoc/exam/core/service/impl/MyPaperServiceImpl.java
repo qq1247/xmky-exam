@@ -167,6 +167,11 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 						Collections.addAll(questionPart.getUserAnswers(), myQuestion.getUserAnswer().split("\n", -1));
 					}
 				}
+
+				if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
+					questionPart.setAnswerImgFileIds(myQuestion.getImgFileIds());
+					questionPart.setAnswerVideoFileIds(myQuestion.getVideoFileIds());
+				}
 				paper.add(questionPart);
 			}
 		}

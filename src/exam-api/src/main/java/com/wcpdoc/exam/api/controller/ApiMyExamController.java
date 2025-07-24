@@ -114,7 +114,7 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
 					.addAttr("ver", myExam.getVer())// 版本（exam.retake为最大重考次数，myExam.ver为当前第几次重考，从2开始，表示第一次重考）
-					;
+			;
 		} catch (MyException e) {
 			log.error("我的考试获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -286,15 +286,18 @@ public class ApiMyExamController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
-	 * @param examId
-	 * @param questionId
-	 * @param answers
+	 * @param examId       考试ID
+	 * @param questionId   试题ID
+	 * @param answers      答案
+	 * @param imgFileId    图片IDS
+	 * @param videoFileIds 视频IDS
 	 * @return PageResult
 	 */
 	@RequestMapping("/answer")
-	public PageResult answer(Integer examId, Integer questionId, String[] answers) {
+	public PageResult answer(Integer examId, Integer questionId, String[] answers, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
 		try {
-			myExamService.answer(examId, getCurUser().getId(), questionId, answers);
+			myExamService.answer(examId, getCurUser().getId(), questionId, answers, imgFileIds, videoFileIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("我的考试答题错误：{}", e.getMessage());

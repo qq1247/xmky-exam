@@ -54,6 +54,24 @@
 							<template #title-post>
 								<text>（{{ examQuestion.score }}分）</text>
 							</template>
+							<template #user-answer-post>
+								<view class="question__img-group">
+									<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="question__img-inner">
+										<image
+											:src="`${host}/file/download?id=${imgFileId}`"
+											mode="aspectFit"
+											view
+											@click="preview(examQuestion.answerImgFileIds, index)"
+											class="question__img"
+										></image>
+										<text>答案图{{ toChinaNum(index + 1) }}</text>
+									</view>
+								</view>
+								<view v-if="examQuestion.answerVideoFileIds?.length > 0">
+									<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="question__video"></video>
+									<text>答案视频{{ toChinaNum(1) }}</text>
+								</view>
+							</template>
 						</xm-question>
 						<view v-else>
 							<view>{{ examQuestion.chapterName }}</view>
@@ -116,6 +134,7 @@ import { Exam } from '@/ts/exam.d';
 import { ExamQuestion } from '@/ts/paper.d';
 import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/api/myExam';
 import { loginSysTime } from '@/api/login';
+import { toChinaNum } from '@/util/numberUtil';
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore();
@@ -165,6 +184,8 @@ const timerId = ref(); // 延时器ID，用于防抖
 
 const answerSheet = ref(); // 答题卡
 const marks = ref<number[]>([]); // 标记
+
+const host = ref(uni.getStorageSync('BASE_URL'));
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
@@ -405,6 +426,15 @@ function prompt(msg: string) {
 function toHome() {
 	uni.switchTab({ url: '/pages/home/home' });
 }
+
+// 预览图片
+function preview(imgFileIds: number[], index: number) {
+	let urls = imgFileIds.map((imgFileId) => `${host.value}/file/download?id=${imgFileId}`);
+	uni.previewImage({
+		current: index,
+		urls: urls
+	});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -468,6 +498,29 @@ function toHome() {
 				}
 			}
 			// #endif
+			.question__img-group {
+				margin-top: 20rpx;
+				display: flex;
+
+				.question__img-inner {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					.question__img {
+						display: inline-block;
+						height: 140rpx;
+						width: 140rpx;
+						background-color: #fff;
+						border: 1px solid #dcdfe6;
+						border-radius: 6px;
+						margin-left: 10rpx;
+					}
+				}
+			}
+			.question__video {
+				width: 100%;
+				padding-top: 75%;
+			}
 		}
 	}
 	.mypaper-foot {

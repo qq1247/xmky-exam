@@ -67,16 +67,38 @@
                             :analysis="examQuestion.analysis" :userAnswers="examQuestion.userAnswers"
                             :userScore="examQuestion.userScore" :answer-show="toolbars.answerShow"
                             :user-answer-show="true" :analysisShow="toolbars.analysisShow" :display="'paper'"
-                            :editable="false" class="paper-question">
+                            :editable="false" class="_question">
                             <template #title-pre>{{ examQuestion.no }}、</template>
                             <template #foot>
-                                <div v-if="toolbars.markOptionShow && examQuestion.markType === 2" class="mark-option">
-                                    <div class="mark-option__title">阅题</div>
-                                    <span class="mark-option__txt">本题得</span>
-                                    <el-input-number v-model="examQuestion.userScore" :min="0" :max="examQuestion.score"
-                                        :precision="2" controls-position="right" :readonly="examQuestion.commit"
-                                        class="mark-option__input-number" /><!-- 用blur事件，输入字母或删除数字不触发change事件 -->
-                                    <span class="mark-option__txt">分</span>
+                                <div v-if="examQuestion.questionType === 5 && examQuestion.markType === 2"
+                                    class="upload-group">
+                                    <div class="upload__btn">
+                                        <vue-draggable v-model="examQuestion.imgFiles">
+                                            <photo-provider :default-backdrop-opacity="0.6">
+                                                <photo-consumer v-for="(file, index) in examQuestion.imgFiles"
+                                                    :key="index" :src="`${downloadUrl}?id=${file.uid}`">
+                                                    <div class="img">
+                                                        <el-image :src="`${downloadUrl}?id=${file.uid}`"
+                                                            fit="contain" />
+                                                        <div class="img__inner">
+                                                            <span class="img__txt">
+                                                                答案图{{ toChinaNum(index + 1) }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </photo-consumer>
+                                            </photo-provider>
+                                        </vue-draggable>
+                                    </div>
+                                    <div class="upload__btn">
+                                        <div v-if="examQuestion.videoFiles.length" class="img">
+                                            <longze-video-play
+                                                v-bind="examQuestion.videoFiles[0].option"></longze-video-play>
+                                            <div class="img__inner" style="margin-top: 10px;">
+                                                <span class="img__txt">答案视频</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
                         </xmks-question>
@@ -98,6 +120,9 @@ import { examGet } from '@/api/exam/exam'
 import type { User } from '@/ts/base/user'
 import { userGet } from '@/api/base/user'
 import http from '@/request'
+import { toChinaNum } from '@/util/numberUtil'
+import { longzeVideoPlay } from "longze-vue3-video-player";
+import { VueDraggable } from 'vue-draggable-plus'
 
 /************************变量定义相关***********************/
 const route = useRoute() // 路由
@@ -162,8 +187,7 @@ const load = reactive({// 加载
     text: '',// 显示加载页面内容
     second: 6,// 倒计时秒数
 })
-
-
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -204,8 +228,49 @@ async function paperQuery() {
     })
     let no = 1;
     examQuestions.value = data1.map((examQuestion: ExamQuestion) => {
-        if (examQuestion.type === 2) { // 处理题号
+        if (examQuestion.type === 2) { // 处理题号、答题附件
             examQuestion.no = no++;
+            if (examQuestion.markType === 2 && examQuestion.questionType === 5) { // 主观问答题添加图片和视频附件
+                examQuestion.imgFiles = []
+                examQuestion.answerImgFileIds?.forEach((fileId: number) => {
+                    examQuestion.imgFiles.push({
+                        uid: fileId,
+                        url: `${downloadUrl}?id=${fileId}`,
+                        name: `${fileId}`
+                    })
+                })
+                examQuestion.videoFiles = []
+                examQuestion.answerVideoFileIds?.forEach((fileId: number) => {
+                    examQuestion.videoFiles.push({
+                        uid: fileId,
+                        url: `${downloadUrl}?id=${fileId}`,
+                        name: `${fileId}`,
+                        option: {
+                            width: "200px", //播放器宽度
+                            height: "146px", //播放器高度
+                            color: "#409eff", //主题色
+                            title: "视频", //视频名称
+                            src: `${downloadUrl}?id=${fileId}`, //视频源
+                            muted: false, //静音
+                            webFullScreen: false,
+                            speedRate: ["0.5", "1.0", "2.0"], //播放倍速
+                            autoPlay: false, //自动播放
+                            loop: false, //循环播放
+                            mirror: false, //镜像画面
+                            ligthOff: false, //关灯模式
+                            volume: 0.3, //默认音量大小
+                            control: true, //是否显示控制
+                            controlBtns: [
+                                "audioTrack",
+                                "quality",
+                                "speedRate",
+                                "volume",
+                                "fullScreen",
+                            ], //显示所有按钮,
+                        }
+                    })
+                })
+            }
         }
         return examQuestion;
     })
@@ -575,7 +640,7 @@ function scrollView(index: number) {
                         }
                     }
 
-                    .paper-question {
+                    ._question {
                         .mark-option {
                             display: flex;
                             align-items: center;
@@ -630,6 +695,107 @@ function scrollView(index: number) {
                                     width: 100%;
                                     height: 1px;
                                     background-color: #333333;
+                                }
+                            }
+                        }
+
+                        .upload-group {
+                            display: flex;
+                            justify-content: left;
+                            align-items: end;
+                            margin-top: 10px;
+
+                            .el-upload {
+                                width: 148px;
+                                height: 148px;
+                                border: 1px dashed var(--el-border-color);
+                                border-radius: 6px;
+                                cursor: pointer;
+                                position: relative;
+                                overflow: hidden;
+                                transition: var(--el-transition-duration-fast);
+                            }
+
+                            .el-upload:hover {
+                                border-color: #3AA8EF;
+                                background-color: #FAFAFA;
+                            }
+
+                            .iconfont {
+                                font-size: 20px;
+                                color: #8c939d;
+                            }
+
+                            .PhotoSlider__Backdrop {
+                                opacity: 0.6;
+                            }
+
+                            .el-image__inner {
+                                background-color: #fff;
+                                border: 1px solid #dcdfe6;
+                                border-radius: 6px;
+                                height: 148px;
+                                width: 148px;
+                                margin: 0 8px 8px 0;
+                                overflow: hidden;
+                                padding: 0px;
+                            }
+
+                            .img {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+
+                                .el-image {
+                                    cursor: move;
+                                }
+
+                                .img__inner {
+                                    line-height: 0px;
+
+                                    .img__txt {
+                                        line-height: 14px;
+                                        font-size: 14px;
+                                        color: #000000;
+                                    }
+
+                                    .img__btn {
+                                        cursor: pointer;
+                                        margin-left: 5px;
+                                        font-size: 16px;
+                                    }
+                                }
+                            }
+
+                            .upload__btn {
+                                margin-right: 10px;
+
+                                .el-upload {
+                                    display: flex;
+                                    flex-direction: column;
+                                    width: 50px;
+                                    height: 45px;
+                                }
+
+                                .upload__btn-icon {
+
+                                    padding: 6px;
+                                    border-radius: 50%;
+                                    font-size: 14px;
+                                    color: #fff;
+
+                                    &.upload__btn-icon--img {
+                                        background-color: #fcc129;
+                                    }
+
+                                    &.upload__btn-icon--video {
+                                        background-color: #287ce7;
+                                    }
+                                }
+
+                                .upload__btn-txt {
+                                    margin-top: 2px;
+                                    font-size: 11px;
                                 }
                             }
                         }

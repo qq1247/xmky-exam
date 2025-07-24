@@ -18,17 +18,17 @@
                     </el-form-item>
                     <!-- 图片 -->
                     <el-form-item label="图片" prop="imgFileIds">
-                        <div class="question__img-group">
+                        <div class="img-group">
                             <vue-draggable v-model="imgFileList">
                                 <photo-provider :default-backdrop-opacity="0.6">
                                     <photo-consumer v-for="(file, index) in imgFileList" :key="index"
                                         :src="`${downloadUrl}?id=${file.uid}`">
-                                        <div class="question_img-outer">
+                                        <div class="img">
                                             <el-image :src="`${downloadUrl}?id=${file.uid}`" fit="contain" />
-                                            <div class="question_img-inner">
-                                                <span class="question_img-txt">图{{ toChinaNum(index + 1) }}</span>
+                                            <div class="img__inner">
+                                                <span class="img__txt">图{{ toChinaNum(index + 1) }}</span>
                                                 <span @click.stop="imgFileList.splice(index, 1)"
-                                                    class="iconfont icon-shanchu question_img-btn"></span>
+                                                    class="iconfont icon-shanchu img__btn"></span>
                                             </div>
                                         </div>
                                     </photo-consumer>
@@ -38,20 +38,20 @@
                             <el-upload v-model:file-list="imgFileList" :action="uploadUrl"
                                 :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
                                 accept=".jpg,.png,.jpeg,JPG,PNG,JPEG" :limit="4" :before-upload="uploadBefore"
-                                :multiple="true" :on-success="uploadSuccess" class="">
+                                :multiple="true" :on-success="uploadSuccess">
                                 <span class="iconfont icon-tubiaoziti2-02"></span>
                             </el-upload>
                         </div>
                     </el-form-item>
                     <!-- 视频 -->
                     <el-form-item label="视频" prop="rideoFileIds">
-                        <div class="question__img-group">
-                            <div v-if="videoOptions.src" class="question_img-outer">
+                        <div class="img-group">
+                            <div v-if="videoOptions.src" class="img">
                                 <longze-video-play ref="videoPlayerRef" v-bind="videoOptions"></longze-video-play>
-                                <div class="question_img-inner" style="margin-top: 10px;">
-                                    <span class="question_img-txt">视频</span>
+                                <div class="img__inner" style="margin-top: 10px;">
+                                    <span class="img__txt">视频</span>
                                     <span @click.stop="videoUploadRef!.clearFiles(); videoOptions.src = ''"
-                                        class="iconfont icon-shanchu question_img-btn"></span>
+                                        class="iconfont icon-shanchu img__btn"></span>
                                 </div>
                             </div>
                             <el-upload ref="videoUploadRef" v-model:file-list="videoFileList" :action="uploadUrl"
@@ -795,7 +795,7 @@ function uploadRemoveOfVideo(uploadFile: UploadFile, uploadFiles: UploadFiles) {
             }
         }
 
-        :deep(.question__img-group) {
+        :deep(.img-group) {
             display: flex;
 
             .el-upload {
@@ -834,7 +834,7 @@ function uploadRemoveOfVideo(uploadFile: UploadFile, uploadFiles: UploadFiles) {
                 padding: 0px;
             }
 
-            .question_img-outer {
+            .img {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -843,16 +843,16 @@ function uploadRemoveOfVideo(uploadFile: UploadFile, uploadFiles: UploadFiles) {
                     cursor: move;
                 }
 
-                .question_img-inner {
+                .img__inner {
                     line-height: 0px;
 
-                    .question_img-txt {
+                    .img__txt {
                         line-height: 14px;
                         font-size: 14px;
                         color: #000000;
                     }
 
-                    .question_img-btn {
+                    .img__btn {
                         cursor: pointer;
                         margin-left: 5px;
                         font-size: 16px;

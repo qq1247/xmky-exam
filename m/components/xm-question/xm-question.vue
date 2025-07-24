@@ -139,6 +139,7 @@
 			maxlength="999"
 			class="question-user-answer"
 		></textarea>
+		<slot name="user-answer-post"></slot>
 		<!-- 分数 -->
 		<view v-if="analysisShow" class="question-score">
 			<view>

@@ -49,13 +49,13 @@
                             <el-form-item prop="score" :rules="formRules.score">
                                 <el-button :disabled="curQuestionIndex <= 0" text class="paper__btn"
                                     @click="curQuestionIndex--; questionView()">
-                                    <span class="iconfont icon-fanye-01 paper__btn-icon"></span>
+                                    <span class="iconfont icon-zuo paper__btn-icon"></span>
                                     <span class="paper__btn-txt">上一题</span>
                                 </el-button>
                                 <el-button :disabled="curQuestionIndex >= _myExerQuestions.length - 1" text
                                     class="paper__btn" @click="curQuestionIndex++; questionView()">
                                     <span class="paper__btn-txt paper__btn-txt-next">下一题</span>
-                                    <span class="iconfont icon-fanye-02 paper__btn-icon"></span>
+                                    <span class="iconfont icon-right paper__btn-icon"></span>
                                 </el-button>
                                 <template
                                     v-if="!toolbars.answerShow && curExamQuestion?.userScore == null && curExamQuestion?.markType === 2"><!--  如果是主观题，需要自评 -->
@@ -88,7 +88,7 @@
                                 class="opt__btn opt__btn--active" @click="wrongReset">
                                 <span class="opt__btn-txt opt__btn-txt--wrong">答错{{
                                     _myExerQuestions[curQuestionIndex]?.wrongAnswerNum
-                                    }}次&nbsp;&nbsp;</span>
+                                }}次&nbsp;&nbsp;</span>
                                 <span class="iconfont icon-lianxi-61 opt__btn-icon"></span>
                                 <span class="opt__btn-txt">已掌握</span>
                             </el-button>

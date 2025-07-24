@@ -28,6 +28,7 @@ import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.StringUtil;
@@ -156,12 +157,13 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	@Override
 	@CacheEvict(value = ExamConstant.MYQUESTION_CACHE, key = ExamConstant.MYQUESTION_LIST_KEY_PRE
 			+ "#examId + ':' + #userId")
-	public void answer(Integer examId, Integer userId, Integer questionId, String[] answers) {
+	public void answer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
 		// 数据校验
-		MyQuestion myQuestion = answerValid(examId, userId, questionId);
+		MyQuestion myQuestion = answerValid(examId, userId, questionId, imgFileIds, videoFileIds);
 
 		// 答案保存
-		answerSave(questionId, answers, myQuestion);
+		answerSave(questionId, answers, myQuestion, imgFileIds, videoFileIds);
 
 		User user = baseCacheService.getUser(userId);
 		Exam exam = examCacheService.getExam(examId);
@@ -383,7 +385,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 		return false;
 	}
-	
+
 	@Override
 	@Caching(evict = { //
 			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_KEY_PRE
@@ -470,7 +472,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			myQuestionService.updateById(myQuestion);
 		}
 	}
-	
+
 	private void paperValid(Integer examId, Integer userId) {
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
@@ -495,7 +497,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 
-	private void answerSave(Integer questionId, String[] answers, MyQuestion myQuestion) {
+	private void answerSave(Integer questionId, String[] answers, MyQuestion myQuestion, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
 		Question question = examCacheService.getQuestion(questionId);
 		if (!ValidateUtil.isValid(answers)) {
 			myQuestion.setUserAnswer(null);
@@ -519,13 +522,18 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		} else if (QuestionUtil.hasFillBlank(question)) {
 			myQuestion.setUserAnswer(StringUtil.join(answers, '\n'));
 		} else if (QuestionUtil.hasQA(question)) {
-			myQuestion.setUserAnswer(StringUtil.join(answers));// bug：文本包含英文逗号会分割
+			myQuestion.setUserAnswer(StringUtil.join(answers));// bug：主观问答题，文本包含英文逗号会分割，需要再合并一下
 		}
 		myQuestion.setAnswerTime(new Date());
+		myQuestion.setImgFileIds(CollectionUtil.toList(imgFileIds));
+		myQuestion.setVideoFileIds(CollectionUtil.toList(videoFileIds));
+		myQuestion.setUpdateTime(new Date());
+		myQuestion.setUpdateUserId(getCurUser().getId());
 		myQuestionService.updateById(myQuestion);
 	}
 
-	private MyQuestion answerValid(Integer examId, Integer userId, Integer questionId) {
+	private MyQuestion answerValid(Integer examId, Integer userId, Integer questionId, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
@@ -561,6 +569,17 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 		if (myExam.getState() == 3) {
 			throw new MyException("已交卷");
+		}
+		Question question = examCacheService.getQuestion(questionId);
+		if (ValidateUtil.isValid(imgFileIds)) {
+			if (!(QuestionUtil.hasSubjective(question) && QuestionUtil.hasQA(question))) {
+				throw new MyException("参数错误：imgFileIds");
+			}
+		}
+		if (ValidateUtil.isValid(videoFileIds)) {
+			if (!(QuestionUtil.hasSubjective(question) && QuestionUtil.hasQA(question))) {
+				throw new MyException("参数错误：videoFileIds");
+			}
 		}
 		return myQuestion;
 	}

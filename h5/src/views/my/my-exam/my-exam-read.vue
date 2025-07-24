@@ -36,7 +36,7 @@
                     </span>
                     <span class="exam__label">
                         成绩查询：<span class="exam__value">{{ dictStore.getValue('SCORE_STATE', exam.scoreState as number)
-                        }}</span>
+                            }}</span>
                     </span>
                     <span class="exam__label">
                         公布排名：<span class="exam__value">{{ dictStore.getValue('STATE_ON', exam.rankState as number) ||
@@ -47,12 +47,12 @@
                     </span>
                     <span class="exam__label">
                         试卷类型：<span class="exam__value">{{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType as number)
-                        }}试卷</span>
+                            }}试卷</span>
                     </span>
 
                     <span class="exam__label">
                         组卷方式：<span class="exam__value">{{ dictStore.getValue('PAPER_GEN_TYPE', exam.genType as number)
-                        }}</span>
+                            }}</span>
                     </span>
                     <span class="exam__label exam__label-2">
                         防 作 弊：<span class="exam__value">
@@ -62,7 +62,7 @@
                         </span>
                     </span>
                     <span class="exam__label">
-                        重考次数：<span class="exam__value">{{ exam.retakeNum || '-' }}次</span>
+                        重考次数：<span class="exam__value">{{ exam.retakeNum }}次</span>
                     </span>
                 </div>
             </div>
@@ -144,7 +144,7 @@
                                         dictStore.getValue('ANSWER_STATE', myExam.answerState as number) || '-' }}</span>
                                 <span v-if="myExam.ver as number > 1">（已重考{{ myExam.ver as number - 1 }}/{{
                                     exam.retakeNum
-                                }}次）</span>
+                                    }}次）</span>
                             </span>
                             <div class="my-exam__btn-group">
                                 <el-button type="primary" class="my-exam__btn"

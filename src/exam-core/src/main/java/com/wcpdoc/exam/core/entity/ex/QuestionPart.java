@@ -26,6 +26,8 @@ public class QuestionPart extends PaperPart {
 	private String analysis;
 	private List<String> options = new ArrayList<>();
 	private List<Object> answers = new ArrayList<>();
+	private List<Integer> answerImgFileIds;
+	private List<Integer> answerVideoFileIds;
 
 	private BigDecimal userScore;
 	private List<String> userAnswers = new ArrayList<>();

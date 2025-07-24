@@ -45,6 +45,10 @@ public class MyQuestion {
 	private Integer markUserId;
 	private Date markTime;
 	private Integer ver;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> imgFileIds;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> videoFileIds;
 	private Integer updateUserId;
 	private Date updateTime;
 
