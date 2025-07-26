@@ -289,8 +289,8 @@ public class ApiMyExamController extends BaseController {
 	 * @param examId       考试ID
 	 * @param questionId   试题ID
 	 * @param answers      答案
-	 * @param imgFileId    图片IDS
-	 * @param videoFileIds 视频IDS
+	 * @param imgFileId    图片IDS 主观问答题有效
+	 * @param videoFileIds 视频IDS 主观问答题有效
 	 * @return PageResult
 	 */
 	@RequestMapping("/answer")

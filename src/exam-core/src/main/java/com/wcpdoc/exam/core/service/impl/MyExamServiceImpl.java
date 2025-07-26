@@ -60,6 +60,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
+import com.wcpdoc.file.service.FileService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,6 +95,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	private MyExamHisService myExamHisService;
 	@Resource
 	private MyQuestionHisService myQuestionHisService;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	public RBaseDao<MyExam> getDao() {
@@ -164,6 +167,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 		// 答案保存
 		answerSave(questionId, answers, myQuestion, imgFileIds, videoFileIds);
+
+		// 答案附件保存
+		answerFileSave(myQuestion);
 
 		User user = baseCacheService.getUser(userId);
 		Exam exam = examCacheService.getExam(examId);
@@ -467,6 +473,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			myQuestion.setMarkUserId(null);
 			myQuestion.setMarkTime(null);
 			myQuestion.setVer(myQuestion.getVer() + 1);
+			myQuestion.setImgFileIds(null);
+			myQuestion.setVideoFileIds(null);
 			myQuestion.setUpdateUserId(getCurUser().getId());
 			myQuestion.setUpdateTime(new Date());
 			myQuestionService.updateById(myQuestion);
@@ -530,6 +538,15 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myQuestion.setUpdateTime(new Date());
 		myQuestion.setUpdateUserId(getCurUser().getId());
 		myQuestionService.updateById(myQuestion);
+	}
+
+	private void answerFileSave(MyQuestion myQuestion) {
+		myQuestion.getImgFileIds().forEach(imgFileId -> {
+			fileService.upload(imgFileId);
+		});
+		myQuestion.getVideoFileIds().forEach(videoFileId -> {
+			fileService.upload(videoFileId);
+		});
 	}
 
 	private MyQuestion answerValid(Integer examId, Integer userId, Integer questionId, Integer[] imgFileIds,

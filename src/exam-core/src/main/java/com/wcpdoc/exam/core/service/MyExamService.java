@@ -44,8 +44,8 @@ public interface MyExamService extends BaseService<MyExam> {
 	 * @param examId
 	 * @param questionId
 	 * @param userId
-	 * @param answers
-	 * @param imgFileIds
+	 * @param answers 主观问答题有效
+	 * @param imgFileIds 主观问答题有效
 	 * @param videoFileIds void
 	 */
 	void answer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer[] imgFileIds,

@@ -241,9 +241,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		questionNew.setId(null);
 		questionNew.setUpdateTime(new Date());
 		questionNew.setUpdateUserId(getCurUser().getId());
-		questionNew.setImgFileIds(questionNew.getImgFileIds().stream().map(fileId -> {
-			return fileService.copyFile(fileId);
-		}).collect(Collectors.toList()));
+		questionNew.setImgFileIds(questionNew.getImgFileIds().stream().map(fileId -> fileService.copyFile(fileId))
+				.collect(Collectors.toList()));
 		if (ValidateUtil.isValid(questionNew.getVideoFileId())) {
 			questionNew.setVideoFileId(fileService.copyFile(questionNew.getVideoFileId()));
 		}
