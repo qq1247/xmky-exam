@@ -153,6 +153,7 @@
 				<text class="question-score__standard">/{{ score }}分</text>
 			</view>
 		</view>
+		<slot name="user-score-post"></slot>
 		<!-- 答案 -->
 		<view v-if="analysisShow && (type === 1 || type === 2 || type === 4)" class="question-select-answer">
 			<view class="question-select-answer__diff">

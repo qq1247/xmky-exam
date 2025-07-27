@@ -172,6 +172,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					questionPart.setAnswerImgFileIds(myQuestion.getImgFileIds());
 					questionPart.setAnswerVideoFileIds(myQuestion.getVideoFileIds());
 				}
+				questionPart.setRemark(myQuestion.getRemark());
 				paper.add(questionPart);
 			}
 		}

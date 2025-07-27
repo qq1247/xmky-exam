@@ -82,7 +82,7 @@
                                                             fit="contain" />
                                                         <div class="img__inner">
                                                             <span class="img__txt">
-                                                                答案图{{ toChinaNum(index + 1) }}
+                                                                图{{ toChinaNum(index + 1) }}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -95,7 +95,7 @@
                                             <longze-video-play
                                                 v-bind="examQuestion.videoFiles[0].option"></longze-video-play>
                                             <div class="img__inner" style="margin-top: 10px;">
-                                                <span class="img__txt">答案视频</span>
+                                                <span class="img__txt">答视频</span>
                                             </div>
                                         </div>
                                     </div>

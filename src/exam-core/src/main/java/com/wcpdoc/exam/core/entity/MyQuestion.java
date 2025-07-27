@@ -49,6 +49,9 @@ public class MyQuestion {
 	private List<Integer> imgFileIds;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> videoFileIds;
+	private String remark;
+	private Integer remarkUserId;
+	private Date remarkTime;
 	private Integer updateUserId;
 	private Date updateTime;
 

@@ -164,7 +164,9 @@
                                         :precision="2" controls-position="right" :readonly="examQuestion.commit"
                                         class="mark-option__input-number"
                                         @blur="() => score(examQuestion)" /><!-- 用blur事件，输入字母或删除数字不触发change事件 -->
-                                    <span class="mark-option__txt">分</span>
+                                    <span class="mark-option__txt">分，批语：</span>
+                                    <el-input v-model="examQuestion.remark" :readonly="examQuestion.commit"
+                                        maxlength="48" class="mark-option__input" @blur="() => score(examQuestion)" />
                                 </div>
                             </template>
                         </xmks-question>
@@ -397,12 +399,13 @@ async function score(examQuestion: ExamQuestion) {
         examQuestion.userScore = 0
     }
 
-    examQuestion.commit = true
+    examQuestion.commit = true // 后台返回前，禁止再次更改分数
     const { data: { code } } = await myMarkScore({
         examId: route.params.examId,
         userId: markList.value[curMarkIndex.value]?.examUserId,
         questionId: examQuestion.questionId,
-        userScore: examQuestion.userScore
+        userScore: examQuestion.userScore,
+        remark: examQuestion.remark,
     })
     examQuestion.commit = false
 
@@ -794,6 +797,16 @@ async function finish() {
                                     width: 100%;
                                     height: 1px;
                                     background-color: #333333;
+                                }
+                            }
+
+                            .mark-option__input {
+                                width: 700px;
+
+                                .el-input__wrapper {
+                                    box-shadow: initial;
+                                    border-bottom: 1px solid #333333;
+                                    border-radius: initial;
                                 }
                             }
                         }

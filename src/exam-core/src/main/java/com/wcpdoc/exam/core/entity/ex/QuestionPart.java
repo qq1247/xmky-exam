@@ -28,7 +28,7 @@ public class QuestionPart extends PaperPart {
 	private List<Object> answers = new ArrayList<>();
 	private List<Integer> answerImgFileIds;
 	private List<Integer> answerVideoFileIds;
-
+	private String remark;
 	private BigDecimal userScore;
 	private List<String> userAnswers = new ArrayList<>();
 }

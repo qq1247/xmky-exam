@@ -35,6 +35,12 @@
                     <span class="iconfont icon-icon-06 editor-toolbar__btn-icon"></span>
                     <span class="editor-toolbar__btn-txt">{{ toolbars.analysisShow ? '隐藏解析' : '显示解析' }}</span>
                 </el-button>
+                <el-button type='' class="editor-toolbar__btn"
+                    :class="{ 'editor-toolbar__btn--active': toolbars.remarkShow }"
+                    @click="toolbars.remarkShow = !toolbars.remarkShow">
+                    <span class="iconfont icon-tubiaoziti22-22 editor-toolbar__btn-icon"></span>
+                    <span class="editor-toolbar__btn-txt">{{ toolbars.remarkShow ? '隐藏批语' : '显示批语' }}</span>
+                </el-button>
             </div>
             <div class="paper__wrap">
                 <div class="answer-sheet">
@@ -150,6 +156,11 @@
                                         </el-upload>
                                     </div>
                                 </div>
+                                <div v-if="toolbars.remarkShow && examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)"
+                                    class="question__analysis"><!-- 主观填空题和主观问答题，显示批语 -->
+                                    <div class="question__analysis-title">批语</div>
+                                    <span class="question__analysis-content">{{ examQuestion.remark || '无' }}</span>
+                                </div>
                             </template>
                         </xmks-question>
                     </template>
@@ -168,7 +179,7 @@ import http from '@/request'
 import type { Exam, ExamQuestion } from '@/ts/exam/exam'
 import type { MyExam } from '@/ts/exam/my-exam'
 import { delay } from '@/util/timeUtil'
-import { ElMessage, genFileId, type UploadFile, type UploadFiles, type UploadRawFile, type UploadUserFile } from 'element-plus'
+import { ElMessage, type UploadFile, type UploadFiles, type UploadRawFile, type UploadUserFile } from 'element-plus'
 import _ from 'lodash'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -185,6 +196,7 @@ const toolbars = reactive({// 工具栏
     answerShow: false,
     totalScoreShow: false,
     analysisShow: false,
+    remarkShow: true,
 })
 
 const examQuestions = ref<ExamQuestion[]>([])// 试卷

@@ -64,12 +64,20 @@
 											@click="preview(examQuestion.answerImgFileIds, index)"
 											class="question__img"
 										></image>
-										<text>答案图{{ toChinaNum(index + 1) }}</text>
+										<text>图{{ toChinaNum(index + 1) }}</text>
 									</view>
 								</view>
 								<view v-if="examQuestion.answerVideoFileIds?.length > 0">
 									<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="question__video"></video>
-									<text>答案视频{{ toChinaNum(1) }}</text>
+									<text>视频</text>
+								</view>
+							</template>
+							<template #user-score-post>
+								<view v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)" class="question-qa-answer">
+									<text class="question-qa-answer__label">批语</text>
+									<view>
+										<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
+									</view>
 								</view>
 							</template>
 						</xm-question>
@@ -520,6 +528,23 @@ function preview(imgFileIds: number[], index: number) {
 			.question__video {
 				width: 100%;
 				padding-top: 75%;
+			}
+			.question-qa-answer {
+				margin-top: 20rpx;
+				padding: 20rpx;
+				background: #f6f7fc;
+				border-radius: 10rpx;
+				.question-qa-answer__label {
+					margin-top: 20rpx;
+					font-weight: bold;
+					font-size: 30rpx;
+					color: #999999;
+				}
+				.question-qa-answer__content {
+					display: inline-block;
+					margin-top: 20rpx;
+					line-height: 60rpx;
+				}
 			}
 		}
 	}

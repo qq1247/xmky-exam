@@ -13,7 +13,7 @@ import com.wcpdoc.exam.core.entity.ex.PaperPart;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 public interface MyMarkService extends BaseService<MyMark> {
-	
+
 	/**
 	 * 试卷领取
 	 * 
@@ -63,9 +63,10 @@ public interface MyMarkService extends BaseService<MyMark> {
 	 * @param examId     考试ID
 	 * @param userId     考试用户ID
 	 * @param questionId 试题ID
-	 * @param userScore  用户得分
+	 * @param userScore  批分
+	 * @param remark     批语 void
 	 */
-	void score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore);
+	void score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore, String remark);
 
 	/**
 	 * 阅卷
@@ -76,4 +77,5 @@ public interface MyMarkService extends BaseService<MyMark> {
 	 * @param userId void
 	 */
 	void finish(Integer examId, Integer userId);
+
 }
