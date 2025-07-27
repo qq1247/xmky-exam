@@ -58,7 +58,8 @@
 						v-model="curExamQuestion.userAnswers"
 						:type="curExamQuestion?.questionType"
 						:title="curExamQuestion.title"
-						:imgIds="curExamQuestion.imgFileIds"
+						:img-ids="curExamQuestion.imgFileIds"
+						:video-id="curExamQuestion.videoFileId"
 						:options="curExamQuestion.options"
 						:answers="curExamQuestion.answers"
 						:mark-type="curExamQuestion.markType"
@@ -167,6 +168,11 @@ import { MyExerQuestion } from '@/ts/my-exer-question.d';
 import { ExamQuestion } from '@/ts/paper.d';
 
 /************************变量定义相关***********************/
+const props = defineProps({
+  exerId: [String, Number], // 根据实际类型调整
+  type: String
+})
+
 const dictStore = useDictStore();
 const pageParm = reactive({
 	exerId: 0,

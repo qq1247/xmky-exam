@@ -147,7 +147,7 @@ public class ApiQuestionBankController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			questionBankService.delEx(id);
+			questionBankService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("题库删除错误：{}", e.getMessage());

@@ -42,8 +42,8 @@
 						<text class="myread-warn-head__title">注意事项</text>
 					</view>
 					<view class="myread-warn-content" style="font-size: 26rpx">
-						<view>考试结束时间到，程序会自动交卷。</view>
-						<view>交卷后不可再次考试，请慎重!</view>
+						<view>1、考试结束时间到，系统会自动交卷，请注意时间。</view>
+						<view>2、交卷后不可再次考试，请慎重（允许重考除外）。</view>
 					</view>
 				</view>
 				<view class="myread-exam">
@@ -59,12 +59,12 @@
 							<text class="myread-exam__value">{{ exam.name }}</text>
 						</view>
 						<view class="myread-exam__row">
-							<text class="myread-exam__label">考试时间：</text>
-							<text class="myread-exam__value">{{ dateTimeFormat(exam.startTime) }} - {{ dateTimeFormat(exam.endTime) }}</text>
+							<text class="myread-exam__label">开始时间：</text>
+							<text class="myread-exam__value">{{ exam.startTime }}</text>
 						</view>
-						<view v-if="mark" class="myread-exam__row">
-							<text class="myread-exam__label">阅卷时间：</text>
-							<text class="myread-exam__value">{{ dateTimeFormat(exam.markStartTime) }} - {{ dateTimeFormat(exam.markEndTime) }}</text>
+						<view class="myread-exam__row">
+							<text class="myread-exam__label">结束时间：</text>
+							<text class="myread-exam__value">{{ exam.endTime }}</text>
 						</view>
 						<view class="myread-exam__row">
 							<text class="myread-exam__label">限时答题：</text>
@@ -80,28 +80,43 @@
 						</view>
 						<view class="myread-exam__row">
 							<text class="myread-exam__label">考试分数：</text>
-							<text class="myread-exam__value">{{ exam.passScore }} / {{ exam.totalScore }}（及格 / 总分）</text>
+							<text class="myread-exam__value">{{ exam.passScore }}/{{ exam.totalScore }}（及格/总分）</text>
 						</view>
 						<view class="myread-exam__row">
 							<text class="myread-exam__label">试卷类型：</text>
-							<text class="myread-exam__value">
-								{{
-									exam.markType === 1
-										? dictStore.getValue('PAPER_MARK_TYPE', exam.markType)
-										: dictStore.getValue('PAPER_MARK_TYPE', 1) + ' | ' + dictStore.getValue('PAPER_MARK_TYPE', 2)
-								}}
-							</text>
+							<text class="myread-exam__value">{{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType) }}试卷</text>
 						</view>
 						<view class="myread-exam__row">
 							<text class="myread-exam__label">组卷方式：</text>
 							<text class="myread-exam__value">{{ dictStore.getValue('PAPER_GEN_TYPE', exam.genType) }}</text>
 						</view>
 						<view class="myread-exam__row">
-							<text class="myread-exam__label">防止作弊：</text>
-							<text class="myread-exam__value">
+							<text class="myread-exam__label">防 作 弊：</text>
+							<!-- 在一行显示 -->
+							<text class="myread-exam__value" style="font-size: 22rpx">
 								<template v-if="!exam.sxes.length">无</template>
-								<template v-else v-for="(sxe, index) in exam.sxes" :key="index">{{ index > 0 ? '、' : '' }}{{ ['', '试题乱序', '选项乱序'][sxe] }}</template>
+								<template v-else v-for="(sxe, index) in exam.sxes" :key="index">{{ index > 0 ? '、' : '' }}{{ dictStore.getValue('EXAM_SXES', sxe) }}</template>
 							</text>
+						</view>
+						<view class="myread-exam__row">
+							<text class="myread-exam__label">允许重考：</text>
+							<text class="myread-exam__value">{{ exam.retakeNum || '-' }}次</text>
+						</view>
+					</view>
+				</view>
+				<view class="myread-paper">
+					<view class="myread-paper-head">
+						<view class="myread-paper-head__icon">
+							<uni-icons customPrefix="iconfont" type="icon-icon-exam3" color="white" size="26rpx"></uni-icons>
+						</view>
+						<text class="myread-paper-head__title">试卷信息</text>
+					</view>
+					<view class="myread-paper-content">
+						<text class="myread-paper_statis-txt">
+							客观题{{ questionStatisData.markTypeStatis.objective }}道 主观题{{ questionStatisData.markTypeStatis.subjective }}道
+						</text>
+						<view>
+							<qiun-data-charts type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" />
 						</view>
 					</view>
 				</view>
@@ -114,24 +129,35 @@
 					</view>
 					<view class="myread-myexam-content">
 						<view class="myread-myexam__row">
-							<text class="myread-myexam__label">答题时间：</text>
-							<text class="myread-myexam__value">{{ dateTimeFormat(myExam.answerStartTime) }} - {{ dateTimeFormat(myExam.answerEndTime) }}</text>
+							<text class="myread-myexam__label">答题开始：</text>
+							<text class="myread-myexam__value">{{ myExam.answerStartTime || '-' }}</text>
+						</view>
+						<view class="myread-myexam__row">
+							<text class="myread-myexam__label">答题结束：</text>
+							<text class="myread-myexam__value">{{ myExam.answerEndTime || '-' }}</text>
 						</view>
 						<view v-if="scoreShow" class="myread-myexam__row">
 							<text class="myread-myexam__label">考试分数：</text>
 							<text class="myread-myexam__value">
-								{{ myExam.objectiveScore == null ? '-' : myExam.objectiveScore }} / {{ myExam.totalScore == null ? '-' : myExam.totalScore }}（客观分 / 合计）
+								<template v-if="exam.markType === 1">{{ myExam.totalScore != null ? myExam.totalScore : '-' }}分</template>
+								<template v-if="exam.markType === 2">
+									{{ myExam.objectiveScore != null ? myExam.objectiveScore : '-' }}/{{ myExam.totalScore != null ? myExam.totalScore : '-' }}（客观分/合计）
+								</template>
 							</text>
-							<view
-								class="myread-myexam__score"
-								:class="{ 'myread-myexam__score--succ': myExam.answerState === 1, 'myread-myexam__score--fail': myExam.answerState === 2 }"
-							>
-								<text>{{ dictStore.getValue('ANSWER_STATE', myExam.answerState) }}</text>
-							</view>
 						</view>
 						<view v-if="rankshow" class="myread-myexam__row">
 							<text class="myread-myexam__label">考试排名：</text>
 							<text class="myread-myexam__value">{{ myExam.no == null ? '-' : myExam.no }} / {{ exam.userNum == null ? '-' : exam.userNum }}</text>
+						</view>
+						<view class="myread-myexam__row">
+							<text class="myread-myexam__label">是否及格：</text>
+							<view
+								class="myread-myexam__score"
+								:class="{ 'myread-myexam__score--succ': myExam.answerState === 1, 'myread-myexam__score--fail': myExam.answerState === 2 }"
+							>
+								<text>{{ dictStore.getValue('ANSWER_STATE', myExam.answerState) || '-' }}</text>
+							</view>
+							<text v-if="myExam.ver as number > 1" class="myread-myexam__value">（已重考{{ (myExam.ver as number) - 1 }}/{{ exam.retakeNum }}次）</text>
 						</view>
 						<view class="myread-myexam__time-wrap">
 							<view class="myread-myexam__time">
@@ -163,31 +189,10 @@
 						</view>
 					</view>
 				</view>
-				<view class="myread-paper">
-					<view class="myread-paper-head">
-						<view class="myread-paper-head__icon">
-							<uni-icons customPrefix="iconfont" type="icon-icon-exam3" color="white" size="26rpx"></uni-icons>
-						</view>
-						<text class="myread-paper-head__title">试卷信息</text>
-					</view>
-					<view class="myread-paper-content">
-						<text class="myread-paper_statis-txt">
-							客观题{{ questionStatisData.markTypeStatis.objective }}道 主观题{{ questionStatisData.markTypeStatis.subjective }}道
-						</text>
-						<view>
-							<qiun-data-charts type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" />
-						</view>
-					</view>
-				</view>
 			</scroll-view>
 		</view>
 		<view class="myread-foot">
-			<button
-				class="myread-foot__exam-in"
-				:class="{ 'myread-foot__exam-in--active': examActive, 'myread-foot__exam-in--disable': !examActive }"
-				type="primary"
-				@click="examIn"
-			>
+			<button class="myread-foot__btn" :class="{ 'myread-foot__btn--active': examActive, 'myread-foot__btn--disable': !examActive }" type="primary" @click="toExam">
 				<xm-count-down
 					v-if="!examActive"
 					:expireTime="exam.startTime"
@@ -197,6 +202,15 @@
 					@end="examActive = !examActive"
 				></xm-count-down>
 				<text>进入考试</text>
+			</button>
+			<button
+				v-if="exam.markType === 1 && exam.markState !== 3 && exam.retakeNum as number > 0 && myExam.answerState === 2 && ((myExam.ver as number) <= (exam.retakeNum as number))"
+				class="myread-foot__btn myread-foot__btn--secondary"
+				type="primary"
+				@click="toRetake"
+			>
+				<!-- 客观题试卷 && 考试未结束 && 允许重考 && 不及格 -->
+				<text>重新考试</text>
 			</button>
 		</view>
 	</view>
@@ -210,7 +224,7 @@ import { Exam } from '@/ts/exam.d';
 import { MyExam } from '@/ts/myExam.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
-import { myExamExamGet, myExamGet, myExamQuestionStatis, myExamGeneratePaper } from '@/api/myExam';
+import { myExamExamGet, myExamGet, myExamQuestionStatis, myExamRetake } from '@/api/myExam';
 import { useDictStore } from '@/stores/dict';
 
 /************************变量定义相关***********************/
@@ -244,7 +258,8 @@ const exam = reactive<Exam>({
 	sxes: [],
 	state: null,
 	userNum: null,
-	limitMinute: null
+	limitMinute: null,
+	retakeNum: null
 });
 const myExam = reactive<MyExam>({
 	examId: null,
@@ -258,7 +273,8 @@ const myExam = reactive<MyExam>({
 	state: null,
 	markState: null,
 	answerState: null,
-	no: null
+	no: null,
+	ver: null
 });
 
 let questionStatisData = reactive<PaperStatis>({
@@ -301,19 +317,12 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.myread-main__scroll')
 		.boundingClientRect((data: any) => {
-			myreadMainHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			myreadMainHeight.value = uni.getWindowInfo().windowHeight - data.top - 100;
 		})
 		.exec();
 });
 
 /************************计算属性相关*************************/
-// 格式时间（yy-MM-dd HH:mm）
-const dateTimeFormat = computed(() => (datetime: string) => {
-	if (!datetime) {
-		return '';
-	}
-	return datetime.substring(2, 16);
-});
 // 成绩展示
 const scoreShow = computed(
 	() => exam.scoreState === 1 || exam.scoreState === 3 // 只要是允许公布成绩，都显示出来占个位置
@@ -324,11 +333,10 @@ const scoreShow = computed(
 );
 // 排名展示
 const rankshow = computed(() => exam.rankState === 1);
-// 是否阅卷
-const mark = computed(() => exam.markType === 2);
 
 /************************事件相关*****************************/
-function examIn() {
+// 去考试
+function toExam() {
 	if (!examActive.value) {
 		uni.showToast({ title: '考试未开始，请等待', icon: 'error' });
 		return;
@@ -369,6 +377,7 @@ async function examQuery() {
 	exam.state = data.state;
 	exam.userNum = data.userNum;
 	exam.limitMinute = data.limitMinute;
+	exam.retakeNum = data.retakeNum;
 }
 // 我的考试查询
 async function myExamQuery() {
@@ -385,6 +394,7 @@ async function myExamQuery() {
 	myExam.markState = data.markState;
 	myExam.answerState = data.answerState;
 	myExam.no = data.no;
+	myExam.ver = data.ver;
 }
 
 // 试题统计查询
@@ -400,6 +410,16 @@ async function questionStatisQueryWithInit() {
 	});
 	questionStatisData.typeStatis = { series: [{ data: datas }] };
 	questionStatisData.markTypeStatis = markTypeStatis;
+}
+
+// 重考
+async function toRetake() {
+	const { code } = await myExamRetake({ examId: examId.value });
+	if (code !== 200) {
+		return;
+	}
+
+	toExam();
 }
 </script>
 
@@ -668,7 +688,8 @@ async function questionStatisQueryWithInit() {
 			.myread-paper {
 				display: flex;
 				flex-direction: column;
-				padding: 30rpx 0rpx;
+				padding: 30rpx 0rpx 0rpx 0rpx;
+				margin-bottom: 20rpx;
 				background-color: white;
 				box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 				border-radius: 16rpx;
@@ -710,14 +731,16 @@ async function questionStatisQueryWithInit() {
 		}
 	}
 	.myread-foot {
-		margin: 20rpx 0rpx 50rpx 0rpx;
-		.myread-foot__exam-in {
+		display: flex;
+		margin: 20rpx 20rpx 50rpx 20rpx;
+		.myread-foot__btn {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			width: 628rpx;
+			width: 100%;
 			height: 100rpx;
+			margin: 0rpx 10rpx;
 			border-radius: 50px;
 			line-height: 40rpx;
 			.myread-foot__time-count-down {
@@ -725,11 +748,18 @@ async function questionStatisQueryWithInit() {
 				font-size: 24rpx;
 			}
 		}
-		.myread-foot__exam-in--active {
+		.myread-foot__btn--active {
 			background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 		}
-		.myread-foot__exam-in--disable {
+		.myread-foot__btn--disable {
 			background: linear-gradient(to right, #dfdfdf 0%, #cacaca 100%);
+		}
+		.myread-foot__btn--secondary {
+			border: 1px solid transparent;
+			background-clip: padding-box, border-box;
+			background-origin: padding-box, border-box;
+			background-image: linear-gradient(to bottom, #fff, #fff), linear-gradient(180deg, #f445a0, #f99c9c);
+			color: #f66a9e;
 		}
 	}
 }

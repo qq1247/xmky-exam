@@ -25,13 +25,13 @@
                 </el-form-item>
                 <el-form-item label="">
                     <el-button class="my-mark-paper__btn" :disabled="curMarkIndex === 0" @click="paperPre">
-                        <span class="iconfont icon-fanye-01 my-mark-paper__btn-icon"></span>
+                        <span class="iconfont icon-zuo my-mark-paper__btn-icon"></span>
                         <span class="my-mark-paper__btn-txt">上一卷</span>
                     </el-button>
                     <el-button class="my-mark-paper__btn" :disabled="curMarkIndex === markList.length - 1"
                         @click="paperNext">
                         <span class="my-mark-paper__btn-txt">下一卷</span>
-                        <span class="iconfont icon-fanye-02 my-mark-paper__btn-icon"></span>
+                        <span class="iconfont icon-right my-mark-paper__btn-icon"></span>
                     </el-button>
                     <el-button v-if="marking" class="my-mark-paper__finish-btn"
                         :disabled="markList[curMarkIndex]?.myExamState !== 3" @click="finish">
@@ -104,15 +104,6 @@
                     </el-scrollbar>
                 </div>
                 <el-scrollbar height="calc(100vh - 269px)" class="paper">
-                    <div v-if="myExam.totalScore" class="total-score">
-                        <div class="total-score__inner">
-                            <span class="total-score__value">
-                                {{ myExam.totalScore }}
-                            </span>
-                            <span class="total-score__unit">分</span>
-                        </div>
-                        <span class="iconfont icon-defen total-score__icon"></span>
-                    </div>
                     <div class="paper__name">
                         {{ exam.paperName }}
                     </div>
@@ -126,15 +117,46 @@
                         </div>
                         <xmks-question v-else-if="hasQuestionShow(examQuestion)" :id="`q${index}`"
                             :type="examQuestion.questionType as number" :title="examQuestion.title as string"
-                            :img-ids="examQuestion.imgFileIds" :options="examQuestion.options"
-                            :answers="examQuestion.answers" :markType="examQuestion.markType as number"
-                            :score="examQuestion.score as number" :scores="examQuestion.scores"
-                            :analysis="examQuestion.analysis" :userAnswers="examQuestion.userAnswers"
-                            :userScore="examQuestion.userScore" :answer-show="toolbars.answerShow"
-                            :user-answer-show="true" :analysisShow="toolbars.analysisShow" :display="'paper'"
-                            :editable="false" class="paper-question">
+                            :img-ids="examQuestion.imgFileIds" :video-id="examQuestion.videoFileId"
+                            :options="examQuestion.options" :answers="examQuestion.answers"
+                            :markType="examQuestion.markType as number" :score="examQuestion.score as number"
+                            :scores="examQuestion.scores" :analysis="examQuestion.analysis"
+                            :userAnswers="examQuestion.userAnswers" :userScore="examQuestion.userScore"
+                            :answer-show="toolbars.answerShow" :user-answer-show="true"
+                            :analysisShow="toolbars.analysisShow" :display="'paper'" :editable="false"
+                            class="_question">
                             <template #title-pre>{{ examQuestion.no }}、</template>
                             <template #foot>
+                                <div v-if="examQuestion.questionType === 5 && examQuestion.markType === 2"
+                                    class="upload-group">
+                                    <div class="upload__btn">
+                                        <vue-draggable v-model="examQuestion.imgFiles">
+                                            <photo-provider :default-backdrop-opacity="0.6">
+                                                <photo-consumer v-for="(file, index) in examQuestion.imgFiles"
+                                                    :key="index" :src="`${downloadUrl}?id=${file.uid}`">
+                                                    <div class="img">
+                                                        <el-image :src="`${downloadUrl}?id=${file.uid}`"
+                                                            fit="contain" />
+                                                        <div class="img__inner">
+                                                            <span class="img__txt">
+                                                                图{{ toChinaNum(index + 1) }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </photo-consumer>
+                                            </photo-provider>
+                                        </vue-draggable>
+                                    </div>
+                                    <div class="upload__btn">
+                                        <div v-if="examQuestion.videoFiles.length" class="img">
+                                            <longze-video-play
+                                                v-bind="examQuestion.videoFiles[0].option"></longze-video-play>
+                                            <div class="img__inner" style="margin-top: 10px;">
+                                                <span class="img__txt">视频</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div v-if="toolbars.markOptionShow && examQuestion.markType === 2" class="mark-option">
                                     <div class="mark-option__title">阅题</div>
                                     <span class="mark-option__txt">本题得</span>
@@ -142,7 +164,9 @@
                                         :precision="2" controls-position="right" :readonly="examQuestion.commit"
                                         class="mark-option__input-number"
                                         @blur="() => score(examQuestion)" /><!-- 用blur事件，输入字母或删除数字不触发change事件 -->
-                                    <span class="mark-option__txt">分</span>
+                                    <span class="mark-option__txt">分，批语：</span>
+                                    <el-input v-model="examQuestion.remark" :readonly="examQuestion.commit"
+                                        maxlength="48" class="mark-option__input" @blur="() => score(examQuestion)" />
                                 </div>
                             </template>
                         </xmks-question>
@@ -157,7 +181,6 @@ import type { Exam, ExamQuestion } from '@/ts/exam/exam'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import XmksQuestion from '@/components/question/xmks-question.vue'
-import type { MyExam } from '@/ts/exam/my-exam'
 import xmksCountDown from '@/components/xmks-count-down.vue'
 import _ from 'lodash'
 import { delay } from '@/util/timeUtil'
@@ -165,6 +188,10 @@ import { myMarkFinish, myMarkMarkList, myMarkPaper, myMarkScore } from '@/api/my
 import { useDictStore } from '@/stores/dict'
 import { examGet } from '@/api/exam/exam'
 import { ElMessage } from 'element-plus'
+import { toChinaNum } from '@/util/numberUtil'
+import http from '@/request'
+import { longzeVideoPlay } from "longze-vue3-video-player";
+import { VueDraggable } from 'vue-draggable-plus'
 
 /************************变量定义相关***********************/
 const route = useRoute() // 路由
@@ -181,7 +208,7 @@ const toolbars = reactive({// 工具栏
     markOptionShow: true,
 })
 
-const exam = reactive<Exam>({// 考试
+const exam = reactive<Exam>({
     id: null,
     name: '',
     paperName: '',
@@ -200,21 +227,8 @@ const exam = reactive<Exam>({// 考试
     sxes: [],
     state: null,
     userNum: null,
-    limitMinute: null
-})
-const myExam = reactive<MyExam>({// 我的考试
-    examId: null,
-    userId: null,
-    answerStartTime: '',
-    answerEndTime: '',
-    markStartTime: '',
-    markEndTime: '',
-    objectiveScore: null,
-    totalScore: null,
-    state: null,
-    markState: null,
-    answerState: null,
-    no: null,
+    limitMinute: null,
+    retakeNum: null
 })
 const load = reactive({// 加载
     loading: false, // 显示加载页面
@@ -222,7 +236,7 @@ const load = reactive({// 加载
     second: 6,// 倒计时秒数
 })
 
-
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -270,8 +284,49 @@ async function paperQuery() {
     })
     let no = 1;
     examQuestions.value = data.map((examQuestion: ExamQuestion) => {
-        if (examQuestion.type === 2) { // 处理题号
+        if (examQuestion.type === 2) { // 处理题号、答题附件
             examQuestion.no = no++;
+            if (examQuestion.markType === 2 && examQuestion.questionType === 5) { // 主观问答题添加图片和视频附件
+                examQuestion.imgFiles = []
+                examQuestion.answerImgFileIds?.forEach((fileId: number) => {
+                    examQuestion.imgFiles.push({
+                        uid: fileId,
+                        url: `${downloadUrl}?id=${fileId}`,
+                        name: `${fileId}`
+                    })
+                })
+                examQuestion.videoFiles = []
+                examQuestion.answerVideoFileIds?.forEach((fileId: number) => {
+                    examQuestion.videoFiles.push({
+                        uid: fileId,
+                        url: `${downloadUrl}?id=${fileId}`,
+                        name: `${fileId}`,
+                        option: {
+                            width: "200px", //播放器宽度
+                            height: "146px", //播放器高度
+                            color: "#409eff", //主题色
+                            title: "视频", //视频名称
+                            src: `${downloadUrl}?id=${fileId}`, //视频源
+                            muted: false, //静音
+                            webFullScreen: false,
+                            speedRate: ["0.5", "1.0", "2.0"], //播放倍速
+                            autoPlay: false, //自动播放
+                            loop: false, //循环播放
+                            mirror: false, //镜像画面
+                            ligthOff: false, //关灯模式
+                            volume: 0.3, //默认音量大小
+                            control: true, //是否显示控制
+                            controlBtns: [
+                                "audioTrack",
+                                "quality",
+                                "speedRate",
+                                "volume",
+                                "fullScreen",
+                            ], //显示所有按钮,
+                        }
+                    })
+                })
+            }
         }
         return examQuestion;
     })
@@ -285,23 +340,24 @@ async function paperQuery() {
 async function examQuery() {
     const { data: { data } } = await examGet({ id: route.params.examId })
     exam.id = parseInt(route.params.examId as string)
-    exam.name = data.name;
-    exam.paperName = data.paperName;
-    exam.startTime = data.startTime;
-    exam.endTime = data.endTime;
-    exam.markStartTime = data.markStartTime;
-    exam.markEndTime = data.markEndTime;
-    exam.markState = data.markState;
-    exam.scoreState = data.scoreState;
-    exam.rankState = data.rankState;
-    exam.passScore = data.passScore;
-    exam.totalScore = data.totalScore;
-    exam.markType = data.markType;
-    exam.genType = data.genType;
-    exam.sxes = data.sxes;
-    exam.state = data.state;
-    exam.userNum = data.userNum;
-    exam.limitMinute = data.limitMinute;
+    exam.name = data.name
+    exam.paperName = data.paperName
+    exam.startTime = data.startTime
+    exam.endTime = data.endTime
+    exam.markStartTime = data.markStartTime
+    exam.markEndTime = data.markEndTime
+    exam.markState = data.markState
+    exam.scoreState = data.scoreState
+    exam.rankState = data.rankState
+    exam.passScore = data.passScore
+    exam.totalScore = data.totalScore
+    exam.markType = data.markType
+    exam.genType = data.genType
+    exam.sxes = data.sxes
+    exam.state = data.state
+    exam.userNum = data.userNum
+    exam.limitMinute = data.limitMinute
+    exam.retakeNum = data.retakeNum
 }
 
 // 滚动预览
@@ -343,12 +399,13 @@ async function score(examQuestion: ExamQuestion) {
         examQuestion.userScore = 0
     }
 
-    examQuestion.commit = true
+    examQuestion.commit = true // 后台返回前，禁止再次更改分数
     const { data: { code } } = await myMarkScore({
         examId: route.params.examId,
         userId: markList.value[curMarkIndex.value]?.examUserId,
         questionId: examQuestion.questionId,
-        userScore: examQuestion.userScore
+        userScore: examQuestion.userScore,
+        remark: examQuestion.remark,
     })
     examQuestion.commit = false
 
@@ -685,7 +742,7 @@ async function finish() {
                         }
                     }
 
-                    .paper-question {
+                    ._question {
                         .mark-option {
                             display: flex;
                             align-items: center;
@@ -740,6 +797,117 @@ async function finish() {
                                     width: 100%;
                                     height: 1px;
                                     background-color: #333333;
+                                }
+                            }
+
+                            .mark-option__input {
+                                width: 700px;
+
+                                .el-input__wrapper {
+                                    box-shadow: initial;
+                                    border-bottom: 1px solid #333333;
+                                    border-radius: initial;
+                                }
+                            }
+                        }
+
+                        .upload-group {
+                            display: flex;
+                            justify-content: left;
+                            align-items: end;
+                            margin-top: 10px;
+
+                            .el-upload {
+                                width: 148px;
+                                height: 148px;
+                                border: 1px dashed var(--el-border-color);
+                                border-radius: 6px;
+                                cursor: pointer;
+                                position: relative;
+                                overflow: hidden;
+                                transition: var(--el-transition-duration-fast);
+                            }
+
+                            .el-upload:hover {
+                                border-color: #3AA8EF;
+                                background-color: #FAFAFA;
+                            }
+
+                            .iconfont {
+                                font-size: 20px;
+                                color: #8c939d;
+                            }
+
+                            .PhotoSlider__Backdrop {
+                                opacity: 0.6;
+                            }
+
+                            .el-image__inner {
+                                background-color: #fff;
+                                border: 1px solid #dcdfe6;
+                                border-radius: 6px;
+                                height: 148px;
+                                width: 148px;
+                                margin: 0 8px 8px 0;
+                                overflow: hidden;
+                                padding: 0px;
+                            }
+
+                            .img {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+
+                                .el-image {
+                                    cursor: move;
+                                }
+
+                                .img__inner {
+                                    line-height: 0px;
+
+                                    .img__txt {
+                                        line-height: 14px;
+                                        font-size: 14px;
+                                        color: #000000;
+                                    }
+
+                                    .img__btn {
+                                        cursor: pointer;
+                                        margin-left: 5px;
+                                        font-size: 16px;
+                                    }
+                                }
+                            }
+
+                            .upload__btn {
+                                margin-right: 10px;
+
+                                .el-upload {
+                                    display: flex;
+                                    flex-direction: column;
+                                    width: 50px;
+                                    height: 45px;
+                                }
+
+                                .upload__btn-icon {
+
+                                    padding: 6px;
+                                    border-radius: 50%;
+                                    font-size: 14px;
+                                    color: #fff;
+
+                                    &.upload__btn-icon--img {
+                                        background-color: #fcc129;
+                                    }
+
+                                    &.upload__btn-icon--video {
+                                        background-color: #287ce7;
+                                    }
+                                }
+
+                                .upload__btn-txt {
+                                    margin-top: 2px;
+                                    font-size: 11px;
                                 }
                             }
                         }

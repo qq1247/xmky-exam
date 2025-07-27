@@ -19,6 +19,7 @@ public class ExamQuestionEx extends ExamQuestion {
 	private Integer markType;
 	private String title;
 	private List<Integer> imgFileIds;
+	private Integer videoFileId;
 	private List<String> options;
 	private List<String> answers;
 	private String analysis;

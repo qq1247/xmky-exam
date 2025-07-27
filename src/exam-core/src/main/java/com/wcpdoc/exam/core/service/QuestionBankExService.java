@@ -16,7 +16,7 @@ public interface QuestionBankExService {
 	 * 
 	 * @param questionBank void
 	 */
-	void delEx(QuestionBank questionBank);
+	void del(QuestionBank questionBank);
 
 	/**
 	 * 题库清空

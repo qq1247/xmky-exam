@@ -40,7 +40,7 @@ public class QuestionBankExServiceImpl extends BaseServiceImp<QuestionBank> impl
 	}
 
 	@Override
-	public void delEx(QuestionBank questionBank) {
+	public void del(QuestionBank questionBank) {
 		List<Integer> questionIds = questionService.getIds(questionBank.getId());
 		if (ValidateUtil.isValid(questionIds)) {
 			throw new MyException("请先清空试题");

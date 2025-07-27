@@ -131,7 +131,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	@Override
 	@CacheEvict(value = ExamConstant.MYQUESTION_CACHE, key = ExamConstant.MYQUESTION_LIST_KEY_PRE
 			+ "#examId + ':' + #userId")
-	public void score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
+	public void score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore, String remark) {
 		// 数据校验
 		MyQuestion myQuestion = scoreValid(examId, userId, questionId, userScore);
 
@@ -139,13 +139,14 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myQuestion.setUserScore(userScore);
 		myQuestion.setMarkTime(new Date());
 		myQuestion.setMarkUserId(getCurUser().getId());
+		myQuestion.setRemark(remark);
 		myQuestionService.updateById(myQuestion);
 
 		Exam exam = examCacheService.getExam(examId);
 		User markUser = baseCacheService.getUser(getCurUser().getId());
 		User examUser = baseCacheService.getUser(userId);
-		log.info("【{}-{}】进入【{}-{}】批阅【{}-{}】得【{}-{}分】", markUser.getLoginName(), markUser.getName(), exam.getId(),
-				exam.getName(), examUser.getLoginName(), examUser.getName(), questionId, userScore.toString());
+		log.info("【{}-{}】进入【{}-{}】批阅【{}-{}】得【{}-{}分】批语【{}】", markUser.getLoginName(), markUser.getName(), exam.getId(),
+				exam.getName(), examUser.getLoginName(), examUser.getName(), questionId, userScore.toString(), remark);
 	}
 
 	@Override
@@ -201,7 +202,9 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (myExam.getMarkUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("未参与考试");
 		}
-
+		if (myExam.getState() == 1) {
+			throw new MyException("用户未参与考试，阅卷无效");
+		}
 		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
 		if (myQuestion == null) {
 			throw new MyException("未参与考试");
@@ -238,9 +241,6 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		Question question = examCacheService.getQuestion(questionId);
 		if (question.getMarkType() != 2) {
 			throw new MyException("该题为客观题");
-		}
-		if (myExam.getState() == 1) {
-			throw new MyException("用户未参与考试，阅卷无效");
 		}
 		return myQuestion;
 	}
@@ -376,4 +376,5 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("无新试卷可领取");
 		}
 	}
+
 }

@@ -48,6 +48,7 @@ function txtImport() {
             markType: question.markType,
             title: question.title,
             imgFileIds: question.imgFileIds,
+            videoFileId: question.videoFileId,
             score: question.score,
             answers: question.answers,
             scores: question.scores,

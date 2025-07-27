@@ -84,7 +84,7 @@ public class ApiOrgController extends BaseController {
 	@RequestMapping("/add")
 	public PageResult add(Org org) {
 		try {
-			orgService.addEx(org);
+			orgService.add(org);
 			return PageResultEx.ok();
 		} catch (MyException e) {
 			log.error("机构添加错误：{}", e.getMessage());
@@ -128,7 +128,7 @@ public class ApiOrgController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			orgService.delEx(id);
+			orgService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("机构删除错误：{}", e.getMessage());

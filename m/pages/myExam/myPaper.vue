@@ -35,16 +35,17 @@
 							v-if="examQuestion.type === 2"
 							v-model="examQuestion.userAnswers"
 							:type="examQuestion.questionType"
-							:markType="examQuestion.markType"
+							:mark-type="examQuestion.markType"
 							:title="examQuestion.title"
-							:imgIds="examQuestion.imgFileIds"
+							:img-ids="examQuestion.imgFileIds"
+							:video-id="examQuestion.videoFileId"
 							:score="examQuestion.score"
 							:answers="examQuestion.answers"
-							:userScore="examQuestion.userScore"
+							:user-score="examQuestion.userScore"
 							:options="examQuestion.options"
 							:analysis="examQuestion.analysis"
 							:editable="examing"
-							:analysisShow="analysisShow"
+							:analysis-show="analysisShow"
 							@change="(answers: string[]) => answer(examQuestion, answers)"
 						>
 							<template #title-pre>
@@ -52,6 +53,32 @@
 							</template>
 							<template #title-post>
 								<text>（{{ examQuestion.score }}分）</text>
+							</template>
+							<template #user-answer-post>
+								<view class="question__img-group">
+									<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="question__img-inner">
+										<image
+											:src="`${host}/file/download?id=${imgFileId}`"
+											mode="aspectFit"
+											view
+											@click="preview(examQuestion.answerImgFileIds, index)"
+											class="question__img"
+										></image>
+										<text>图{{ toChinaNum(index + 1) }}</text>
+									</view>
+								</view>
+								<view v-if="examQuestion.answerVideoFileIds?.length > 0">
+									<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="question__video"></video>
+									<text>视频</text>
+								</view>
+							</template>
+							<template #user-score-post>
+								<view v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)" class="question-qa-answer">
+									<text class="question-qa-answer__label">批语</text>
+									<view>
+										<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
+									</view>
+								</view>
 							</template>
 						</xm-question>
 						<view v-else>
@@ -115,6 +142,7 @@ import { Exam } from '@/ts/exam.d';
 import { ExamQuestion } from '@/ts/paper.d';
 import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/api/myExam';
 import { loginSysTime } from '@/api/login';
+import { toChinaNum } from '@/util/numberUtil';
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore();
@@ -123,7 +151,7 @@ const questionHeight = ref(0); // 试题滚动高度
 const timePercent = ref(0); // 时间进度条
 const curQuestionIndex = ref(0); // 当前试题索引
 const exam = reactive<Exam>({
-	id: null, // 考试信息
+	id: null,
 	name: '',
 	startTime: '',
 	endTime: '',
@@ -141,10 +169,11 @@ const exam = reactive<Exam>({
 	sxes: [],
 	state: null,
 	userNum: null,
-	limitMinute: null
+	limitMinute: null,
+	retakeNum: null
 });
 const myExam = reactive<MyExam>({
-	examId: null, // 我的考试信息
+	examId: null,
 	userId: null,
 	answerStartTime: '',
 	answerEndTime: '',
@@ -155,13 +184,16 @@ const myExam = reactive<MyExam>({
 	state: null,
 	markState: null,
 	answerState: null,
-	no: null
+	no: null,
+	ver: null
 });
 const examQuestions = ref([{}] as ExamQuestion[]);
 const timerId = ref(); // 延时器ID，用于防抖
 
 const answerSheet = ref(); // 答题卡
 const marks = ref<number[]>([]); // 标记
+
+const host = ref(uni.getStorageSync('BASE_URL'));
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
@@ -227,6 +259,7 @@ async function examQuery() {
 	exam.state = data.state;
 	exam.userNum = data.userNum;
 	exam.limitMinute = data.limitMinute;
+	exam.retakeNum = data.retakeNum;
 }
 // 我的考试查询
 async function myExamQuery() {
@@ -243,6 +276,7 @@ async function myExamQuery() {
 	myExam.markState = data.markState;
 	myExam.answerState = data.answerState;
 	myExam.no = data.no;
+	myExam.ver = data.ver;
 }
 
 // 试卷查询
@@ -400,6 +434,15 @@ function prompt(msg: string) {
 function toHome() {
 	uni.switchTab({ url: '/pages/home/home' });
 }
+
+// 预览图片
+function preview(imgFileIds: number[], index: number) {
+	let urls = imgFileIds.map((imgFileId) => `${host.value}/file/download?id=${imgFileId}`);
+	uni.previewImage({
+		current: index,
+		urls: urls
+	});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -463,6 +506,46 @@ function toHome() {
 				}
 			}
 			// #endif
+			.question__img-group {
+				margin-top: 20rpx;
+				display: flex;
+
+				.question__img-inner {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					.question__img {
+						display: inline-block;
+						height: 140rpx;
+						width: 140rpx;
+						background-color: #fff;
+						border: 1px solid #dcdfe6;
+						border-radius: 6px;
+						margin-left: 10rpx;
+					}
+				}
+			}
+			.question__video {
+				width: 100%;
+				padding-top: 75%;
+			}
+			.question-qa-answer {
+				margin-top: 20rpx;
+				padding: 20rpx;
+				background: #f6f7fc;
+				border-radius: 10rpx;
+				.question-qa-answer__label {
+					margin-top: 20rpx;
+					font-weight: bold;
+					font-size: 30rpx;
+					color: #999999;
+				}
+				.question-qa-answer__content {
+					display: inline-block;
+					margin-top: 20rpx;
+					line-height: 60rpx;
+				}
+			}
 		}
 	}
 	.mypaper-foot {

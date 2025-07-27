@@ -90,6 +90,11 @@
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
+                <el-form-item v-if="form.markType === 1" label="重考次数：" prop="retakeNum"
+                    @mouseover="tipShow('重考次数', '1、如果是客观题试卷，在用户考试不及格时，可以重考的次数<br/>2、整场考试结束后，不允许重考')">
+                    <el-input-number v-model="form.retakeNum" controls-position="right" :min="0" :max="10" :step="1"
+                        :precision="0" />&nbsp;/ 10次
+                </el-form-item>
             </el-form>
         </el-scrollbar>
         <div class="exam-config-side">

@@ -38,7 +38,7 @@
                     :editable="editable" :user-answer-show="userAnswerShow" :answerShow="answerShow" :score="score"
                     :user-score="userScore" @change="(value: string[]) => emit('change', value)"></xmks-question-title>
             </div>
-            <div v-if="imgIds.length" class="question__img-group">
+            <div v-if="props.imgIds.length" class="question__img-group">
                 <photo-provider :default-backdrop-opacity="0.6">
                     <photo-consumer v-for="(imgId, index) in imgIds" :key="index" :src="`${downloadUrl}?id=${imgId}`">
                         <div class="question_img-inner">
@@ -47,6 +47,9 @@
                         </div>
                     </photo-consumer>
                 </photo-provider>
+            </div>
+            <div v-if="props.videoId" class="question__img-group">
+                <longze-video-play ref="videoPlayerRef" v-bind="videoOptions" preload="metadata"></longze-video-play>
             </div>
             <!-- 单选题选项 -->
             <el-radio-group v-if="type === 1"
@@ -110,13 +113,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import XmksQuestionTitle from './xmks-question-title.vue'
 import { useDictStore } from '@/stores/dict'
 import type { CardBtn } from '@/ts/common/card-btn'
 import { toChinaNum, toLetter } from '@/util/numberUtil'
 import { escape2Html } from '@/util/htmlUtil'
 import http from '@/request'
+import { longzeVideoPlay } from "longze-vue3-video-player";
 
 /************************变量定义相关***********************/
 const emit = defineEmits<{
@@ -127,6 +131,7 @@ const props = withDefaults(defineProps<{
     type: number // 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）
     title: string // 题干
     imgIds?: number[] // 图片附件IDS
+    videoId?: number | null // 视频附件ID
     options?: string[] // 试题选项
     answers?: string[] // 标准答案
     markType: number // 阅卷类型（1：客观题；2：主观题）
@@ -158,6 +163,30 @@ const props = withDefaults(defineProps<{
 const dictStore = useDictStore()// 字典缓存
 const userAnswers = ref(props.userAnswers) // 用户答案
 const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
+const videoPlayerRef = ref()
+const videoOptions = reactive({
+    width: "400px", //播放器宽度
+    height: "300px", //播放器高度
+    color: "#409eff", //主题色
+    title: "视频", //视频名称
+    src: "", //视频源
+    muted: false, //静音
+    webFullScreen: false,
+    speedRate: ["0.5", "1.0", "2.0"], //播放倍速
+    autoPlay: false, //自动播放
+    loop: false, //循环播放
+    mirror: false, //镜像画面
+    ligthOff: false, //关灯模式
+    volume: 0.3, //默认音量大小
+    control: true, //是否显示控制
+    controlBtns: [
+        "audioTrack",
+        "quality",
+        "speedRate",
+        "volume",
+        "fullScreen",
+    ], //显示所有按钮,
+});
 
 /************************计算属性相关*************************/
 const qaAnswer = computed(() => {// 标准问答答案
@@ -205,6 +234,14 @@ const isWrongSelect = computed(() => (curAnswer: string) => {// 是否错误选�
 watch(() => props.userAnswers, () => {
     userAnswers.value = props.userAnswers
 })
+watch(() => props.videoId, () => {
+    if (props.videoId) {
+        videoOptions.src = `${downloadUrl}?id=${props.videoId}`
+    } else {
+        videoOptions.src = ''
+    }
+}, { immediate: true }
+)
 
 </script>
 

@@ -12,4 +12,5 @@ export interface MyExam {
 	markState: number | null; //阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）
 	answerState: number | null; //答题状态（1：及格；2：不及格）
 	no: number | null; // 排名
+	ver: number | null; // 版本
 }

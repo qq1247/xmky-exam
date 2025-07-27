@@ -122,7 +122,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	 * 24,// 总分 "markType": 2,// 阅卷类型（1：客观题；2：主观题） "startTime": "2023-04-01
 	 * 08:00:00",// 考试开始时间 "endTime": "2023-04-01 10:00:00",// 考试结束时间
 	 * "markStartTime": "2023-04-01 14:00:00",// 阅卷开始时间 "markEndTime": "2023-04-01
-	 * 18:00:00",// 阅卷结束时间 "limitMinute": 60 // 限制分钟（考试开始时间由用户第一次打开试卷时计时）） }
+	 * 18:00:00",// 阅卷结束时间 "limitMinute": 60, // 限制分钟（考试开始时间由用户第一次打开试卷时计时））
+	 * "retakeNum": 0, // 重考次数（V5.5.0新增） }
 	 */
 	@Override
 	@Caching(evict = { //
@@ -157,7 +158,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	@CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true)
-	public void delEx(Integer id) {
+	public void del(Integer id) {
 		// 数据校验
 		delValid(id);
 
@@ -236,6 +237,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			// myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
 			myExam.setState(1);// 未考试
 			myExam.setMarkState(1);// 未阅卷
+			myExam.setVer(1);
 			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.save(myExam);
@@ -256,6 +258,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					myQuestion.setQuestionId(examQuestion.getQuestionId());
 					myQuestion.setUserId(userId);
 					myQuestion.setNo(i + 1);
+					myQuestion.setVer(1);
 					myQuestion.setUpdateUserId(getCurUser().getId());
 					myQuestion.setUpdateTime(new Date());
 					myQuestionService.save(myQuestion);
@@ -305,6 +308,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						myQuestion.setUserId(userId);
 						myQuestion.setExamId(exam.getId());
 						myQuestion.setNo(no++);
+						myQuestion.setVer(1);
+						myQuestion.setUpdateTime(new Date());
+						myQuestion.setUpdateUserId(getCurUser().getId());
 						myQuestionService.save(myQuestion);
 					} else {// 如果是规则
 						List<Question> questionList = questionListCache.get(examRule.getQuestionBankId());
@@ -344,6 +350,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
 							}
 
+							myQuestion.setVer(1);
 							myQuestion.setUpdateTime(new Date());
 							myQuestion.setUpdateUserId(getCurUser().getId());
 							myQuestionService.save(myQuestion);
@@ -737,9 +744,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setUserIds(examInfo.getUserIds());
 		exam.setOrgIds(examInfo.getOrgIds());
 		exam.setMarkUserIds(examInfo.getMarkUserIds());
+		exam.setRetakeNum(examInfo.getRetakeNum());
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
 
+		Collections.sort(exam.getSxes());// 重新排序，保证在页面显示时顺序一致
 		if (!ValidateUtil.isValid(examInfo.getId())) {
 			exam.setCreateUserId(getCurUser().getId());
 			save(exam);
@@ -785,6 +794,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					question.setType(examQuestionEx.getQuestionType());
 					question.setTitle(examQuestionEx.getTitle());
 					question.setImgFileIds(examQuestionEx.getImgFileIds());
+					question.setVideoFileId(examQuestionEx.getVideoFileId());
 					question.setMarkType(examQuestionEx.getMarkType());
 					question.setMarkOptions(examQuestionEx.getMarkOptions());
 					question.setAnalysis(examQuestionEx.getAnalysis());
@@ -792,7 +802,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					question.setQuestionBankId(questionBank.getId());
 					question.setUpdateUserId(getCurUser().getId());
 					question.setUpdateTime(new Date());
-					questionService.addEx(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
+					questionService.add(question, examQuestionEx.getOptions(), examQuestionEx.getAnswers(),
 							examQuestionEx.getScores());
 					examQuestionEx.setQuestionId(question.getId());
 				}
@@ -841,6 +851,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			// myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
 			myExam.setState(1);// 未考试
 			myExam.setMarkState(1);// 未阅卷
+			myExam.setVer(1);
 			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.save(myExam);
@@ -860,6 +871,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					myQuestion.setQuestionId(examQuestion.getQuestionId());
 					myQuestion.setUserId(userId);
 					myQuestion.setNo(i + 1);
+					myQuestion.setVer(1);
 					myQuestion.setUpdateUserId(getCurUser().getId());
 					myQuestion.setUpdateTime(new Date());
 					myQuestionService.save(myQuestion);
@@ -902,6 +914,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						myQuestion.setUserId(userId);
 						myQuestion.setExamId(examInfo.getId());
 						myQuestion.setNo(no++);
+						myQuestion.setVer(1);
+						myQuestion.setUpdateTime(new Date());
+						myQuestion.setUpdateUserId(getCurUser().getId());
 						myQuestionService.save(myQuestion);
 					} else {// 如果是规则
 						List<Question> questionList = questionListCache.get(examRule.getQuestionBankId());
@@ -941,6 +956,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
 							}
 
+							myQuestion.setVer(1);
 							myQuestion.setUpdateTime(new Date());
 							myQuestion.setUpdateUserId(getCurUser().getId());
 							myQuestionService.save(myQuestion);
@@ -1378,6 +1394,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				|| examInfo.getPassScore().doubleValue() > examInfo.getTotalScore().doubleValue()) {// 大于总分
 			throw new MyException("参数错误：passScore");
 		}
+		if (!ValidateUtil.isValid(examInfo.getRetakeNum()) || examInfo.getRetakeNum() < 0
+				|| examInfo.getRetakeNum() > 10) {
+			throw new MyException("参数错误：retakeNum");
+		}
 	}
 
 	private Map<Integer, List<Question>> publishHandle(ExamInfo examInfo) {
@@ -1567,4 +1587,5 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException("已删除");
 		}
 	}
+
 }

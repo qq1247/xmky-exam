@@ -27,3 +27,6 @@ export function myExamSxe(parm: object) {
 export function myExamGeneratePaper(parm: object) {
     return request.post('/myExam/generatePaper', parm);
 }
+export function myExamRetake(parm: object) {
+    return request.post('/myExam/retake', parm);
+}

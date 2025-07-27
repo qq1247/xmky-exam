@@ -17,7 +17,7 @@ public interface QuestionBankService extends BaseService<QuestionBank> {
 	 * 
 	 * @param id void
 	 */
-	void delEx(Integer id);
+	void del(Integer id);
 
 	/**
 	 * 题库清空

@@ -174,6 +174,7 @@ public class ApiMyExerController extends BaseController {
 			questionPart.setMarkType(question.getMarkType());
 			questionPart.setTitle(question.getTitle());
 			questionPart.setImgFileIds(question.getImgFileIds());
+			questionPart.setVideoFileId(question.getVideoFileId());
 			questionPart.setMarkOptions(myExerQuestion.getMarkOptions());// 使用练习的阅卷选项
 			questionPart.setScore(myExerQuestion.getScore());// 使用练习的分数
 			questionPart.setUserScore(myExerQuestion.getUserScore());// 使用练习的用户分数

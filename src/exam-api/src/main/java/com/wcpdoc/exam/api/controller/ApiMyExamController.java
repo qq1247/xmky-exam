@@ -86,7 +86,7 @@ public class ApiMyExamController extends BaseController {
 	}
 
 	/**
-	 * 我的考试
+	 * 我的考试获取
 	 * 
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
 	 * 
@@ -113,18 +113,19 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("state", myExam.getState())//
 					.addAttr("markState", myExam.getMarkState())//
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
-					.addAttr("userNum", exam.getUserIds().size());
+					.addAttr("ver", myExam.getVer())// 版本（exam.retake为最大重考次数，myExam.ver为当前第几次重考，从2开始，表示第一次重考）
+			;
 		} catch (MyException e) {
-			log.error("获取我的考试错误：{}", e.getMessage());
+			log.error("我的考试获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取我的考试错误：", e);
+			log.error("我的考试获取错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 考试获取
+	 * 我的考试获取
 	 * 
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
 	 * 
@@ -160,18 +161,20 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("sxes", exam.getSxes())//
 					.addAttr("state", exam.getState())//
 					.addAttr("userNum", exam.getUserIds().size())//
-					.addAttr("limitMinute", exam.getLimitMinute());//
+					.addAttr("limitMinute", exam.getLimitMinute())//
+					.addAttr("retakeNum", exam.getRetakeNum())//
+			;//
 		} catch (MyException e) {
-			log.error("获取考试错误：{}", e.getMessage());
+			log.error("我的考试获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取考试错误：", e);
+			log.error("我的考试获取错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 试题统计
+	 * 我的考试试题统计
 	 * 
 	 * v1.0 zhanghc 2024年8月30日下午4:18:55
 	 * 
@@ -227,16 +230,16 @@ public class ApiMyExamController extends BaseController {
 					.addAttr("markTypeStatis", markTypeStatis)//
 					.addAttr("typeStatis", typeStatis);
 		} catch (MyException e) {
-			log.error("获取试题统计错误：{}", e.getMessage());
+			log.error("我的考试试题统计错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取试题统计错误：", e);
+			log.error("我的考试试题统计错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 我的试卷
+	 * 我的考试试卷
 	 * 
 	 * v1.0 zhanghc 2022年5月18日下午1:21:07
 	 * 
@@ -248,16 +251,16 @@ public class ApiMyExamController extends BaseController {
 		try {
 			return PageResultEx.ok().data(myExamService.paper(examId, getCurUser().getId()));
 		} catch (MyException e) {
-			log.error("我的试卷错误：{}", e.getMessage());
+			log.error("我的考试试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("我的试卷错误：", e);
+			log.error("我的考试试卷错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 生成试卷
+	 * 我的考试生成试卷
 	 * 
 	 * v1.0 zhanghc 2024年10月11日上午9:11:57
 	 * 
@@ -270,40 +273,43 @@ public class ApiMyExamController extends BaseController {
 			myExamService.generatePaper(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("我的试卷错误：{}", e.getMessage());
+			log.error("我的考试生成试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("我的试卷错误：", e);
+			log.error("我的考试生成试卷错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 答题
+	 * 我的考试答题
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
-	 * @param examId
-	 * @param questionId
-	 * @param answers
+	 * @param examId       考试ID
+	 * @param questionId   试题ID
+	 * @param answers      答案
+	 * @param imgFileId    图片IDS 主观问答题有效
+	 * @param videoFileIds 视频IDS 主观问答题有效
 	 * @return PageResult
 	 */
 	@RequestMapping("/answer")
-	public PageResult answer(Integer examId, Integer questionId, String[] answers) {
+	public PageResult answer(Integer examId, Integer questionId, String[] answers, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
 		try {
-			myExamService.answer(examId, getCurUser().getId(), questionId, answers);
+			myExamService.answer(examId, getCurUser().getId(), questionId, answers, imgFileIds, videoFileIds);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("答题错误：{}", e.getMessage());
+			log.error("我的考试答题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("答题错误：", e);
+			log.error("我的考试答题错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 交卷
+	 * 我的考试交卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
@@ -316,16 +322,16 @@ public class ApiMyExamController extends BaseController {
 			myExamService.finish(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("交卷错误：{}", e.getMessage());
+			log.error("我的考试交卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("交卷错误：", e);
+			log.error("我的考试交卷错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 作弊
+	 * 我的考试作弊
 	 * 
 	 * v1.0 zhanghc 2025年3月16日上午11:19:25
 	 * 
@@ -339,10 +345,34 @@ public class ApiMyExamController extends BaseController {
 		try {
 			return PageResultEx.ok().data(myExamService.sxe(examId, getCurUser().getId(), type, content));
 		} catch (MyException e) {
-			log.error("作弊错误：{}", e.getMessage());
+			log.error("我的考试作弊错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("作弊错误：", e);
+			log.error("我的考试作弊错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的考试重考
+	 * 
+	 * v1.0 zhanghc 2025年7月12日下午5:23:24
+	 * 
+	 * @param examId
+	 * @param type
+	 * @param content
+	 * @return PageResult
+	 */
+	@RequestMapping("/retake")
+	public PageResult retake(Integer examId) {
+		try {
+			myExamService.retake(examId, getCurUser().getId());
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("我的考试重考错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的考试重考错误：", e);
 			return PageResult.err();
 		}
 	}

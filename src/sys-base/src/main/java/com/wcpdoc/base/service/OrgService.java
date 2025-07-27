@@ -21,7 +21,7 @@ public interface OrgService extends BaseService<Org> {
 	 * @param phone
 	 * @param pwd   void
 	 */
-	void addEx(Org org);
+	void add(Org org);
 
 	/**
 	 * 机构修改
@@ -41,7 +41,7 @@ public interface OrgService extends BaseService<Org> {
 	 * 
 	 * @param id void
 	 */
-	void delEx(Integer id);
+	void del(Integer id);
 
 	/**
 	 * 机构移动

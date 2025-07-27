@@ -194,7 +194,7 @@ const examRankListpage = reactive<Listpage>({// 考试排名分页列表
     total: 0,
     list: [],
 })
-const exam = reactive<Exam>({ // 考试
+const exam = reactive<Exam>({
     id: null,
     name: '',
     paperName: '',
@@ -213,7 +213,8 @@ const exam = reactive<Exam>({ // 考试
     sxes: [],
     state: null,
     userNum: null,
-    limitMinute: null
+    limitMinute: null,
+    retakeNum: null
 })
 const questionStatisOpts = ref({// 试题统计数据
     title: {
@@ -334,6 +335,8 @@ async function examQuery() {
     exam.sxes = data.sxes
     exam.userNum = data.userNum
     exam.state = data.state
+    exam.retakeNum = data.retakeNum
+
 }
 // 考试统计查询
 async function examStatisQuery() {

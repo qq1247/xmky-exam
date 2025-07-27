@@ -195,7 +195,7 @@ const user = reactive<User>({ // 用户
     state: null,
     orgName: ''
 })
-const exam = reactive<Exam>({ // 考试
+const exam = reactive<Exam>({
     id: null,
     name: '',
     paperName: '',
@@ -214,7 +214,8 @@ const exam = reactive<Exam>({ // 考试
     sxes: [],
     state: null,
     userNum: null,
-    limitMinute: null
+    limitMinute: null,
+    retakeNum: null
 })
 const markTypeStatis = reactive({ // 阅卷类型统计
     subjective: 0,
@@ -289,24 +290,26 @@ async function userQuery() {
 // 考试查询
 async function examQuery() {
     const { data: { data } } = await examGet({ id: route.params.examId })
-    exam.id = parseInt(route.params.examId as string);
-    exam.name = data.name;
-    exam.paperName = data.paperName;
-    exam.startTime = data.startTime;
-    exam.endTime = data.endTime;
-    exam.markStartTime = data.markStartTime;
-    exam.markEndTime = data.markEndTime;
-    exam.markState = data.markState;
-    exam.scoreState = data.scoreState;
-    exam.rankState = data.rankState;
-    exam.passScore = data.passScore;
-    exam.totalScore = data.totalScore;
-    exam.markType = data.markType;
-    exam.genType = data.genType;
-    exam.sxes = data.sxes;
-    exam.state = data.state;
-    exam.userNum = data.userNum;
-    exam.limitMinute = data.limitMinute;
+    exam.id = parseInt(route.params.examId as string)
+    exam.name = data.name
+    exam.paperName = data.paperName
+    exam.startTime = data.startTime
+    exam.endTime = data.endTime
+    exam.markStartTime = data.markStartTime
+    exam.markEndTime = data.markEndTime
+    exam.markState = data.markState
+    exam.scoreState = data.scoreState
+    exam.rankState = data.rankState
+    exam.passScore = data.passScore
+    exam.totalScore = data.totalScore
+    exam.markType = data.markType
+    exam.genType = data.genType
+    exam.sxes = data.sxes
+    exam.state = data.state
+    exam.userNum = data.userNum
+    exam.limitMinute = data.limitMinute
+    exam.retakeNum = data.retakeNum
+
 }
 
 // 试题统计查询
@@ -674,7 +677,7 @@ function markIn() {
                             }
 
                             &.my-mark__tag--fail {
-                                background-image: linear-gradient(to bottom, #fff, #fff), linear-gradient(180deg, #F99C9C, #F445A0);
+                                background-image: linear-gradient(to bottom, #fff, #fff), linear-gradient(180deg, #F445A0, #F99C9C);
                                 color: #F66A9E;
                             }
                         }

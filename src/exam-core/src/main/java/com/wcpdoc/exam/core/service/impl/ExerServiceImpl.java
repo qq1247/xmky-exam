@@ -64,7 +64,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 	}
 
 	@Override
-	public void updateEx(Exer exer) {
+	public void update(Exer exer) {
 		// 数据校验
 		Exer entity = getById(exer.getId());
 		updateValid(exer, entity);

@@ -8,7 +8,7 @@
                 <el-button type="primary" class="paper-create__btn" @click="emit('select', 'blank')">创建</el-button>
             </div>
             <div class="paper-create">
-                <span class="iconfont icon-shijuan-13 paper-create__icon"></span>
+                <span class="iconfont icon-kuaisushengcheng paper-create__icon"></span>
                 <span class="paper-create__title">快速生成试卷</span>
                 <span class="paper-create__desc">即时编辑试题，快速导入</span>
                 <el-button type="primary" class="paper-create__btn" @click="emit('select', 'quick')">创建</el-button>
@@ -101,6 +101,7 @@ async function copy(id: number) {
     form.userIds = []
     form.markUserIds = []
     form.limitMinute = data.limitMinute
+    form.retakeNum = data.retakeNum
 
     form.questionNoUpdate()
     if (form.loginType === 1) {// 匿名考试不需要导入考试用户
@@ -112,7 +113,6 @@ async function copy(id: number) {
         } else if (importUser.value === 'retake') {
             const { data: { data: myExams } } = await examUser({ id })
             myExams.forEach((myExam: { userId: number; answerState: number; }) => {
-                console.log(myExam);
                 if (myExam.answerState === 2) {
                     form.userIds.push(myExam.userId)
                 }

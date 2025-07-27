@@ -109,7 +109,7 @@ public class ApiUserController extends BaseController {
 	public PageResult add(User user) {
 		try {
 			// 用户添加
-			userService.addEx(user);
+			userService.add(user);
 
 			// 密码初始化
 			String initPwd = userService.pwdInit(user.getId());
@@ -170,7 +170,7 @@ public class ApiUserController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			userService.delEx(id);
+			userService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("用户删除错误：{}", e.getMessage());

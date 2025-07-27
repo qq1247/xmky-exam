@@ -86,7 +86,7 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
-	 * 我的考试
+	 * 我的阅卷我的考试
 	 * 
 	 * v1.0 zhanghc 2022年11月2日下午2:38:55
 	 * 
@@ -116,16 +116,16 @@ public class ApiMyMarkController extends BaseController {
 					.addAttr("no", exam.getRankState() == 1 ? myExam.getNo() : null)//
 					.addAttr("userNum", exam.getUserIds().size());
 		} catch (MyException e) {
-			log.error("我的考试错误：{}", e.getMessage());
+			log.error("我的阅卷我的考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("我的考试错误：", e);
+			log.error("我的阅卷我的考试错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 阅卷列表
+	 * 我的阅卷列表
 	 * 
 	 * v1.0 zhanghc 2025年2月16日上午11:56:47
 	 * 
@@ -145,7 +145,8 @@ public class ApiMyMarkController extends BaseController {
 								return true;
 							}
 						} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员
-							if ((exam.getMarkState() == 3 && exam.getCreateUserId().intValue() == getCurUser().getId().intValue())// 整场考试结束并且自己创建的
+							if ((exam.getMarkState() == 3
+									&& exam.getCreateUserId().intValue() == getCurUser().getId().intValue())// 整场考试结束并且自己创建的
 									|| (myExam.getMarkUserId() != null
 											&& myExam.getMarkUserId().intValue() == getCurUser().getId().intValue())) {// 只看自己领取的
 								return true;
@@ -175,13 +176,13 @@ public class ApiMyMarkController extends BaseController {
 					}).collect(Collectors.toList());
 			return PageResultEx.ok().data(result);
 		} catch (Exception e) {
-			log.error("阅卷列表错误：", e);
+			log.error("我的阅卷列表错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 领取信息
+	 * 我的阅卷领取信息
 	 * 
 	 * v1.0 zhanghc 2025年2月24日下午12:22:49
 	 * 
@@ -211,13 +212,13 @@ public class ApiMyMarkController extends BaseController {
 					.addAttr("paperNum", paperNum).addAttr("markNum", markNum).addAttr("myClaimNum", myClaimNum)
 					.addAttr("myMarkNum", myMarkNum);
 		} catch (Exception e) {
-			log.error("阅卷列表错误：", e);
+			log.error("我的阅卷领取信息错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 试卷领取
+	 * 我的阅卷试卷领取
 	 * 
 	 * v1.0 zhanghc 2023年2月23日下午2:31:16
 	 * 
@@ -231,16 +232,16 @@ public class ApiMyMarkController extends BaseController {
 			myMarkService.claim(examId, num);
 			return PageResultEx.ok();
 		} catch (MyException e) {
-			log.error("试卷分配错误：{}", e.getMessage());
+			log.error("我的阅卷试卷领取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("试卷分配错误：", e);
+			log.error("我的阅卷试卷领取错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取用户试卷
+	 * 我的阅卷用户试卷
 	 * 
 	 * v1.0 zhanghc 2022年5月18日下午1:21:07
 	 * 
@@ -253,41 +254,42 @@ public class ApiMyMarkController extends BaseController {
 		try {
 			return PageResultEx.ok().data(myMarkService.paper(examId, userId));
 		} catch (MyException e) {
-			log.error("获取用户试卷错误：{}", e.getMessage());
+			log.error("我的阅卷用户试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取用户试卷错误：", e);
+			log.error("我的阅卷用户试卷错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 打分
+	 * 我的阅卷打分
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
 	 * @param examId     考试ID
 	 * @param userId     考试用户ID
 	 * @param questionId 试题ID
-	 * @param userScore  用户得分
+	 * @param userScore  批分
+	 * @param remark  批语
 	 * @return PageResult
 	 */
 	@RequestMapping("/score")
-	public PageResult score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
+	public PageResult score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore, String remark) {
 		try {
-			myMarkService.score(examId, userId, questionId, userScore);
+			myMarkService.score(examId, userId, questionId, userScore, remark);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("打分错误：{}", e.getMessage());
+			log.error("我的阅卷打分错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("打分错误：", e);
+			log.error("我的阅卷打分错误：", e);
 			return PageResult.err();
 		}
 	}
-
+	
 	/**
-	 * 阅卷
+	 * 我的阅卷完成
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * 
@@ -301,16 +303,16 @@ public class ApiMyMarkController extends BaseController {
 			myMarkService.finish(examId, userId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("阅卷错误：{}", e.getMessage());
+			log.error("我的阅卷完成错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("阅卷错误：", e);
+			log.error("我的阅卷完成错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 试题统计
+	 * 我的阅卷试题统计
 	 * 
 	 * v1.0 zhanghc 2025年2月15日下午12:06:41
 	 * 
@@ -359,10 +361,10 @@ public class ApiMyMarkController extends BaseController {
 					.addAttr("markTypeStatis", markTypeStatis)//
 					.addAttr("typeStatis", typeStatis);
 		} catch (MyException e) {
-			log.error("获取试题统计错误：{}", e.getMessage());
+			log.error("我的阅卷试题统计错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取试题统计错误：", e);
+			log.error("我的阅卷试题统计错误：", e);
 			return PageResult.err();
 		}
 	}

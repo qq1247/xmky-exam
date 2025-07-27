@@ -26,6 +26,6 @@ public interface ExerService extends BaseService<Exer> {
 	 * 
 	 * @param exer void
 	 */
-	void updateEx(Exer exer);
+	void update(Exer exer);
 
 }

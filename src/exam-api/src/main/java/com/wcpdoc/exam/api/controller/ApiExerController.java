@@ -113,7 +113,7 @@ public class ApiExerController extends BaseController {
 	@RequestMapping("/edit")
 	public PageResult edit(Exer exer) {
 		try {
-			exerService.updateEx(exer);
+			exerService.update(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("练习修改错误：{}", e.getMessage());

@@ -42,7 +42,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public void addEx(User user) {
+	public void add(User user) {
 		// 数据校验
 		addValid(user);
 
@@ -94,7 +94,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 	@Override
 	@CacheEvict(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id")
-	public void delEx(Integer id) {
+	public void del(Integer id) {
 		// 数据校验
 		delValid(id);
 

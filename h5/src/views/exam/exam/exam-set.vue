@@ -86,6 +86,12 @@
                                 {{ dictStore.getValue('STATE_ON', form.rankState as number) }}
                             </span>
                         </div>
+                        <div class="exam-info__column">
+                            <span class="exam-info__lab">重考次数</span>
+                            <span class="exam-info__value">
+                                {{ form.retakeNum }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -309,6 +315,7 @@ const form = reactive<Exam>({
     sxes: [],
     userNum: null,
     state: null,
+    retakeNum: null,
 })
 const delConfirm = ref(false) // 删除确认
 
@@ -417,6 +424,7 @@ async function load() {
     form.sxes = data.sxes
     form.userNum = data.userNum
     form.state = data.state
+    form.retakeNum = data.retakeNum
 
     timeForm.id = data.id
     timeForm.markType = data.markType
@@ -766,7 +774,7 @@ async function del() {
 
                 .exam-info__row1 {
                     display: grid;
-                    grid-template-columns: repeat(6, 1fr);
+                    grid-template-columns: repeat(7, 1fr);
                     margin-top: 10px;
 
                     .exam-info__column {

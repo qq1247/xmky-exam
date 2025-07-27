@@ -62,12 +62,13 @@
                     <el-scrollbar height="calc(100vh - 475px)">
                         <el-empty v-if="listpage.list.length === 0" description="暂无数据" class="question-list__empty" />
                         <xmks-question v-else v-for="question in listpage.list" :key="question.id" :type="question.type"
-                            :title="question.title" :img-ids="question.imgFileIds" :options="question.options"
-                            :answers="question.answers" :markType="question.markType" :score="question.score"
-                            :scores="question.scores" :analysis="question.analysis" :userAnswers="[]" :userScore="0"
-                            :answerShow="display === 'paper-with-detail'" :userAnswerShow="false"
-                            :analysisShow="display === 'paper-with-detail'" :updateUserName="question.updateUserName"
-                            :display="display === 'list' ? 'list' : 'paper'" :editable="false" :btns="[{
+                            :title="question.title" :img-ids="question.imgFileIds" :video-id="question.videoFileId"
+                            :options="question.options" :answers="question.answers" :markType="question.markType"
+                            :score="question.score" :scores="question.scores" :analysis="question.analysis"
+                            :userAnswers="[]" :userScore="0" :answerShow="display === 'paper-with-detail'"
+                            :userAnswerShow="false" :analysisShow="display === 'paper-with-detail'"
+                            :updateUserName="question.updateUserName" :display="display === 'list' ? 'list' : 'paper'"
+                            :editable="false" :btns="[{
                                 name: '导入',
                                 icon: 'icon-daoru',
                                 event: () => questionAdd(question)
@@ -156,6 +157,7 @@ function questionAdd(question: Question) {
         markType: question.markType,
         title: question.title,
         imgFileIds: question.imgFileIds,
+        videoFileId: question.videoFileId,
         score: question.score,
         answers: question.answers,
         scores: question.scores,

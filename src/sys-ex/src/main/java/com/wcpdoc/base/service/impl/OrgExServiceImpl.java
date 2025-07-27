@@ -27,7 +27,7 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 	}
 
 	@Override
-	public void delEx(Integer orgId) {
+	public void del(Integer orgId) {
 		List<User> userList = SpringUtil.getBean(UserService.class).getList(orgId);
 		if (ValidateUtil.isValid(userList)) {
 			throw new MyException("存在考试用户");

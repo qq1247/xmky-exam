@@ -19,4 +19,5 @@ export interface Exam {
 	state: number | null; //状态（0：删除；1：发布；2：暂停；）
 	userNum: number | null; //考试用户数量
 	limitMinute: number | null; //限制分钟（考试开始时间由用户第一次打开试卷时计时）
+	retakeNum: number | null  // 补考次数
 }

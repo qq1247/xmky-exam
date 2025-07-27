@@ -44,9 +44,12 @@ public interface MyExamService extends BaseService<MyExam> {
 	 * @param examId
 	 * @param questionId
 	 * @param userId
-	 * @param answers    void
+	 * @param answers 主观问答题有效
+	 * @param imgFileIds 主观问答题有效
+	 * @param videoFileIds void
 	 */
-	void answer(Integer examId, Integer userId, Integer questionId, String[] answers);
+	void answer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer[] imgFileIds,
+			Integer[] videoFileIds);
 
 	/**
 	 * 交卷
@@ -83,11 +86,22 @@ public interface MyExamService extends BaseService<MyExam> {
 	 * 
 	 * v1.0 zhanghc 2025年3月16日上午11:19:25
 	 * 
-	 * @param examId  考试ID 
+	 * @param examId  考试ID
 	 * @param content 用户ID
 	 * @param type    作弊类型（3：禁止考试中切屏；）
 	 * @param content 作弊内容
 	 * @return boolean true：提前交卷；false：不处理
 	 */
 	boolean sxe(Integer examId, Integer userId, Integer type, String content);
+
+	/**
+	 * 重考
+	 * 
+	 * v1.0 zhanghc 2025年7月12日下午5:23:24
+	 * 
+	 * @param examId
+	 * @param userId
+	 * @return PageResult
+	 */
+	void retake(Integer examId, Integer userId);
 }

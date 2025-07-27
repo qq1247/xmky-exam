@@ -30,7 +30,7 @@ public interface ExamService extends BaseService<Exam> {
 	 * 
 	 * @param id void
 	 */
-	void delEx(Integer id);
+	void del(Integer id);
 
 	/**
 	 * 考试时间变更
@@ -123,6 +123,4 @@ public interface ExamService extends BaseService<Exam> {
 	 * @return Exam
 	 */
 	Exam getExam(String examName);
-
-	
 }

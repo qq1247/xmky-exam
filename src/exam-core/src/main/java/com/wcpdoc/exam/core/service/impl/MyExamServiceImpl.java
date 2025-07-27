@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +28,7 @@ import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.StringUtil;
@@ -37,7 +39,9 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyExamHis;
 import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyQuestionHis;
 import com.wcpdoc.exam.core.entity.MySxe;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -46,14 +50,17 @@ import com.wcpdoc.exam.core.entity.ex.PaperPart;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamRuleService;
+import com.wcpdoc.exam.core.service.MyExamHisService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyPaperService;
+import com.wcpdoc.exam.core.service.MyQuestionHisService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.MySxeService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
+import com.wcpdoc.file.service.FileService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,6 +91,12 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	private QuestionService questionService;
 	@Resource
 	private MySxeService mySxeService;
+	@Resource
+	private MyExamHisService myExamHisService;
+	@Resource
+	private MyQuestionHisService myQuestionHisService;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	public RBaseDao<MyExam> getDao() {
@@ -147,12 +160,16 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	@Override
 	@CacheEvict(value = ExamConstant.MYQUESTION_CACHE, key = ExamConstant.MYQUESTION_LIST_KEY_PRE
 			+ "#examId + ':' + #userId")
-	public void answer(Integer examId, Integer userId, Integer questionId, String[] answers) {
+	public void answer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
 		// 数据校验
-		MyQuestion myQuestion = answerValid(examId, userId, questionId);
+		MyQuestion myQuestion = answerValid(examId, userId, questionId, imgFileIds, videoFileIds);
 
 		// 答案保存
-		answerSave(questionId, answers, myQuestion);
+		answerSave(questionId, answers, myQuestion, imgFileIds, videoFileIds);
+
+		// 答案附件保存
+		answerFileSave(myQuestion);
 
 		User user = baseCacheService.getUser(userId);
 		Exam exam = examCacheService.getExam(examId);
@@ -194,133 +211,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	@CacheEvict(value = ExamConstant.MYEXAM_CACHE, allEntries = true)
 	public void clear(Integer examId) {
 		myExamDao.clear(examId);
-	}
-
-	private void paperValid(Integer examId, Integer userId) {
-		if (!ValidateUtil.isValid(examId)) {
-			throw new MyException("参数错误：examId");
-		}
-		if (!ValidateUtil.isValid(userId)) {
-			throw new MyException("参数错误：userId");
-		}
-
-		MyExam myExam = examCacheService.getMyExam(examId, userId);
-		if (myExam == null) {
-			throw new MyException("试卷不存在");
-		}
-		Exam exam = examCacheService.getExam(examId);
-		if (exam.getState() == 0) {
-			throw new MyException("考试已删除");
-		}
-		if (exam.getState() == 2) {
-			throw new MyException("考试已暂停");
-		}
-		if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
-			throw new MyException("考试未开始");
-		}
-	}
-
-	private void answerSave(Integer questionId, String[] answers, MyQuestion myQuestion) {
-		Question question = examCacheService.getQuestion(questionId);
-		if (!ValidateUtil.isValid(answers)) {
-			myQuestion.setUserAnswer(null);
-		} else if (QuestionUtil.hasJudge(question)) {
-			myQuestion.setUserAnswer(answers[0]);
-		} else if (QuestionUtil.hasSingleChoice(question)) {
-			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
-				myQuestion.setUserAnswer(myQuestion.getOptionsNoCacheOfAnswer().get(answers[0]));
-			} else {
-				myQuestion.setUserAnswer(answers[0]);
-			}
-		} else if (QuestionUtil.hasMultipleChoice(question)) {
-			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
-				for (int i = 0; i < answers.length; i++) {
-					answers[i] = myQuestion.getOptionsNoCacheOfAnswer().get(answers[i]);
-				}
-			}
-
-			Arrays.sort(answers);// 页面先选d在选c，值为db，这里重新排序一下
-			myQuestion.setUserAnswer(StringUtil.join(answers));
-		} else if (QuestionUtil.hasFillBlank(question)) {
-			myQuestion.setUserAnswer(StringUtil.join(answers, '\n'));
-		} else if (QuestionUtil.hasQA(question)) {
-			myQuestion.setUserAnswer(StringUtil.join(answers));// bug：文本包含英文逗号会分割
-		}
-		myQuestion.setAnswerTime(new Date());
-		myQuestionService.updateById(myQuestion);
-	}
-
-	private MyQuestion answerValid(Integer examId, Integer userId, Integer questionId) {
-		if (!ValidateUtil.isValid(examId)) {
-			throw new MyException("参数错误：examId");
-		}
-		if (!ValidateUtil.isValid(userId)) {
-			throw new MyException("参数错误：userId");
-		}
-		if (!ValidateUtil.isValid(questionId)) {
-			throw new MyException("参数错误：questionId");
-		}
-//		if (!ValidateUtil.isValid(answers)) {// 允许清空答案，比如多选
-//			throw new MyException("参数错误：answers");
-//		} 
-
-		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
-		if (myQuestion == null) {
-			throw new MyException("未参与考试");
-		}
-
-		Exam exam = examCacheService.getExam(examId);
-		if (exam.getState() == 0) {
-			throw new MyException("考试已删除");
-		}
-		if (exam.getState() == 2) {
-			throw new MyException("考试已暂停");
-		}
-		MyExam myExam = examCacheService.getMyExam(examId, userId);
-		long curTime = System.currentTimeMillis();
-		if (myExam.getAnswerStartTime().getTime() > curTime) {
-			throw new MyException("考试未开始");
-		}
-		if (myExam.getAnswerEndTime().getTime() < curTime) {
-			throw new MyException("考试已结束");
-		}
-		if (myExam.getState() == 3) {
-			throw new MyException("已交卷");
-		}
-		return myQuestion;
-	}
-
-	private void finishValid(Integer examId, Integer userId) {
-		if (!ValidateUtil.isValid(examId)) {
-			throw new MyException("参数错误：examId");
-		}
-		if (!ValidateUtil.isValid(userId)) {
-			throw new MyException("参数错误：userId");
-		}
-		MyExam myExam = examCacheService.getMyExam(examId, userId);
-		if (myExam == null) {
-			throw new MyException("未参与考试");
-		}
-		if (myExam.getState() == 1) {// 考试时间内，只要进入考试，状态就是2
-			throw new MyException("未考试");
-		}
-		if (myExam.getState() == 3) {
-			throw new MyException("已交卷");
-		}
-		Exam exam = examCacheService.getExam(examId);
-		if (exam.getState() == 0) {
-			throw new MyException("考试已删除");
-		}
-		if (exam.getState() == 2) {
-			throw new MyException("考试已暂停");
-		}
-		long curTime = System.currentTimeMillis();
-		if (myExam.getAnswerStartTime().getTime() > curTime) {
-			throw new MyException("考试未开始");
-		}
-//		if (myExam.getExamEndTime().getTime() < curTime + 1) {// 预留1秒网络延时
-//			throw new MyException("考试已结束");// 服务部署在低配的电脑上，如果有高并发，可以会造成延时1秒也不够
-//		}// 所以只要状态是考试中，就可以更新交卷时间
 	}
 
 	@Override
@@ -377,6 +267,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 				myQuestion.setQuestionId(examQuestion.getQuestionId());
 				myQuestion.setUserId(userId);
 				myQuestion.setNo(i + 1);
+				myQuestion.setVer(1);
 				myQuestion.setUpdateUserId(getCurUser().getId());
 				myQuestion.setUpdateTime(new Date());
 				myQuestionService.save(myQuestion);
@@ -419,6 +310,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 					myQuestion.setUserId(userId);
 					myQuestion.setExamId(examId);
 					myQuestion.setNo(no++);
+					myQuestion.setVer(1);
+					myQuestion.setUpdateTime(new Date());
+					myQuestion.setUpdateUserId(getCurUser().getId());
 					myQuestionService.save(myQuestion);
 				} else {// 如果是规则
 					List<Question> questionList = questionService.getList(examRule.getQuestionBankId());
@@ -458,6 +352,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 							myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
 						}
 
+						myQuestion.setVer(1);
 						myQuestion.setUpdateTime(new Date());
 						myQuestion.setUpdateUserId(getCurUser().getId());
 						myQuestionService.save(myQuestion);
@@ -497,6 +392,248 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		return false;
 	}
 
+	@Override
+	@Caching(evict = { //
+			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_KEY_PRE
+					+ "#examId + ':' + #userId"),
+			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_LIST_KEY_PRE + "#examId"),
+			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, key = ExamConstant.MYEXAM_UNMARK_LIST_KEY),
+			@CacheEvict(value = ExamConstant.MYQUESTION_CACHE, key = ExamConstant.MYQUESTION_LIST_KEY_PRE
+					+ "#examId + ':' + #userId") })
+	public void retake(Integer examId, Integer userId) {
+		// 数据校验
+		Exam exam = examCacheService.getExam(examId);
+		if (exam.getMarkType() == 2) {
+			throw new MyException("主观题试卷");
+		}
+		if (exam.getMarkState() != 1) {
+			throw new MyException("考试已结束");
+		}
+		if (exam.getRetakeNum() == 0) {
+			throw new MyException("不允许重考");
+		}
+
+		MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
+		if (myExam.getAnswerState() == null) {// 相当于判断了state和markState
+			throw new MyException("请继续参考");
+		}
+		if (myExam.getAnswerState() == 1) {
+			throw new MyException("已及格，无须重考");
+		}
+		if (myExam.getVer().intValue() > exam.getRetakeNum().intValue()) {
+			throw new MyException(String.format("只能重考%s次", exam.getRetakeNum()));
+		}
+
+		// 旧试卷存档
+		MyExamHis myExamHis = new MyExamHis();
+		try {
+			BeanUtils.copyProperties(myExamHis, myExam);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new MyException("拷贝属性错误");
+		}
+		myExamHis.setId(null);
+		myExamHisService.save(myExamHis);
+
+		List<MyQuestion> myQuestionList = examCacheService.getMyQuestionList(examId, getCurUser().getId());
+		for (MyQuestion myQuestion : myQuestionList) {
+			MyQuestionHis myQuestionHis = new MyQuestionHis();
+			try {
+				BeanUtils.copyProperties(myQuestionHis, myQuestion);
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				throw new MyException("拷贝属性错误");
+			}
+
+			myQuestionHis.setId(null);
+			myQuestionHisService.save(myQuestionHis);
+		}
+
+		// 生成新试卷
+		myExam.setMarkUserId(null);
+		myExam.setAnswerStartTime(null);
+		myExam.setAnswerEndTime(null);
+		myExam.setMarkStartTime(null);
+		myExam.setMarkEndTime(null);
+		myExam.setObjectiveScore(null);
+		myExam.setTotalScore(null);
+		myExam.setState(1);
+		myExam.setMarkState(1);
+		myExam.setAnswerState(null);
+		myExam.setNo(null);
+		myExam.setVer(myExam.getVer() + 1);
+		myExam.setUpdateUserId(getCurUser().getId());
+		myExam.setUpdateTime(new Date());
+		updateById(myExam);
+
+		for (MyQuestion myQuestion : myQuestionList) {
+			myQuestion.setAnswerTime(null);
+			myQuestion.setUserAnswer(null);
+			myQuestion.setUserScore(null);
+			myQuestion.setMarkUserId(null);
+			myQuestion.setMarkTime(null);
+			myQuestion.setVer(myQuestion.getVer() + 1);
+			myQuestion.setImgFileIds(null);
+			myQuestion.setVideoFileIds(null);
+			myQuestion.setUpdateUserId(getCurUser().getId());
+			myQuestion.setUpdateTime(new Date());
+			myQuestionService.updateById(myQuestion);
+		}
+	}
+
+	private void paperValid(Integer examId, Integer userId) {
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+
+		MyExam myExam = examCacheService.getMyExam(examId, userId);
+		if (myExam == null) {
+			throw new MyException("试卷不存在");
+		}
+		Exam exam = examCacheService.getExam(examId);
+		if (exam.getState() == 0) {
+			throw new MyException("考试已删除");
+		}
+		if (exam.getState() == 2) {
+			throw new MyException("考试已暂停");
+		}
+		if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
+			throw new MyException("考试未开始");
+		}
+	}
+
+	private void answerSave(Integer questionId, String[] answers, MyQuestion myQuestion, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
+		Question question = examCacheService.getQuestion(questionId);
+		if (!ValidateUtil.isValid(answers)) {
+			myQuestion.setUserAnswer(null);
+		} else if (QuestionUtil.hasJudge(question)) {
+			myQuestion.setUserAnswer(answers[0]);
+		} else if (QuestionUtil.hasSingleChoice(question)) {
+			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
+				myQuestion.setUserAnswer(myQuestion.getOptionsNoCacheOfAnswer().get(answers[0]));
+			} else {
+				myQuestion.setUserAnswer(answers[0]);
+			}
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
+				for (int i = 0; i < answers.length; i++) {
+					answers[i] = myQuestion.getOptionsNoCacheOfAnswer().get(answers[i]);
+				}
+			}
+
+			Arrays.sort(answers);// 页面先选d在选c，值为db，这里重新排序一下
+			myQuestion.setUserAnswer(StringUtil.join(answers));
+		} else if (QuestionUtil.hasFillBlank(question)) {
+			myQuestion.setUserAnswer(StringUtil.join(answers, '\n'));
+		} else if (QuestionUtil.hasQA(question)) {
+			myQuestion.setUserAnswer(StringUtil.join(answers));// bug：主观问答题，文本包含英文逗号会分割，需要再合并一下
+		}
+		myQuestion.setAnswerTime(new Date());
+		myQuestion.setImgFileIds(CollectionUtil.toList(imgFileIds));
+		myQuestion.setVideoFileIds(CollectionUtil.toList(videoFileIds));
+		myQuestion.setUpdateTime(new Date());
+		myQuestion.setUpdateUserId(getCurUser().getId());
+		myQuestionService.updateById(myQuestion);
+	}
+
+	private void answerFileSave(MyQuestion myQuestion) {
+		myQuestion.getImgFileIds().forEach(imgFileId -> {
+			fileService.upload(imgFileId);
+		});
+		myQuestion.getVideoFileIds().forEach(videoFileId -> {
+			fileService.upload(videoFileId);
+		});
+	}
+
+	private MyQuestion answerValid(Integer examId, Integer userId, Integer questionId, Integer[] imgFileIds,
+			Integer[] videoFileIds) {
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		if (!ValidateUtil.isValid(questionId)) {
+			throw new MyException("参数错误：questionId");
+		}
+//		if (!ValidateUtil.isValid(answers)) {// 允许清空答案，比如多选
+//			throw new MyException("参数错误：answers");
+//		} 
+
+		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
+		if (myQuestion == null) {
+			throw new MyException("未参与考试");
+		}
+
+		Exam exam = examCacheService.getExam(examId);
+		if (exam.getState() == 0) {
+			throw new MyException("考试已删除");
+		}
+		if (exam.getState() == 2) {
+			throw new MyException("考试已暂停");
+		}
+		MyExam myExam = examCacheService.getMyExam(examId, userId);
+		long curTime = System.currentTimeMillis();
+		if (myExam.getAnswerStartTime().getTime() > curTime) {
+			throw new MyException("考试未开始");
+		}
+		if (myExam.getAnswerEndTime().getTime() < curTime) {
+			throw new MyException("考试已结束");
+		}
+		if (myExam.getState() == 3) {
+			throw new MyException("已交卷");
+		}
+		Question question = examCacheService.getQuestion(questionId);
+		if (ValidateUtil.isValid(imgFileIds)) {
+			if (!(QuestionUtil.hasSubjective(question) && QuestionUtil.hasQA(question))) {
+				throw new MyException("参数错误：imgFileIds");
+			}
+		}
+		if (ValidateUtil.isValid(videoFileIds)) {
+			if (!(QuestionUtil.hasSubjective(question) && QuestionUtil.hasQA(question))) {
+				throw new MyException("参数错误：videoFileIds");
+			}
+		}
+		return myQuestion;
+	}
+
+	private void finishValid(Integer examId, Integer userId) {
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		MyExam myExam = examCacheService.getMyExam(examId, userId);
+		if (myExam == null) {
+			throw new MyException("未参与考试");
+		}
+		if (myExam.getState() == 1) {// 考试时间内，只要进入考试，状态就是2
+			throw new MyException("未考试");
+		}
+		if (myExam.getState() == 3) {
+			throw new MyException("已交卷");
+		}
+		Exam exam = examCacheService.getExam(examId);
+		if (exam.getState() == 0) {
+			throw new MyException("考试已删除");
+		}
+		if (exam.getState() == 2) {
+			throw new MyException("考试已暂停");
+		}
+		long curTime = System.currentTimeMillis();
+		if (myExam.getAnswerStartTime().getTime() > curTime) {
+			throw new MyException("考试未开始");
+		}
+//		if (myExam.getExamEndTime().getTime() < curTime + 1) {// 预留1秒网络延时
+//			throw new MyException("考试已结束");// 服务部署在低配的电脑上，如果有高并发，可以会造成延时1秒也不够
+//		}// 所以只要状态是考试中，就可以更新交卷时间
+	}
+
 	/**
 	 * 拆分分数<br/>
 	 * 1分 拆分成2份，结果：0.5、0.5<br/>
@@ -527,5 +664,4 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		ArrayUtils.shuffle(shuffleNums);
 		return Arrays.asList(shuffleNums);
 	}
-
 }

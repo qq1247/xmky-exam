@@ -19,7 +19,7 @@ public interface CronService extends BaseService<Cron> {
 	 * 
 	 * @param cron void
 	 */
-	void updateEx(Cron cron);
+	void update(Cron cron);
 
 	/**
 	 * 定时任务删除
@@ -28,7 +28,7 @@ public interface CronService extends BaseService<Cron> {
 	 * 
 	 * @param id void
 	 */
-	void delEx(Integer id);
+	void del(Integer id);
 
 	/**
 	 * 定时任务列表
