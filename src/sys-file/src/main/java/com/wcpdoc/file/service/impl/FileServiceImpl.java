@@ -136,7 +136,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		java.io.File destDir = new java.io.File(String.format("%s%s", getUploadDir().getAbsolutePath(), file.getPath()))
 				.getParentFile();
 		try {
-			FileUtils.moveFileToDirectory(tempFile, destDir, true);
+			FileUtils.copyFileToDirectory(tempFile, destDir, true);
 		} catch (Exception e) {
 			log.error("移动附件失败：{} 到 {}", tempFile.getAbsolutePath(), destDir.getAbsolutePath());
 			throw new MyException("保存附件失败");
