@@ -46,7 +46,10 @@
 							:analysis="examQuestion.analysis"
 							:editable="examing"
 							:analysis-show="analysisShow"
-							@change="(answers: string[]) => answer(examQuestion, answers)"
+							@change="(answers: string[]) => {
+								examQuestion.userAnswers = answers;
+								answer(examQuestion)
+							}"
 						>
 							<template #title-pre>
 								<text class="mypaper-main__question-cur-no">{{ examQuestion.no }}、</text>
@@ -55,25 +58,74 @@
 								<text>（{{ examQuestion.score }}分）</text>
 							</template>
 							<template #user-answer-post>
-								<view class="question__img-group">
-									<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="question__img-inner">
-										<image
-											:src="`${host}/file/download?id=${imgFileId}`"
-											mode="aspectFit"
-											view
-											@click="preview(examQuestion.answerImgFileIds, index)"
-											class="question__img"
-										></image>
-										<text>图{{ toChinaNum(index + 1) }}</text>
+								<view v-if="examQuestion.questionType === 5 && examQuestion.markType === 2" class="user-files">
+									<view class="img-group">
+										<view class="img-group__inner">
+											<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="img">
+												<image
+													:src="`${host}/file/download?id=${imgFileId}`"
+													mode="aspectFit"
+													view
+													@click="preview(examQuestion.answerImgFileIds, index)"
+													class="img__inner"
+												></image>
+												<view>
+													<text class="img__txt">图{{ toChinaNum(index + 1) }}</text>
+													<uni-icons
+														v-if="myExam.state === 2"
+														customPrefix="iconfont"
+														type="icon-icon-close"
+														color="#8c939d"
+														size="32rpx"
+														class="img__icon"
+														@click="() => {
+															examQuestion.answerImgFileIds = examQuestion.answerImgFileIds.filter((answerImgFileId: number) => answerImgFileId != imgFileId)
+															answer(examQuestion);
+														}"
+													></uni-icons>
+												</view>
+											</view>
+										</view>
+										<view v-if="myExam.state === 2" class="upload-btn" @click="uploadImg(examQuestion)">
+											<uni-icons customPrefix="iconfont" type="icon-shipin" color="#FFF" size="32rpx" class="upload-btn__icon"></uni-icons>
+											<text class="upload-btn__txt">照片</text>
+										</view>
 									</view>
-								</view>
-								<view v-if="examQuestion.answerVideoFileIds?.length > 0">
-									<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="question__video"></video>
-									<text>视频</text>
+									<view class="video-group">
+										<view class="video-group__inner">
+											<view v-if="examQuestion.answerVideoFileIds?.length > 0" class="video">
+												<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="video__inner"></video>
+												<view>
+													<text class="video__txt">视频</text>
+													<uni-icons
+														v-if="myExam.state === 2"
+														customPrefix="iconfont"
+														type="icon-icon-close"
+														color="#8c939d"
+														size="32rpx"
+														class="video__icon"
+														@click="
+															() => {
+																examQuestion.answerVideoFileIds = [];
+																answer(examQuestion);
+															}
+														"
+													></uni-icons>
+												</view>
+											</view>
+										</view>
+										<view v-if="myExam.state === 2" class="upload-btn" @click="uploadVideo(examQuestion)">
+											<uni-icons customPrefix="iconfont" type="icon-zhaopian" color="#FFF" size="32rpx" class="upload-btn__icon"></uni-icons>
+											<text class="upload-btn__txt">视频</text>
+										</view>
+									</view>
 								</view>
 							</template>
 							<template #user-score-post>
-								<view v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)" class="question-qa-answer">
+								<view
+									v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5) && myExam.markState === 3"
+									class="question-qa-answer"
+								>
 									<text class="question-qa-answer__label">批语</text>
 									<view>
 										<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
@@ -143,9 +195,11 @@ import { ExamQuestion } from '@/ts/paper.d';
 import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/api/myExam';
 import { loginSysTime } from '@/api/login';
 import { toChinaNum } from '@/util/numberUtil';
+import { useUserStore } from '@/stores/user';
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore();
+const userStore = useUserStore();
 const swiperRef = ref(); // 滑块索引
 const questionHeight = ref(0); // 试题滚动高度
 const timePercent = ref(0); // 时间进度条
@@ -292,13 +346,15 @@ async function paperQuery() {
 }
 
 // 作答
-function answer(examQuestion: ExamQuestion, answers: string[]) {
+function answer(examQuestion: ExamQuestion) {
 	clearTimeout(timerId.value);
 	timerId.value = setTimeout(async () => {
 		await myExamAnswer({
 			examId: exam.id,
 			questionId: examQuestion.questionId,
-			answers: answers
+			answers: examQuestion.userAnswers,
+			imgFileIds: examQuestion.markType === 2 && examQuestion.questionType === 5 ? examQuestion.answerImgFileIds : '',
+			videoFileIds: examQuestion.markType === 2 && examQuestion.questionType === 5 ? examQuestion.answerVideoFileIds : ''
 		});
 	}, 500);
 }
@@ -443,6 +499,80 @@ function preview(imgFileIds: number[], index: number) {
 		urls: urls
 	});
 }
+
+// 上传照片
+function uploadImg(examQuestion: ExamQuestion) {
+	if (examQuestion.answerImgFileIds.length >= 2) {
+		uni.showToast({ title: '最多两个图片', icon: 'error' });
+		return;
+	}
+
+	uni.chooseImage({
+		extension: ['jpg', 'png', 'jpeg', 'JPG', 'PNG', 'JPEG'],
+		success: (chooseImageRes) => {
+			console.log(chooseImageRes.tempFiles[0].size)
+			if (chooseImageRes.tempFiles[0].size / 1024 > 2048) {
+				uni.showToast({ title: '图片最大支持2兆', icon: 'error' });
+				return
+			}
+			
+			const tempFilePaths = chooseImageRes.tempFilePaths;
+			uni.uploadFile({
+				url: `${host.value}/file/upload`,
+				filePath: tempFilePaths[0],
+				name: 'files',
+				header: {
+					Authorization: userStore.user.accessToken
+				},
+				success: (uploadFileRes) => {
+					const jsonObj = JSON.parse(uploadFileRes.data);
+					examQuestion.answerImgFileIds.push(jsonObj.data.fileIds);
+					answer(examQuestion);
+				}
+			});
+		}
+	});
+}
+
+// 上传视频
+function uploadVideo(examQuestion: ExamQuestion) {
+	if (examQuestion.answerVideoFileIds.length >= 1) {
+		uni.showToast({ title: '最多一个视频', icon: 'error' });
+		return;
+	}
+
+	uni.chooseVideo({
+		extension: ['mp4', 'MP4'],
+		success: function (chooseVideoRes) {
+			// #ifdef H5
+			if (chooseVideoRes.tempFile.size / 1024 > 10240) {
+				uni.showToast({ title: '视频最大支持10兆', icon: 'error' });
+				return
+			}
+			// #endif 
+			// #ifdef MP-WEIXIN
+			if (chooseVideoRes.size / 1024 > 10240) {
+				uni.showToast({ title: '视频最大支持10兆', icon: 'error' });
+				return
+			}
+			// #endif 
+			
+			uni.uploadFile({
+				url: `${host.value}/file/upload`,
+				filePath: chooseVideoRes.tempFilePath,
+				name: 'files',
+				header: {
+					Authorization: userStore.user.accessToken
+				},
+				success: (uploadFileRes) => {
+					const jsonObj = JSON.parse(uploadFileRes.data);
+					examQuestion.answerVideoFileIds.push(jsonObj.data.fileIds);
+					answer(examQuestion);
+				}
+			});
+		}
+	});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -506,28 +636,101 @@ function preview(imgFileIds: number[], index: number) {
 				}
 			}
 			// #endif
-			.question__img-group {
-				margin-top: 20rpx;
+			.user-files {
 				display: flex;
-
-				.question__img-inner {
+				justify-content: left;
+				align-items: flex-end;
+				margin-top: 10rpx;
+				.img-group {
 					display: flex;
 					flex-direction: column;
-					align-items: center;
-					.question__img {
-						display: inline-block;
-						height: 140rpx;
-						width: 140rpx;
-						background-color: #fff;
-						border: 1px solid #dcdfe6;
-						border-radius: 6px;
-						margin-left: 10rpx;
+					.img-group__inner {
+						display: flex;
+					}
+					.img {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						.img__inner {
+							display: inline-block;
+							height: 180rpx;
+							width: 180rpx;
+							background-color: #fff;
+							border: 1px solid #dcdfe6;
+							border-radius: 6rpx;
+							margin-left: 10rpx;
+						}
+						.img__txt {
+							font-size: 24rpx;
+							color: #000000;
+						}
+						.img__icon {
+							margin-left: 10rpx;
+						}
+					}
+					.upload-btn {
+						display: flex;
+						flex-direction: column;
+						margin-top: 10rpx;
+						.upload-btn__icon {
+							width: 48rpx;
+							height: 48rpx;
+							background-color: #fcc129;
+							border-radius: 50%;
+							align-content: center;
+							// #ifdef MP-WEIXIN
+							text-align: center;
+							// #endif
+						}
+						.upload-btn__txt {
+							font-size: 22rpx;
+							color: #000000;
+						}
 					}
 				}
-			}
-			.question__video {
-				width: 100%;
-				padding-top: 75%;
+				.video-group {
+					display: flex;
+					flex-direction: column;
+					margin-left: 20rpx;
+					.video-group__inner {
+					}
+					.video {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						.video__inner {
+							width: 240rpx;
+							height: 180rpx;
+						}
+						.video__txt {
+							font-size: 24rpx;
+							color: #000000;
+						}
+						.video__icon {
+							margin-left: 10rpx;
+						}
+					}
+					.upload-btn {
+						display: flex;
+						flex-direction: column;
+						margin-top: 10rpx;
+						.upload-btn__icon {
+							width: 48rpx;
+							height: 48rpx;
+							background-color: #287ce7;
+							border-radius: 50%;
+							align-content: center;
+							// #ifdef MP-WEIXIN
+							text-align: center;
+							// #endif
+						}
+						.upload-btn__txt {
+							font-size: 22rpx;
+							color: #000000;
+							align-content: center;
+						}
+					}
+				}
 			}
 			.question-qa-answer {
 				margin-top: 20rpx;

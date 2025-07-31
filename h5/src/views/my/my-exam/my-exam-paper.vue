@@ -156,7 +156,7 @@
                                         </el-upload>
                                     </div>
                                 </div>
-                                <div v-if="toolbars.remarkShow && examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)"
+                                <div v-if="toolbars.remarkShow && examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5) && myExam.markState === 3"
                                     class="question__analysis"><!-- 主观填空题和主观问答题，显示批语 -->
                                     <div class="question__analysis-title">批语</div>
                                     <span class="question__analysis-content">{{ examQuestion.remark || '无' }}</span>

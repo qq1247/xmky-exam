@@ -6,7 +6,8 @@
 			<template v-for="(title, index) in titles as Title[]" :key="index">
 				// #ifdef H5
 				<text v-if="title.type === 'txt'" class="question-title__text" v-html="title.value"></text>
-				// #endif // #ifdef MP-WEIXIN
+				// #endif 
+				// #ifdef MP-WEIXIN
 				<text v-if="title.type === 'txt'" class="question-title__text" decode="true">
 					{{
 						title.value

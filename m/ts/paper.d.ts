@@ -34,4 +34,5 @@ export interface ExamQuestion {
 	userAnswers?: string[]; // 用户答案
 	userScore?: number; // 用户分数
 	analysis?: string; // 解析
+	[key: string]: any // 扩展字段
 }
