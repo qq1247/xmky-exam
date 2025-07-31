@@ -423,10 +423,10 @@ async function toPDF(examId: number, userId: number) {
         downloadLink.href = objectUrl;
         downloadLink.click();
         URL.revokeObjectURL(downloadLink.href);
-    } catch (error) {
-        ElMessage.error('生成PDF失败：' + error,)
-    } finally {
         ElMessage.success('下载完成')
+    } catch (error) {
+        ElMessage.error('生成PDF失败：请联系管理员安装wkhtmltopdf')
+    } finally {
         if (downloadLink) {
             document.removeChild(downloadLink);
             downloadLink = null;

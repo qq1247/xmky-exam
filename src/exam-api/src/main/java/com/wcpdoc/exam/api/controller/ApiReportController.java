@@ -311,7 +311,7 @@ public class ApiReportController extends BaseController {
 //    }
 
 	/**
-	 * 导出试卷
+	 * 用户试卷导出
 	 * 
 	 * v1.0 zhanghc 2025年3月21日下午12:05:18
 	 * 
@@ -468,13 +468,14 @@ public class ApiReportController extends BaseController {
 			}
 
 		} catch (MyException e) {
-			log.error("导出试卷错误：{}", e.getMessage());
+			log.error("用户试卷导出错误：{}", e.getMessage());
 		} catch (Exception e) {
 			if (e.getMessage().contains("wkhtmltopdf")) {
-				log.error("导出试卷错误：{}", "请联系管理员安装wkhtmltopdf");
+				log.error("用户试卷导出错误：{}", "请联系管理员安装wkhtmltopdf");
+				return;
 			}
 
-			log.error("导出试卷错误：", e);
+			log.error("用户试卷导出错误：", e);
 		}
 	}
 
@@ -598,8 +599,9 @@ public class ApiReportController extends BaseController {
 		} catch (MyException e) {
 			log.error("导出考试排名错误：{}", e.getMessage());
 		} catch (Exception e) {
-			if (e.getMessage().contains("Cannot run program \"wkhtmltopdf\"")) {
+			if (e.getMessage().contains("wkhtmltopdf")) {
 				log.error("导出考试排名错误：{}", "请联系管理员安装wkhtmltopdf");
+				return;
 			}
 
 			log.error("导出考试排名错误：", e);
