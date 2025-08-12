@@ -403,7 +403,7 @@ function parseQuestion(questionTxt: string[]) {
     }
 
     // 拼装试题
-    const analysis = analysisIndex === -1 ? '' : questionTxt.slice(analysisIndex, questionTxt.length - 1).join("\n").replace(/^\[解析]/, '')
+    const analysis = analysisIndex === -1 ? '' : questionTxt.slice(analysisIndex, questionTxt.length).join("\n").replace(/^\[解析]/, '')
     const markType = (type === 5 || (type === 3 && subjective)) ? 2 : 1  // 如果是问答题或（填空带主观题）设置为主观题，剩下是客观题
     let score = 1
     const _scores = []
