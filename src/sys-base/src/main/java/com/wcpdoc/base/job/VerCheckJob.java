@@ -67,7 +67,6 @@ public class VerCheckJob implements Job {
 				SpringUtil.getBean(ParmService.class).app((String) data.get("relVer"),
 						DateUtil.getDate((String) data.get("relTime")), (String) data.get("verHubUrl"));
 			} catch (Exception e) {
-				e.printStackTrace();
 				// 失败也没关系，无须处理
 			}
 		}).start();

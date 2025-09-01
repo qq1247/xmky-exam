@@ -1,5 +1,6 @@
+export { }
 declare global {
     interface Window {
-        domain?: string;
+        [key: string]: unknown;
     }
 }

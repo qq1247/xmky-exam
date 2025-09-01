@@ -1,0 +1,10 @@
+[
+    {
+        "name": "xmky-ai-plugin",
+        "displayName": "小猫AI插件",
+        "version": "5.6.0",
+        "url": "/plugins/xmky-ai-plugin/xmky-ai-plugin.iife.js",
+        "enabled": false,
+        "config": {}
+    }
+]
