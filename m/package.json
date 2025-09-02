@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "babel-plugin-prismjs": "~2.1.0",
+    "he": "~1.2.0",
     "prismjs": "~1.30.0"
   }
 }

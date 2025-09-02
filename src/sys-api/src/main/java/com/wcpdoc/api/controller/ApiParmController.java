@@ -31,24 +31,24 @@ public class ApiParmController extends BaseController {
 	private BaseCacheService baseCacheService;
 
 	/**
-	 * 企业修改
+	 * 系统修改
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * 
-	 * @param logoFileId
 	 * @param name
+	 * @param logoFileId
 	 * @return PageResult
 	 */
-	@RequestMapping("/ent")
-	public PageResult ent(Integer logoFileId, String name) {
+	@RequestMapping("/sys")
+	public PageResult ent(String name, Integer logoFileId) {
 		try {
 			parmService.ent(logoFileId, name);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("企业修改错误：{}", e.getMessage());
+			log.error("系统修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("企业修改错误：", e);
+			log.error("系统修改错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -143,7 +143,7 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
-	 * 自定义信息修改
+	 * 服务支持修改
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午9:22:54
 	 * 
@@ -151,16 +151,39 @@ public class ApiParmController extends BaseController {
 	 * @param content
 	 * @return PageResult
 	 */
-	@RequestMapping("/custom")
-	public PageResult custom(String title, String content) {
+	@RequestMapping("/support")
+	public PageResult support(String title, String content) {
 		try {
-			parmService.custom(title, content);
+			parmService.support(title, content);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("自定义信息修改错误：{}", e.getMessage());
+			log.error("服务支持修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("自定义信息修改错误：", e);
+			log.error("服务支持修改错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 备案信息修改
+	 * 
+	 * v1.0 zhanghc 2025年9月1日下午2:33:37
+	 * 
+	 * @param title
+	 * @param content
+	 * @return PageResult
+	 */
+	@RequestMapping("/icp")
+	public PageResult icp(String icp) {
+		try {
+			parmService.icp(icp);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("备案信息修改错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("备案信息修改错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -197,16 +220,20 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/get")
 	public PageResult get() {
 		try {
-			Parm parm = baseCacheService.getParm();;
+			Parm parm = baseCacheService.getParm();
+			;
 			return PageResultEx.ok()//
-					.addAttr("entName", parm.getEntName())//
+					.addAttr("sysName", parm.getSysName())//
 					.addAttr("fileUploadDir", parm.getFileUploadDir())//
 					.addAttr("dbBakDir", parm.getDbBakDir())//
 					.addAttr("pwdType", parm.getPwdType())//
 					.addAttr("pwdValue", parm.getPwdValue())//
 					.addAttr("customTitle", parm.getCustomTitle())//
 					.addAttr("customContent", parm.getCustomContent())//
-					.addAttr("mHost", parm.getMHost());
+					.addAttr("customContent", parm.getCustomContent())//
+					.addAttr("icp", parm.getIcp())//
+					.addAttr("mHost", parm.getMHost())//
+			;
 		} catch (MyException e) {
 			log.error("参数获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -20,12 +20,12 @@
                     style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card title="企业信息" desc="企业信息">
+        <xmks-edit-card title="系统信息" desc="系统信息">
             <template #card-main>
-                <el-form ref="entFormRef" :model="entForm" :rules="entFormRules" label-width="100" size="large"
+                <el-form ref="sysFormRef" :model="sysForm" :rules="sysFormRules" label-width="100" size="large"
                     :inline="true" class="form">
-                    <el-form-item label="企业名称" prop="name">
-                        <el-input v-model="entForm.name" placeholder="请输入企业名称" />
+                    <el-form-item label="系统名称" prop="name">
+                        <el-input v-model="sysForm.name" placeholder="请输入系统名称" />
                     </el-form-item>
                     <el-form-item label="Logo" prop="logoFileId">
                         <el-upload :action="`${uploadUrl}`" :headers="{ Authorization: userStore.accessToken }"
@@ -37,7 +37,7 @@
                 </el-form>
             </template>
             <template #card-side>
-                <el-button type="primary" class="form__btn" @click="entSave"
+                <el-button type="primary" class="form__btn" @click="sysSave"
                     style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
@@ -55,21 +55,36 @@
                 <el-button type="primary" class="form__btn" @click="mSave" style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card title="自定义信息" desc="自定义内容">
+        <xmks-edit-card title="服务支持" desc="pc端：首页顶部欢迎图左侧显示；移动端：个人中心/服务支持 显示">
             <template #card-main>
-                <el-form ref="customFormRef" :model="customForm" :rules="customFormRules" label-width="100" size="large"
-                    :inline="false" class="form">
+                <el-form ref="supportFormRef" :model="supportForm" :rules="supportFormRules" label-width="100"
+                    size="large" :inline="false" class="form">
                     <el-form-item label="标题" prop="title">
-                        <el-input v-model="customForm.title" placeholder="请输入标题" />
+                        <el-input v-model="supportForm.title" placeholder="请输入标题" />
                     </el-form-item>
                     <el-form-item label="内容" prop="content">
-                        <el-input v-model="customForm.content" placeholder="请输入内容" :autosize="{ minRows: 2 }"
+                        <el-input v-model="supportForm.content" placeholder="请输入内容" :autosize="{ minRows: 2 }"
                             type="textarea" />
                     </el-form-item>
                 </el-form>
             </template>
             <template #card-side>
-                <el-button type="primary" class="form__btn" @click="customSave"
+                <el-button type="primary" class="form__btn" @click="supportSave"
+                    style="margin-bottom: 40px;">保存设置</el-button>
+            </template>
+        </xmks-edit-card>
+        <xmks-edit-card title="登录页备案" desc="用于设置登录页底部备案区域的内容">
+            <template #card-main>
+                <el-form ref="icpFormRef" :model="icpForm" :rules="icpFormRules" label-width="100" size="large"
+                    :inline="false" class="form">
+                    <el-form-item label="内容" prop="icp">
+                        <el-input v-model="icpForm.icp" placeholder="请输入备案" :autosize="{ minRows: 2 }"
+                            type="textarea" />
+                    </el-form-item>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-button type="primary" class="form__btn" @click="icpSave"
                     style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
@@ -86,19 +101,20 @@
 import type { ParmPwd } from '@/ts/sys/parm'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { parmCustom, parmEnt, parmGet, parmM, parmPwd } from '@/api/sys/parm'
+import { parmSupport, parmSys, parmGet, parmIcp, parmM, parmPwd } from '@/api/sys/parm'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import http from '@/request'
 import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile } from 'element-plus'
 import { useUserStore } from '@/stores/user'
-import { useCustomStore } from '@/stores/custom'
+import { useParmStore } from '@/stores/parm'
 import { cacheRefresh } from '@/api/sys/cache'
+import { escape2Html } from '@/util/htmlUtil'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
 const router = useRouter()// 路由
 const userStore = useUserStore()// 用户缓存
-const customStore = useCustomStore()// 自定义缓存
+const parmStore = useParmStore()// 参数缓存
 
 const pwdFormRef = ref<FormInstance>()// 密码表单引用
 const pwdForm = reactive<ParmPwd>({// 密码表单
@@ -112,17 +128,17 @@ const pwdFormRules = reactive<FormRules>({// 密码表单规则
     ],
 })
 
-const entForm = reactive({// 企业表单
-    name: '',// 企业名称
+const sysForm = reactive({// 系统表单
+    name: '',// 系统名称
     logoFileId: null, // logo附件ID
 })
 const logoUrl = ref(`${http.defaults.baseURL}login/logo?t=${new Date().getTime()}`)// logo链接
 const uploadUrl = `${http.defaults.baseURL}file/upload`// 上传地址
 const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
-const entFormRef = ref<FormInstance>() // 企业表单引用
-const entFormRules = reactive<FormRules>({// 企业表单校验规则
+const sysFormRef = ref<FormInstance>() // 系统表单引用
+const sysFormRules = reactive<FormRules>({// 系统表单校验规则
     name: [
-        { required: true, message: '请输入企业名称', trigger: 'blur' },
+        { required: true, message: '请输入系统名称', trigger: 'blur' },
         { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
     ],
     logoFileId: [
@@ -141,12 +157,12 @@ const mFormRules = reactive<FormRules>({// 移动端表单校验规则
     ],
 })
 
-const customForm = reactive({// 表单
+const supportForm = reactive({// 表单
     title: '',// 服务名称
     content: '',// 服务内容
 })
-const customFormRef = ref<FormInstance>() // 表单引用
-const customFormRules = reactive<FormRules>({// 表单校验规则
+const supportFormRef = ref<FormInstance>() // 表单引用
+const supportFormRules = reactive<FormRules>({// 表单校验规则
     title: [
         { required: true, message: '请输入标题', trigger: 'blur' },
         { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
@@ -157,6 +173,18 @@ const customFormRules = reactive<FormRules>({// 表单校验规则
     ],
 })
 
+const icpForm = reactive({// 表单
+    icp: '',// 备案
+})
+const icpFormRef = ref<FormInstance>() // 表单引用
+const icpFormRules = reactive<FormRules>({// 表单校验规则
+    icp: [
+        { required: false, message: '请输入备案', trigger: 'blur' },
+        { min: 1, max: 512, message: '长度介于1-512', trigger: 'blur' },
+    ],
+})
+
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加
@@ -165,10 +193,12 @@ onMounted(async () => {
         const { data: { data } } = await parmGet({ id: route.params.id })
         pwdForm.type = data.pwdType
         pwdForm.value = data.pwdValue
-        entForm.name = data.entName
+        sysForm.name = data.sysName
         mForm.host = data.mHost
-        customForm.title = data.customTitle
-        customForm.content = data.customContent
+        supportForm.title = data.customTitle
+        supportForm.content = data.customContent
+        icpForm.icp = escape2Html(data.icp)
+
     }
 })
 
@@ -190,20 +220,19 @@ async function pwdSave() {
     router.push("/sys-nav/parm-list")
 }
 
-// 企业修改
-async function entSave() {
+async function sysSave() {
     // 数据校验
-    if (!entFormRef.value || !await entFormRef.value.validate()) {
+    if (!sysFormRef.value || !await sysFormRef.value.validate()) {
         return
     }
 
-    const { data: { code } } = await parmEnt({ ...entForm })
+    const { data: { code } } = await parmSys({ ...sysForm })
     if (code !== 200) {
         return
     }
 
-    userStore.sysName = entForm.name
-    document.title = userStore.sysName
+    parmStore.sysName = sysForm.name
+    document.title = sysForm.name
 
     router.push("/sys-nav/parm-list")
 }
@@ -224,20 +253,37 @@ async function mSave() {
 }
 
 // 自定义修改
-async function customSave() {
+async function supportSave() {
     // 数据校验
-    if (!customFormRef.value || !await customFormRef.value.validate()) {
+    if (!supportFormRef.value || !await supportFormRef.value.validate()) {
         return
     }
 
-    const { data: { code } } = await parmCustom({ ...customForm })
+    const { data: { code } } = await parmSupport({ ...supportForm })
     if (code !== 200) {
         return
     }
 
-    customStore.title = customForm.title
-    customStore.content = customForm.content.replaceAll('\n', '<br/>')
+    parmStore.customTitle = supportForm.title
+    parmStore.customContent = supportForm.content.replaceAll('\n', '<br/>')
 
+
+    router.push("/sys-nav/parm-list")
+}
+
+// 备案修改
+async function icpSave() {
+    // 数据校验
+    if (!icpFormRef.value || !await icpFormRef.value.validate()) {
+        return
+    }
+
+    const { data: { code } } = await parmIcp({ ...icpForm })
+    if (code !== 200) {
+        return
+    }
+
+    parmStore.icp = icpForm.icp
 
     router.push("/sys-nav/parm-list")
 }
@@ -270,8 +316,8 @@ function uploadBefore(rawFile: UploadRawFile) {
 
 // 上传成功处理
 function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) {
-    entForm.logoFileId = response.data.fileIds
-    logoUrl.value = `${downloadUrl}?id=${entForm.logoFileId}`
+    sysForm.logoFileId = response.data.fileIds
+    logoUrl.value = `${downloadUrl}?id=${sysForm.logoFileId}`
 }
 
 </script>

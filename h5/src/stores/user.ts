@@ -8,9 +8,8 @@ export const useUserStore = defineStore('user', () => {
     const headFileId = ref(0)
     const type = ref(0)  // 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
     const accessToken = ref('') // 访问令牌
-    const sysName = ref('')// 系统名称
 
-    return { id, name, headFileId, type, accessToken, sysName }
+    return { id, name, headFileId, type, accessToken }
 }, {
     persist: true
 })

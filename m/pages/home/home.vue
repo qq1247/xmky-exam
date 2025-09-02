@@ -2,7 +2,7 @@
 	<view class="home">
 		<view class="home-head">
 			<image class="home-head__bg" src="@/static/img/home-bg.png"></image>
-			<text class="home-head__sysname">{{ userStore.user.sysName }}</text>
+			<text class="home-head__sysname">{{ parmStore.sysName }}</text>
 			<text class="home-head__goodluck">祝考试之旅一帆风顺，成就满满！</text>
 		</view>
 		<view class="home-main">
@@ -110,9 +110,11 @@ import { useUserStore } from '@/stores/user';
 import { myExamListpage } from '@/api/myExam';
 import { bulletinListpage } from '@/api/bulletin';
 import { exerListpage } from '@/api/exer';
+import { useParmStore } from '@/stores/parm';
 
 /************************变量定义相关***********************/
 const userStore = useUserStore(); // 用户存储
+const parmStore = useParmStore(); // 参数存储
 const todoExamList = ref<any[]>(); // 未完成考试列表
 const myExerList = ref<any[]>(); // 我的练习列表
 const bulletinList = ref<any[]>(); // 公告列表

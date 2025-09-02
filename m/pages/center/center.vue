@@ -28,6 +28,13 @@
 						to="/pages/center/pwd"
 					/>
 					<uni-list-item
+						:show-extra-icon="true"
+						showArrow
+						:extra-icon="{ customPrefix: 'iconfont', color: '#999', size: '18', type: 'icon-gerenzhongxin2-03' }"
+						title="服务支持"
+						to="/pages/center/custom"
+					/>
+					<uni-list-item
 						v-if="custom.title"
 						:show-extra-icon="true"
 						showArrow
@@ -48,8 +55,8 @@ import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { User } from '@/ts/user.d';
-import { loginCustom, loginOut } from '@/api/login';
 import { userGet } from '@/api/user';
+import { loginOut } from '@/api/login';
 
 /************************变量定义相关***********************/
 const userStore = useUserStore(); // 用户存储
@@ -73,7 +80,6 @@ onShow(async () => {
 	}
 
 	userQuery();
-	customQuery();
 });
 
 onReady(() => {
@@ -93,13 +99,6 @@ async function userQuery() {
 	user.name = data.name;
 	user.loginName = data.loginName;
 	user.orgName = data.orgName;
-}
-
-// 自定义查询
-async function customQuery() {
-	let { data } = await loginCustom();
-	custom.title = data.title;
-	custom.content = data.content;
 }
 
 // 退出登录

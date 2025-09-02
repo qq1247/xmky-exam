@@ -9,11 +9,8 @@ export function loginNoLogin(parm) {
 export function loginPwd(parm) {
 	return request.post('/login/pwd', parm);
 }
-export function loginEnt(parm) {
-	return request.post('/login/ent', parm);
-}
-export function loginCustom(parm) {
-	return request.post('/login/custom', parm);
+export function loginParm(parm) {
+	return request.post('/login/parm', parm);
 }
 export function loginSysTime(parm) {
 	return request.post('/login/sysTime', parm);

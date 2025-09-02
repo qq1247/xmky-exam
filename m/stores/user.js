@@ -9,7 +9,6 @@ export const useUserStore = defineStore(
 			name: '',
 			type: 0,
 			accessToken: '',
-			sysName: ''
 		});
 		return { user };
 	},

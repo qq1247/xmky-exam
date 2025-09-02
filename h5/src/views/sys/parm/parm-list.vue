@@ -20,8 +20,8 @@
                         {{ scope.row.type === 1 ? '随机密码' : '固定密码' }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="企业名称" align="center" />
-                <el-table-column prop="logo" label="企业logo" align="center">
+                <el-table-column prop="name" label="系统名称" align="center" />
+                <el-table-column prop="logo" label="系统logo" align="center">
                     <img :src="logoUrl" class="table__logo" />
                 </el-table-column>
                 <el-table-column prop="host" label="移动端主机" align="center" />
@@ -72,7 +72,7 @@ async function query() {
     row.id = 1
     row.type = data.pwdType
     row.value = data.pwdValue
-    row.name = data.entName
+    row.name = data.sysName
     row.host = data.mHost
     row.title = data.customTitle
     row.content = data.customContent

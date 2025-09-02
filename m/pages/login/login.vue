@@ -4,7 +4,7 @@
 			<image class="login-head__bg" src="@/static/img/login-bg.png"></image>
 			<view class="login-head__wrap">
 				<image class="login-head__logo" :src="`${baseUrl}/login/logo`"></image>
-				<text class="login-head__sysname">{{ userStore.user.sysName }}</text>
+				<text class="login-head__sysname">{{ parmStore.sysName }}</text>
 			</view>
 		</view>
 		<view class="login-main">
@@ -66,22 +66,27 @@
 				</uni-forms-item>
 			</uni-forms>
 		</view>
-		<view class="login-foot"></view>
+		<view class="login-foot">
+			<rich-text :nodes="`<div style='text-align: center;'>${escape2Html(parmStore.icp)}</div>`" class="copyright" @tap="" />
+		</view>
 	</view>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { loginIn, loginEnt, loginSysTime, loginNoLogin } from '@/api/login';
+import { loginIn, loginSysTime, loginNoLogin, loginParm } from '@/api/login';
 import { examExamGet } from '@/api/exam.js';
 import { dictIndexList } from '@/api/dict';
 import { useUserStore } from '@/stores/user';
 import { useDictStore } from '@/stores/dict';
-import { myExamGeneratePaper } from '../../api/myExam';
+import { useParmStore } from '@/stores/parm';
+import { myExamGeneratePaper } from '@/api/myExam';
+import { escape2Html } from '@/util/htmlUtil';
 
 /************************变量定义相关***********************/
 const userStore = useUserStore();
+const parmStore = useParmStore();
 const dictStore = useDictStore();
 const baseUrl = ref(uni.getStorageSync('BASE_URL'));
 const redirectPath = ref('');
@@ -127,10 +132,13 @@ onLoad(async (option) => {
 	redirectPath.value = option.redirectPath;
 
 	let {
-		data: { name }
-	} = await loginEnt();
+		data: { sysName, customTitle, customContent, icp }
+	} = await loginParm();
 
-	userStore.user.sysName = name;
+	parmStore.sysName = sysName;
+	parmStore.customTitle = customTitle;
+	parmStore.customContent = customContent;
+	parmStore.icp = icp;
 });
 
 /************************事件相关*****************************/
@@ -305,6 +313,22 @@ async function anonLogin() {
 	}
 
 	.login-foot {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		padding: 20rpx 0rpx;
+		font-size: 22rpx;
+		color: #888;
+		:deep(a) {
+			color: #888;
+			text-decoration: none;
+
+			&:hover,
+			&:active {
+				text-decoration: underline;
+			}
+		}
 	}
 }
 </style>

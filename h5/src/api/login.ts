@@ -3,11 +3,8 @@ import request from "@/request"
 export function loginIn(parm: object) {
     return request.post('/login/in', parm);
 }
-export function loginEnt(parm: object) {
-    return request.post('/login/ent', parm);
-}
-export function loginCustom(parm: object) {
-    return request.post('/login/custom', parm);
+export function loginParm(parm: object) {
+    return request.post('/login/parm', parm);
 }
 export function loginSysTime(parm: object) {
     return request.post('/login/sysTime', parm);

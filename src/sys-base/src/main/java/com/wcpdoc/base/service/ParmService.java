@@ -59,14 +59,22 @@ public interface ParmService extends BaseService<Parm> {
 	void db(String bakDir);
 
 	/**
-	 * 自定义内容修改
+	 * 服务支持修改
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午9:25:18
 	 * 
 	 * @param title
 	 * @param content void
 	 */
-	void custom(String title, String content);
+	void support(String title, String content);
+	
+	/**
+	 * 备案信息修改
+	 * 
+	 * v1.0 zhanghc 2025年9月1日下午2:34:25
+	 * @param icp void
+	 */
+	void icp(String icp);
 
 	/**
 	 * 移动端设置
@@ -86,4 +94,5 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param verhubUrl void
 	 */
 	void app(String relVer, Date relTime, String verhubUrl);
+	
 }

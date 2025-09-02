@@ -25,7 +25,7 @@ public class Parm {
 	private String emailUserName;
 	private String emailPwd;
 	private String emailProtocol;
-	private String entName;
+	private String sysName;
 	private Integer updateUserId;
 	private Date updateTime;
 	private String fileUploadDir;
@@ -34,6 +34,7 @@ public class Parm {
 	private String pwdValue;
 	private String customTitle;
 	private String customContent;
+	private String icp;
 	private String mHost;
 	private String verhubUrl;
 	private String appId;

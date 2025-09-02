@@ -1,40 +1,28 @@
 <template>
 	<view class="custom">
 		<view class="custom__main-title">
-			<text :decode="true">{{ custom.title }}</text>
+			<text :decode="true">{{ parmStore.customTitle }}</text>
 		</view>
 		<view class="custom__sub-title">
 			<text :decode="true"></text>
 		</view>
 		<view class="custom__content">
-			<text :decode="true">{{ custom.content }}</text>
+			<text :decode="true">{{ parmStore.customContent }}</text>
 		</view>
 	</view>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { loginCustom, loginOut } from '@/api/login';
+import { useParmStore } from '@/stores/parm';
 
 /************************变量定义相关***********************/
-const custom = reactive({
-	title: '', // 自定义内容
-	content: ''
-});
+const parmStore = useParmStore();
 
 /************************组件生命周期相关*********************/
-onLoad(async () => {
-	customQuery();
-});
+onLoad(async () => {});
 
 /************************事件相关*****************************/
-// 自定义查询
-async function customQuery() {
-	let { data } = await loginCustom();
-	custom.title = data.title;
-	custom.content = data.content;
-}
 </script>
 
 <style lang="scss" scoped>

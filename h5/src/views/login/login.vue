@@ -2,7 +2,7 @@
     <div class="login">
         <div class="login__head">
             <img :src="logoWhiteUrl" class="login__logo">
-            <span class="login__sysname">{{ userStore.sysName }}</span>
+            <span class="login__sysname">{{ parmStore.sysName }}</span>
         </div>
         <div class="login__main">
             <div class="login__main-wrap">
@@ -15,7 +15,7 @@
                     <div class="login-win">
                         <div class="login-win__head">
                             <img :src="logoUrl" class="login-win__logo">
-                            <span class="login-win__sysname">{{ userStore.sysName }}</span>
+                            <span class="login-win__sysname">{{ parmStore.sysName }}</span>
                             <span class="login-win__welcome">欢迎登录</span>
                         </div>
                         <el-form v-if="loginType == 1" ref="formRef" :model="form" :rules="formRules"
@@ -72,27 +72,31 @@
                 </div>
             </div>
         </div>
+        <div class="login__foot">
+            <p v-if="parmStore.icp" v-html="parmStore.icp" class="copyright"></p>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { useDictStore } from '@/stores/dict'
-import { useCustomStore } from '@/stores/custom'
-import { loginIn, loginEnt, loginCustom, loginNoLogin, loginSysTime } from '@/api/login'
+import { examExamGet } from '@/api/exam/exam'
+import { loginIn, loginNoLogin, loginParm, loginSysTime } from '@/api/login'
+import { myExamGeneratePaper } from '@/api/my/my-exam'
 import { dictIndexList } from '@/api/sys/dict'
 import http from '@/request'
-import { examExamGet } from '@/api/exam/exam'
-import { myExamGeneratePaper } from '@/api/my/my-exam'
+import { useDictStore } from '@/stores/dict'
+import { useParmStore } from '@/stores/parm'
+import { useUserStore } from '@/stores/user'
+import { escape2Html } from '@/util/htmlUtil'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 /************************变量定义相关***********************/
 const router = useRouter()// 路由
 const dictStore = useDictStore()// 字典缓存
 const userStore = useUserStore()// 用户缓存
-const customStore = useCustomStore() // 自定义缓存
+const parmStore = useParmStore() // 参数缓存
 const logoUrl = ref(`${http.defaults.baseURL}login/logo`)// logo链接
 const logoWhiteUrl = ref(`${http.defaults.baseURL}login/logo`)// logo链接
 const form = reactive({// 表单
@@ -149,19 +153,14 @@ onUnmounted(() => {
 // 初始化
 async function init() {
     // 缓存系统信息
-    const { data: { data } } = await loginEnt({
-        loginName: form.loginName,
-        pwd: form.pwd
-    })
-    userStore.sysName = data.name
-
-    // 缓存自定义信息
-    const { data: { data: custom } } = await loginCustom({})
-    customStore.title = custom.title
-    customStore.content = custom.content.replaceAll('\n', '<br/>')
+    const { data: { data } } = await loginParm({})
+    parmStore.sysName = data.sysName
+    parmStore.customTitle = data.customTitle
+    parmStore.customContent = data.customContent.replaceAll('\n', '<br/>')
+    parmStore.icp = escape2Html(data.icp || '')
 
     // 更新浏览器标题和图标
-    document.title = userStore.sysName
+    document.title = parmStore.sysName
     const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
     favicon.href = logoUrl.value;
 }
@@ -268,7 +267,6 @@ async function anonLogin() {
     flex: 1;
     display: flex;
     flex-direction: column;
-    position: relative;
     background-image: linear-gradient(to right, #82D1FD, #69C0FE);
 
     &::before {
@@ -279,8 +277,8 @@ async function anonLogin() {
         background-image: url('/img/login/login-bg2.png');
         bottom: 0;
         left: 0;
-        width: 1116px;
-        height: 552px;
+        width: 800px;
+        height: 380px;
     }
 
     &::after {
@@ -474,6 +472,34 @@ async function anonLogin() {
                         }
 
                     }
+                }
+            }
+        }
+    }
+
+    .login__foot {
+        position: relative;
+
+        .copyright {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            margin: initial;
+            padding: 4px 0px;
+            text-align: center;
+            font-size: 14px;
+            color: #FFF;
+            background-color: rgba(13, 157, 246, 0.2);
+
+            :deep(a) {
+                color: #FFF;
+                text-decoration: none;
+
+                &:hover,
+                &:active {
+                    text-decoration: underline;
+                    color: #0D9DF6;
                 }
             }
         }

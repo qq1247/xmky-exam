@@ -143,39 +143,24 @@ public class ApiLoginController extends BaseController {
 	}
 
 	/**
-	 * 企业信息
+	 * 登录参数
 	 * 
-	 * v1.0 chenyun 2021-10-08 16:05:35
-	 * 
-	 * @return PageResult
-	 */
-	@RequestMapping("/ent")
-	public PageResult ent() {
-		try {
-			Parm parm = baseCacheService.getParm();
-			return PageResultEx.ok().addAttr("name", parm.getEntName());
-		} catch (Exception e) {
-			log.error("企业信息错误：", e);
-			return PageResult.err().msg(e.getMessage());
-		}
-	}
-
-	/**
-	 * 自定义信息
-	 * 
-	 * v1.0 zhanghc 2023年3月10日上午11:36:23
+	 * v1.0 zhanghc 2025年9月1日下午3:17:28
 	 * 
 	 * @return PageResult
 	 */
-	@RequestMapping("/custom")
-	public PageResult custom() {
+	@RequestMapping("/parm")
+	public PageResult parm() {
 		try {
 			Parm parm = baseCacheService.getParm();
 			return PageResultEx.ok()//
-					.addAttr("title", parm.getCustomTitle())//
-					.addAttr("content", parm.getCustomContent());
+					.addAttr("sysName", parm.getSysName())//
+					.addAttr("customTitle", parm.getCustomTitle())//
+					.addAttr("customContent", parm.getCustomContent())//
+					.addAttr("icp", parm.getIcp())//
+			;
 		} catch (Exception e) {
-			log.error("自定义信息错误：", e);
+			log.error("登录参数错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}

@@ -46,7 +46,7 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 	@Override
 	public void emailUpdate(Parm parm) throws Exception {// 改成编译时异常，必须处理
 		notifyService.emailPush(parm.getEmailUserName(), parm.getEmailUserName(),
-				parm.getEntName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getEntName()), "邮箱配置成功！");
+				parm.getSysName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getSysName()), "邮箱配置成功！");
 	}
 
 	@Override

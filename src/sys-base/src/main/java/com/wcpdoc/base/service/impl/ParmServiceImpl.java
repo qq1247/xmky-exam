@@ -83,18 +83,18 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void ent(Integer logoFileId, String name) throws Exception {
+	public void ent(Integer logoFileId, String sysName) throws Exception {
 		// 数据校验
 		// if (!ValidateUtil.isValid(logoFileId)) {// 不是每次都替换
 		// throw new MyException("参数错误：logoFileId");
 		// }
-		if (!ValidateUtil.isValid(name)) {
-			throw new MyException("参数错误：name");
+		if (!ValidateUtil.isValid(sysName)) {
+			throw new MyException("参数错误：sysName");
 		}
 
 		// 企业信息更新
 		Parm entity = baseCacheService.getParm();
-		entity.setEntName(name);
+		entity.setSysName(sysName);
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		updateById(entity);
@@ -193,7 +193,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
-	public void custom(String title, String content) {
+	public void support(String title, String content) {
 		// 数据校验
 		if (!ValidateUtil.isValid(title)) {
 			throw new MyException("参数错误：title");
@@ -206,6 +206,20 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		Parm parm = baseCacheService.getParm();
 		parm.setCustomTitle(title);
 		parm.setCustomContent(content);
+		updateById(parm);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
+	public void icp(String icp) {
+//		// 数据校验
+//		if (!ValidateUtil.isValid(icp)) {// 允许不显示
+//			throw new MyException("参数错误：icp");
+//		}
+
+		// 备案信息修改
+		Parm parm = baseCacheService.getParm();
+		parm.setIcp(icp);
 		updateById(parm);
 	}
 

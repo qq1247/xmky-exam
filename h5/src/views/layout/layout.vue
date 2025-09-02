@@ -5,7 +5,7 @@
                 <div class="nav">
                     <div class="nav-logo">
                         <img :src="logoUrl" class="nav-logo__img">
-                        <span class="nav-logo__name">{{ userStore.sysName }}</span>
+                        <span class="nav-logo__name">{{ parmStore.sysName }}</span>
                     </div>
                     <el-menu :default-active="curActiveMenu" mode="horizontal" :router="true" :ellipsis="false"
                         class="nav-menu">
@@ -44,8 +44,8 @@
             <div class="carousel__wrap">
                 <div class="carousel">
                     <div class="carousel__inner">
-                        <span class="carousel__title" v-html="customStore.title"></span>
-                        <span class="carousel__desc" v-html="customStore.content"></span>
+                        <span class="carousel__title" v-html="parmStore.customTitle"></span>
+                        <span class="carousel__desc" v-html="parmStore.customContent"></span>
                     </div>
                 </div>
             </div>
@@ -59,14 +59,14 @@
 import http from '@/request'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { useCustomStore } from '@/stores/custom'
+import { useParmStore } from '@/stores/parm'
 import { computed, onMounted } from 'vue'
 
 /************************变量定义相关***********************/
 const router = useRouter() // 路由
 const route = useRoute() // 路由
 const userStore = useUserStore() // 用户缓存
-const customStore = useCustomStore() // 自定义缓存
+const parmStore = useParmStore() // 参数缓存
 const logoUrl = `${http.defaults.baseURL}login/logo` // logo地址
 
 /************************组件生命周期相关*********************/
