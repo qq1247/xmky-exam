@@ -30,3 +30,9 @@ export function myExerFav(parm) {
 export function myExerWrongReset(parm) {
 	return request.post('myExer/wrongReset', parm);
 }
+export function myExerTrackList(parm) {
+	return request.post('myExer/trackList', parm);
+}
+export function myExerTrack(parm) {
+	return request.post('myExer/track', parm);
+}

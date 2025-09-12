@@ -184,8 +184,8 @@ public class DateUtil {
 	 * 
 	 * v1.0 zhanghc 2020年1月7日下午2:26:49
 	 * 
-	 * @param t1 减数
-	 * @param t2 被减数
+	 * @param t1
+	 * @param t2
 	 * @return int
 	 */
 	public static int diffYear(Date t1, Date t2) {
@@ -194,6 +194,39 @@ public class DateUtil {
 		Calendar aft = Calendar.getInstance();
 		aft.setTime(t2);
 		return bef.get(Calendar.YEAR) - aft.get(Calendar.YEAR);
+	}
+	
+	/**
+	 * 相差月份
+	 * 
+	 * v1.0 zhanghc 2025年9月11日下午5:20:14
+	 * @param t1
+	 * @param t2
+	 * @return int
+	 */
+	public static int diffMonth(Date t1, Date t2) {
+	    Calendar c1 = Calendar.getInstance();
+	    Calendar c2 = Calendar.getInstance();
+	    c1.setTime(t1);
+	    c2.setTime(t2);
+
+	    int yearDiff = c2.get(Calendar.YEAR) - c1.get(Calendar.YEAR);
+	    int monthDiff = c2.get(Calendar.MONTH) - c1.get(Calendar.MONTH);
+
+	    return yearDiff * 12 + monthDiff;
+	}
+
+	/**
+	 * 相差天数（昨天和今天算两天）
+	 * 
+	 * v1.0 zhanghc 2025年9月9日下午4:04:07
+	 * 
+	 * @param t1
+	 * @param t2
+	 * @return long
+	 */
+	public static int diffDay(Date t1, Date t2) {
+		return (int) ((t2.getTime() - t1.getTime()) / (24 * 60 * 60 * 1000) + 1);
 	}
 
 	/**
@@ -287,6 +320,14 @@ public class DateUtil {
 	public static Date getRandomDate(Date startTime, Date endTime) {
 		long randomLong = Math.round(Math.random() * (endTime.getTime() - startTime.getTime()) + startTime.getTime());
 		return new Date(randomLong);
+	}
+
+	public static int getMinuteOfDay(Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minute = calendar.get(Calendar.MINUTE);
+		return hour * 60 + minute;
 	}
 
 	public static void main(String[] args) {

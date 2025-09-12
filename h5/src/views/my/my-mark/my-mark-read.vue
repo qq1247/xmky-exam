@@ -64,7 +64,7 @@
                     </span>
                     <span class="exam__label">
                         成绩查询：<span class="exam__value">{{ dictStore.getValue('SCORE_STATE', exam.scoreState as number)
-                        }}</span>
+                            }}</span>
                     </span>
                     <span class="exam__label">
                         公布排名：<span class="exam__value">{{ dictStore.getValue('STATE_ON', exam.rankState as number) ||
@@ -75,12 +75,12 @@
                     </span>
                     <span class="exam__label">
                         试卷类型：<span class="exam__value">{{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType as number)
-                        }}试卷</span>
+                            }}试卷</span>
                     </span>
 
                     <span class="exam__label">
                         组卷方式：<span class="exam__value">{{ dictStore.getValue('PAPER_GEN_TYPE', exam.genType as number)
-                        }}</span>
+                            }}</span>
                     </span>
                     <span class="exam__label">
                         防 作 弊：<span class="exam__value">
@@ -101,7 +101,7 @@
                         <el-form-item label="" prop="">
                             <span class="my-task__label">
                                 本次考试一共<span class="my-task__value my-task__value--total">{{ claimInfo.paperNum
-                                }}</span>份试卷，已被领取<span class="my-task__value my-task__value--total-claim">{{
+                                    }}</span>份试卷，已被领取<span class="my-task__value my-task__value--total-claim">{{
                                         claimInfo.markNum }}</span>份，剩余<span
                                     class="my-task__value my-task__value--total-remaining">{{
                                         claimInfo.paperNum - claimInfo.markNum }}</span>份。
@@ -110,7 +110,7 @@
                         <el-form-item label="" prop="">
                             <span class="my-task__label">
                                 你已领取<span class="my-task__value my-task__value--my-total">{{ claimInfo.myClaimNum
-                                }}</span>份试卷，未批阅<span class="my-task__value my-task__value--my-unmark">{{
+                                    }}</span>份试卷，未批阅<span class="my-task__value my-task__value--my-unmark">{{
                                         claimInfo.myClaimNum - claimInfo.myMarkNum }}</span>份。
                             </span>
                         </el-form-item>
@@ -168,7 +168,7 @@ import { LegendComponent, TitleComponent, TooltipComponent } from 'echarts/compo
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import VChart from 'vue-echarts'
 import { useRoute, useRouter } from 'vue-router'
 

@@ -117,7 +117,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 												exam.getName(), e.getMessage()));
 										SpringUtil.getBean(EhCacheCacheManager.class)
 												.getCache(ExamConstant.MYEXAM_CACHE)
-												.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));
+												.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));// "'UNMARK_LIST'" '是注解拼接表达式需要，手动触发不能有'
 									} catch (Exception e) {// bug：如果有人进入考试后退出，不交卷不触发刷新缓存，导致一直存在未阅卷而不能结束考试。
 										log.error(String.format("自动结束【%s-%s】的考试错误：", exam.getId(), exam.getName()), e);
 									}

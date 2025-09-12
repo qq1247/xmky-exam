@@ -46,4 +46,9 @@ public class ExamConstant {
 	 */
 	public static final String SXE_CACHE = "SXE_CACHE";
 	public static final String SXE_KEY_PRE = "'SXE_:' + ";
+	
+	/**
+	 * 练习时间缓存
+	 */
+	public static final String EXER_TIME_CACHE = "EXER_TIME_CACHE";
 }

@@ -117,13 +117,15 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import XmksQuestion from '@/components/question/xmks-question.vue'
 import type { MyExerQuestion } from '@/ts/exam/my-exer-question';
-import { myExerAnswer, myExerFav, myExerGenerate, myExerQuestion, myExerWrongReset } from '@/api/my/my-exer';
+import { myExerAnswer, myExerFav, myExerGenerate, myExerQuestion, myExerWrongReset, myExerTrack } from '@/api/my/my-exer';
 import { useRoute } from 'vue-router';
 import type { ExamQuestion } from '@/ts/exam/exam';
 import type { FormInstance, FormRules } from 'element-plus';
+import { useIdleTrack } from '@/composables/xmky-idle-track';
 
 /************************变量定义相关***********************/
 const route = useRoute() // 路由
+const idleTrack = useIdleTrack()
 const toolbars = reactive({// 工具栏
     randShow: false,
     answerShow: false,
@@ -159,6 +161,22 @@ const formRules = reactive<FormRules>({// 表单校验规则
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
+    idleTrack.startTracking({
+        startupDelaySec: Math.floor(Math.random() * 30) + 1,
+        trackingIntervalSec: 60,
+        inactiveThresholdSec: 300,
+
+        onStatusUpdate: async (isIdle: boolean) => {
+            console.log(isIdle, 666)
+            if (isIdle) return
+
+            await myExerTrack({
+                exerId: route.params.exerId,
+                type: route.params.type
+            })
+        }
+    })
+
     // 加载试题列表
     await questionQuery()
 
@@ -278,7 +296,7 @@ async function answer() {
 
 // 收藏试题
 async function fav() {
-    const { data: { code, data } } = await myExerFav({
+    const { data: { code } } = await myExerFav({
         exerId: route.params.exerId,
         questionId: curExamQuestion.value?.questionId,
     })
@@ -290,7 +308,7 @@ async function fav() {
 }
 // 错题重置（从历史错题中移除）
 async function wrongReset() {
-    const { data: { code, data } } = await myExerWrongReset({
+    const { data: { code } } = await myExerWrongReset({
         exerId: route.params.exerId,
         questionId: curExamQuestion.value?.questionId,
     })

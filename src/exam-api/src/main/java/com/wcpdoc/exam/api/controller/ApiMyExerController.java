@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -108,8 +109,8 @@ public class ApiMyExerController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2025年6月15日下午4:39:09
 	 * 
-	 * @param exerId
-	 * @param type
+	 * @param exerId 练习ID
+	 * @param type   类型（1：单选题；2：多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
 	 * @return PageResult
 	 */
 	@RequestMapping("/generate")
@@ -261,7 +262,7 @@ public class ApiMyExerController extends BaseController {
 	 * v1.0 zhanghc 2025年6月25日下午12:27:39
 	 * 
 	 * @param exerId 练习ID
-	 * @param type 类型（1：单选题；2多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
+	 * @param type   类型（1：单选题；2多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
 	 * @return PageResult
 	 */
 	@RequestMapping("/exerReset")
@@ -442,7 +443,7 @@ public class ApiMyExerController extends BaseController {
 	}
 
 	/**
-	 * 试题统计
+	 * 我的练习试题统计
 	 * 
 	 * v1.0 zhanghc 2025年6月9日下午9:02:28
 	 * 
@@ -497,6 +498,61 @@ public class ApiMyExerController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取试题统计错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的练习跟踪
+	 * 
+	 * v1.0 zhanghc 2025年9月4日下午1:14:56
+	 * 
+	 * @param exerId 练习ID
+	 * @param type   类型（1：单选题；2多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
+	 * @return PageResult
+	 */
+	@RequestMapping("/track")
+	public PageResult track(Integer exerId, Integer type) {
+		try {
+			myExerService.track(exerId, getCurUser().getId(), type);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("我的练习跟踪错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习跟踪错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的练习跟踪列表
+	 * 
+	 * v1.0 zhanghc 2025年9月9日下午3:33:51
+	 * 
+	 * @param exerId
+	 * @param startDate yyyy-MM-dd
+	 * @param endDate   yyyy-MM-dd
+	 * @return PageResult
+	 */
+	@RequestMapping("/trackList")
+	public PageResult trackList(Integer exerId, String startDate, String endDate) {
+		try {
+			List<Map<String, Object>> myExerTrackList = myExerService
+					.getTrackList(exerId, getCurUser().getId(), startDate, endDate).stream().map(myExerTrack -> {
+						Map<String, Object> map = new HashMap<>();
+						map.put("ymd", String.format("%08d", myExerTrack.getYmd())
+								.replaceAll("(\\d{4})(\\d{2})(\\d{2})", "$1-$2-$3"));
+						map.put("minuteTicks", myExerTrack.getMinuteTicks());
+						map.put("minuteCount", myExerTrack.getMinuteCount());
+						return map;
+					}).collect(Collectors.toList());
+			return PageResultEx.ok().data(myExerTrackList);
+		} catch (MyException e) {
+			log.error("我的练习跟踪列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习跟踪列表错误：", e);
 			return PageResult.err();
 		}
 	}

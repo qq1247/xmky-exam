@@ -44,7 +44,7 @@
 					<view class="warn__main" style="font-size: 26rpx">
 						<view>1、进入此页面，会自动增量更新最新试题到自己的练习</view>
 						<view>2、答错试题会收集到历史错题</view>
-						<view>3、想重新练题，请点“重新练习”按钮</view>
+						<view>3、需要重新练题，请点“重新练习”按钮</view>
 					</view>
 				</view>
 				<view class="exer">
@@ -55,14 +55,15 @@
 						<text class="exer__title">练习信息</text>
 					</view>
 					<view class="exer__main">
-						<view class="exer__row">
+						<qiun-data-charts type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" />
+						<!-- <view class="exer__row">
 							<text class="exer__label">练习名称：</text>
 							<text class="exer__value">{{ exer.name }}</text>
 						</view>
 						<view class="exer__row">
 							<text class="exer__label">发布状态：</text>
 							<text class="exer__value">{{ dictStore.getValue('STATE_PS', exer.state) }}</text>
-						</view>
+						</view> -->
 					</view>
 				</view>
 				<view class="question-bank">
@@ -149,12 +150,13 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed } from 'vue';
-import { onLoad, onReady, onShow } from '@dcloudio/uni-app';
+import { onLoad, onReady } from '@dcloudio/uni-app';
 import { User } from '@/ts/user.d';
 import { Exer } from '@/ts/exer.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
-import { myExerQuestionStatis, myExerPull, myExerListpage, myExerExerReset } from '@/api/my-exer';
+import { myExerQuestionStatis, myExerPull, myExerListpage, myExerExerReset, myExerTrackList } from '@/api/my-exer';
+import { loginSysTime } from '@/api/login';
 import { useDictStore } from '@/stores/dict';
 import { myExerExerGet } from '@/api/my-exer';
 import { Page } from '@/ts/page.d';
@@ -227,6 +229,7 @@ onLoad(async (options) => {
 	userQuery();
 	exerQuery();
 	questionStatisQueryWithInit();
+	exerTimeStatisQuery();
 
 	await pull();
 	myExerQuery();
@@ -259,6 +262,33 @@ const correctAnswerRate = computed(() => (type: number) => {
 
 	return Math.round((correctAnswerNum / answerNum) * 100);
 }); // 正确率
+
+const exerTimeStatisData = reactive({
+	// 不要单独更新某个属性，要作为一个整体，插件限制
+	data: {}
+});
+const exerTimeStatisOpts = reactive({
+	color: ['#4692D8', '#06BCE3', '#978CEC', '#DD8CEC', '#85e3a4'],
+	padding: [15, 10, 0, 15],
+	enableScroll: true,
+	legend: { show: false },
+	xAxis: {
+		disableGrid: true,
+		scrollShow: true,
+		itemCount: 4
+	},
+	yAxis: {
+		gridType: 'dash',
+		dashLength: 2
+	},
+	extra: {
+		line: {
+			type: 'straight',
+			width: 2,
+			activeType: 'hollow'
+		}
+	}
+});
 
 /************************事件相关*****************************/
 // 用户查询
@@ -316,6 +346,48 @@ async function questionStatisQueryWithInit() {
 	questionStatisData.markTypeStatis = markTypeStatis;
 }
 
+// 练习时间统计（近一年）
+async function exerTimeStatisQuery() {
+	const { data: sysTime } = await loginSysTime({});
+	const [datePart] = sysTime.split(' ');
+	const [y, m, d] = datePart.split('-').map(Number);
+	const now = new Date(y, m - 1, d);
+	const startYear = now.getFullYear() - 1;
+	const startMonth = now.getMonth(); // 0~11
+	const startTimeDate = new Date(startYear, startMonth, 1);
+	const endTimeDate = new Date(now.getFullYear(), now.getMonth(), 1);
+	const categories: string[] = [];
+	const monthMap: Record<string, number> = {};
+	let current = new Date(startTimeDate);
+	while (current <= endTimeDate) {
+		const ym = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
+		categories.push(ym);
+		monthMap[ym] = 0;
+		current.setMonth(current.getMonth() + 1);
+	}
+
+	const { data: myExerTracks } = await myExerTrackList({
+		exerId: exerId.value,
+		startDate: `${startYear}-${String(startMonth + 1).padStart(2, '0')}-01`, // 去年同月的第一天（去年的今天会丢数据）
+		endDate: datePart // 今天
+	});
+
+	myExerTracks.forEach((myExerTrack: any) => {
+		const ym = myExerTrack.ymd.substring(0, 7);
+		monthMap[ym] += myExerTrack.minuteCount;
+	});
+
+	exerTimeStatisData.data = {
+		categories,
+		series: [
+			{
+				name: '练习时长（分钟）',
+				data: categories.map((ym) => monthMap[ym] || 0)
+			}
+		]
+	};
+}
+
 // 我的练习查询
 async function myExerQuery() {
 	const { code, data } = await myExerListpage({
@@ -355,10 +427,6 @@ async function reset() {
 	}
 
 	toExer();
-}
-
-function onShow(arg0: () => Promise<void>) {
-	throw new Error('Function not implemented.');
 }
 </script>
 

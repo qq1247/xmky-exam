@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,19 +16,25 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.lock.ReadWriteLockManager;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.MyExerDao;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.MyExer;
 import com.wcpdoc.exam.core.entity.MyExerQuestion;
+import com.wcpdoc.exam.core.entity.MyExerTrack;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -34,6 +42,7 @@ import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.MyExerQuestionService;
 import com.wcpdoc.exam.core.service.MyExerService;
+import com.wcpdoc.exam.core.service.MyExerTrackService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
@@ -57,6 +66,12 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 	private MyExerQuestionService myExerQuestionService;
 	@Resource
 	private ExamCacheService examCacheService;
+	@Resource
+	private ReadWriteLockManager readWriteLockManager;
+	@Resource
+	private CacheManager cacheManager;
+	@Resource
+	private MyExerTrackService myExerTrackService;
 
 	@Override
 	public RBaseDao<MyExer> getDao() {
@@ -175,7 +190,7 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 		if (type >= 1 && type <= 5) {
 			long count = myExerDao.getList(exerId, getCurUser().getId()).stream()
 					.filter(myExer -> myExer.getType().intValue() == type.intValue()).count();
-			if (count == 0) {
+			if (count == 0) {// 为每个题型生成一个练习（更科学），用于第二次查看进度，并继续训练。
 				MyExer myExer = new MyExer();
 				myExer.setExerId(exerId);
 				myExer.setUserId(getCurUser().getId());
@@ -188,14 +203,14 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 					.filter(myExerQuestion -> myExerQuestion.getType().intValue() == type).collect(Collectors.toList());
 		}
 
-		if (type == 11) {
+		if (type == 11) {// 进入历史错误
 			return myExerQuestionService.getList(exerId, getCurUser().getId()).stream()
 					.filter(myExerQuestion -> myExerQuestion.getUserScore() != null
 							&& myExerQuestion.getUserScore().doubleValue() != myExerQuestion.getScore().doubleValue())
 					.collect(Collectors.toList());
 		}
 
-		if (type == 12) {
+		if (type == 12) {// 进入我的收藏
 			return myExerQuestionService.getList(exerId, getCurUser().getId()).stream()
 					.filter(myExerQuestion -> myExerQuestion.getFav().intValue() == 1).collect(Collectors.toList());
 		}
@@ -299,6 +314,20 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 		if (!ValidateUtil.isValid(type)) {
 			throw new MyException("参数错误：type");
 		}
+		Exer exer = exerService.getById(exerId);
+		if (exer == null) {
+			throw new MyException("参数错误：exerId");
+		}
+		if (exer.getState() == 0) {
+			throw new MyException("已删除");
+		}
+		if (exer.getState() == 2) {
+			throw new MyException("已暂停");
+		}
+		User user = baseCacheService.getUser(userId);
+		if (!(exer.getUserIds().contains(user.getId()) || exer.getOrgIds().contains(user.getOrgId()))) {
+			throw new MyException("无操作权限");
+		}
 
 		// 重新练习
 		myExerQuestionService.getList(exerId, userId).stream()//
@@ -312,5 +341,91 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 					myExerQuestion.setUpdateTime(new Date());
 					myExerQuestionService.updateById(myExerQuestion);
 				});
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void track(Integer exerId, Integer userId, Integer type) {
+		// 数据校验
+		if (!ValidateUtil.isValid(exerId)) {
+			throw new MyException("参数错误：exerId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		if (!ValidateUtil.isValid(type)) {
+			throw new MyException("参数错误：type");
+		}
+		if (type != 1 && type != 2 && type != 3 && type != 4 && type != 5 && type != 11 && type != 12) {
+			throw new MyException("参数错误：type");
+		}
+
+		Exer exer = exerService.getById(exerId);
+		if (exer == null) {
+			throw new MyException("参数错误：exerId");
+		}
+		if (exer.getState() == 0) {
+			throw new MyException("已删除");
+		}
+		if (exer.getState() == 2) {
+			throw new MyException("已暂停");
+		}
+		User user = baseCacheService.getUser(userId);
+		if (!(exer.getUserIds().contains(user.getId()) || exer.getOrgIds().contains(user.getOrgId()))) {
+			throw new MyException("无操作权限");
+		}
+
+		/**
+		 * 跟踪 <br/>
+		 * 1：为防止高并发，先加入缓存。<br/>
+		 * 2：定时器每5分钟把缓存数据批量落库。如果服务器重启，最多会丢失5分钟数据，在可以容忍范围内。<br/>
+		 */
+		Cache cache = cacheManager.getCache(ExamConstant.EXER_TIME_CACHE);
+		String cacheKey = String.format("%s:%s:%s:%s", exerId, userId, type,
+				DateUtil.formatDateCustom(new Date(), "yyyyMMdd"));// 3:5:1:20250908
+		Lock writeLock = readWriteLockManager.getLock(cacheKey).writeLock();
+		writeLock.lock();
+		try {
+			if (cache.get(cacheKey) == null) {
+				cache.put(cacheKey, new HashSet<Integer>());
+			}
+			int minuteOfDay = DateUtil.getMinuteOfDay(new Date());
+			cache.get(cacheKey, Set.class).add(minuteOfDay); // 去重，多次重复上报也没事
+		} catch (Exception e) {
+			log.error("加锁异常：", e);
+		} finally {
+			writeLock.unlock();
+		}
+	}
+
+	@Override
+	public List<MyExerTrack> getTrackList(Integer exerId, Integer userId, String startDate, String endDate) {
+		// 数据校验
+		if (!ValidateUtil.isValid(exerId)) {
+			throw new MyException("参数错误：exerId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		if (!ValidateUtil.isValid(startDate)) {
+			throw new MyException("参数错误：startDate");
+		}
+		if (!ValidateUtil.isValid(endDate)) {
+			throw new MyException("参数错误：startDate");
+		}
+
+		Date _startDate = DateUtil.getDate(startDate);
+		Date _endDate = DateUtil.getDate(endDate);
+
+		int diffDay = DateUtil.diffMonth(_startDate, _endDate); // 如果跨度最大一年，统计数据不准确。如：2024-09-11 -
+																// 2025-09-11，应该为2024-09-01 - 2025-09-11，
+		if (diffDay > 12) {
+			throw new MyException("查询时间范围不得超过12个月");
+		}
+
+		// 我的练习跟踪列表
+		return myExerTrackService.getList(exerId, userId,
+				Integer.parseInt(DateUtil.formatDateCustom(_startDate, "yyyyMMdd")),
+				Integer.parseInt(DateUtil.formatDateCustom(_endDate, "yyyyMMdd")));
 	}
 }

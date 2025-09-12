@@ -1,5 +1,5 @@
 <template>
-	<view class="mypaper">
+	<view class="mypaper" @touchstart="() => idleTracker.updateLastActive()" @click="idleTracker.updateLastActive()">
 		<view class="mypaper__head">
 			<!-- <view class="exer-info">
 				<uni-icons customPrefix="iconfont" type="icon-tongzhi" color="#231815" size="34rpx"></uni-icons>
@@ -163,15 +163,16 @@ import { ref, reactive, computed } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import { useDictStore } from '@/stores/dict';
 import { Exer } from '@/ts/exer.d';
-import { myExerExerGet, myExerGenerate, myExerQuestion, myExerAnswer, myExerFav, myExerWrongReset } from '@/api/my-exer';
+import { myExerExerGet, myExerGenerate, myExerQuestion, myExerAnswer, myExerFav, myExerWrongReset, myExerTrack } from '@/api/my-exer';
 import { MyExerQuestion } from '@/ts/my-exer-question.d';
 import { ExamQuestion } from '@/ts/paper.d';
+import { useIdleTrack } from '@/composables/xmky-idle-track';
 
 /************************变量定义相关***********************/
-const props = defineProps({
-  exerId: [String, Number], // 根据实际类型调整
-  type: String
-})
+defineProps({
+	exerId: [String, Number], // 根据实际类型调整
+	type: String
+});
 
 const dictStore = useDictStore();
 const pageParm = reactive({
@@ -206,9 +207,25 @@ const answerSheet = ref(); // 答题卡
 const marks = ref<number[]>([]); // 标记
 
 const inputDialog = ref();
+const idleTracker = useIdleTrack();
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
+	idleTracker.startTracking({
+		startupDelaySec: Math.floor(Math.random() * 3) + 1,
+		trackingIntervalSec: 3,
+		inactiveThresholdSec: 6,
+		onStatusUpdate: async (isIdle) => {
+console.log(isIdle, 666)
+			if (isIdle) return;
+
+			await myExerTrack({
+				exerId: options.exerId,
+				type: options.type
+			});
+		}
+	});
+
 	// 导航栏显示练习名称
 	pageParm.exerId = options.exerId;
 	pageParm.type = options.type;
@@ -298,10 +315,6 @@ const isFav = computed(() => (index: number) => {
 	const myExerQuestion = _myExerQuestions.value[index];
 	return myExerQuestion?.fav === 1;
 }); // 是否收藏
-const answerNum = computed(() => () => {
-	let a = _myExerQuestions.value.filter((myExerQuestion, index) => isAnswer(1));
-	return marks.value.includes(questionId);
-}); // 是否标记
 
 /************************事件相关*****************************/
 // 练习查询
@@ -383,10 +396,10 @@ async function answerOfObjective(val: string) {
 	const parsedValue = Number(val);
 	let userScore: number = isNaN(parsedValue) ? 0 : Math.round(parsedValue * 100) / 100;
 	if (userScore < 0) {
-		userScore = 0
+		userScore = 0;
 	}
 	if (userScore > curExamQuestion.value.score) {
-		userScore = curExamQuestion.value.score
+		userScore = curExamQuestion.value.score;
 	}
 
 	const { code, data } = await myExerAnswer({

@@ -299,23 +299,6 @@
                                 </span>
                             </div>
                         </div>
-                        <div v-for="(exer, index) in exerGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
-                            class="calendar-task">
-                            <div class="calendar-task__outer">
-                                <span class="calendar-task__name">{{ exer.name }}</span>
-                                <div class="calendar-task__inner">
-                                    <span class="calendar-task__type">练习</span>
-                                    <!-- <span class="calendar-task__state calendar__date--ongoing">
-                                        练习
-                                    </span> -->
-                                </div>
-                            </div>
-                            <div class="calendar-task__content">
-                                <span class="calendar-task__time">
-                                    {{ exer.startTime }} - {{ exer.endTime }}
-                                </span>
-                            </div>
-                        </div>
                     </div>
                     <div v-if="userStore.type === 1" class="calendar__task-list">
                         <div v-for="(myExam, index) in myExamGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
@@ -443,16 +426,6 @@ const unMarkList = computed(() => { // 阅卷任务列表
 const unExamList = computed(() => {
     return myExamList.value.filter(myExam => myExam.markState !== 3)
 })
-const exerGroup = computed(() => {
-    return exerList.value.reduce((groups, exer) => {
-        const date = exer.startTime.substring(0, 10);
-        if (!groups[date]) {
-            groups[date] = [];
-        }
-        groups[date].push(exer);
-        return groups;
-    }, {});
-});
 const myExamGroup = computed(() => {
     return myExamList.value.reduce((groups, myExam) => {
         const date = myExam.examStartTime.substring(0, 10);
@@ -465,11 +438,10 @@ const myExamGroup = computed(() => {
 });
 const hasFinishedTask = computed(() => (date: string): boolean => {
     if (userStore.type === 0 || userStore.type === 2) {
-        if (!myMarkGroup.value[date] && !exerGroup.value[date]) {// 当天没有任务
+        if (!myMarkGroup.value[date]) {// 当天没有任务
             return false
         }
         return (myMarkGroup.value[date] == null || myMarkGroup.value[date].every((myMark: any) => myMark.examMarkState === 3)) // 当天阅卷任务都完成
-            && exerGroup.value[date] == null // 并且当天练习任务都完成
     }
 
     if (userStore.type === 1) {
@@ -488,12 +460,11 @@ const hasFinishedTask = computed(() => (date: string): boolean => {
 })
 const hasOngoingTask = computed(() => (date: string): boolean => {
     if (userStore.type === 0 || userStore.type === 2) {
-        if (!myMarkGroup.value[date] && !exerGroup.value[date]) {// 当天没有任务
+        if (!myMarkGroup.value[date]) {// 当天没有任务
             return false
         }
 
         return (myMarkGroup.value[date] != null && myMarkGroup.value[date]?.some((myMark: any) => myMark.examMarkState !== 3)) // 只要有一个阅卷任务未完成
-            || exerGroup.value[date] != null // 或者有一个练习任务未完成
     }
 
     if (userStore.type === 1) {

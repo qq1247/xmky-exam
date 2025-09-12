@@ -90,5 +90,10 @@
 	<cache name="SXE_CACHE"
 		maxEntriesLocalHeap="100000"
 		timeToLiveSeconds="60">
+	</cache>
+	<!-- 练习时长缓存 -->
+	<cache name="EXER_TIME_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToLiveSeconds="600">
     </cache>
 </ehcache>

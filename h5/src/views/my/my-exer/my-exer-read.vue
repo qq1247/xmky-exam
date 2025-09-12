@@ -15,7 +15,7 @@
                     <span class="notes__txt">
                         1、进入此页面，会自动增量更新最新试题到自己的练习<br />
                         2、答错试题会收集到历史错题<br />
-                        3、想重新练题，请点“重新练习”按钮<br />
+                        3、需要重新练题，请点“重新练习”按钮<br />
                     </span>
                 </div>
             </div>
@@ -52,16 +52,17 @@
             <div class="exer">
                 <xmks-card-guide title="练习信息" icon="icon-icon_xiugaishijian" class="exer__head"></xmks-card-guide>
                 <div class="exer__main">
-                    <span class="exer__label">
+                    <!-- <span class="exer__label">
                         练习名称：<span class="exer__value">{{ exer.name }}</span>
                     </span>
                     <span class="exer__label">
                         发布状态：<span class="exer__value">{{ dictStore.getValue('STATE_PS', exer.state as number) }}</span>
-                    </span>
+                    </span> -->
                     <!-- <span class="exer__label">
                         允许评论：<span class="exer__value">{{ dictStore.getValue('STATE_YN', exer.rmkState as number)
                             }}</span>
                     </span> -->
+                    <v-chart :option="exerTimeStatisOpts" class="exer__statis" />
                 </div>
             </div>
             <div class="my-exer">
@@ -80,7 +81,7 @@
                         <div v-for="(exer, index) in listpage.list" :key="index" class="history__list">
                             <div class="history__row">
                                 <span class="history__title">{{ dictStore.getValue('QUESTION_TYPE', exer.type)
-                                    }}题</span>
+                                }}题</span>
                                 <span class="history__btn"
                                     @click="$router.push(`/my-exer/paper/${form.exerId}/${exer.type}`)">>>继续训练</span>
                             </div>
@@ -130,28 +131,32 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import XmksCardGuide from '@/components/card/xmks-card-guide.vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { PieChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components'
-import VChart from 'vue-echarts'
 import { ref } from 'vue'
 import { useDictStore } from '@/stores/dict'
 import type { User } from '@/ts/base/user'
 import { userGet } from '@/api/base/user'
 import { useUserStore } from '@/stores/user'
 import { useRoute, useRouter } from 'vue-router'
-import { type FormRules } from 'element-plus'
-import { myExerExerGet, myExerListpage, myExerPull, myExerQuestionStatis, myExerExerReset } from '@/api/my/my-exer'
+import { dayjs, type FormRules } from 'element-plus'
+import { myExerExerGet, myExerListpage, myExerPull, myExerQuestionStatis, myExerExerReset, myExerTrackList } from '@/api/my/my-exer'
 import type { Exer } from '@/ts/exam/exer'
 import type { Listpage } from '@/ts/common/listpage'
 import Decimal from 'decimal.js-light'
 import xmksCardEmpty from '@/components/card/xmks-card-empty.vue'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { PieChart } from 'echarts/charts'
+import { TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent, GridComponent } from 'echarts/components'
+import VChart from 'vue-echarts'
+import { LineChart } from 'echarts/charts';
+import { UniversalTransition } from 'echarts/features';
+import { loginSysTime } from '@/api/login'
 
 /************************变量定义相关***********************/
-use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent]);
+use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent, GridComponent, LineChart, UniversalTransition]);
+
 const dictStore = useDictStore(); // 字典缓存
 const userStore = useUserStore(); // 字典缓存
 const route = useRoute()// 路由
@@ -228,6 +233,9 @@ const questionStatisOpts = ref({// 试题类型统计
         },
     ],
 })
+
+// const typeCache: Record<number, string> = reactive({ 1: '单选题', 2: '多选题', 3: '填空题', 4: '判断题', 5: '问答题', });
+
 const typeStatis = ref<any[]>([])
 
 const progressBar = reactive({// 进度条
@@ -247,9 +255,71 @@ onMounted(async () => {
     userQuery()
     exerQuery()
     questionStatisQuery()
+    exerTimeStatisQuery()
 
     await pull()
     myExerQuery()
+})
+
+/************************计算属性相关*************************/
+const exerTimeStatisXAxis = computed<string[]>(() => {
+    return exerTimeStatisData.value.flatMap(item => Object.keys(item))
+})
+const exerTimeStatisYAxis = computed<number[]>(() => {
+    return exerTimeStatisData.value.flatMap(item => Object.values(item))
+})
+const exerTimeStatisTitle = computed<string>(() => {
+    return exer.name
+})
+const exerTimeStatisData = ref<Record<string, number>[]>([])
+const exerTimeStatisOpts = ref({// 练习时长统计
+    title: {
+        text: exerTimeStatisTitle, // 直接exer.name不是响应式的
+        left: 'center'
+    },
+    tooltip: {
+        show: true,
+        trigger: 'axis',
+        formatter: '{b}<br/>练习{c}分钟'
+    },
+    // toolbox: {
+    //     feature: {
+    //         myDay: {
+    //             show: true,
+    //             title: '按日统计',
+    //             icon: 'image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzAwMCI+CiAgPHJlY3QgeD0iMiIgeT0iNCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiByeD0iMSIgcnk9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHJlY3QgeD0iNCIgeT0iMiIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPgogIDxyZWN0IHg9IjEwIiB5PSIyIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+CiAgPHRleHQgeD0iOSIgeT0iMTIiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPuWPtzwvdGV4dD4KPC9zdmc+',
+    //             onclick: function () {
+    //             }
+    //         },
+    //         myDay2: {
+    //             show: true,
+    //             title: '按月统计',
+    //             icon: 'image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzAwMCI+CiAgPHJlY3QgeD0iMiIgeT0iNCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiByeD0iMSIgcnk9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHJlY3QgeD0iNCIgeT0iMiIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPgogIDxyZWN0IHg9IjEwIiB5PSIyIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+CiAgPHRleHQgeD0iOSIgeT0iMTIiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPuaXnTwvdGV4dD4KPC9zdmc+',
+    //             onclick: function () {
+    //             }
+    //         }
+    //     },
+    // },
+    xAxis: {
+        type: 'category',
+        data: exerTimeStatisXAxis
+    },
+    yAxis: {
+        type: 'value',
+    },
+    series: [
+        {
+            data: exerTimeStatisYAxis,
+            type: 'line'
+        }
+    ],
+    grid: {
+        left: '10',
+        right: '10',
+        top: '10',
+        bottom: '0',
+        containLabel: true
+    },
 })
 
 /************************事件相关*****************************/
@@ -355,6 +425,35 @@ async function reset() {
     toExer()
 }
 
+// 练习时间统计（近一年）
+async function exerTimeStatisQuery() {
+    const { data: { data } } = await loginSysTime({})
+    const startTime = dayjs(data).subtract(1, 'year').startOf('month').valueOf(); // 去年同月的第一天（去年的今天会丢数据）
+    const endTime = dayjs(data).startOf('day').valueOf();// 今天
+
+    const { data: { data: myExerTracks } } = await myExerTrackList({
+        exerId: route.params.exerId,
+        startDate: dayjs(startTime).format('YYYY-MM-DD'),
+        endDate: dayjs(endTime).format('YYYY-MM-DD'),
+    })
+
+    const myExerTrackCache = myExerTracks.reduce((preMyExerTrack: Record<string, number>, curMyExerTrack: any) => {
+        const ym = dayjs(curMyExerTrack.ymd).format('YYYY-MM');
+        preMyExerTrack[ym] = (preMyExerTrack[ym] || 0) + curMyExerTrack.minuteCount;
+        return preMyExerTrack;
+    }, {})
+
+    let curMonth = dayjs(startTime);
+    const endMonth = dayjs(endTime).startOf('month');
+    while (curMonth.isBefore(endMonth) || curMonth.isSame(endMonth, 'month')) {
+        const ym = curMonth.format('YYYY-MM');
+        exerTimeStatisData.value.push({
+            [ym]: myExerTrackCache[ym] || 0
+        });
+        curMonth = curMonth.add(1, 'month');
+    }
+}
+
 </script>
 <style lang="scss" scoped>
 .my-exer-read {
@@ -375,7 +474,7 @@ async function reset() {
             align-items: center;
             position: relative;
             background-color: #FFFFFF;
-            height: 200px;
+            height: 180px;
             padding: 20px 0px;
             border-radius: 15px 15px 15px 15px;
             margin-top: 30px;
@@ -449,7 +548,7 @@ async function reset() {
             .paper__main {
                 display: flex;
                 background-color: #FFFFFF;
-                height: 200px;
+                height: 180px;
                 padding: 20px 0px;
                 border-radius: 15px 15px 15px 15px;
 
@@ -500,6 +599,11 @@ async function reset() {
             }
 
             .exer__main {
+                .exer__statis {
+                    width: 850px;
+                    height: 120px;
+                }
+
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 grid-template-rows: repeat(1, 1fr);
