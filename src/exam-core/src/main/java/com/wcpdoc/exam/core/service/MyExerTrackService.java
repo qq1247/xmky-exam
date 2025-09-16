@@ -32,8 +32,8 @@ public interface MyExerTrackService extends BaseService<MyExerTrack> {
 	 * 
 	 * @param exerId
 	 * @param userId
-	 * @param startDay yyyy-MM-dd
-	 * @param endDay   yyyy-MM-dd
+	 * @param startDay
+	 * @param endDay
 	 * @return List<MyExerTrack>
 	 */
 	List<MyExerTrack> getList(Integer exerId, Integer userId, Integer startDate, Integer endDate);

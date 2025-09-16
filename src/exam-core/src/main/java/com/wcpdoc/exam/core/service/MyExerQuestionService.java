@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyExerQuestion;
@@ -16,6 +17,7 @@ public interface MyExerQuestionService extends BaseService<MyExerQuestion> {
 	 * 我的练习列表
 	 * 
 	 * v1.0 zhanghc 2025年6月15日下午2:56:42
+	 * 
 	 * @param exerId
 	 * @param userId
 	 * @return List<MyExer>
@@ -26,11 +28,22 @@ public interface MyExerQuestionService extends BaseService<MyExerQuestion> {
 	 * 我的练习获取
 	 * 
 	 * v1.0 zhanghc 2025年6月16日下午9:10:48
+	 * 
 	 * @param exerId
 	 * @param userId
 	 * @param questionId
 	 * @return MyExerQuestion
 	 */
 	MyExerQuestion getMyExerQuestion(Integer exerId, Integer userId, Integer questionId);
+
+	/**
+	 * 答错数量列表
+	 * 
+	 * v1.0 zhanghc 2025年9月15日上午9:40:30
+	 * 
+	 * @param exerId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> getWrongAnswerNumList(Integer exerId);
 
 }

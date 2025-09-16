@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import com.wcpdoc.core.lock.ReadWriteLockManager;
 import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
+import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
+import com.wcpdoc.exam.core.service.MyExerTrackMonthlyService;
 import com.wcpdoc.exam.core.service.MyExerTrackService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,8 @@ import net.sf.ehcache.Ehcache;
 public class ExerTrackJob {
 	@Resource
 	private MyExerTrackService myExerTrackService;
+	@Resource
+	private MyExerTrackMonthlyService myExerTrackMonthlyService;
 	@Resource
 	private ReadWriteLockManager lockManager;
 	@Resource
@@ -76,6 +80,25 @@ public class ExerTrackJob {
 						myExerTrack.setUpdateTime(new Date());
 						myExerTrack.setUpdateUserId(1);
 						myExerTrackService.updateById(myExerTrack);
+					}
+
+					MyExerTrackMonthly myExerTrackMonthly = myExerTrackMonthlyService.getMyExerTrackMonthly(exerId,
+							userId, Integer.parseInt(ymd.toString().substring(0, 6)));
+					if (myExerTrackMonthly == null) {
+						myExerTrackMonthly = new MyExerTrackMonthly();
+						myExerTrackMonthly.setExerId(exerId);
+						myExerTrackMonthly.setUserId(userId);
+						myExerTrackMonthly.setYm(Integer.parseInt(ymd.toString().substring(0, 6)));
+						myExerTrackMonthly.setMinuteCount(myExerTrack.getMinuteCount());
+						myExerTrackMonthly.setUpdateTime(new Date());
+						myExerTrackMonthly.setUpdateUserId(1);
+						myExerTrackMonthlyService.save(myExerTrackMonthly);
+					} else {
+						myExerTrackMonthly
+								.setMinuteCount(myExerTrackMonthly.getMinuteCount() + myExerTrack.getMinuteCount());
+						myExerTrackMonthly.setUpdateTime(new Date());
+						myExerTrackMonthly.setUpdateUserId(1);
+						myExerTrackMonthlyService.updateById(myExerTrackMonthly);
 					}
 				} catch (Exception e) {
 					log.error("加锁错误：", e);

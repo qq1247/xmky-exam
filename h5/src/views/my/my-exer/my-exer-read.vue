@@ -81,7 +81,7 @@
                         <div v-for="(exer, index) in listpage.list" :key="index" class="history__list">
                             <div class="history__row">
                                 <span class="history__title">{{ dictStore.getValue('QUESTION_TYPE', exer.type)
-                                }}题</span>
+                                    }}题</span>
                                 <span class="history__btn"
                                     @click="$router.push(`/my-exer/paper/${form.exerId}/${exer.type}`)">>>继续训练</span>
                             </div>

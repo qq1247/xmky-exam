@@ -327,6 +327,11 @@ const router = createRouter({
                     component: () => import('@/views/exam/exer/exer-set.vue'),
                     meta: { title: '练习设置' },
                 },
+                {
+                    path: 'statis/:id',
+                    component: () => import('@/views/exam/exer/exer-statis.vue'),
+                    meta: { title: '练习统计' },
+                },
             ]
         },
         {

@@ -88,7 +88,7 @@
                                 class="opt__btn opt__btn--active" @click="wrongReset">
                                 <span class="opt__btn-txt opt__btn-txt--wrong">答错{{
                                     _myExerQuestions[curQuestionIndex]?.wrongAnswerNum
-                                }}次&nbsp;&nbsp;</span>
+                                    }}次&nbsp;&nbsp;</span>
                                 <span class="iconfont icon-lianxi-61 opt__btn-icon"></span>
                                 <span class="opt__btn-txt">已掌握</span>
                             </el-button>
@@ -167,7 +167,6 @@ onMounted(async () => {
         inactiveThresholdSec: 300,
 
         onStatusUpdate: async (isIdle: boolean) => {
-            console.log(isIdle, 666)
             if (isIdle) return
 
             await myExerTrack({

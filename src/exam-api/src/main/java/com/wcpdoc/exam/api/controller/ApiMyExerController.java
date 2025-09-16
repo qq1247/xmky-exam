@@ -556,4 +556,36 @@ public class ApiMyExerController extends BaseController {
 			return PageResult.err();
 		}
 	}
+
+	/**
+	 * 我的练习跟踪月度列表
+	 * 
+	 * v1.0 zhanghc 2025年9月12日下午9:54:43
+	 * 
+	 * @param exerId
+	 * @param startYm yyyy-MM
+	 * @param endYm   yyyy-MM
+	 * @return PageResult
+	 */
+	@RequestMapping("/trackMonthlyList")
+	public PageResult trackMonthlyList(Integer exerId, String startYm, String endYm) {
+		try {
+			List<Map<String, Object>> myExerTrackMonthlyList = myExerService
+					.getTrackMonthlyList(exerId, getCurUser().getId(), startYm, endYm).stream()
+					.map(myExerTrackMonthly -> {
+						Map<String, Object> map = new HashMap<>();
+						map.put("ym", String.format("%06d", myExerTrackMonthly.getYm()).replaceAll("(\\d{4})(\\d{2})",
+								"$1-$2"));
+						map.put("minuteCount", myExerTrackMonthly.getMinuteCount());
+						return map;
+					}).collect(Collectors.toList());
+			return PageResultEx.ok().data(myExerTrackMonthlyList);
+		} catch (MyException e) {
+			log.error("我的练习跟踪月度列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习跟踪月度列表错误：", e);
+			return PageResult.err();
+		}
+	}
 }

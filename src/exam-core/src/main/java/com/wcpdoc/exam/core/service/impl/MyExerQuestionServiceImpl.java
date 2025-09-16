@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -35,5 +36,10 @@ public class MyExerQuestionServiceImpl extends BaseServiceImp<MyExerQuestion> im
 	@Override
 	public MyExerQuestion getMyExerQuestion(Integer exerId, Integer id, Integer questionId) {
 		return myExerQuestionDao.getMyExerQuestion(exerId, id, questionId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getWrongAnswerNumList(Integer exerId) {
+		return myExerQuestionDao.getWrongAnswerNumList(exerId);
 	}
 }

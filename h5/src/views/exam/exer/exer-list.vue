@@ -16,6 +16,10 @@
                 name: '设置',
                 icon: 'icon-liebiao-01',
                 event: () => $router.push(`/exer/set/${exer.id}`)
+            }, {
+                name: '统计',
+                icon: 'icon-liebiao-02',
+                event: () => $router.push(`/exer/statis/${exer.id}`)
             }]" class="exer">
                 <div class="exer__state">
                     <span class="exer__pre-txt">

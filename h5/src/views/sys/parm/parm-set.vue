@@ -73,12 +73,12 @@
                     style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card title="登录页备案" desc="用于设置登录页底部备案区域的内容">
+        <xmks-edit-card title="登录页页脚" desc="用于设置登录页底部显示的备案、版权或自定义信息">
             <template #card-main>
                 <el-form ref="icpFormRef" :model="icpForm" :rules="icpFormRules" label-width="100" size="large"
                     :inline="false" class="form">
                     <el-form-item label="内容" prop="icp">
-                        <el-input v-model="icpForm.icp" placeholder="请输入备案" :autosize="{ minRows: 2 }"
+                        <el-input v-model="icpForm.icp" placeholder="请输入页脚内容" :autosize="{ minRows: 2 }"
                             type="textarea" />
                     </el-form-item>
                 </el-form>

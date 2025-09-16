@@ -212,11 +212,11 @@ const idleTracker = useIdleTrack();
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	idleTracker.startTracking({
-		startupDelaySec: Math.floor(Math.random() * 3) + 1,
-		trackingIntervalSec: 3,
-		inactiveThresholdSec: 6,
+		startupDelaySec: Math.floor(Math.random() * 30) + 1,
+		trackingIntervalSec: 60,
+		inactiveThresholdSec: 300,
 		onStatusUpdate: async (isIdle) => {
-console.log(isIdle, 666)
+
 			if (isIdle) return;
 
 			await myExerTrack({

@@ -15,9 +15,16 @@ const navList = ref<NavLink[]>([]);// 导航列表
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
-    navList.value.push(
-        { 'title': '设置', 'url': `/exer/set/${route.params.id}` }
-    );
+    if (route.path.indexOf('/exer/add') !== -1) {
+        navList.value.push(
+            { 'title': '设置', 'url': `/exer/add` }
+        );
+    } else {
+        navList.value.push(
+            { 'title': '设置', 'url': `/exer/set/${route.params.id}` },
+            { 'title': '统计', 'url': `/exer/statis/${route.params.id}` },
+        );
+    }
 })
 
 </script>

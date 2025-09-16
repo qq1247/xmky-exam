@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.lock.ReadWriteLockManager;
@@ -35,6 +36,7 @@ import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.MyExer;
 import com.wcpdoc.exam.core.entity.MyExerQuestion;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
+import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -42,6 +44,7 @@ import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.MyExerQuestionService;
 import com.wcpdoc.exam.core.service.MyExerService;
+import com.wcpdoc.exam.core.service.MyExerTrackMonthlyService;
 import com.wcpdoc.exam.core.service.MyExerTrackService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.MyExamUtil;
@@ -72,6 +75,8 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 	private CacheManager cacheManager;
 	@Resource
 	private MyExerTrackService myExerTrackService;
+	@Resource
+	private MyExerTrackMonthlyService myExerTrackMonthlyService;
 
 	@Override
 	public RBaseDao<MyExer> getDao() {
@@ -416,9 +421,7 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 
 		Date _startDate = DateUtil.getDate(startDate);
 		Date _endDate = DateUtil.getDate(endDate);
-
 		int diffDay = DateUtil.diffMonth(_startDate, _endDate); // 如果跨度最大一年，统计数据不准确。如：2024-09-11 -
-																// 2025-09-11，应该为2024-09-01 - 2025-09-11，
 		if (diffDay > 12) {
 			throw new MyException("查询时间范围不得超过12个月");
 		}
@@ -427,5 +430,54 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 		return myExerTrackService.getList(exerId, userId,
 				Integer.parseInt(DateUtil.formatDateCustom(_startDate, "yyyyMMdd")),
 				Integer.parseInt(DateUtil.formatDateCustom(_endDate, "yyyyMMdd")));
+	}
+
+	@Override
+	public List<MyExerTrackMonthly> getTrackMonthlyList(Integer exerId, Integer userId, String startYm, String endYm) {
+		// 数据校验
+		if (!ValidateUtil.isValid(exerId)) {
+			throw new MyException("参数错误：exerId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		if (!ValidateUtil.isValid(startYm)) {
+			throw new MyException("参数错误：startYm");
+		}
+		if (!ValidateUtil.isValid(endYm)) {
+			throw new MyException("参数错误：endYm");
+		}
+
+		Exer exer = exerService.getById(exerId);
+		if (exer == null) {
+			throw new MyException("参数错误：exerId");
+		}
+
+		User user = baseCacheService.getUser(userId);
+		if (CurLoginUserUtil.isAdmin()) {
+
+		} else if (CurLoginUserUtil.isSubAdmin()) {
+			if (userId.intValue() != getCurUser().getId().intValue()) {
+				throw new MyException("无查阅权限");
+			}
+		} else if (CurLoginUserUtil.isExamUser()) {
+			if (userId.intValue() != getCurUser().getId().intValue()) {
+				throw new MyException("无查阅权限");
+			}
+			if (!(exer.getUserIds().contains(user.getId()) || exer.getOrgIds().contains(user.getOrgId()))) {
+				throw new MyException("无查询权限");
+			}
+		}
+
+		Date _startDate = DateUtil.getDate(startYm + "01");
+		Date _endDate = DateUtil.getDate(endYm + "31");
+
+		int diffDay = DateUtil.diffMonth(_startDate, _endDate);
+		if (diffDay > 12) {
+			throw new MyException("查询时间范围不得超过12个月");
+		}
+
+		// 我的练习跟踪列表
+		return myExerTrackMonthlyService.getList(exerId, userId, Integer.parseInt(startYm), Integer.parseInt(endYm));
 	}
 }

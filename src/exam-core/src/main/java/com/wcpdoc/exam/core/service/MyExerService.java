@@ -8,6 +8,7 @@ import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyExer;
 import com.wcpdoc.exam.core.entity.MyExerQuestion;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
+import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 
 /**
  * 我的练习服务层接口
@@ -100,4 +101,17 @@ public interface MyExerService extends BaseService<MyExer> {
 	 * @return List<MyExerTrack>
 	 */
 	List<MyExerTrack> getTrackList(Integer exerId, Integer userId, String startDate, String endDate);
+
+	/**
+	 * 我的练习跟踪月度列表
+	 * 
+	 * v1.0 zhanghc 2025年9月9日下午3:34:37
+	 * 
+	 * @param exerId
+	 * @param userId
+	 * @param startDate yyyy-MM
+	 * @param endDate   yyyy-MM
+	 * @return List<MyExerTrackMonthly>
+	 */
+	List<MyExerTrackMonthly> getTrackMonthlyList(Integer exerId, Integer userId, String startYm, String endYm);
 }

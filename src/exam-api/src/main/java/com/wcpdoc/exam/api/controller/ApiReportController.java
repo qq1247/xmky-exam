@@ -12,7 +12,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,8 +42,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Dict;
+import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -49,12 +56,20 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.entity.ex.PaperPart;
 import com.wcpdoc.exam.core.entity.ex.QuestionPart;
 import com.wcpdoc.exam.core.service.ExamCacheService;
+import com.wcpdoc.exam.core.service.ExerService;
+import com.wcpdoc.exam.core.service.MyExerQuestionService;
+import com.wcpdoc.exam.core.service.MyExerTrackMonthlyService;
 import com.wcpdoc.exam.core.service.MyPaperService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.report.service.ReportService;
 import com.wcpdoc.file.service.FileService;
 
@@ -83,6 +98,18 @@ public class ApiReportController extends BaseController {
 	private MyPaperService myPaperService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private ExerService exerService;
+	@Resource
+	private UserService userService;
+	@Resource
+	private QuestionBankService questionBankService;
+	@Resource
+	private MyExerTrackMonthlyService myExerTrackMonthlyService;
+	@Resource
+	private OrgService orgService;
+	@Resource
+	private MyExerQuestionService myExerQuestionService;
 
 	@Value("classpath:templates/prism.js")
 	private org.springframework.core.io.Resource prismJsResource;
@@ -290,26 +317,6 @@ public class ApiReportController extends BaseController {
 		}
 	}
 
-//	/**
-//	 * 错题分析
-//	 * 
-//	 * v1.0 chenyun 2021-12-15 13:44:47
-//	 * 
-//	 * @return PageResult
-//	 */
-//    @RequestMapping("/exam/questionErrList")
-//    public PageResult questionErrList(Integer examId) {
-//        try {
-//            return PageResultEx.ok().data(reportService.questionErrList(examId));
-//        } catch (MyException e) {
-//            log.error("错题分析统计错误：{}", e.getMessage());
-//            return PageResult.err().msg(e.getMessage());
-//        } catch (Exception e) {
-//            log.error("错题分析统计错误：", e);
-//            return PageResult.err();
-//        }
-//    }
-
 	/**
 	 * 用户试卷导出
 	 * 
@@ -394,16 +401,16 @@ public class ApiReportController extends BaseController {
 			{// 如果有代码片段，则高亮并带行号（wkhtmltopdf对js支持不友好，比如代码高亮的背景色、行号，它更适合纯html解析
 				Document doc = Jsoup.parse(new String(Files.readAllBytes(tempHtmlFile.toPath())));
 				Elements titles = doc.select(".question__title");
-		        
+
 				ScriptEngineManager manager = new ScriptEngineManager();
-		        ScriptEngine engine = manager.getEngineByName("nashorn");
-		        try (FileReader reader = new FileReader(prismJs)) {
-		        	engine.eval(reader);
-		        
+				ScriptEngine engine = manager.getEngineByName("nashorn");
+				try (FileReader reader = new FileReader(prismJs)) {
+					engine.eval(reader);
+
 					for (Element title : titles) {
 						Matcher matcher = Pattern.compile("```([a-z]*)<br>([\\s\\S]*?)<br>```").matcher(title.html());
 						StringBuffer result = new StringBuffer();
-	
+
 						while (matcher.find()) {
 							String lang = matcher.group(1);
 							String code = matcher.group(2).replaceAll("<br>", "\n");
@@ -419,21 +426,22 @@ public class ApiReportController extends BaseController {
 								lineNumbersRows.append("<span></span>");
 							}
 							lineNumbersRows.append("</span>");
-							matcher.appendReplacement(result, "<pre class=\"line-numbers language-java\"><code class=\"match-braces language-java\">"
-									+ higCode + lineNumbersRows.toString() + "</code></pre>");
+							matcher.appendReplacement(result,
+									"<pre class=\"line-numbers language-java\"><code class=\"match-braces language-java\">"
+											+ higCode + lineNumbersRows.toString() + "</code></pre>");
 						}
 						matcher.appendTail(result);
 						title.html(result.toString());
 					}
-		        }
-		        Files.write(tempHtmlFile.toPath(), doc.outerHtml().getBytes(StandardCharsets.UTF_8));
+				}
+				Files.write(tempHtmlFile.toPath(), doc.outerHtml().getBytes(StandardCharsets.UTF_8));
 			}
 
 			// html文件转pdf
 			String WK_PATH = "wkhtmltopdf";
 			File tempPdfFile = new File(tempDir, fileName + ".pdf");
-			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, "--enable-local-file-access", tempHtmlFile.getAbsolutePath(),
-					tempPdfFile.getAbsolutePath());
+			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, "--enable-local-file-access",
+					tempHtmlFile.getAbsolutePath(), tempPdfFile.getAbsolutePath());
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			boolean success = process.waitFor(10, TimeUnit.SECONDS);
@@ -607,10 +615,199 @@ public class ApiReportController extends BaseController {
 			log.error("导出考试排名错误：", e);
 		}
 	}
-	
+
+	/**
+	 * 练习跟踪列表
+	 * 
+	 * v1.0 zhanghc 2025年9月13日下午10:20:16
+	 * 
+	 * @param examId
+	 * @param userId void
+	 */
+	@RequestMapping("/exer/trackList")
+	public PageResult exerTrackList(Integer exerId, String startYm, String endYm) {
+		try {
+			// 数据校验
+			if (!ValidateUtil.isValid(exerId)) {
+				throw new MyException("参数错误：exerId");
+			}
+			if (!ValidateUtil.isValid(startYm)) {
+				throw new MyException("参数错误：startYm");
+			}
+			if (!ValidateUtil.isValid(endYm)) {
+				throw new MyException("参数错误：endYm");
+			}
+			Date startDate = DateUtil.getDate(startYm + "-01");
+			Date endDate = DateUtil.getDate(endYm + "-01");
+			int diffDay = DateUtil.diffMonth(startDate, endDate);
+			if (diffDay > 12) {
+				throw new MyException("查询时间范围不得超过12个月");
+			}
+
+			Exer exer = exerService.getById(exerId);
+			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
+			if (CurLoginUserUtil.isExamUser() || CurLoginUserUtil.isMarkUser()) {
+				throw new MyException("无操作权限");
+			}
+			if (CurLoginUserUtil.isSubAdmin()
+					&& getCurUser().getId().intValue() != questionBank.getCreateUserId().intValue()) {
+				throw new MyException("无操作权限");
+			}
+
+			// 查询我的练习跟踪月度列表
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+			YearMonth start = YearMonth.parse(startYm, formatter);
+			YearMonth end = YearMonth.parse(endYm, formatter);
+			List<Integer> allYmList = new ArrayList<>();
+			for (YearMonth ym = start; !ym.isAfter(end); ym = ym.plusMonths(1)) {
+				allYmList.add(Integer.parseInt(ym.format(DateTimeFormatter.ofPattern("yyyyMM")))); // [202409,202405...202509]
+			}
+
+			List<MyExerTrackMonthly> myExerTrackMonthlyList = myExerTrackMonthlyService.getList(exerId,
+					Integer.parseInt(startYm.replace("-", "")), Integer.parseInt(endYm.replace("-", "")));
+			Map<Integer, List<MyExerTrackMonthly>> myExerTrackMonthlyGroup = myExerTrackMonthlyList.stream()
+					.collect(Collectors.groupingBy(MyExerTrackMonthly::getUserId));// [2:[{ym:202405,minuteCount:6,updateUserId:1},{ym:202407,minuteCount:5,updateUserId:1}]]
+
+			Map<Integer, List<Map<String, Object>>> result = new HashMap<>();
+			for (Map.Entry<Integer, List<MyExerTrackMonthly>> entry : myExerTrackMonthlyGroup.entrySet()) {
+				Integer userId = entry.getKey();
+				List<MyExerTrackMonthly> _myExerTrackMonthly = entry.getValue();
+				Map<Integer, MyExerTrackMonthly> _myExerTrackMonthlyCache = _myExerTrackMonthly.stream()
+						.collect(Collectors.toMap(MyExerTrackMonthly::getYm, r -> r));
+				List<Map<String, Object>> resultList = new ArrayList<>();
+				for (Integer ym : allYmList) {
+					MyExerTrackMonthly myExerTrackMonthly = _myExerTrackMonthlyCache.get(ym);
+					Map<String, Object> data = new HashMap<>();
+					data.put("ym", String.format("%06d", ym).replaceAll("(\\d{4})(\\d{2})", "$1-$2"));
+					data.put("minuteCount", myExerTrackMonthly == null ? 0 : myExerTrackMonthly.getMinuteCount());
+					resultList.add(data);
+				}
+				result.put(userId, resultList);
+			}
+
+			List<User> exerUserList = userService.getList().stream()//
+					.filter(user -> exer.getUserIds().contains(user.getId())
+							|| exer.getOrgIds().contains(user.getOrgId()))//
+					.collect(Collectors.toList()); // 获取这个练习的所有用户
+
+			List<Org> orgList = orgService.getList();
+			Map<Integer, Org> idOrgCache = orgList.stream().collect(Collectors.toMap(Org::getId, Function.identity()));
+
+			List<Map<String, Object>> emptyList = new ArrayList<>();
+			for (Integer ym : allYmList) {
+				Map<String, Object> data = new HashMap<>();
+				data.put("ym", String.format("%06d", ym).replaceAll("(\\d{4})(\\d{2})", "$1-$2"));
+				data.put("minuteCount", 0);
+				emptyList.add(data);
+			}
+
+			List<Map<String, Object>> resultList = exerUserList.stream().map(exerUser -> {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userId", exerUser.getId());
+				map.put("userName", exerUser.getName());
+				map.put("orgName", idOrgCache.get(exerUser.getOrgId()).getName());
+				map.put("tracks", result.get(exerUser.getId()) == null ? emptyList : result.get(exerUser.getId()));
+				return map;
+			}).collect(Collectors.toList());
+
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("练习跟踪列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("练习跟踪列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 练习答错数量列表
+	 * 
+	 * v1.0 zhanghc 2025年9月15日上午9:30:06
+	 * 
+	 * @param exerId
+	 * @return PageResult
+	 */
+	@RequestMapping("/exer/wrongAnswerNumList")
+	public PageResult exerWrongQuestionList(Integer exerId) {
+		try {
+			// 数据校验
+			if (!ValidateUtil.isValid(exerId)) {
+				throw new MyException("参数错误：exerId");
+			}
+
+			Exer exer = exerService.getById(exerId);
+			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
+			if (CurLoginUserUtil.isExamUser() || CurLoginUserUtil.isMarkUser()) {
+				throw new MyException("无操作权限");
+			}
+			if (CurLoginUserUtil.isSubAdmin()
+					&& getCurUser().getId().intValue() != questionBank.getCreateUserId().intValue()) {
+				throw new MyException("无操作权限");
+			}
+
+			// 查询练习错题列表
+			Map<Integer, Map<String, Object>> wrongAnswerCountCache = myExerQuestionService
+					.getWrongAnswerNumList(exerId).stream()
+					.collect(Collectors.toMap(row -> ((Integer) row.get("userId")), row -> row));
+
+			List<User> exerUserList = userService.getList().stream()//
+					.filter(user -> exer.getUserIds().contains(user.getId())
+							|| exer.getOrgIds().contains(user.getOrgId()))//
+					.collect(Collectors.toList()); // 获取这个练习的所有用户
+
+			List<Org> orgList = orgService.getList();
+			Map<Integer, Org> idOrgCache = orgList.stream().collect(Collectors.toMap(Org::getId, Function.identity()));
+
+			List<Map<String, Object>> resultList = exerUserList.stream().map(exerUser -> {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userId", exerUser.getId());
+				map.put("userName", exerUser.getName());
+				map.put("orgName", idOrgCache.get(exerUser.getOrgId()).getName());
+				map.put("wrongAnswerNum", wrongAnswerCountCache.get(exerUser.getId()) == null ? 0
+						: wrongAnswerCountCache.get(exerUser.getId()).get("wrongAnswerNum"));
+				map.put("totalQuestionNum", wrongAnswerCountCache.get(exerUser.getId()) == null ? 0
+						: wrongAnswerCountCache.get(exerUser.getId()).get("totalQuestionNum"));
+				map.put("answeredNum", wrongAnswerCountCache.get(exerUser.getId()) == null ? 0
+						: wrongAnswerCountCache.get(exerUser.getId()).get("answeredNum"));
+				return map;
+			}).collect(Collectors.toList());
+
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("练习答错数量错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("练习答错数量错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 练习试题列表
+	 * 
+	 * v1.0 zhanghc 2025年9月15日下午3:17:03
+	 * 
+	 * @param pageIn
+	 * @return PageResult
+	 */
+	@RequestMapping("/exer/questionListpage")
+	public PageResult wrongQuestionListpage(PageIn pageIn) {
+		try {
+			PageOut pageOut = myExerQuestionService.getListpage(pageIn);
+			return PageResultEx.ok().data(pageOut);
+		} catch (MyException e) {
+			log.error("练习试题列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("练习试题列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
 	public static void main(String[] args) {
 		String input = "1、素质教育理念的核心是()（直接文本写入）<br>```java<br>File prismJs = new File(tempDir, \"prism.js\");<br>File prismCss = new File(tempDir, \"prism.css\");<br>```（4分）";
-		input =                                        "<br>```java<br>File prismJs = new File(tempDir, \"prism.js\");<br>File prismCss = new File(tempDir, \"prism.css\");<br>```（4分）";
+		input = "<br>```java<br>File prismJs = new File(tempDir, \"prism.js\");<br>File prismCss = new File(tempDir, \"prism.css\");<br>```（4分）";
 		Matcher matcher = Pattern.compile("```([a-z]*)<br>([\\s\\S]*?)<br>```").matcher(input);
 		StringBuffer result = new StringBuffer();
 
