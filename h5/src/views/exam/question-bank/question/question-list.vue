@@ -2,9 +2,9 @@
     <div class="question-list">
         <div class="question-list__head">
             <el-form :model="queryForm" :inline="true" size="large" class="query">
-                <el-form-item label="" style="width: 150px;">
+                <!-- <el-form-item label="" style="width: 150px;">
                     <el-input v-model="queryForm.id" placeholder="请输入编号" />
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="" style="width: 150px;">
                     <el-input v-model="queryForm.title" placeholder="请输入题干" />
                 </el-form-item>
@@ -51,18 +51,19 @@
         <div class="question-list__main">
             <el-scrollbar height="calc(100vh - 275px)">
                 <el-empty v-if="listpage.list.length === 0" description="暂无数据" class="question-list__empty" />
-                <xmks-question v-else v-for="question in listpage.list" :key="question.id" :type="question.type"
-                    :title="question.title" :img-ids="question.imgFileIds" :video-id="question.videoFileId"
-                    :options="question.options" :answers="question.answers" :markType="question.markType"
-                    :score="question.score" :scores="question.scores" :analysis="question.analysis" :userAnswers="[]"
-                    :userScore="0" :answerShow="display === 'paper-with-detail'" :userAnswerShow="false"
+                <xmks-question v-else v-for="(question, index) in listpage.list" :key="question.id"
+                    :type="question.type" :title="question.title" :img-ids="question.imgFileIds"
+                    :video-id="question.videoFileId" :options="question.options" :answers="question.answers"
+                    :markType="question.markType" :score="question.score" :scores="question.scores"
+                    :analysis="question.analysis" :userAnswers="[]" :userScore="0"
+                    :answerShow="display === 'paper-with-detail'" :userAnswerShow="false"
                     :analysisShow="display === 'paper-with-detail'" :updateUserName="question.updateUserName"
                     :display="display === 'list' ? 'list' : 'paper'" :editable="false" :btns="[{
                         name: '设置',
                         icon: 'icon-liebiao-01',
                         event: () => $router.push(`/question-bank/question-nav/set/${question.id}`)
                     }]">
-                    <template #title-pre>{{ question.id }}、</template>
+                    <template #title-pre>{{ ((listpage.curPage - 1) * listpage.pageSize) + index + 1 }}、</template>
                 </xmks-question>
             </el-scrollbar>
         </div>
