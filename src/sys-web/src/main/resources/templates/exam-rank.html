@@ -16,8 +16,7 @@
                 <th>姓名</th>
                 <th>机构</th>
                 <th>分数</th>
-                <th>考试状态</th>
-                <th>阅卷状态</th>
+                <th>考试结果</th>
                 <th>答题用时</th>
                 <th>阅卷用时</th>
             </tr>
@@ -28,9 +27,8 @@
                 <td>${rank.myExamNo}</td>
                 <td>${rank.userName}</td>
                 <td>${rank.orgName}</td>
-                <td>${rank.myExamTotalScore}</td>
-                <td>${rank.myExamStateName}</td>
-                <td>${rank.myExamMarkStateName}</td>
+                <td class="${(rank.myExamAnswerState == 1)?then('score-pass', 'score-fail')}">${rank.myExamTotalScore}</td>
+                <td>${rank.myExamAnswerStateName}</td>
                 <td>${rank.answerTime}分钟</td>
                 <td>${rank.markTime}分钟</td>
             </tr>
@@ -111,6 +109,13 @@
 
     tr:nth-child(odd) {
         background-color: #ffffff;
+    }
+    
+    .score-pass {
+    	color: #67c23a;
+    }
+    .score-fail {
+    	color: #f56c6c;
     }
 </style>
 

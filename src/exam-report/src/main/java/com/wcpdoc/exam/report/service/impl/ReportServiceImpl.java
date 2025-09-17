@@ -466,8 +466,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 								"MY_EXAM.TOTAL_SCORE AS MY_EXAM_TOTAL_SCORE", // 用户分数
 								"EXAM.MARK_TYPE AS EXAM_MARK_TYPE", "EXAM.MARK_STATE AS EXAM_MARK_STATE")// 考试信息，用于判断如果是主观题试卷，分数应该考试结束才显示
 						.like(pageIn.hasParm("userName"), "USER.NAME", pageIn.getParm("userName"))//
+						.like(pageIn.hasParm("orgName"), "ORG.NAME", pageIn.getParm("orgName"))//
 						.eq("MY_EXAM.EXAM_ID", pageIn.getParm("examId"))//
-						.orderByAsc("MY_EXAM.NO").orderByDesc("MY_EXAM.ANSWER_END_TIME"));
+						.orderByAsc("MY_EXAM.NO")//
+						.orderByDesc("MY_EXAM.ANSWER_END_TIME"));
 		return new PageOut(page.getRecords(), page.getTotal());
 	}
 

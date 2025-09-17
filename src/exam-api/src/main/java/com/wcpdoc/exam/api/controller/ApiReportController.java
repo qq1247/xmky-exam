@@ -495,7 +495,7 @@ public class ApiReportController extends BaseController {
 	 * @param examId void
 	 */
 	@RequestMapping("/rank/exportPDF")
-	public void rankExportPDF(Integer examId) {
+	public void rankExportPDF(Integer examId, String userName, String orgName) {
 		try {
 			// 数据校验
 			Exam exam = examCacheService.getExam(examId);
@@ -512,6 +512,12 @@ public class ApiReportController extends BaseController {
 			// 获取考试排名数据
 			PageIn pageIn = new PageIn();
 			pageIn.addParm("examId", examId);
+			if (ValidateUtil.isValid(userName)) {
+				pageIn.addParm("userName", userName);
+			}
+			if (ValidateUtil.isValid(orgName)) {
+				pageIn.addParm("orgName", orgName);
+			}
 			List<Map<String, Object>> rankList = new ArrayList<>();
 			int curPage = 1;
 			Map<Integer, String> examStateCache = baseCacheService.getDictList().stream()
@@ -520,11 +526,15 @@ public class ApiReportController extends BaseController {
 			Map<Integer, String> markStateCache = baseCacheService.getDictList().stream()
 					.filter(dict -> "MARK_STATE".equals(dict.getDictIndex()))
 					.collect(Collectors.toMap(dict -> Integer.parseInt(dict.getDictKey()), Dict::getDictValue));
+			Map<Integer, String> answerStateCache = baseCacheService.getDictList().stream()
+					.filter(dict -> "ANSWER_STATE".equals(dict.getDictIndex()))
+					.collect(Collectors.toMap(dict -> Integer.parseInt(dict.getDictKey()), Dict::getDictValue));
 			while (true) {
 				pageIn.setCurPage(curPage++);
 				pageIn.setPageSize(100);
 				PageOut pageOut = reportService.examRankListpage(pageIn);
 				rankList.addAll(pageOut.getList().stream().map(data -> {
+					data.put("myExamAnswerStateName", answerStateCache.get(data.get("myExamAnswerState")));
 					data.put("myExamStateName", examStateCache.get(data.get("myExamState")));
 					data.put("myExamMarkStateName", markStateCache.get(data.get("myExamMarkState")));
 					if (data.get("myExamAnswerStartTime") != null && data.get("myExamAnswerEndTime") != null) {
@@ -570,8 +580,8 @@ public class ApiReportController extends BaseController {
 			// html文件转pdf
 			String WK_PATH = "wkhtmltopdf";
 			File tempPdfFile = new File(tempDir, fileName + ".pdf");
-			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, tempHtmlFile.getAbsolutePath(),
-					tempPdfFile.getAbsolutePath());
+			ProcessBuilder processBuilder = new ProcessBuilder(WK_PATH, "--enable-local-file-access",
+					tempHtmlFile.getAbsolutePath(), tempPdfFile.getAbsolutePath());
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			boolean success = process.waitFor(10, TimeUnit.SECONDS);

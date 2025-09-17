@@ -78,6 +78,9 @@
                             <el-form-item label="">
                                 <el-input v-model="examRankForm.userName" placeholder="请输入姓名" />
                             </el-form-item>
+                            <el-form-item label="">
+                                <el-input v-model="examRankForm.orgName" placeholder="请输入机构名称" />
+                            </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" class="query__btn" @click="examRankQuery">查询</el-button>
                                 <el-button v-if="exam.markState === 3" type="success"
@@ -186,6 +189,7 @@ const statis = reactive({// 统计信息
 const examRankForm = reactive({// 考试排名查询表单
     examId: route.params.id,
     userName: '',
+    orgName: '',
 })
 
 const examRankListpage = reactive<Listpage>({// 考试排名分页列表
@@ -380,7 +384,7 @@ async function examRankExport() {
     let objectUrl = null;
     try {
         ElMessage.info('正在生成PDF，请稍后...')
-        const data = await http.post('report/rank/exportPDF', { examId: examRankForm.examId }, { responseType: 'blob' })
+        const data = await http.post('report/rank/exportPDF', { examId: examRankForm.examId, userName: examRankForm.userName, orgName: examRankForm.orgName }, { responseType: 'blob' })
         objectUrl = URL.createObjectURL(data.data)
 
         const downloadLink = document.createElement('a');
@@ -389,10 +393,10 @@ async function examRankExport() {
         downloadLink.href = objectUrl;
         downloadLink.click();
         URL.revokeObjectURL(downloadLink.href);
-    } catch (error) {
-        ElMessage.error('生成PDF失败：' + error,)
-    } finally {
         ElMessage.success('下载完成')
+    } catch (error) {
+        ElMessage.error('生成PDF失败：请联系管理员安装wkhtmltopdf')
+    } finally {
         if (downloadLink) {
             document.removeChild(downloadLink);
             downloadLink = null;
