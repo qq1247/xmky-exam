@@ -25,12 +25,12 @@
                 </el-form-item>
             </el-form>
             <div class="opt">
-                <el-button type="success" class="opt__btn"
+                <el-button v-if="route.params.questionBankId !== '0'" type="success" class="opt__btn"
                     @click="$router.push(`/question-bank/question-nav/add/${queryForm.questionBankId}`)">
                     <span class="iconfont icon-tubiaoziti2-02 opt__btn-icon"></span>
                     <span class="opt__btn-txt">添加</span>
                 </el-button>
-                <el-button type="success" class="opt__btn"
+                <el-button v-if="route.params.questionBankId !== '0'" type="success" class="opt__btn"
                     @click="$router.push(`/question-bank/question-nav/import/${queryForm.questionBankId}`)">
                     <span class="iconfont icon-daoru opt__btn-icon"></span>
                     <span class="opt__btn-txt">在线导入</span>
@@ -88,7 +88,7 @@ const route = useRoute()
 const dictStore = useDictStore()// 字典缓存
 const display = ref('list') // 显示样式
 const queryForm = reactive({// 查询表单
-    questionBankId: 0,
+    questionBankId: null as number | null,
     id: '',
     title: '',
     type: null,
@@ -96,14 +96,14 @@ const queryForm = reactive({// 查询表单
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,
-    pageSize: 8,
+    pageSize: 5,
     total: 0,
     list: [],
 })
 
 /************************组件生命周期相关*********************/
 onMounted(() => {
-    queryForm.questionBankId = parseInt(route.params.questionBankId as string)
+    queryForm.questionBankId = parseInt(route.params.questionBankId as string) || null
 
     query()
 })

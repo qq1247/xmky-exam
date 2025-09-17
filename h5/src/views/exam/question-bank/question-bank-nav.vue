@@ -20,8 +20,12 @@ onMounted(async () => {
             { 'title': '设置', 'url': `/question-bank/add` }
         );
     } else {
+        if (route.params.questionBankId !== '0') {
+            navList.value.push(
+                { 'title': '设置', 'url': `/question-bank/set/${route.params.id || route.params.questionBankId}` },
+            );
+        }
         navList.value.push(
-            { 'title': '设置', 'url': `/question-bank/set/${route.params.id || route.params.questionBankId}` },
             { 'title': '试题列表', 'url': `/question-bank/question-nav/list/${route.params.id || route.params.questionBankId}` },
         );
     }

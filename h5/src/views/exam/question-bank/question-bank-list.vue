@@ -9,6 +9,12 @@
                     <el-button type="primary" class="query__btn" @click="query">查询</el-button>
                 </el-form-item>
             </el-form>
+            <div class="opt">
+                <el-button type="success" class="opt__btn" @click="$router.push(`/question-bank/question-nav/list/0`)">
+                    <span class="iconfont icon-liebiao-03 opt__btn-icon"></span>
+                    <span class="opt__btn-txt">全库试题</span>
+                </el-button>
+            </div>
         </div>
         <div class="question-bank-list__main">
             <el-scrollbar max-height="calc(100vh - 360px)">
@@ -128,8 +134,10 @@ async function query() {
     margin: 20px 0px;
 
     .question-bank-list__head {
-        .query {
+        display: flex;
+        justify-content: space-between;
 
+        .query {
             .query__btn {
                 height: 40px;
                 padding: 0px 30px;
@@ -138,6 +146,27 @@ async function query() {
                 color: #FFFFFF;
                 font-size: 16px;
                 background-image: linear-gradient(to right, #04C7F2, #259FF8);
+            }
+        }
+
+        .opt {
+            .opt__btn {
+                height: 40px;
+                padding: 0px 20px;
+                border-radius: 6px;
+                border: 0px;
+                background-image: linear-gradient(to right, #04C7F2, #259FF8);
+
+                .opt__btn-icon {
+                    color: #FFFFFF;
+                    font-size: 16px;
+                    margin-right: 4px;
+                }
+
+                .opt__btn-txt {
+                    color: #FFFFFF;
+                    font-size: 14px;
+                }
             }
         }
     }

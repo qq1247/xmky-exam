@@ -613,7 +613,8 @@ async function edit() {
         return
     }
 
-    router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
+    router.back()
+    // router.push(`/question-bank/question-nav/list/${form.questionBankId}`) // 题库列表页增加全局试题按钮，不能在返回当前题库了
 }
 
 // 删除
@@ -628,7 +629,8 @@ async function de1() {
         return
     }
 
-    router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
+    router.back()
+    // router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
 }
 
 // 复制
@@ -638,7 +640,8 @@ async function copy() {
         return
     }
 
-    router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
+    router.back()
+    // router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
 }
 
 // 添加选项
@@ -679,7 +682,8 @@ async function move() {
         return
     }
 
-    router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
+    router.back()
+    // router.push(`/question-bank/question-nav/list/${form.questionBankId}`)
 }
 
 // 上传之前处理
