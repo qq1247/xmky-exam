@@ -48,12 +48,12 @@
                 <el-form-item label="防作弊：" prop="sxes" @mouseover="tipShow('防作弊',
                     `试题乱序：章节内试题进行随机排序，无章节则所有试题进行随机排序<br/>
                     选项乱序：单选多选题的选项进行随机排序<br/>
-                    禁止考试中切屏：禁止切出浏览器查询资料，超出3次自动交卷；<br/>
+                    禁止考试中切屏：禁止切出浏览器查询资料，一分钟内算一次，超出3次自动交卷；<br/>
                     禁止浏览器调试：禁止复制粘贴、右键、调试代码等`)">
                     <el-checkbox-group v-model="form.sxes">
                         <el-checkbox v-for="dict in dictStore.getList('EXAM_SXES').filter(dict => {
                             if (form.genType === 2) {
-                                if (dict.dictKey == '3' || dict.dictKey === '4') {
+                                if (dict.dictKey == '2' || dict.dictKey == '3' || dict.dictKey === '4') {
                                     return true
                                 }
                                 return false
