@@ -3,12 +3,12 @@ package com.wcpdoc.core.util;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +22,8 @@ import com.wcpdoc.core.exception.MyException;
  * @author zhanghc 2015-3-27下午04:58:24
  */
 public class StringUtil {
-	private static final Random random = new Random();
+	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	private static final SecureRandom RANDOM = new SecureRandom();
 
 	/**
 	 * 获取字符串
@@ -300,57 +301,12 @@ public class StringUtil {
 	 * @param length
 	 * @return String
 	 */
-	public static String getRandomStr(int length) {
-		String value = getRandom(length);
-
-		return value.replaceAll("0", "2").replaceAll("o", "3").replaceAll("O", "4").replaceAll("1", "5")
-				.replaceAll("l", "6").replaceAll("L", "7");
-	}
-
-	/**
-	 * 获取随机字符串（大小写字母+数字）
-	 * 
-	 * v1.0 zhanghc 2017年7月13日下午5:59:34
-	 * 
-	 * @param length
-	 * @return String
-	 */
 	public static String getRandom(int length) {
-		StringBuilder value = new StringBuilder();
-		for (int i = 0; i < length; i++) {
-			boolean isNum = random.nextInt(2) % 2 == 0;
-			if (isNum) {
-				value.append(random.nextInt(10));
-				continue;
-			}
-
-			boolean lower = random.nextInt(2) % 2 == 0;
-			if (lower) {
-				value.append((char) (random.nextInt(26) + 65));
-				continue;
-			}
-
-			value.append((char) (random.nextInt(26) + 97));
+		StringBuilder sb = new StringBuilder(16);
+		for (int i = 0; i < 16; i++) {
+			sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
 		}
-
-		return value.toString();
-	}
-
-	/**
-	 * 获取随机数字
-	 * 
-	 * v1.0 zhanghc 2017年7月13日下午5:59:34
-	 * 
-	 * @param length
-	 * @return String
-	 */
-	public static String getRandomNum(int length) {
-		StringBuilder value = new StringBuilder();
-		for (int i = 0; i < length; i++) {
-			value.append(random.nextInt(10));
-		}
-
-		return value.toString();
+		return sb.toString();
 	}
 
 	/**

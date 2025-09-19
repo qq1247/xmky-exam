@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { examExamGet } from '@/api/exam/exam'
-import { loginIn, loginNoLogin, loginParm, loginSysTime } from '@/api/login'
+import { loginIn, loginNoLogin, loginParm, loginEncrypt, loginSysTime } from '@/api/login'
 import { myExamGeneratePaper } from '@/api/my/my-exam'
 import { dictIndexList } from '@/api/sys/dict'
 import http from '@/request'
@@ -89,6 +89,7 @@ import { useParmStore } from '@/stores/parm'
 import { useUserStore } from '@/stores/user'
 import { escape2Html } from '@/util/htmlUtil'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import JSEncrypt from 'jsencrypt'
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -174,10 +175,22 @@ async function login() {
         return
     }
 
+    const { data: { code: _code, data: _encrypt } } = await loginEncrypt({ loginName: form.loginName })
+    if (_code !== 200) {
+        return
+    }
+    const encrypt = new JSEncrypt();
+    encrypt.setPublicKey(_encrypt.publicKey);
+    const encryptedPwd = encrypt.encrypt(`${_encrypt.nonce}:${form.pwd}`);
+    if (!encryptedPwd) {
+        ElMessage.warning('生成秘钥失败')
+        return
+    }
+
     // 登录
     const { data: { code, data } } = await loginIn({
         loginName: form.loginName,
-        pwd: form.pwd
+        pwd: encryptedPwd
     })
     if (code !== 200) {
         return

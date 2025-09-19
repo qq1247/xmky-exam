@@ -6,12 +6,16 @@ import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.Cache.ValueWrapper;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.api.entity.UserToken;
 import com.wcpdoc.api.service.LoginService;
 import com.wcpdoc.auth.cache.TokenCache;
 import com.wcpdoc.auth.util.JwtUtil;
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.UserExService;
@@ -22,6 +26,8 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.RsaUtil;
+import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +68,41 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 			throw new LoginException("参数错误：pwd");
 		}
 
+		String plainText = RsaUtil.decrypt(pwd);
+		String[] plainTexts = plainText.split(":"); // loginName:nonce:pwd
+		if (plainTexts.length != 3) {
+			throw new LoginException("数据格式错误");
+		}
+		if (!plainTexts[0].equals(loginName)) {
+			throw new LoginException("数据格式错误");
+		}
+
+		Cache nonceCache = SpringUtil.getBean(EhCacheCacheManager.class).getCache(BaseConstant.NONCE_CACHE);
+		ValueWrapper valueWrapper = nonceCache.get(String.format("%s:%s", plainTexts[0], plainTexts[1]));
+		if (valueWrapper == null) {// 防重放，使用一次后失效
+			throw new LoginException("请求已过期或重复提交");
+		}
+		Long timestamp = (Long) valueWrapper.get();
+		if (System.currentTimeMillis() - timestamp > 3000) { // 作用：弱网、服务器繁忙，攻击者延迟重放的请求先到达。不防止毫秒级重放。
+			throw new LoginException("nonce超时");
+		}
+		nonceCache.evict(String.format("%s:%s", plainTexts[0], plainTexts[1]));
+
 		User user = userService.getUser(loginName);
-		if (user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
+		Cache userLockCache = SpringUtil.getBean(EhCacheCacheManager.class).getCache(BaseConstant.USER_LOCK_CACHE);
+		ValueWrapper lockWrapper = userLockCache.get(loginName);
+		if (lockWrapper != null) {
+			Long failCount = (Long) lockWrapper.get();
+			if (failCount >= 5) {
+				throw new LoginException("账号已被锁定，请1分钟后重试");
+			}
+		}
+
+		if (user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, plainTexts[2]))) {
+			Long currentCount = lockWrapper != null ? (Long) lockWrapper.get() : 0L;
+			currentCount++;
+			userLockCache.put(loginName, currentCount);
+
 			throw new LoginException("用户名或密码错误");
 		}
 		if (user.getState() == 2) {
@@ -109,7 +148,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		if (name.length() > 16) {
 			throw new LoginException("参数错误：name必须小于16位");
 		}
-		
+
 //		if (!Pattern.compile("^1[3-9]\\d{9}$").matcher(phone).matches()) {
 //			throw new LoginException("手机号格式错误");
 //		}
@@ -181,4 +220,5 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		user.setPwd(userService.getEncryptPwd(user.getLoginName(), newPwd));
 		userService.updateById(user);
 	}
+
 }

@@ -21,6 +21,7 @@
         "echarts": "~5.6.0",
         "element-plus": "~2.9.2",
         "he": "~1.2.0",
+        "jsencrypt": "~3.5.4",
         "longze-vue3-video-player": "~1.1.7",
         "pinia": "~2.3.0",
         "pinia-plugin-persistedstate": "~4.2.0",

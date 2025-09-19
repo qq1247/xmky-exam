@@ -15,3 +15,6 @@ export function loginPwd(parm: object) {
 export function loginNoLogin(parm: object) {
     return request.post('/login/noLogin', parm);
 }
+export function loginEncrypt(parm: object) {
+    return request.post('/login/encrypt', parm);
+}

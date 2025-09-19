@@ -11,6 +11,8 @@ public class BaseConstant {
 	public static final String PARM_CACHE = "PARM_CACHE";
 	public static final String PROGRESS_BAR_CACHE = "PROGRESS_BAR_CACHE";
 	public static final String DICT_CACHE = "DICT_CACHE";
+	public static final String NONCE_CACHE = "NONCE_CACHE";
+	public static final String USER_LOCK_CACHE = "USER_LOCK_CACHE";
 
 	public static final String USER_KEY_PRE = "'USER:' + ";
 	public static final String ORG_KEY_PRE = "'ORG:' + ";

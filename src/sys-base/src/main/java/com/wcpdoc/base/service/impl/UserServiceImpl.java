@@ -131,7 +131,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		// 修改密码
 		User user = baseCacheService.getUser(id);
 		Parm parm = baseCacheService.getParm();
-		String newPwd = parm.getPwdType() == 1 ? StringUtil.getRandomStr(8) : parm.getPwdValue();
+		String newPwd = parm.getPwdType() == 1 ? StringUtil.getRandom(8) : parm.getPwdValue();
 		user.setPwd(getEncryptPwd(user.getLoginName(), newPwd));
 		updateById(user);
 		return newPwd;
@@ -273,7 +273,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (user.getState() != 1 && user.getState() != 2) {
 			throw new MyException("参数错误：id");
 		}
-		
+
 		if (state != 1 && state != 2) {
 			throw new MyException("参数错误：state");
 		}

@@ -2,16 +2,20 @@ package com.wcpdoc.api.controller;
 
 import java.io.File;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.cache.Cache;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.api.entity.UserToken;
 import com.wcpdoc.api.service.LoginService;
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.controller.BaseController;
@@ -19,6 +23,8 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.RsaUtil;
+import com.wcpdoc.core.util.SpringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -166,7 +172,7 @@ public class ApiLoginController extends BaseController {
 	}
 
 	/**
-	 * 企业logo
+	 * 登录logo
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * 
@@ -184,6 +190,32 @@ public class ApiLoginController extends BaseController {
 			log.error("企业logo失败：{}", e.getMessage());
 		} catch (Exception e) {
 			log.error("企业logo失败：", e);
+		}
+	}
+
+	/**
+	 * 登录密钥
+	 * 
+	 * v1.0 zhanghc 2025年9月18日下午10:30:47
+	 * 
+	 * @return String
+	 */
+	@RequestMapping("/encrypt")
+	public PageResult encrypt(String loginName) {
+		try {
+			String nonce = String.format("%s:%s", loginName, UUID.randomUUID().toString());
+			Cache cache = SpringUtil.getBean(EhCacheCacheManager.class).getCache(BaseConstant.NONCE_CACHE);
+			cache.put(nonce, System.currentTimeMillis());
+			return PageResultEx.ok()//
+					.addAttr("publicKey", RsaUtil.getPublicKeyBase64())//
+					.addAttr("nonce", nonce)//
+			;
+		} catch (MyException e) {
+			log.error("登录密钥错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("登录密钥错误：", e);
+			return PageResult.err();
 		}
 	}
 }

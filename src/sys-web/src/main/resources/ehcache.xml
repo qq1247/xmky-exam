@@ -91,9 +91,19 @@
 		maxEntriesLocalHeap="100000"
 		timeToLiveSeconds="60">
 	</cache>
-	<!-- 练习时长缓存 -->
+	<!-- 练习时长缓存，距第一次600秒后失效 -->
 	<cache name="EXER_TIME_CACHE"
 		maxEntriesLocalHeap="10000"
 		timeToLiveSeconds="600">
+    </cache>
+    <!-- 防重放缓存，距第一次3秒后失效 -->
+	<cache name="NONCE_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToLiveSeconds="3">
+    </cache>
+    <!-- 用户锁定缓存，空闲一分钟后失效 -->
+	<cache name="USER_LOCK_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToIdleSeconds="60">
     </cache>
 </ehcache>
