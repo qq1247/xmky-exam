@@ -2,6 +2,7 @@ package com.wcpdoc.base.service.impl;
 
 import java.io.File;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -257,5 +258,15 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parm.setAppRelVer(relVer);
 		parm.setAppRelTime(relTime);
 		updateById(parm);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
+	public void appId() {
+		Parm parm = baseCacheService.getParm();
+		if (!ValidateUtil.isValid(parm.getAppId())) {
+			parm.setAppId(UUID.randomUUID().toString().replaceAll("-", ""));
+			updateById(parm);
+		}
 	}
 }

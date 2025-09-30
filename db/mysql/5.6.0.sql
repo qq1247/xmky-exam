@@ -710,7 +710,7 @@ alter table EXM_MY_EXER_TRACK_MONTHLY comment '我的练习跟踪月度';
 /*==============================================================*/
 INSERT INTO `SYS_ORG` VALUES (1, '企业', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
 INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', '79nRuL+wDo42R5kPfXTR2A==', 0, NULL, NULL, NULL, NULL, NULL, NULL, '2017-08-01 22:31:43', '2017-08-01 22:31:43', 0, 1, 1, '2017-08-01 22:31:43');
-INSERT INTO `SYS_PARM` VALUES (1, NULL, NULL, NULL, NULL, NULL, '小猫考试', 'bak\\file', 'bak\\db', 2, '111111', '服务支持', '开源项目：小猫考试\r\n在线支持： qq群（811189776）', '小猫开源 - 在线考试&lt;br/&gt;\n&copy; 2017-2025 \n&lt;a href=&quot;https://beian.miit.gov.cn&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;\n  晋ICP备2022004812号-4\n&lt;/a&gt;', NULL, 'http://verhub.xiaomaokaiyuan.com/api/ver/latest', REPLACE(UUID(), '-', ''), '5.6.0', '5.6.0', '2025-09-30 15:53:00', 1, '2017-08-01 22:31:43');
+INSERT INTO `SYS_PARM` VALUES (1, NULL, NULL, NULL, NULL, NULL, '小猫考试', 'bak\\file', 'bak\\db', 2, '111111', '服务支持', '开源项目：小猫考试\r\n在线支持： qq群（811189776）', '小猫开源 - 在线考试&lt;br/&gt;\n&copy; 2017-2025 \n&lt;a href=&quot;https://beian.miit.gov.cn&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;\n  晋ICP备2022004812号-4\n&lt;/a&gt;', NULL, 'http://verhub.xiaomaokaiyuan.com/api/ver/latest', NULL, '5.6.0', '5.6.0', '2025-09-30 15:53:00', 1, '2017-08-01 22:31:43');
 
 INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '正常', 2);
@@ -832,7 +832,7 @@ INSERT INTO `SYS_VER` VALUES (44, '5.2.1', '2025-05-17 10:32:00', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (45, '5.3.0', '2025-05-27 16:34:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (46, '5.4.0', '2025-07-01 21:07:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (47, '5.5.0', '2025-07-31 09:15:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (48, '5.6.0', '2025-09-30 15:53:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (48, '5.6.0', '2025-09-30 09:28:00', 'zhanghc', '');
 
 /*==============================================================*/
 /* 索引															*/

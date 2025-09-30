@@ -36,6 +36,7 @@ public class VerCheckJob {
 			Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
 
 			// 获取最新版本
+			SpringUtil.getBean(ParmService.class).appId();
 			MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
 			requestParams.add("appSeries", "小猫开源");
 			requestParams.add("appName", "在线考试");

@@ -67,11 +67,12 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param content void
 	 */
 	void support(String title, String content);
-	
+
 	/**
 	 * 备案信息修改
 	 * 
 	 * v1.0 zhanghc 2025年9月1日下午2:34:25
+	 * 
 	 * @param icp void
 	 */
 	void icp(String icp);
@@ -84,15 +85,22 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param host void
 	 */
 	void m(String host);
-	
+
 	/**
 	 * 应用设置
 	 * 
 	 * v1.0 zhanghc 2025年4月8日下午6:42:52
+	 * 
 	 * @param relVer
 	 * @param relTime
 	 * @param verhubUrl void
 	 */
 	void app(String relVer, Date relTime, String verhubUrl);
-	
+
+	/**
+	 * 应用ID
+	 * 
+	 * v1.0 zhanghc 2025年9月30日下午4:49:46 void
+	 */
+	void appId();
 }

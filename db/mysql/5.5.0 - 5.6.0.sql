@@ -1,6 +1,6 @@
 -- 记录版本
-INSERT INTO `SYS_VER` VALUES (48, '5.6.0', '2025-09-30 15:53:00', 'zhanghc', '');
-UPDATE SYS_PARM SET APP_VER = '5.6.0';
+INSERT INTO `SYS_VER` VALUES (48, '5.6.0', '2025-09-30 09:28:00', 'zhanghc', '');
+UPDATE SYS_PARM SET APP_VER = '5.6.0', APP_ID = NULL;
 
 -- 支持登录页底部显示的备案、版权或自定义信息
 ALTER TABLE `SYS_PARM` ADD COLUMN `ICP` varchar(512) DEFAULT NULL COMMENT '备案信息' AFTER `CUSTOM_CONTENT`;
@@ -49,7 +49,79 @@ ALTER TABLE `EXM_EXER` CHANGE COLUMN `QUESTION_BANK_ID` `QUESTION_BANK_IDS` VARC
 UPDATE `EXM_EXER` SET `QUESTION_BANK_IDS` = CONCAT(',', `QUESTION_BANK_IDS`, ',');
 ALTER TABLE `EXM_EXER` MODIFY COLUMN `ORG_IDS` text CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '机构IDS' AFTER `QUESTION_BANK_IDS`;
 
--- 练习支持用户自由组合试题，方便模拟考试等情景（会丢之前的数据，写兼容sql太复杂，非核心业务丢之前的数据也影响不大）
+-- 练习的错题集和收藏从练习中独立出来，以适应业务变更
+create table EXM_MY_WRONG_QUESTION
+(
+   ID                   int not null auto_increment comment '主键',
+   USER_ID              int comment '用户ID',
+   QUESTION_ID          int comment '试题ID',
+   QUESTION_TYPE        int comment '试题类型',
+   WRONG_NUM            int comment '答错次数',
+   FIRST_WRONG_TIME     datetime comment '首次答错时间',
+   FIRST_WRONG_SOURCE   varchar(32) comment '首次答错来源',
+   LAST_WRONG_TIME      datetime comment '末次答错时间',
+   LAST_WRONG_SOURCE    varchar(32) comment '末次答错来源',
+   STATE                int comment '状态（1：已掌握；2：未掌握）',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_MY_WRONG_QUESTION comment '我的错题';
+ALTER TABLE `EXM_MY_WRONG_QUESTION` ADD INDEX `MY_WRONG_QUESTION_U` ( `USER_ID` );
+
+INSERT INTO EXM_MY_WRONG_QUESTION (
+    USER_ID,
+    QUESTION_ID,
+    QUESTION_TYPE,
+    WRONG_NUM,
+    FIRST_WRONG_TIME,
+    FIRST_WRONG_SOURCE,
+    LAST_WRONG_TIME,
+    LAST_WRONG_SOURCE,
+    STATE,
+    UPDATE_USER_ID,
+    UPDATE_TIME
+)
+SELECT MEQ.USER_ID, MEQ.QUESTION_ID, Q.TYPE, MEQ.WRONG_ANSWER_NUM, MEQ.UPDATE_TIME, E.NAME, MEQ.UPDATE_TIME, E.NAME, 2, MEQ.UPDATE_USER_ID, MEQ.UPDATE_TIME
+FROM EXM_MY_EXER_QUESTION MEQ
+LEFT JOIN EXM_QUESTION Q ON MEQ.QUESTION_ID = Q.ID
+LEFT JOIN EXM_EXER E ON MEQ.EXER_ID = E.ID
+WHERE WRONG_ANSWER_NUM > 0;
+
+create table EXM_MY_FAV_QUESTION
+(
+   ID                   int not null auto_increment comment '主键',
+   USER_ID              int comment '用户ID',
+   QUESTION_ID          int comment '试题ID',
+   QUESTION_TYPE        int comment '试题类型',
+   FAV_TIME             datetime comment '收藏时间',
+   FAV_SOURCE           varchar(32) comment '收藏来源',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_MY_FAV_QUESTION comment '我的收藏试题';
+ALTER TABLE `EXM_MY_FAV_QUESTION` ADD INDEX `MY_FAV_QUESTION_U` ( `USER_ID` );
+
+INSERT INTO EXM_MY_FAV_QUESTION (
+    USER_ID,
+    QUESTION_ID,
+    QUESTION_TYPE,
+    FAV_TIME,
+    FAV_SOURCE,
+    UPDATE_USER_ID,
+    UPDATE_TIME
+)
+SELECT MEQ.USER_ID, MEQ.QUESTION_ID, Q.TYPE, MEQ.UPDATE_TIME, E.NAME, MEQ.UPDATE_USER_ID, MEQ.UPDATE_TIME
+FROM EXM_MY_EXER_QUESTION MEQ
+LEFT JOIN EXM_QUESTION Q ON MEQ.QUESTION_ID = Q.ID
+LEFT JOIN EXM_EXER E ON MEQ.EXER_ID = E.ID
+WHERE MEQ.FAV = 1;
+
+
+-- 练习支持用户自由组合试题，方便模拟考试等情景
 drop table if exists EXM_MY_EXER;
 create table EXM_MY_EXER
 (
@@ -93,39 +165,3 @@ create table EXM_MY_EXER_QUESTION
 alter table EXM_MY_EXER_QUESTION comment '我的练习试题';
 ALTER TABLE `EXM_MY_EXER_QUESTION` ADD INDEX `MY_EXER_QUESTION_MQ` ( `MY_EXER_ID`, `QUESTION_ID` );
 
--- 练习的错题集和收藏从练习中独立出来，以适应业务变更
-create table EXM_MY_WRONG_QUESTION
-(
-   ID                   int not null auto_increment comment '主键',
-   USER_ID              int comment '用户ID',
-   QUESTION_ID          int comment '试题ID',
-   QUESTION_TYPE        int comment '试题类型',
-   WRONG_NUM            int comment '答错次数',
-   FIRST_WRONG_TIME     datetime comment '首次答错时间',
-   FIRST_WRONG_SOURCE   varchar(32) comment '首次答错来源',
-   LAST_WRONG_TIME      datetime comment '末次答错时间',
-   LAST_WRONG_SOURCE    varchar(32) comment '末次答错来源',
-   STATE                int comment '状态（1：已掌握；2：未掌握）',
-   UPDATE_USER_ID       int comment '修改用户ID',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_MY_WRONG_QUESTION comment '我的错题';
-ALTER TABLE `EXM_MY_WRONG_QUESTION` ADD INDEX `MY_WRONG_QUESTION_U` ( `USER_ID` );
-
-create table EXM_MY_FAV_QUESTION
-(
-   ID                   int not null auto_increment comment '主键',
-   USER_ID              int comment '用户ID',
-   QUESTION_ID          int comment '试题ID',
-   QUESTION_TYPE        int comment '试题类型',
-   FAV_TIME             datetime comment '收藏时间',
-   FAV_SOURCE           varchar(32) comment '收藏来源',
-   UPDATE_USER_ID       int comment '修改用户ID',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_MY_FAV_QUESTION comment '我的收藏试题';
-ALTER TABLE `EXM_MY_FAV_QUESTION` ADD INDEX `MY_FAV_QUESTION_U` ( `USER_ID` );
