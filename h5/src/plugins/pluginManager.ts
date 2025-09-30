@@ -1,12 +1,12 @@
 // src/plugins/pluginManager.ts
 //
-// 🧩 插件管理器核心模块
+// 插件管理器核心模块
 //
 // 本模块负责动态加载、初始化和管理外部插件。
 // 宿主应用应调用 `initPlugins()` 启动插件系统。
 // 插件开发者需确保其构建产物挂载到 window 并实现标准 API 接口。
 //
-// 🔧 使用方式：
+//   使用方式：
 //   1. 构建插件为 IIFE/UMD 格式，挂载名格式为 camelCase（如 'myPlugin'）
 //   2. 实现 init(), mount(), unmount(), getInfo() 四个方法
 //   3. 在 plugins-config.json 中配置插件元信息与脚本路径
@@ -73,7 +73,7 @@ const pluginInfos: Array<ReturnType<PluginAPI['getInfo']>> = []
  */
 export async function loadPlugin(config: PluginConfig): Promise<void> {
     if (!config.enabled) {
-        console.log(`⏭️ 插件已禁用，跳过加载: ${config.name}`)
+        //console.log(`插件已禁用，跳过加载: ${config.name}`)
         return
     }
 
@@ -85,12 +85,12 @@ export async function loadPlugin(config: PluginConfig): Promise<void> {
             script.async = true
 
             script.onload = () => {
-                console.log(`✅ 插件加载成功: ${config.url}`)
+                //console.log(`插件加载成功: ${config.url}`)
                 resolve()
             }
 
             script.onerror = () => {
-                console.error(`❌ 插件加载失败: ${config.url}`)
+                console.error(`插件加载失败: ${config.url}`)
                 reject(new Error(`插件加载失败: ${config.url}`))
             }
 
@@ -115,9 +115,9 @@ export async function loadPlugin(config: PluginConfig): Promise<void> {
             pluginInfos.push(info)
         }
 
-        console.log(`🔌 插件加载成功: ${info.displayName} (v${info.version})`)
+        //console.log(`插件加载成功: ${info.displayName} (v${info.version})`)
     } catch (err) {
-        console.error(`❌ 插件加载失败: ${config.name}`, err)
+        console.error(`插件加载失败: ${config.name}`, err)
     }
 }
 
@@ -150,7 +150,7 @@ export async function initPlugins(): Promise<void> {
             window.vueUse = module
         })
         .catch(err => {
-            console.warn('⚠️ 无法加载 @vueuse/core，部分功能受限', err)
+            console.warn('无法加载 @vueuse/core，部分功能受限', err)
         })
 
     // 加载插件配置文件
@@ -159,9 +159,9 @@ export async function initPlugins(): Promise<void> {
         const res = await fetch('/plugins-config.json')
         if (!res.ok) throw new Error(`加载plugins-config.json失败`)
         pluginConfigs = await res.json()
-        console.log('✅ 插件配置加载成功:', pluginConfigs)
+        //console.log('插件配置加载成功:', pluginConfigs)
     } catch (err) {
-        console.error('❌ 无法加载插件配置文件:', err)
+        console.error('无法加载插件配置文件:', err)
     }
 
     // 批量加载所有插件
@@ -169,8 +169,8 @@ export async function initPlugins(): Promise<void> {
         for (const config of pluginConfigs) {
             await loadPlugin(config)
         }
-        console.log('🎉 所有插件加载完成')
+        //console.log('所有插件加载完成')
     } catch (err) {
-        console.error('❌ 插件加载过程出错:', err)
+        console.error('插件加载过程出错:', err)
     }
 }

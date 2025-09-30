@@ -13,9 +13,8 @@
                 <xmks-card-guide title="注意事项" icon="icon-tubiaoziti-34" class="notes__head"></xmks-card-guide>
                 <div class="notes__main">
                     <span class="notes__txt">
-                        1、进入此页面，会自动增量更新最新试题到自己的练习<br />
-                        2、答错试题会收集到历史错题<br />
-                        3、需要重新练题，请点“重新练习”按钮<br />
+                        1、自组练习抽题：优先题库中未抽取到的试题，题数不足再补练习中未答试题，再补练习中已答试题，确保练习内容覆盖全面<br />
+                        2、单次练习5分钟无操作，将视为挂机，不计入有效练习时长<br />
                     </span>
                 </div>
             </div>
@@ -50,7 +49,7 @@
                 </div>
             </div>
             <div class="exer">
-                <xmks-card-guide title="练习信息" icon="icon-icon_xiugaishijian" class="exer__head"></xmks-card-guide>
+                <xmks-card-guide title="练习时长" icon="icon-icon_xiugaishijian" class="exer__head"></xmks-card-guide>
                 <div class="exer__main">
                     <!-- <span class="exer__label">
                         练习名称：<span class="exer__value">{{ exer.name }}</span>
@@ -68,60 +67,107 @@
             <div class="my-exer">
                 <xmks-card-guide title="我的练习" icon="icon-icon_xiugaishijian" class="my-exer__head"></xmks-card-guide>
                 <div class="my-exer__main">
-                    <div v-if="progressBar.percent !== 100" class="create-progress">
-                        <el-progress :percentage="40" class="create-progress__progress" />
-                        <div class="create-progress__inner">
-                            <span class="create-progress__title">{{ progressBar.title }}</span>
-                            <span class="create-progress__desc">{{ progressBar.msg }}</span>
-                        </div>
-                    </div>
-                    <el-scrollbar v-if="progressBar.percent === 100" max-height="290px" class="history">
-                        <div v-if="pullInfo.questionBankUpdateNum" class="history__head">新增试题{{
-                            pullInfo.questionBankUpdateNum }}道</div>
-                        <div v-for="(exer, index) in listpage.list" :key="index" class="history__list">
+                    <el-scrollbar max-height="290px" class="history">
+                        <div v-for="(myExer, index) in listpage.list" :key="index" class="history__list">
                             <div class="history__row">
-                                <span class="history__title">{{ dictStore.getValue('QUESTION_TYPE', exer.type)
-                                    }}题</span>
+                                <span class="history__title">{{ myExer.name }}</span>
                                 <span class="history__btn"
-                                    @click="$router.push(`/my-exer/paper/${form.exerId}/${exer.type}`)">>>继续训练</span>
+                                    @click="$router.push(`/my-exer/paper/${form.exerId}/${myExer.id}`)">>>继续训练</span>
                             </div>
                             <div class="history__row">
-                                <span class="history__progress">进度：{{ exer.answerNum }}/{{ exer.questionNum }}</span>
+                                <span class="history__progress">进度：{{ myExer.answerNum }}/{{ myExer.questionNum
+                                    }}</span>
                                 <span class="history__correct-rate">正确率：
                                     {{ new
-                                        Decimal(exer.correctAnswerNum).dividedBy(exer.answerNum).times(100).toDecimalPlaces(0).toNumber()
+                                        Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber()
                                     }}%</span>
                             </div>
                         </div>
                         <xmks-card-empty v-if="listpage.list.length === 0" name="暂无最近练习"
                             icon="icon-tubiaoziti22-22"></xmks-card-empty>
                     </el-scrollbar>
-                    <div v-if="progressBar.percent === 100" class="my-exer__opt-panel">
-                        <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large"
+                    <div class="opt-panel">
+                        <el-form ref="formRef" :model="form" :rules="formRules" label-width="" size="large"
                             class="form">
-                            <el-form-item label="题型练习：" prop="type">
-                                <el-radio-group v-model="form.type">
-                                    <el-radio v-for="dict in dictStore.getList('QUESTION_TYPE')" :key="dict.dictKey"
-                                        border :value="parseInt(dict.dictKey)"
-                                        :disabled="typeStatis.find((item: any) => item.type == dict.dictKey)?.count === 0">
-                                        {{ dict.dictValue }}题（{{ pullInfo.questionTypeStatis[dict.dictKey] || 0 }}道）
-                                    </el-radio>
+                            <el-form-item label="" prop="type">
+                                <el-radio-group v-model="form.type" size="large" fill="#04C7F2" @change="toggleExer">
+                                    <el-radio-button
+                                        :label="`自组（${(myExerStatis.free?.[0]?.count ?? 0) + (myExerStatis.free?.[1]?.count ?? 0) + (myExerStatis.free?.[2]?.count ?? 0) + (myExerStatis.free?.[3]?.count ?? 0) + (myExerStatis.free?.[4]?.count ?? 0)}题）`"
+                                        :value="1" />
+                                    <el-radio-button
+                                        :label="`未练（${(myExerStatis.unExer?.[0]?.count ?? 0) + (myExerStatis.unExer?.[1]?.count ?? 0) + (myExerStatis.unExer?.[2]?.count ?? 0) + (myExerStatis.unExer?.[3]?.count ?? 0) + (myExerStatis.unExer?.[4]?.count ?? 0)}题）`"
+                                        :value="2" />
+                                    <el-radio-button
+                                        :label="`错题（${(myExerStatis.wrong?.[0]?.count ?? 0) + (myExerStatis.wrong?.[1]?.count ?? 0) + (myExerStatis.wrong?.[2]?.count ?? 0) + (myExerStatis.wrong?.[3]?.count ?? 0) + (myExerStatis.wrong?.[4]?.count ?? 0)}题）`"
+                                        :value="3" />
+                                    <el-radio-button
+                                        :label="`收藏（${(myExerStatis.fav?.[0]?.count ?? 0) + (myExerStatis.fav?.[1]?.count ?? 0) + (myExerStatis.fav?.[2]?.count ?? 0) + (myExerStatis.fav?.[3]?.count ?? 0) + (myExerStatis.fav?.[4]?.count ?? 0)}题）`"
+                                        :value="4" />
                                 </el-radio-group>
                             </el-form-item>
-                            <el-form-item label="巩固练习：" prop="type">
-                                <el-radio-group v-model="form.type">
-                                    <el-radio border :value="11" :disabled="pullInfo.wrongAnswerNum === 0">
-                                        历史错题（{{ pullInfo.wrongAnswerNum }}道）
-                                    </el-radio>
-                                    <el-radio border :value="12" :disabled="pullInfo.favNum === 0">
-                                        我的收藏（{{ pullInfo.favNum }}道）
-                                    </el-radio>
-                                </el-radio-group>
+                            <el-form-item label="单选题：" prop="singleNum">
+                                <div class="form__slider">
+                                    <el-slider v-model="form.singleNum" show-stops :max="questionMaxNum.singleNum"
+                                        class="form__slider-bar form__slider-bar--single-choice"
+                                        :format-tooltip="(value: number) => `本次选择【${value || 0}】题`"
+                                        :disabled="questionMaxNum.singleNum === 0"
+                                        @input="nameUpdate" /><!--max变小，不触发change，改用input-->
+                                    <span class="form__slider-unit form__slider-unit--single-choice">
+                                        共{{ questionMaxNum.singleNum }}题
+                                    </span>
+                                </div>
                             </el-form-item>
-                            <el-form-item>
-                                <el-button type="primary" class="form__btn" @click="toExer">进入练习</el-button>
-                                <el-button v-if="form.type >= 1 && form.type <= 5" type="primary"
-                                    class="form__btn form__btn--secondary" @click="reset">重新练习</el-button>
+                            <el-form-item label="多选题：" prop="multipleNum">
+                                <div class="form__slider">
+                                    <el-slider v-model="form.multipleNum" show-stops :max="questionMaxNum.multipleNum"
+                                        class="form__slider-bar form__slider-bar--form__multiple-choice"
+                                        :format-tooltip="(value: number) => `本次选择【${value || 0}】题`"
+                                        :disabled="questionMaxNum.multipleNum === 0" @input="nameUpdate" />
+                                    <span class="form__slider-unit form__slider-unit--multiple-choice">
+                                        共{{ questionMaxNum.multipleNum }}题
+                                    </span>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="填空题：" prop="fillBlankNum">
+                                <div class="form__slider">
+                                    <el-slider v-model="form.fillBlankNum" show-stops :max="questionMaxNum.fillBlankNum"
+                                        class="form__slider-bar form__slider-bar--fill-blank"
+                                        :format-tooltip="(value: number) => `本次选择【${value || 0}】题`"
+                                        :disabled="questionMaxNum.fillBlankNum === 0" @input="nameUpdate" />
+                                    <span class="form__slider-unit form__slider-unit--fill-blank">
+                                        共{{ questionMaxNum.fillBlankNum }}题
+                                    </span>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="判断题：" prop="judgeNum">
+                                <div class="form__slider">
+                                    <el-slider v-model="form.judgeNum" show-stops :max="questionMaxNum.judgeNum"
+                                        class="form__slider-bar form__slider-bar--judge"
+                                        :format-tooltip="(value: number) => `本次选择【${value || 0}】题`"
+                                        :disabled="questionMaxNum.judgeNum === 0" @input="nameUpdate" />
+                                    <span class="form__slider-unit form__slider-unit--judge">
+                                        共{{ questionMaxNum.judgeNum }}题
+                                    </span>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="问答题：" prop="qaNum">
+                                <div class="form__slider">
+                                    <el-slider v-model="form.qaNum" show-stops :max="questionMaxNum.qaNum"
+                                        class="form__slider-bar form__slider-bar--qa"
+                                        :format-tooltip="(value: number) => `本次选择【${value || 0}】题`"
+                                        :disabled="questionMaxNum.qaNum === 0" @input="nameUpdate" />
+                                    <span class="form__slider-unit form__slider-unit--qa">
+                                        共{{ questionMaxNum.qaNum }}题
+                                    </span>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="名 称：" prop="name" class="form__submit">
+                                <el-input v-model="form.name" placeholder="请输入名称">
+                                    <template #append>
+                                        <el-button type="primary" :loading="loading" :disabled="loading"
+                                            class="form__btn" @click="toExer">创建练习</el-button>
+                                    </template>
+                                </el-input>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -134,13 +180,12 @@
 import { computed, onMounted, reactive } from 'vue'
 import XmksCardGuide from '@/components/card/xmks-card-guide.vue'
 import { ref } from 'vue'
-import { useDictStore } from '@/stores/dict'
 import type { User } from '@/ts/base/user'
 import { userGet } from '@/api/base/user'
 import { useUserStore } from '@/stores/user'
 import { useRoute, useRouter } from 'vue-router'
 import { dayjs, type FormRules } from 'element-plus'
-import { myExerExerGet, myExerListpage, myExerPull, myExerQuestionStatis, myExerExerReset, myExerTrackList } from '@/api/my/my-exer'
+import { myExerAdd, myExerGet, myExerListpage, myExerTrackList } from '@/api/my/my-exer'
 import type { Exer } from '@/ts/exam/exer'
 import type { Listpage } from '@/ts/common/listpage'
 import Decimal from 'decimal.js-light'
@@ -153,24 +198,40 @@ import VChart from 'vue-echarts'
 import { LineChart } from 'echarts/charts';
 import { UniversalTransition } from 'echarts/features';
 import { loginSysTime } from '@/api/login'
+import { exerListpage } from '@/api/exam/exer'
 
 /************************变量定义相关***********************/
 use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent, GridComponent, LineChart, UniversalTransition]);
 
-const dictStore = useDictStore(); // 字典缓存
-const userStore = useUserStore(); // 字典缓存
+const userStore = useUserStore(); // 用户缓存
 const route = useRoute()// 路由
 const router = useRouter()// 路由
 const form = reactive<any>({
     exerId: route.params.exerId,
     type: 1,
+    singleNum: 0,
+    multipleNum: 0,
+    fillBlankNum: 0,
+    judgeNum: 0,
+    qaNum: 0,
 })
+const questionMaxNum = reactive({
+    singleNum: 0,
+    multipleNum: 0,
+    fillBlankNum: 0,
+    judgeNum: 0,
+    qaNum: 0,
+})
+
 const formRules = reactive<FormRules>({// 表单规则
+    name: [
+        { required: true, message: '请输入名称', trigger: 'blur' },
+    ],
 })
 
 const listpage = reactive<Listpage>({// 我的练习分页列表
     curPage: 1,
-    pageSize: 20,
+    pageSize: 100,
     total: 0,
     list: [],
 })
@@ -186,11 +247,10 @@ const user = reactive<User>({ // 用户
 const exer = reactive<Exer>({// 练习
     id: null,
     name: '',
-    questionBankId: undefined,
+    questionBankIds: [],
     userIds: [],
     orgIds: [],
     state: null,
-    rmkState: null
 })
 
 const markTypeStatis = reactive({ // 阅卷类型统计
@@ -213,13 +273,7 @@ const questionStatisOpts = ref({// 试题类型统计
             type: 'pie',
             radius: '100%',
             center: ['50%', '50%'],
-            data: [
-                // { value: 20, name: '单选题' },
-                // { value: 20, name: '多选题' },
-                // { value: 10, name: '填空题' },
-                // { value: 10, name: '判断题' },
-                // { value: 2, name: '问答题' },
-            ],
+            data: [],
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,
@@ -234,31 +288,24 @@ const questionStatisOpts = ref({// 试题类型统计
     ],
 })
 
-// const typeCache: Record<number, string> = reactive({ 1: '单选题', 2: '多选题', 3: '填空题', 4: '判断题', 5: '问答题', });
-
-const typeStatis = ref<any[]>([])
-
-const progressBar = reactive({// 进度条
-    percent: 0,// 进度
-    title: '', // 响应码
-    msg: '', // 响应消息
+const myExerStatis = reactive({
+    free: [],
+    unExer: [],
+    wrong: [],
+    fav: [],
 })
-const pullInfo = reactive({
-    questionTypeStatis: {} as any,
-    questionBankUpdateNum: 0,
-    wrongAnswerNum: 0,
-    favNum: 0,
-});// 拉取信息
+
+const loading = ref(false)
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     userQuery()
-    exerQuery()
-    questionStatisQuery()
+    questionBankStatisQuery()
     exerTimeStatisQuery()
-
-    await pull()
     myExerQuery()
+
+    await myExerStatisQuery()
+    toggleExer()
 })
 
 /************************计算属性相关*************************/
@@ -282,24 +329,6 @@ const exerTimeStatisOpts = ref({// 练习时长统计
         trigger: 'axis',
         formatter: '{b}<br/>练习{c}分钟'
     },
-    // toolbox: {
-    //     feature: {
-    //         myDay: {
-    //             show: true,
-    //             title: '按日统计',
-    //             icon: 'image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzAwMCI+CiAgPHJlY3QgeD0iMiIgeT0iNCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiByeD0iMSIgcnk9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHJlY3QgeD0iNCIgeT0iMiIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPgogIDxyZWN0IHg9IjEwIiB5PSIyIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+CiAgPHRleHQgeD0iOSIgeT0iMTIiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPuWPtzwvdGV4dD4KPC9zdmc+',
-    //             onclick: function () {
-    //             }
-    //         },
-    //         myDay2: {
-    //             show: true,
-    //             title: '按月统计',
-    //             icon: 'image://data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzAwMCI+CiAgPHJlY3QgeD0iMiIgeT0iNCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiByeD0iMSIgcnk9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHJlY3QgeD0iNCIgeT0iMiIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPgogIDxyZWN0IHg9IjEwIiB5PSIyIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+CiAgPHRleHQgeD0iOSIgeT0iMTIiIGZvbnQtc2l6ZT0iOCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPuaXnTwvdGV4dD4KPC9zdmc+',
-    //             onclick: function () {
-    //             }
-    //         }
-    //     },
-    // },
     xAxis: {
         type: 'category',
         data: exerTimeStatisXAxis
@@ -332,58 +361,51 @@ async function userQuery() {
     user.orgName = data.orgName;
 }
 
-// 练习查询
-async function exerQuery() {
-    const { data: { data } } = await myExerExerGet({ exerId: route.params.exerId })
-    exer.id = parseInt(route.params.exerId as string)
-    exer.name = data.name
-    exer.questionBankId = data.questionBankId
-    exer.state = data.state
-    exer.rmkState = data.rmkState
+// 我的练习统计查询
+async function myExerStatisQuery() {
+    const { data: { data } } = await myExerGet({ exerId: route.params.exerId })
+    myExerStatis.free = data.free
+    myExerStatis.unExer = data.unExer
+    myExerStatis.wrong = data.wrong
+    myExerStatis.fav = data.fav
 }
 
-// 试题统计查询
-async function questionStatisQuery() {
-    const { data: { data: { typeStatis: _typeStatis, markTypeStatis: _markTypeStatis } } } = await myExerQuestionStatis({ exerId: route.params.exerId })
-    const datas = (_typeStatis as any[]).map((d) => {
-        return {
-            name: dictStore.getValue('QUESTION_TYPE', d.type),
-            value: d.count
-        };
-    })
-    questionStatisOpts.value.series[0].data = datas as never[]
-    markTypeStatis.subjective = _markTypeStatis.subjective;
-    markTypeStatis.objective = _markTypeStatis.objective;
-    markTypeStatis.chapter = _markTypeStatis.chapter;
-
-    typeStatis.value = _typeStatis
-}
-
-// 我的练习拉取
-async function pull() {
-    progressBar.percent = 20;
-    progressBar.title = '正在更新最新试题'
-    progressBar.msg = '请等待。。。'
-
-    const { data: { code, msg, data } } = await myExerPull({
-        exerId: route.params.exerId
+// 题库统计查询
+async function questionBankStatisQuery() {
+    const { data: { code, data } } = await exerListpage({
+        id: route.params.exerId,
+        curPage: 1,
+        pageSize: 1,
     })
 
     if (code !== 200) {
-        progressBar.percent = 99;
-        progressBar.title = '拉取错误'
-        progressBar.msg = msg
         return
     }
+    questionStatisOpts.value.series[0].data.push({
+        name: '单选题',
+        value: data.list[0].singleNum
+    } as never)
+    questionStatisOpts.value.series[0].data.push({
+        name: '多选题',
+        value: data.list[0].multipleNum
+    } as never)
+    questionStatisOpts.value.series[0].data.push({
+        name: '填空题',
+        value: data.list[0].fillBlankObjNum + data.list[0].fillBlankSubNum
+    } as never)
+    questionStatisOpts.value.series[0].data.push({
+        name: '判断题',
+        value: data.list[0].judgeNum
+    } as never)
+    questionStatisOpts.value.series[0].data.push({
+        name: '问答题',
+        value: data.list[0].qaObjNum + data.list[0].qaSubNum
+    } as never)
 
-    pullInfo.questionTypeStatis = data.questionTypeStatis
-    pullInfo.questionBankUpdateNum = data.questionBankUpdateNum
-    pullInfo.wrongAnswerNum = data.wrongAnswerNum
-    pullInfo.favNum = data.favNum
 
-    progressBar.percent = 100;
-    progressBar.title = '拉取成功'
-    progressBar.msg = ''
+    markTypeStatis.subjective = data.list[0].subjectiveNum
+    markTypeStatis.objective = data.list[0].objectiveNum
+    markTypeStatis.chapter = 0
 }
 
 // 我的练习查询
@@ -402,30 +424,56 @@ async function myExerQuery() {
     listpage.total = data.total
 }
 
-// 去练习
-async function toExer() {
-    router.push(`/my-exer/paper/${form.exerId}/${form.type}`)
-}
-
-// 重新练习
-async function reset() {
-    if (form.type === 11 || form.type === 12) {
-        return;
+// 切换练习
+function toggleExer() {
+    if (form.type === 1) {
+        questionMaxNum.singleNum = myExerStatis.free?.[0]?.count ?? 0
+        questionMaxNum.multipleNum = myExerStatis.free?.[1]?.count ?? 0
+        questionMaxNum.fillBlankNum = myExerStatis.free?.[2]?.count ?? 0
+        questionMaxNum.judgeNum = myExerStatis.free?.[3]?.count ?? 0
+        questionMaxNum.qaNum = myExerStatis.free?.[4]?.count ?? 0
+    } else if (form.type === 2) {
+        questionMaxNum.singleNum = myExerStatis.unExer?.[0]?.count ?? 0
+        questionMaxNum.multipleNum = myExerStatis.unExer?.[1]?.count ?? 0
+        questionMaxNum.fillBlankNum = myExerStatis.unExer?.[2]?.count ?? 0
+        questionMaxNum.judgeNum = myExerStatis.unExer?.[3]?.count ?? 0
+        questionMaxNum.qaNum = myExerStatis.unExer?.[4]?.count ?? 0
+    } else if (form.type === 3) {
+        questionMaxNum.singleNum = myExerStatis.wrong?.[0]?.count ?? 0
+        questionMaxNum.multipleNum = myExerStatis.wrong?.[1]?.count ?? 0
+        questionMaxNum.fillBlankNum = myExerStatis.wrong?.[2]?.count ?? 0
+        questionMaxNum.judgeNum = myExerStatis.wrong?.[3]?.count ?? 0
+        questionMaxNum.qaNum = myExerStatis.wrong?.[4]?.count ?? 0
+    } else if (form.type === 4) {
+        questionMaxNum.singleNum = myExerStatis.fav?.[0]?.count ?? 0
+        questionMaxNum.multipleNum = myExerStatis.fav?.[1]?.count ?? 0
+        questionMaxNum.fillBlankNum = myExerStatis.fav?.[2]?.count ?? 0
+        questionMaxNum.judgeNum = myExerStatis.fav?.[3]?.count ?? 0
+        questionMaxNum.qaNum = myExerStatis.fav?.[4]?.count ?? 0
     }
 
-    const { data: { code } } = await myExerExerReset({
-        exerId: route.params.exerId,
-        type: form.type,
-    })
+    nameUpdate()
+}
 
+// 名称更新
+function nameUpdate() {
+    const typeName = form.type === 1 ? '自组' : form.type === 2 ? '未练' : form.type === 3 ? '错题' : '收藏'
+    form.name = `${typeName}_单${form.singleNum || 0}多${form.multipleNum || 0}填${form.fillBlankNum || 0}判${form.judgeNum || 0}问${form.qaNum || 0}_${dayjs().format('YYYYMMDD')}`
+}
+
+// 去练习
+async function toExer() {
+    loading.value = true
+    const { data: { code, data } } = await myExerAdd({ ...form })
     if (code !== 200) {
+        loading.value = false // 错误显示，正确就跳转了
         return
     }
 
-    toExer()
+    router.push(`/my-exer/paper/${route.params.exerId}/${data}`)
 }
 
-// 练习时间统计（近一年）
+// 练习时长统计（近一年）
 async function exerTimeStatisQuery() {
     const { data: { data } } = await loginSysTime({})
     const startTime = dayjs(data).subtract(1, 'year').startOf('month').valueOf(); // 去年同月的第一天（去年的今天会丢数据）
@@ -722,17 +770,135 @@ async function exerTimeStatisQuery() {
                     }
                 }
 
-                .my-exer__opt-panel {
+                .opt-panel {
                     width: 480px;
 
-
                     .form {
-                        margin-top: 20px;
+                        padding: 10px 20px 0px 20px;
 
-                        .el-radio {
-                            width: 160px;
-                            margin-top: 10px;
+                        // .el-radio {
+                        //     width: 160px;
+                        //     margin-top: 10px;
+                        // }
+
+                        .el-form-item {
+                            margin-bottom: 0px;
+
+                            // :deep(.el-form-item__label) {
+                            //     height: 36px;
+                            //     line-height: 36px;
+                            // }
+
+                            // :deep(.el-form-item__content) {
+                            //     line-height: 36px;
+
+                            //     .el-slider {
+                            //         height: 36px;
+                            //     }
+                            // }
+                            :deep(.form__slider) {
+                                flex: 1;
+                                display: flex;
+                                justify-content: space-between;
+
+                                .form__slider-bar {
+                                    width: 300px;
+
+                                    .el-slider__stop {
+                                        background-color: #e4e7ed;
+                                    }
+
+                                    &.form__slider-bar--single-choice {
+                                        .el-slider__bar {
+                                            background-color: #4692D8;
+                                        }
+
+                                        .el-slider__button {
+                                            border: 2px solid #4692D8;
+                                        }
+                                    }
+
+                                    &.form__slider-bar--multiple-choice {
+                                        .el-slider__bar {
+                                            background-color: #06BCE3;
+                                        }
+
+                                        .el-slider__button {
+                                            border: 2px solid #06BCE3;
+                                        }
+                                    }
+
+                                    &.form__slider-bar--fill-blank {
+                                        .el-slider__bar {
+                                            background-color: #978CEC;
+                                        }
+
+                                        .el-slider__button {
+                                            border: 2px solid #978CEC;
+                                        }
+                                    }
+
+                                    &.form__slider-bar--judge {
+                                        .el-slider__bar {
+                                            background-color: #DD8CEC;
+                                        }
+
+                                        .el-slider__button {
+                                            border: 2px solid #DD8CEC;
+                                        }
+                                    }
+
+                                    &.form__slider-bar--qa {
+                                        .el-slider__bar {
+                                            background-color: #85E3A4;
+                                        }
+
+                                        .el-slider__button {
+                                            border: 2px solid #85E3A4;
+                                        }
+                                    }
+                                }
+
+                                .form__slider-unit {
+                                    flex: 1;
+                                    text-align: right;
+
+                                    &.form__slider-unit--single-choice {
+                                        color: #4692D8;
+                                    }
+
+                                    &.form__slider-unit--multiple-choice {
+                                        color: #06BCE3;
+                                    }
+
+                                    &.form__slider-unit--fill-blank {
+                                        color: #978CEC;
+                                    }
+
+                                    &.form__slider-unit--judge {
+                                        color: #DD8CEC;
+                                    }
+
+                                    &.form__slider-unit--qa {
+                                        color: #85E3A4;
+                                    }
+                                }
+                            }
+
+                            .el-radio-button {
+                                :deep(.el-radio-button__inner) {
+                                    width: 110px;
+                                    height: 38px;
+                                    line-height: 38px;
+                                    padding: 0px;
+                                }
+                            }
+
                         }
+
+                        // .form__submit {
+                        //     margin-top: 4px;
+                        // }
 
                         .form__btn {
                             width: 114px;

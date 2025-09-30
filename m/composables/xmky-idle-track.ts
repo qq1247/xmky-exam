@@ -109,7 +109,7 @@ export function useIdleTrack() {
 		startListeningEvents();
 
 		// 启动错峰延迟
-		console.log(`[IdleTrack] 跟踪已启动 | 错峰:${startupDelaySec}s | 周期:${trackingIntervalSec}s | 阈值:${inactiveThresholdSec}s`)
+		//console.log(`[IdleTrack] 跟踪已启动 | 错峰:${startupDelaySec}s | 周期:${trackingIntervalSec}s | 阈值:${inactiveThresholdSec}s`)
 		startupDelayTimer = setTimeout(() => {
 			startReporting(trackingIntervalMs, onStatusUpdate);
 		}, startupDelayMs) as unknown as number;

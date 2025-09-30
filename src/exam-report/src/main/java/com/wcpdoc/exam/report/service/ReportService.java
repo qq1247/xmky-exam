@@ -7,7 +7,7 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 
 /**
- * 统计服务层接口
+ * 报表服务层接口
  * 
  * v1.0 zhanghc 2017年8月29日下午2:03:36
  */

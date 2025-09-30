@@ -42,21 +42,6 @@ public interface MyExerTrackMonthlyDao extends RBaseDao<MyExerTrackMonthly> {
 	 * v1.0 zhanghc 2025年9月12日下午9:59:08
 	 * 
 	 * @param exerId
-	 * @param startYm
-	 * @param endYm
-	 * @return List<MyExerTrackMonthly>
-	 */
-	default List<MyExerTrackMonthly> getList(Integer exerId, Integer startYm, Integer endYm) {
-		return selectList(new LambdaQueryWrapper<MyExerTrackMonthly>().eq(MyExerTrackMonthly::getExerId, exerId)
-				.ge(MyExerTrackMonthly::getYm, startYm).le(MyExerTrackMonthly::getYm, endYm));
-	}
-
-	/**
-	 * 我的练习跟踪月度列表
-	 * 
-	 * v1.0 zhanghc 2025年9月12日下午9:59:08
-	 * 
-	 * @param exerId
 	 * @param userId
 	 * @param startYm
 	 * @param endYm

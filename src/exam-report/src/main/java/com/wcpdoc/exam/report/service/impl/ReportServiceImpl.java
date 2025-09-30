@@ -54,7 +54,7 @@ import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.report.service.ReportService;
 
 /**
- * 统计服务层实现
+ * 报表服务层实现
  * 
  * v1.0 zhanghc 2017年8月29日下午2:03:36
  */

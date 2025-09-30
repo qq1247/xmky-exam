@@ -23,12 +23,10 @@ import lombok.Data;
 public class MyExerQuestion {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
-	private Integer exerId;
-	private Integer userId;
-	private Integer type;
+	private Integer myExerId;
 	private Integer questionId;
+	private Integer questionType;
 	private Integer no;
-	private Integer shuffleNo;
 	private BigDecimal score;
 	@TableField(typeHandler = BigDecimalTypeHandler.class)
 	private List<BigDecimal> scores;
@@ -37,8 +35,6 @@ public class MyExerQuestion {
 	private Date answerTime;
 	private String userAnswer;
 	private BigDecimal userScore;
-	private Integer fav;
-	private Integer wrongAnswerNum;
 	private Integer updateUserId;
 	private Date updateTime;
 }

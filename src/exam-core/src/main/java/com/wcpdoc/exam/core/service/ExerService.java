@@ -11,7 +11,7 @@ import com.wcpdoc.exam.core.entity.Exer;
 public interface ExerService extends BaseService<Exer> {
 
 	/**
-	 * 试题模拟添加
+	 * 练习添加
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * 
@@ -20,7 +20,7 @@ public interface ExerService extends BaseService<Exer> {
 	void add(Exer exer);
 
 	/**
-	 * 试题模拟修改
+	 * 练习修改
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * 

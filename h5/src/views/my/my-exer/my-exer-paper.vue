@@ -15,12 +15,12 @@
                     <span class="iconfont icon-icon_xiugaishijian paper-toolbar__btn-icon"></span>
                     <span class="paper-toolbar__btn-txt">{{ toolbars.answerShow ? '答题' : '背题' }}</span>
                 </el-button>
-                <el-button type='' class="paper-toolbar__btn"
+                <!-- <el-button type='' class="paper-toolbar__btn"
                     :class="{ 'paper-toolbar__btn--active': toolbars.randShow }"
                     @click="toolbars.randShow = !toolbars.randShow; questionView()">
                     <span class="iconfont icon-a-icon_huaban1 paper-toolbar__btn-icon"></span>
                     <span class="paper-toolbar__btn-txt">{{ toolbars.randShow ? '顺序' : '随机' }}</span>
-                </el-button>
+                </el-button> -->
             </div>
             <div class="paper__wrap">
                 <div class="answer-sheet">
@@ -74,21 +74,25 @@
                         </el-form>
                         <div class="opt">
                             <el-button type='' class="opt__btn"
-                                :class="{ 'opt__btn--active': _myExerQuestions[curQuestionIndex]?.fav === 1 }"
-                                @click="fav">
+                                :class="{ 'opt__btn--active': favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1) }"
+                                @click="questionFav">
                                 <span class="iconfont opt__btn-icon" :class="{
-                                    'icon-lianxi-66': _myExerQuestions[curQuestionIndex]?.fav === 1,
-                                    'icon-lianxi-64': _myExerQuestions[curQuestionIndex]?.fav === 2,
+                                    'icon-lianxi-66': favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1),
+                                    'icon-lianxi-64': !favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1),
                                 }"></span>
-                                <span class="opt__btn-txt">{{ _myExerQuestions[curQuestionIndex]?.fav === 1 ? '已收藏' :
-                                    '未收藏' }}</span>
+                                <span class="opt__btn-txt">{{
+                                    favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1) ?
+                                        '已收藏' :
+                                        '未收藏' }}</span>
                             </el-button>
 
-                            <el-button v-if="_myExerQuestions[curQuestionIndex]?.wrongAnswerNum" type=''
-                                class="opt__btn opt__btn--active" @click="wrongReset">
+                            <el-button
+                                v-if="wrongQuestions.some(wq => wq.questionId === _myExerQuestions[curQuestionIndex]?.questionId)"
+                                type='' class="opt__btn opt__btn--active" @click="wrongQuestionReset">
                                 <span class="opt__btn-txt opt__btn-txt--wrong">答错{{
-                                    _myExerQuestions[curQuestionIndex]?.wrongAnswerNum
-                                    }}次&nbsp;&nbsp;</span>
+                                    wrongQuestions.find(wq => wq.questionId ===
+                                        _myExerQuestions[curQuestionIndex]?.questionId).wrongNum
+                                }}次&nbsp;&nbsp;</span>
                                 <span class="iconfont icon-lianxi-61 opt__btn-icon"></span>
                                 <span class="opt__btn-txt">已掌握</span>
                             </el-button>
@@ -117,7 +121,7 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import XmksQuestion from '@/components/question/xmks-question.vue'
 import type { MyExerQuestion } from '@/ts/exam/my-exer-question';
-import { myExerAnswer, myExerFav, myExerGenerate, myExerQuestion, myExerWrongReset, myExerTrack } from '@/api/my/my-exer';
+import { myExerAnswer, myExerQuestionFav, myExerQuestion, myExerTrack, myExerQuestionList, myExerFavQuestionList, myExerWrongQuestionList, myExerWrongQuestionReset } from '@/api/my/my-exer';
 import { useRoute } from 'vue-router';
 import type { ExamQuestion } from '@/ts/exam/exam';
 import type { FormInstance, FormRules } from 'element-plus';
@@ -158,6 +162,8 @@ const formRules = reactive<FormRules>({// 表单校验规则
         }
     }],
 })
+const favQuestionIds = ref<number[]>([])
+const wrongQuestions = ref<any[]>([])
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -171,13 +177,14 @@ onMounted(async () => {
 
             await myExerTrack({
                 exerId: route.params.exerId,
-                type: route.params.type
             })
         }
     })
 
     // 加载试题列表
     await questionQuery()
+    await favQuestionQuery()
+    await wrongQuestionQuery()
 
     // 显示第一题
     curQuestionIndex.value = 0
@@ -238,8 +245,18 @@ const isWrong = computed(() => (index: number) => {
 /************************事件相关*****************************/
 // 试题列表查询
 async function questionQuery() {
-    const { data: { data } } = await myExerGenerate({ exerId: route.params.exerId, type: route.params.type })
+    const { data: { data } } = await myExerQuestionList({ id: route.params.id })
     myExerQuestions.value.push(...data)
+}
+// 收藏试题列表查询
+async function favQuestionQuery() {
+    const { data: { data } } = await myExerFavQuestionList({})
+    favQuestionIds.value.push(...data)
+}
+// 错题列表查询
+async function wrongQuestionQuery() {
+    const { data: { data } } = await myExerWrongQuestionList({})
+    wrongQuestions.value.push(...data)
 }
 
 /**
@@ -263,7 +280,7 @@ async function questionView() {
 
     Promise.all(uncacheQuestionId.map(questionId =>
         myExerQuestion({
-            exerId: route.params.exerId,
+            id: route.params.id,
             questionId
         }).then(res => {
             questionCache.value.set(questionId as number, res.data.data)
@@ -276,7 +293,7 @@ async function questionView() {
 // 答题
 async function answer() {
     const { data: { code, data } } = await myExerAnswer({
-        exerId: route.params.exerId,
+        id: route.params.id,
         questionId: curExamQuestion.value?.questionId,
         userAnswers: curExamQuestion.value?.userAnswers,
         userScore: curExamQuestion.value?.markType === 2 ? form.score : null,// 主观题有效
@@ -289,36 +306,51 @@ async function answer() {
     _myExerQuestions.value[curQuestionIndex.value].userScore = data
 
     if (_myExerQuestions.value[curQuestionIndex.value].userScore !== _myExerQuestions.value[curQuestionIndex.value].score) {
-        _myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum = _myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum as number + 1
+        const found = wrongQuestions.value.find(wq => wq.questionId === _myExerQuestions.value[curQuestionIndex.value].questionId)
+        if (found) {
+            found.wrongNum += 1
+        } else {
+            wrongQuestions.value.push({
+                questionId: _myExerQuestions.value[curQuestionIndex.value].questionId,
+                wrongNum: 1
+            })
+        }
     }
 }
 
 // 收藏试题
-async function fav() {
-    const { data: { code } } = await myExerFav({
-        exerId: route.params.exerId,
+async function questionFav() {
+    const { data: { code } } = await myExerQuestionFav({
+        id: route.params.id,
         questionId: curExamQuestion.value?.questionId,
     })
     if (code !== 200) {
         return
     }
 
-    _myExerQuestions.value[curQuestionIndex.value].fav = _myExerQuestions.value[curQuestionIndex.value].fav === 1 ? 2 : 1
+    const index = favQuestionIds.value.indexOf(curExamQuestion.value?.questionId as number)
+    if (index > -1) {
+        favQuestionIds.value.splice(index, 1)
+    } else {
+        favQuestionIds.value.push(curExamQuestion.value?.questionId as number)
+    }
 }
-// 错题重置（从历史错题中移除）
-async function wrongReset() {
-    const { data: { code } } = await myExerWrongReset({
-        exerId: route.params.exerId,
+// 错题重置
+async function wrongQuestionReset() {
+    const { data: { code } } = await myExerWrongQuestionReset({
+        id: route.params.id,
         questionId: curExamQuestion.value?.questionId,
     })
     if (code !== 200) {
         return
     }
 
-    _myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum = 0
-    _myExerQuestions.value[curQuestionIndex.value].userScore = null
-    curExamQuestion.value!.userAnswers = []
-    curExamQuestion.value!.userScore = null
+    const currentId = _myExerQuestions.value[curQuestionIndex.value]?.questionId
+    if (currentId == null) return
+
+    wrongQuestions.value = wrongQuestions.value.filter(
+        wq => wq.questionId !== currentId
+    )
 }
 </script>
 <style scoped lang="scss">

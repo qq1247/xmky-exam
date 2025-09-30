@@ -75,7 +75,7 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { loginIn, loginSysTime, loginNoLogin, loginParm } from '@/api/login';
+import { loginIn, loginSysTime, loginNoLogin, loginParm, loginEncrypt } from '@/api/login';
 import { examExamGet } from '@/api/exam.js';
 import { dictIndexList } from '@/api/dict';
 import { useUserStore } from '@/stores/user';
@@ -83,6 +83,12 @@ import { useDictStore } from '@/stores/dict';
 import { useParmStore } from '@/stores/parm';
 import { myExamGeneratePaper } from '@/api/myExam';
 import { escape2Html } from '@/util/htmlUtil';
+// #ifdef MP-WEIXIN
+import WxmpRsa from 'wxmp-rsa'
+// #endif
+// #ifdef H5
+import forge from 'node-forge';
+// #endif
 
 /************************变量定义相关***********************/
 const userStore = useUserStore();
@@ -153,8 +159,38 @@ async function login() {
 		return;
 	}
 
+	const { code: _code, data: _encrypt } = await loginEncrypt({ loginName: form.loginName });
+	if (_code !== 200) {
+		return;
+	}
+
+	let encryptedPwd = null;
+	try {
+		// #ifdef H5
+		const base64Key = _encrypt.publicKey;
+		const lines = base64Key.match(/.{1,64}/g) || [];
+		const pemKey = `-----BEGIN PUBLIC KEY-----\n${lines.join('\n')}\n-----END PUBLIC KEY-----`;
+		const publicKey = forge.pki.publicKeyFromPem(pemKey);
+		
+		const encryptedBytes = publicKey.encrypt(`${_encrypt.nonce}:${form.pwd}`, 'RSAES-PKCS1-V1_5');
+		encryptedPwd = forge.util.encode64(encryptedBytes);
+		// #endif
+		
+		// #ifdef MP-WEIXIN
+		const rsa = new WxmpRsa()
+		rsa.setPublicKey(_encrypt.publicKey)
+		encryptedPwd = rsa.encryptLong(`${_encrypt.nonce}:${form.pwd}`)
+		// #endif
+	} catch (error) {
+		uni.showToast({ title: '生成秘钥失败', icon: 'error' });
+		return;
+	}
+
 	// 用户登录
-	let { code, data } = await loginIn({ ...form });
+	let { code, data } = await loginIn({
+		loginName: form.loginName,
+		pwd: encryptedPwd
+	});
 	if (code !== 200) {
 		return;
 	}

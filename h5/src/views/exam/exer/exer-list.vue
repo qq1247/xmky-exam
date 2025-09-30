@@ -32,15 +32,27 @@
                 <div class="exer__outer">
                     <div class="exer__inner">
                         <span class="exer__num">
+                            {{ exer.questionBankIds.length }}<span class="exer__unit">个</span>
+                        </span>
+                        <span class="exer__after-txt">题库已选</span>
+                    </div>
+                    <div class="exer__inner">
+                        <span class="exer__num">
+                            {{ exer.objectiveNum + exer.subjectiveNum }}<span class="exer__unit">题</span>
+                        </span>
+                        <span class="exer__after-txt">试题合计</span>
+                    </div>
+                    <div class="exer__inner">
+                        <span class="exer__num">
                             {{ exer.orgIds.length }}<span class="exer__unit">个</span>
                         </span>
-                        <span class="exer__after-txt">练习机构</span>
+                        <span class="exer__after-txt">机构已选</span>
                     </div>
                     <div class="exer__inner">
                         <span class="exer__num">
                             {{ exer.userIds.length }}<span class="exer__unit">人</span>
                         </span>
-                        <span class="exer__after-txt">练习人数</span>
+                        <span class="exer__after-txt">用户已选</span>
                     </div>
                 </div>
                 <div class="exer__other">
@@ -163,7 +175,7 @@ async function query() {
 
                 .exer__outer {
                     display: grid;
-                    grid-template-columns: repeat(2, 1fr);
+                    grid-template-columns: repeat(4, 1fr);
                     height: 74px;
                     justify-content: center;
                     align-items: center;

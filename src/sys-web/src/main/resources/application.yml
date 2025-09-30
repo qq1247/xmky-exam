@@ -58,18 +58,16 @@ shiro-filter:
     ? /api/exam/get: jwt,anyRolesEx[0,2,3]
     ? /api/exam/**: jwt,anyRolesEx[0,2]
     ? /api/myMark/**: jwt,anyRolesEx[0,2,3]
-    ? /api/report/subAdmin/home: jwt,anyRolesEx
     ? /api/report/exam/rankListpage: jwt,anyRolesEx[0,2]
     ? /api/report/exam/statis: jwt,anyRolesEx[0,2]
     ? /api/report/paper/exportPDF: jwt,anyRolesEx[0,2]
     ? /api/report/rank/exportPDF: jwt,anyRolesEx[0,2]
+    ? /api/report/exer/trackListpage: jwt,anyRolesEx[0,2]
+    ? /api/report/exer/wrongQuestionListpage: jwt,anyRolesEx[0,2]
     ? /api/parm/get: jwt,anyRolesEx[0,2]
      
     ? /api/myExam/**: jwt,anyRolesEx[1,4]
     ? /api/myExer/**: jwt,anyRolesEx[1]
-    ? /api/report/user/home: jwt,anyRolesEx[1]
-     
-    ? /api/report/markUser/home: jwt,anyRolesEx[3]
      
     ? /api/**: jwt,anyRolesEx[0]
   demo:

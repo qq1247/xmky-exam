@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,13 +8,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.RBaseDao;
-import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExerRmkDao;
-import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.ExerRmk;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
@@ -42,47 +37,47 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 
 	@Override
 	public void rmk(ExerRmk exerRmk, Boolean anon) {
-		// 数据有效性校验
-		if (!ValidateUtil.isValid(exerRmk.getExerId())) {
-			throw new MyException("参数错误：exerId");
-		}
-		if (!ValidateUtil.isValid(exerRmk.getQuestionId())) {
-			throw new MyException("参数错误：questionId");
-		}
-		if (!ValidateUtil.isValid(exerRmk.getContent())) {
-			throw new MyException("参数错误：content");
-		}
-		if (!ValidateUtil.isValid(anon)) {
-			throw new MyException("参数错误：anon");
-		}
-		Exer exer = exerService.getById(exerRmk.getExerId());
-		if (exer.getState() == 0) {
-			throw new MyException("无权限");
-		}
-//		long curTime = System.currentTimeMillis();
-//		if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-//			throw new MyException("时间已过期");
+//		// 数据有效性校验
+//		if (!ValidateUtil.isValid(exerRmk.getExerId())) {
+//			throw new MyException("参数错误：exerId");
 //		}
-		if (!exer.getUserIds().contains(getCurUser().getId())) {
-			throw new MyException("无权限");
-		}
-		Question question = examCacheService.getQuestion(exerRmk.getQuestionId());
-		if (question.getQuestionBankId().intValue() != exer.getQuestionBankId().intValue()) {
-			throw new MyException("无权限");
-		}
-		if (exer.getRmkState() == 2) {
-			throw new MyException("评论已关闭");
-		}
-
-		// 评论添加
-		exerRmk.setLikeNum(0);
-		exerRmk.setState(1);
-		exerRmk.setLikeUserIds(null);
-		if (!anon) {// 如果匿名评论，不记录评论用户
-			exerRmk.setUpdateUserId(getCurUser().getId());
-		}
-		exerRmk.setUpdateTime(new Date());
-		save(exerRmk);
+//		if (!ValidateUtil.isValid(exerRmk.getQuestionId())) {
+//			throw new MyException("参数错误：questionId");
+//		}
+//		if (!ValidateUtil.isValid(exerRmk.getContent())) {
+//			throw new MyException("参数错误：content");
+//		}
+//		if (!ValidateUtil.isValid(anon)) {
+//			throw new MyException("参数错误：anon");
+//		}
+//		Exer exer = exerService.getById(exerRmk.getExerId());
+//		if (exer.getState() == 0) {
+//			throw new MyException("无权限");
+//		}
+////		long curTime = System.currentTimeMillis();
+////		if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
+////			throw new MyException("时间已过期");
+////		}
+//		if (!exer.getUserIds().contains(getCurUser().getId())) {
+//			throw new MyException("无权限");
+//		}
+//		Question question = examCacheService.getQuestion(exerRmk.getQuestionId());
+//		if (question.getQuestionBankId().intValue() != exer.getQuestionBankId().intValue()) {
+//			throw new MyException("无权限");
+//		}
+//		if (exer.getRmkState() == 2) {
+//			throw new MyException("评论已关闭");
+//		}
+//
+//		// 评论添加
+//		exerRmk.setLikeNum(0);
+//		exerRmk.setState(1);
+//		exerRmk.setLikeUserIds(null);
+//		if (!anon) {// 如果匿名评论，不记录评论用户
+//			exerRmk.setUpdateUserId(getCurUser().getId());
+//		}
+//		exerRmk.setUpdateTime(new Date());
+//		save(exerRmk);
 	}
 
 	@Override

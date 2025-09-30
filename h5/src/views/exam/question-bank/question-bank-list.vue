@@ -12,7 +12,7 @@
             <div class="opt">
                 <el-button type="success" class="opt__btn" @click="$router.push(`/question-bank/question-nav/list/0`)">
                     <span class="iconfont icon-liebiao-03 opt__btn-icon"></span>
-                    <span class="opt__btn-txt">全库试题</span>
+                    <span class="opt__btn-txt">全库查询</span>
                 </el-button>
             </div>
         </div>
@@ -260,7 +260,8 @@ async function query() {
                 .question-bank__other {
                     display: flex;
                     justify-content: space-between;
-                    margin-top: 20px;
+                    align-items: center;
+                    margin-top: 16px;
                     font-size: 12px;
                     color: #8F939C;
                 }

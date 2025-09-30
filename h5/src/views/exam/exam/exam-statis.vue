@@ -4,7 +4,7 @@
         </div> -->
         <el-scrollbar max-height="calc(100vh - 110px)" class="exam-statis__main">
             <div class="statis-data">
-                <div class="statis-data__head">考试统计</div>
+                <div class="statis-data__head">考试统计（{{ exam.name }}）</div>
                 <div class="statis-data__main">
                     <span v-if="exam.markState !== 3" class="statis-data__msg">考试未结束</span>
                     <div v-if="exam.markState === 3" class="statis-num">

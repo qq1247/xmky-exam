@@ -1,6 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -9,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -40,6 +46,10 @@ public class ApiExerController extends BaseController {
 	private QuestionBankService questionBankService;
 	@Resource
 	private BaseCacheService baseCacheService;
+	@Resource
+	private UserService userService;
+	@Resource
+	private OrgService orgService;
 
 	/**
 	 * 练习列表
@@ -66,11 +76,27 @@ public class ApiExerController extends BaseController {
 
 			PageOut pageOut = exerService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
-				if (CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin()) {
-					map.put("userIds", map.get("userIds") == null ? new Integer[0]
-							: StringUtil.toIntList(map.get("userIds").toString()));
-					map.put("orgIds", map.get("orgIds") == null ? new Integer[0]
-							: StringUtil.toIntList(map.get("orgIds").toString()));
+				List<Integer> questionBankIds = StringUtil.toIntList((String) map.remove("questionBankIds"));
+				List<Integer> userIds = StringUtil.toIntList((String) map.remove("userIds"));
+				List<Integer> orgIds = StringUtil.toIntList((String) map.remove("orgIds"));
+
+				List<QuestionBank> questionBankList = questionBankIds.stream()
+						.map(questionBankId -> questionBankService.getById(questionBankId))
+						.collect(Collectors.toList());
+				map.put("objectiveNum", questionBankList.stream().mapToInt(QuestionBank::getObjectiveNum).sum());
+				map.put("subjectiveNum", questionBankList.stream().mapToInt(QuestionBank::getSubjectiveNum).sum());
+				map.put("singleNum", questionBankList.stream().mapToInt(QuestionBank::getSingleNum).sum());
+				map.put("multipleNum", questionBankList.stream().mapToInt(QuestionBank::getMultipleNum).sum());
+				map.put("fillBlankObjNum", questionBankList.stream().mapToInt(QuestionBank::getFillBlankObjNum).sum());
+				map.put("fillBlankSubNum", questionBankList.stream().mapToInt(QuestionBank::getFillBlankSubNum).sum());
+				map.put("judgeNum", questionBankList.stream().mapToInt(QuestionBank::getJudgeNum).sum());
+				map.put("qaObjNum", questionBankList.stream().mapToInt(QuestionBank::getQaObjNum).sum());
+				map.put("qaSubNum", questionBankList.stream().mapToInt(QuestionBank::getQaSubNum).sum());
+
+				if (CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin()) {// 管理员和子管理员显示
+					map.put("questionBankIds", questionBankIds);
+					map.put("userIds", userIds);
+					map.put("orgIds", orgIds);
 				}
 			}
 			return PageResultEx.ok().data(pageOut);
@@ -168,19 +194,35 @@ public class ApiExerController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exer exer = exerService.getById(id);
-			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
-			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
+
 			return PageResultEx.ok()//
 					.addAttr("id", exer.getId())//
 					.addAttr("name", exer.getName())//
-					.addAttr("questionBankId", exer.getQuestionBankId())//
-					.addAttr("questionBankName", questionBank.getName())//
-					.addAttr("userIds", exer.getUserIds())//
-					.addAttr("orgIds", exer.getOrgIds())//
+					.addAttr("questionBanks", exer.getQuestionBankIds().stream().map(questionBankId -> {
+						QuestionBank questionBank = questionBankService.getById(questionBankId);
+						Map<String, Object> data = new HashMap<>();
+						data.put("id", questionBank.getId());
+						data.put("name", questionBank.getName());
+						return data;
+					}).collect(Collectors.toList()))//
+					.addAttr("orgs", orgService.getList().stream().filter(org -> exer.getOrgIds().contains(org.getId()))
+							.map(org -> {
+								Map<String, Object> data = new HashMap<>();
+								data.put("id", org.getId());
+								data.put("name", org.getName());
+								return data;
+							}).collect(Collectors.toList()))//
+					.addAttr("users", userService.getList().stream()
+							.filter(user -> exer.getUserIds().contains(user.getId())).map(user -> {
+								Map<String, Object> data = new HashMap<>();
+								data.put("id", user.getId());
+								data.put("name", user.getName());
+								return data;
+							}).collect(Collectors.toList()))//
 					.addAttr("state", exer.getState())//
-					.addAttr("rmkState", exer.getRmkState())//
 			;
 		} catch (MyException e) {
 			log.error("练习获取错误：{}", e.getMessage());
@@ -203,12 +245,13 @@ public class ApiExerController extends BaseController {
 	public PageResult state(Integer id) {
 		try {
 			Exer exer = exerService.getById(id);
-			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
-			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
 
 			exer.setState(exer.getState() == 1 ? 2 : 1);
+			exer.setUpdateTime(new Date());
+			exer.setUpdateUserId(getCurUser().getId());
 			exerService.updateById(exer);
 			return PageResult.ok();
 		} catch (MyException e) {

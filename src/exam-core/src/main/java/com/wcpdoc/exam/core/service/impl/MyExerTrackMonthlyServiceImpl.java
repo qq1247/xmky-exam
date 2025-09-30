@@ -34,11 +34,6 @@ public class MyExerTrackMonthlyServiceImpl extends BaseServiceImp<MyExerTrackMon
 	}
 
 	@Override
-	public List<MyExerTrackMonthly> getList(Integer exerId, Integer startYm, Integer endYm) {
-		return myExerTrackMonthlyDao.getList(exerId, startYm, endYm);
-	}
-
-	@Override
 	public List<MyExerTrackMonthly> getList(Integer exerId, Integer userId, Integer startYm, Integer endYm) {
 		return myExerTrackMonthlyDao.getList(exerId, userId, startYm, endYm);
 	}

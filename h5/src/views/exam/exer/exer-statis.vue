@@ -7,25 +7,26 @@
                     <el-tabs v-model="curTab" class="tabs">
                         <el-form :inline="true" size="large" class="query">
                             <!-- <el-form-item label="">
-                                <el-input v-model="examRankForm.userName" placeholder="请输入姓名" />
+                                <el-input v-model="exerTrackForm.userName" placeholder="请输入姓名" />
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" class="query__btn" @click="examRankQuery">查询</el-button>
+                                <el-button type="primary" class="query__btn" @click="exerTrackQuery">查询</el-button>
                             </el-form-item> -->
                         </el-form>
-                        <el-tab-pane label="练习时长" name="examRank">
-                            <el-table :data="exerTracks" size="small" row-key="userId" height="450px" class="table">
+                        <el-tab-pane label="练习时长" name="exerTrack">
+                            <el-table :data="exerTrackListpage.list" size="small" row-key="userId" height="450px"
+                                class="table">
                                 <el-table-column prop="userName" label="姓名" align="center" />
                                 <el-table-column prop="orgName" label="机构" align="center" />
                                 <el-table-column prop="" label="当月练习" align="center">
                                     <template #default="scope">{{ scope.row.tracks[scope.row.tracks.length -
                                         1].minuteCount
-                                    }}分钟</template>
+                                        }}分钟</template>
                                 </el-table-column>
                                 <el-table-column prop="" label="上月练习" align="center">
                                     <template #default="scope">{{ scope.row.tracks[scope.row.tracks.length -
                                         2].minuteCount
-                                    }}分钟</template>
+                                        }}分钟</template>
                                 </el-table-column>
                                 <el-table-column prop="" label="近一年练习" align="center">
                                     <template #default="scope">
@@ -40,10 +41,15 @@
                                     </template>
                                 </el-table-column>
                             </el-table>
+                            <el-pagination v-model:current-page="exerTrackListpage.curPage"
+                                v-model:page-size="exerTrackListpage.pageSize" :total="exerTrackListpage.total"
+                                background layout="prev, pager, next" :hide-on-single-page="true" size="large"
+                                class="pagination" @size-change="exerTrackQuery" @current-change="exerTrackQuery"
+                                @prev-click="exerTrackQuery" @next-click="exerTrackQuery" />
                         </el-tab-pane>
                         <el-tab-pane label="答错数量" name="wrongAnswerNumList">
-                            <el-table :data="wrongAnswerNums" size="small" row-key="userId" height="450px" class="table"
-                                @expand-change="exerQuestionListQuestion">
+                            <el-table :data="exerWrongQuestionListpage.list" size="small" row-key="userId"
+                                height="450px" class="table">
                                 <el-table-column prop="userName" label="姓名" align="center" />
                                 <el-table-column prop="orgName" label="机构" align="center" />
                                 <el-table-column prop="" label="已答错数量" align="center">
@@ -76,18 +82,21 @@
                                 </el-table-column>
                                 <el-table-column type="expand">
                                     <template #default="props">
-                                        <el-table :data="props.row.exerQuestions" size="small" row-key="userId"
+                                        <el-table :data="props.row.questions" size="small" row-key="userId"
                                             class="sub_table">
-                                            <el-table-column prop="questionId" label="试题编号" align="center"
-                                                width="100" />
-                                            <el-table-column prop="questionTitle" label="试题题干"
-                                                :show-overflow-tooltip="true" />
+                                            <el-table-column prop="title" label="试题题干" :show-overflow-tooltip="true" />
                                             <el-table-column prop="wrongAnswerNum" label="答错次数" align="center"
                                                 width="100" />
                                         </el-table>
                                     </template>
                                 </el-table-column>
                             </el-table>
+                            <el-pagination v-model:current-page="exerWrongQuestionListpage.curPage"
+                                v-model:page-size="exerWrongQuestionListpage.pageSize"
+                                :total="exerWrongQuestionListpage.total" background layout="prev, pager, next"
+                                :hide-on-single-page="true" size="large" class="pagination"
+                                @size-change="exerWrongQuestionQuery" @current-change="exerWrongQuestionQuery"
+                                @prev-click="exerWrongQuestionQuery" @next-click="exerWrongQuestionQuery" />
                         </el-tab-pane>
                     </el-tabs>
                 </div>
@@ -99,7 +108,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import { reportExerQuestionListpage, reportExerTrackList, reportExerWrongAnswerNumList } from '@/api/report/report'
+import { reportExerTrackListpage, reportExerWrongQuestionListpage } from '@/api/report/report'
 import { dayjs } from 'element-plus'
 import { loginSysTime } from '@/api/login'
 import { TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent, GridComponent } from 'echarts/components'
@@ -109,68 +118,69 @@ import { use } from 'echarts/core'
 import { LineChart } from 'echarts/charts';
 import { UniversalTransition } from 'echarts/features';
 import _ from 'lodash'
+import type { Listpage } from '@/ts/common/listpage'
 
 /************************变量定义相关***********************/
 use([CanvasRenderer, TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent, GridComponent, LineChart, UniversalTransition]);
 const route = useRoute()// 路由
-const curTab = ref('examRank') // 当前标签页（默认考试排名）
-const examRankForm = reactive({
-    userName: ''
+const curTab = ref('exerTrack') // 当前标签页（默认考试排名）
+
+const exerTrackListpage = reactive<Listpage>({// 练习跟踪分页列表
+    curPage: 1,
+    pageSize: 10,
+    total: 0,
+    list: [],
 })
-const exerTracks = ref<any[]>([])
-const wrongAnswerNums = ref<any[]>([])
+const exerWrongQuestionListpage = reactive<Listpage>({// 练习跟踪分页列表
+    curPage: 1,
+    pageSize: 10,
+    total: 0,
+    list: [],
+})
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
-    exerTrackListQuery()
-    wrongAnswerNumListQuery()
+    exerTrackQuery()
+    exerWrongQuestionQuery()
 })
 
 /************************事件相关*****************************/
 
 // 练习跟踪查询
-async function exerTrackListQuery() {
+async function exerTrackQuery() {
     const { data: { data } } = await loginSysTime({})
     const startTime = dayjs(data).subtract(1, 'year').startOf('month').valueOf(); // 去年同月的第一天（去年的今天会丢数据）
     const endTime = dayjs(data).startOf('day').valueOf();// 今天
 
-    const { data: { code, data: _exerTracks } } = await reportExerTrackList({
+    const { data: { code, data: data1 } } = await reportExerTrackListpage({
         exerId: route.params.id,
         startYm: dayjs(startTime).format('YYYY-MM'),
         endYm: dayjs(endTime).format('YYYY-MM'),
+        curPage: exerTrackListpage.curPage,
+        pageSize: exerTrackListpage.pageSize,
     })
 
     if (code !== 200) {
         return
     }
 
-    exerTracks.value = _exerTracks
-}
-// 练习错题数量查询
-async function wrongAnswerNumListQuery() {
-    const { data: { code, data: _wrongAnswerNums } } = await reportExerWrongAnswerNumList({
-        exerId: route.params.id,
-    })
-
-    if (code !== 200) {
-        return
-    }
-
-    wrongAnswerNums.value = _wrongAnswerNums
+    exerTrackListpage.list = data1.list
+    exerTrackListpage.total = data1.total
 }
 // 练习错题排行查询
-async function exerQuestionListQuestion(row: any, expandedRows: any[]) {
-    const { data: { code, data: _exerQuestions } } = await reportExerQuestionListpage({
+async function exerWrongQuestionQuery() {
+    const { data: { code, data } } = await reportExerWrongQuestionListpage({
         exerId: route.params.id,
-        userId: row.userId,
-        wrongAnswerNum: 0, // 只看答错
+        curPage: exerWrongQuestionListpage.curPage,
+        pageSize: exerWrongQuestionListpage.pageSize,
     })
 
     if (code !== 200) {
         return
     }
 
-    row.exerQuestions = _exerQuestions.list
+    exerWrongQuestionListpage.list = data.list
+    exerWrongQuestionListpage.total = data.total
 }
 
 // 生成折线图选项

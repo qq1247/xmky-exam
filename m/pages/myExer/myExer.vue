@@ -16,8 +16,23 @@
 			<scroll-view scroll-y="true" class="myexer-main__scroll" :style="{ height: taskListHeight + 'px' }">
 				<xm-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
 					<template #content>
+						<view class="myexer-main__head">
+							<text>主观：</text>
+							<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
+							<text>客观：</text>
+							<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
+						</view>
 						<view>
-							<text></text>
+							<text>单选：</text>
+							<text class="myexer-main__value">{{ exer.singleNum }}</text>
+							<text>多选：</text>
+							<text class="myexer-main__value">{{ exer.multipleNum }}</text>
+							<text>填空：</text>
+							<text class="myexer-main__value">{{ exer.fillBlankObjNum + exer.fillBlankSubNum }}</text>
+							<text>判断：</text>
+							<text class="myexer-main__value">{{ exer.judgeNum }}</text>
+							<text>问答：</text>
+							<text class="myexer-main__value">{{ exer.qaObjNum + exer.qaSubNum }}</text>
 						</view>
 					</template>
 					<template #opt>
@@ -53,7 +68,7 @@ import { Exer } from '@/ts/exer.d';
 const queryForm = reactive({
 	name: '' // 练习名称
 });
-const listpage = reactive<Page<Exer>>({
+const listpage = reactive<Page<any>>({
 	curPage: 1,
 	pageSize: 10,
 	total: 0,
@@ -143,9 +158,13 @@ async function toExer(exer: Exer) {
 					background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 				}
 			}
+			.myexer-main__head {
+				display: flex;
+				justify-content: center;
+			}
 			.myexer-main__value {
 				color: #333;
-				margin-right: 30rpx;
+				margin-right: 20rpx;
 			}
 		}
 	}

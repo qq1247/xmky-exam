@@ -19,11 +19,10 @@ public interface MyExerTrackService extends BaseService<MyExerTrack> {
 	 * 
 	 * @param exerId
 	 * @param userId
-	 * @param type
 	 * @param ymd    yyyyMMdd
 	 * @return MyExerTrack
 	 */
-	MyExerTrack getMyExerTrack(Integer exerId, Integer userId, Integer type, Integer ymd);
+	MyExerTrack getMyExerTrack(Integer exerId, Integer userId, Integer ymd);
 
 	/**
 	 * 我的练习跟踪列表

@@ -55,17 +55,15 @@ public class ExerTrackJob {
 					String[] parts = key.split(":");
 					Integer exerId = Integer.valueOf(parts[0]);
 					Integer userId = Integer.valueOf(parts[1]);
-					Integer type = Integer.valueOf(parts[2]);
-					Integer ymd = Integer.valueOf(parts[3]);
+					Integer ymd = Integer.valueOf(parts[2]);
 					@SuppressWarnings("unchecked")
 					Set<Integer> minuteSet = cache.get(key, Set.class);
 
-					MyExerTrack myExerTrack = myExerTrackService.getMyExerTrack(exerId, userId, type, ymd);
+					MyExerTrack myExerTrack = myExerTrackService.getMyExerTrack(exerId, userId, ymd);
 					if (myExerTrack == null) {
 						myExerTrack = new MyExerTrack();
 						myExerTrack.setExerId(exerId);
 						myExerTrack.setUserId(userId);
-						myExerTrack.setType(type);
 						myExerTrack.setYmd(ymd);
 						myExerTrack.setMinuteTicks(minuteSet.stream().sorted().collect(Collectors.toList()));
 						myExerTrack.setMinuteCount(minuteSet.size());
@@ -89,13 +87,18 @@ public class ExerTrackJob {
 						myExerTrackMonthly.setExerId(exerId);
 						myExerTrackMonthly.setUserId(userId);
 						myExerTrackMonthly.setYm(Integer.parseInt(ymd.toString().substring(0, 6)));
-						myExerTrackMonthly.setMinuteCount(myExerTrack.getMinuteCount());
+						myExerTrackMonthly.setMinuteCount(myExerTrackService
+								.getList(exerId, userId, Integer.parseInt(ymd.toString().substring(0, 6) + "01"),
+										Integer.parseInt(ymd.toString().substring(0, 6) + "31"))
+								.stream().mapToInt(MyExerTrack::getMinuteCount).sum());
 						myExerTrackMonthly.setUpdateTime(new Date());
 						myExerTrackMonthly.setUpdateUserId(1);
 						myExerTrackMonthlyService.save(myExerTrackMonthly);
 					} else {
-						myExerTrackMonthly
-								.setMinuteCount(myExerTrackMonthly.getMinuteCount() + myExerTrack.getMinuteCount());
+						myExerTrackMonthly.setMinuteCount(myExerTrackService
+								.getList(exerId, userId, Integer.parseInt(ymd.toString().substring(0, 6) + "01"),
+										Integer.parseInt(ymd.toString().substring(0, 6) + "31"))
+								.stream().mapToInt(MyExerTrack::getMinuteCount).sum());
 						myExerTrackMonthly.setUpdateTime(new Date());
 						myExerTrackMonthly.setUpdateUserId(1);
 						myExerTrackMonthlyService.updateById(myExerTrackMonthly);

@@ -12,15 +12,51 @@
         </div>
         <el-scrollbar max-height="calc(100vh - 360px)" class="my-exer-list__main">
             <xmks-card-empty v-if="listpage.total === 0" name="暂无练习" icon="icon-tubiaoziti22-22"></xmks-card-empty>
-            <xmks-card-data v-else v-for="myExer in listpage.list" :key="myExer.id" :title="myExer.name" tag-name="练习"
+            <xmks-card-data v-else v-for="exer in listpage.list" :key="exer.id" :title="exer.name" tag-name="练习"
                 class="my-exer">
                 <div class="my-exer__exam-time">
+                    <span class="my-exer__pre-txt">
+                        客观题：<span class="my-exer__num">{{ exer.objectiveNum }}</span>道
+                    </span>
+                    <span class="my-exer__pre-txt">
+                        主观题：<span class="my-exer__num">{{ exer.subjectiveNum }}</span>道
+                    </span>
                 </div>
                 <div class="my-exer__outer">
+                    <div class="my-exer__inner">
+                        <span class="my-exer__num">
+                            {{ exer.singleNum }}<span class="my-exer__unit">道</span>
+                        </span>
+                        <span class="my-exer__after-txt">单选题</span>
+                    </div>
+                    <div class="my-exer__inner">
+                        <span class="my-exer__num">
+                            {{ exer.multipleNum }}<span class="my-exer__unit">道</span>
+                        </span>
+                        <span class="my-exer__after-txt">多选题</span>
+                    </div>
+                    <div class="my-exer__inner">
+                        <span class="my-exer__num">
+                            {{ exer.fillBlankObjNum + exer.fillBlankSubNum }}<span class="my-exer__unit">道</span>
+                        </span>
+                        <span class="my-exer__after-txt">填空题</span>
+                    </div>
+                    <div class="my-exer__inner">
+                        <span class="my-exer__num">
+                            {{ exer.judgeNum }}<span class="my-exer__unit">道</span>
+                        </span>
+                        <span class="my-exer__after-txt">判断题</span>
+                    </div>
+                    <div class="my-exer__inner">
+                        <span class="my-exer__num">
+                            {{ exer.qaObjNum + exer.qaSubNum }}<span class="my-exer__unit">道</span>
+                        </span>
+                        <span class="my-exer__after-txt">问答题</span>
+                    </div>
                 </div>
                 <div class="my-exer__other">
                     <div></div>
-                    <el-button type="primary" class="my-exer__btn" @click="toExer(myExer)">
+                    <el-button type="primary" class="my-exer__btn" @click="toExer(exer)">
                         进入练习
                     </el-button>
                 </div>
@@ -129,19 +165,29 @@ async function toExer(exer: any) {
                 .my-exer__exam-time {
                     display: flex;
                     justify-content: center;
+                    align-items: baseline;
                     margin-top: 10px;
-                    font-size: 14px;
-                    color: #8F939C;
+
+                    .my-exer__pre-txt {
+                        font-size: 12px;
+                        color: #8F939C;
+                        margin-right: 20px;
+
+                        .my-exer__num {
+                            font-size: 16px;
+                            color: #333333;
+                        }
+                    }
                 }
 
                 .my-exer__outer {
                     display: grid;
-                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-columns: repeat(5, 1fr);
                     height: 74px;
                     justify-content: center;
                     align-items: center;
                     margin-top: 10px;
-                    // background: #EFF5FA;
+                    background: #EFF5FA;
                     border-radius: 6px 6px 6px 6px;
 
                     .my-exer__inner {
@@ -195,25 +241,6 @@ async function toExer(exer: any) {
                     margin-top: 16px;
                     font-size: 12px;
                     color: #8F939C;
-
-                    .my-exer__tag {
-                        font-size: 12px;
-                        padding: 2px 4px;
-                        border-radius: 4px 4px 4px 4px;
-                        margin-right: 10px;
-
-                        &.my-exer__tag--state {
-                            color: #FE7068;
-                            background: #FFE6E6;
-                            border: 1px solid #FFCAC7;
-                        }
-
-                        &.my-exer__tag--mark-state {
-                            color: #1AC693;
-                            background: #E8F9F4;
-                            border: 1px solid #AFE7D6;
-                        }
-                    }
 
                     .my-exer__btn {
                         height: 30px;

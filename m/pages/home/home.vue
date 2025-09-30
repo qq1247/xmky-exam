@@ -89,7 +89,24 @@
 					tag-name="练习"
 				>
 					<template #content>
-						<view></view>
+						<view class="myexer-main__head">
+							<text>主观：</text>
+							<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
+							<text>客观：</text>
+							<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
+						</view>
+						<view>
+							<text>单选：</text>
+							<text class="myexer-main__value">{{ exer.singleNum }}</text>
+							<text>多选：</text>
+							<text class="myexer-main__value">{{ exer.multipleNum }}</text>
+							<text>填空：</text>
+							<text class="myexer-main__value">{{ exer.fillBlankObjNum + exer.fillBlankSubNum }}</text>
+							<text>判断：</text>
+							<text class="myexer-main__value">{{ exer.judgeNum }}</text>
+							<text>问答：</text>
+							<text class="myexer-main__value">{{ exer.qaObjNum + exer.qaSubNum }}</text>
+						</view>
 					</template>
 					<template #opt>
 						<view class="home-foot__opt">
@@ -404,6 +421,14 @@ function quickNav({ detail: { index } }) {
 			.home-foot__value {
 				color: #333;
 				margin-right: 30rpx;
+			}
+			.myexer-main__head {
+				display: flex;
+				justify-content: center;
+			}
+			.myexer-main__value {
+				color: #333;
+				margin-right: 20rpx;
 			}
 		}
 	}

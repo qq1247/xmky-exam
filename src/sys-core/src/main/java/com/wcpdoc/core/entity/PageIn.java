@@ -55,4 +55,8 @@ public class PageIn {
 	public <T> Page<T> toPage() {
 		return Page.of(curPage, pageSize);
 	}
+
+	public void setPageSize(Integer pageSize) {
+		this.pageSize = Math.min(pageSize, 100);
+	}
 }

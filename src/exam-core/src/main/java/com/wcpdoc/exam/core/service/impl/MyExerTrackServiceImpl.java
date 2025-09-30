@@ -28,8 +28,8 @@ public class MyExerTrackServiceImpl extends BaseServiceImp<MyExerTrack> implemen
 	}
 
 	@Override
-	public MyExerTrack getMyExerTrack(Integer exerId, Integer userId, Integer type, Integer ymd) {
-		return myExerTrackDao.getMyExerTrack(exerId, userId, type, ymd);
+	public MyExerTrack getMyExerTrack(Integer exerId, Integer userId, Integer ymd) {
+		return myExerTrackDao.getMyExerTrack(exerId, userId, ymd);
 	}
 
 	@Override

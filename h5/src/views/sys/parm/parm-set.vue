@@ -77,7 +77,7 @@
             <template #card-main>
                 <el-form ref="icpFormRef" :model="icpForm" :rules="icpFormRules" label-width="100" size="large"
                     :inline="false" class="form">
-                    <el-form-item label="内容" prop="icp">
+                    <el-form-item label="html内容" prop="icp">
                         <el-input v-model="icpForm.icp" placeholder="请输入页脚内容" :autosize="{ minRows: 2 }"
                             type="textarea" />
                     </el-form-item>

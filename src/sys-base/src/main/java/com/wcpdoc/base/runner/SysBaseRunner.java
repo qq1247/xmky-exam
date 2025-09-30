@@ -26,6 +26,6 @@ public class SysBaseRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		log.info("系统基础启动：当前版本为{}，最新版本为{}", sysVer, baseCacheService.getParm().getAppRelVer());
+		log.info("系统基础启动：当前版本为{}，最新版本为{}", baseCacheService.getParm().getAppVer(), baseCacheService.getParm().getAppRelVer());
 	}
 }

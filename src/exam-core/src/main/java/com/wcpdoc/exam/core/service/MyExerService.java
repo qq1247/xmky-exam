@@ -2,11 +2,9 @@ package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyExer;
-import com.wcpdoc.exam.core.entity.MyExerQuestion;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
 import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 
@@ -18,27 +16,13 @@ import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 public interface MyExerService extends BaseService<MyExer> {
 
 	/**
-	 * 我的练习拉取
+	 * 我的练习添加
 	 * 
-	 * v1.0 zhanghc 2025年6月15日上午10:04:47
+	 * v1.0 zhanghc 2025年9月25日上午10:52:57
 	 * 
-	 * @param exerId
-	 * @param userId
-	 * @return Map<String, Object>
+	 * @param myExer void
 	 */
-	Map<String, Object> pull(Integer exerId, Integer userId);
-
-	/**
-	 * 我的练习生成
-	 * 
-	 * v1.0 zhanghc 2025年6月23日下午3:52:21
-	 * 
-	 * @param exerId 练习ID
-	 * @param userId 用户ID
-	 * @param type   类型（1：单选题；2：多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
-	 * @return List<MyExerQuestion>
-	 */
-	List<MyExerQuestion> generate(Integer exerId, Integer userId, Integer type);
+	void add(MyExer myExer);
 
 	/**
 	 * 我的练习列表
@@ -56,38 +40,23 @@ public interface MyExerService extends BaseService<MyExer> {
 	 * 
 	 * v1.0 zhanghc 2025年6月17日下午11:04:03
 	 * 
-	 * @param exerId
-	 * @param userId
+	 * @param id
 	 * @param questionId
 	 * @param userAnswers
 	 * @param userScore
 	 * @return BigDecimal
 	 */
-	BigDecimal answer(Integer exerId, Integer userId, Integer questionId, String[] userAnswers, BigDecimal userScore);
-
-	/**
-	 * 重新练习
-	 * 
-	 * v1.0 zhanghc 2025年6月25日下午12:27:39
-	 * 
-	 * @param exerId
-	 * @param userId
-	 * @param type
-	 * @return PageResult
-	 */
-	void exerReset(Integer exerId, Integer userId, Integer type);
+	BigDecimal answer(Integer id, Integer questionId, String[] userAnswers, BigDecimal userScore);
 
 	/**
 	 * 我的练习跟踪
 	 * 
 	 * v1.0 zhanghc 2025年9月4日下午1:14:56
 	 * 
-	 * @param exerId 练习ID
-	 * @param userId 用户ID
-	 * @param type   类型（1：单选题；2多选题；3：填空题；4：判断题；5：问答题；11：历史错题；12：我的收藏）
+	 * @param exerId
 	 * @return PageResult
 	 */
-	void track(Integer exerId, Integer userId, Integer type);
+	void track(Integer exerId);
 
 	/**
 	 * 我的练习跟踪列表
@@ -95,12 +64,11 @@ public interface MyExerService extends BaseService<MyExer> {
 	 * v1.0 zhanghc 2025年9月9日下午3:34:37
 	 * 
 	 * @param exerId
-	 * @param userId
 	 * @param startDate yyyy-MM-dd
 	 * @param endDate   yyyy-MM-dd
 	 * @return List<MyExerTrack>
 	 */
-	List<MyExerTrack> getTrackList(Integer exerId, Integer userId, String startDate, String endDate);
+	List<MyExerTrack> getTrackList(Integer exerId, String startDate, String endDate);
 
 	/**
 	 * 我的练习跟踪月度列表
@@ -108,10 +76,10 @@ public interface MyExerService extends BaseService<MyExer> {
 	 * v1.0 zhanghc 2025年9月9日下午3:34:37
 	 * 
 	 * @param exerId
-	 * @param userId
 	 * @param startDate yyyy-MM
 	 * @param endDate   yyyy-MM
 	 * @return List<MyExerTrackMonthly>
 	 */
-	List<MyExerTrackMonthly> getTrackMonthlyList(Integer exerId, Integer userId, String startYm, String endYm);
+	List<MyExerTrackMonthly> getTrackMonthlyList(Integer exerId, String startYm, String endYm);
+
 }

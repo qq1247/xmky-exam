@@ -28,10 +28,10 @@ public interface QuestionDao extends RBaseDao<Question> {
 				new MPJQueryWrapper<Question>().setAlias("QUESTION")//
 						.leftJoin("EXM_QUESTION_BANK QUESTION_BANK ON QUESTION.QUESTION_BANK_ID = QUESTION_BANK.ID")
 						.leftJoin("SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID")
-						.select("QUESTION.ID", "QUESTION.TYPE", "QUESTION.TITLE", "QUESTION.IMG_FILE_IDS", "QUESTION.VIDEO_FILE_ID", "QUESTION.MARK_TYPE",
-								"QUESTION.STATE", "QUESTION.ANALYSIS", "QUESTION.QUESTION_BANK_ID",
-								"QUESTION_BANK.NAME AS QUESTION_BANK_NAME", "QUESTION.SCORE", "QUESTION.MARK_OPTIONS",
-								"UPDATE_USER.NAME AS UPDATE_USER_NAME")//
+						.select("QUESTION.ID", "QUESTION.TYPE", "QUESTION.TITLE", "QUESTION.IMG_FILE_IDS",
+								"QUESTION.VIDEO_FILE_ID", "QUESTION.MARK_TYPE", "QUESTION.STATE", "QUESTION.ANALYSIS",
+								"QUESTION.QUESTION_BANK_ID", "QUESTION_BANK.NAME AS QUESTION_BANK_NAME",
+								"QUESTION.SCORE", "QUESTION.MARK_OPTIONS", "UPDATE_USER.NAME AS UPDATE_USER_NAME")//
 						.eq(pageIn.hasParm("questionBankId"), "QUESTION.QUESTION_BANK_ID",
 								pageIn.getParm("questionBankId"))//
 						.like(pageIn.hasParm("questionBankName"), "QUESTION_BANK.NAME",
@@ -52,19 +52,6 @@ public interface QuestionDao extends RBaseDao<Question> {
 						.eq(pageIn.hasParm("curUserId"), "QUESTION.CREATE_USER_ID", pageIn.getParm("curUserId"))//
 						.orderByDesc("QUESTION.ID"));
 		return new PageOut(page.getRecords(), page.getTotal());
-	}
-
-	/**
-	 * 试题列表
-	 * 
-	 * v1.0 zhanghc 2024年1月18日上午10:26:45
-	 * 
-	 * @param ids
-	 * @return List<Question>
-	 */
-	default List<Question> getList(List<Integer> ids) {
-		return selectList(new LambdaQueryWrapper<Question>()//
-				.in(Question::getId, ids));
 	}
 
 	/**

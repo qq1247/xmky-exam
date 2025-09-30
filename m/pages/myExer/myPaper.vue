@@ -34,17 +34,26 @@
 						></uni-icons>
 						<text>标记</text>
 					</view> -->
-					<view :class="['toolbar__btn', { 'toolbar__btn--selected': isFav(curQuestionIndex) }]" @click="fav">
+					<view
+						:class="['toolbar__btn', { 'toolbar__btn--selected': favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1) }]"
+						@click="questionFav"
+					>
 						<uni-icons
 							customPrefix="iconfont"
-							:type="isFav(curQuestionIndex) ? 'icon-lianxi-66' : 'icon-lianxi-64'"
-							:color="isFav(curQuestionIndex) ? '#FF8C11' : '#231815'"
+							:type="favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1) ? 'icon-lianxi-66' : 'icon-lianxi-64'"
+							:color="favQuestionIds.includes(_myExerQuestions[curQuestionIndex]?.questionId ?? -1) ? '#FF8C11' : '#231815'"
 							size="30rpx"
 						></uni-icons>
 						<text>收藏</text>
 					</view>
-					<view class="toolbar__btn toolbar__btn--grasp" v-if="_myExerQuestions[curQuestionIndex]?.wrongAnswerNum" @click="wrongReset">
-						<text class="toolbar__txt-err">答错{{ _myExerQuestions[curQuestionIndex]?.wrongAnswerNum }}次&nbsp;</text>
+					<view
+						class="toolbar__btn toolbar__btn--grasp"
+						v-if="wrongQuestions.some((wq) => wq.questionId === _myExerQuestions[curQuestionIndex]?.questionId)"
+						@click="wrongQuestionReset"
+					>
+						<text class="toolbar__txt-err">
+							答错{{ wrongQuestions.find((wq) => wq.questionId === _myExerQuestions[curQuestionIndex]?.questionId).wrongNum }}次&nbsp;
+						</text>
 						<uni-icons customPrefix="iconfont" type="icon-lianxi-61" color="#1EA1EE" size="30rpx"></uni-icons>
 						<text>已掌握</text>
 					</view>
@@ -163,27 +172,35 @@ import { ref, reactive, computed } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import { useDictStore } from '@/stores/dict';
 import { Exer } from '@/ts/exer.d';
-import { myExerExerGet, myExerGenerate, myExerQuestion, myExerAnswer, myExerFav, myExerWrongReset, myExerTrack } from '@/api/my-exer';
+import {
+	myExerQuestion,
+	myExerAnswer,
+	myExerQuestionFav,
+	myExerWrongQuestionReset,
+	myExerFavQuestionList,
+	myExerWrongQuestionList,
+	myExerTrack,
+	myExerQuestionList
+} from '@/api/my-exer';
 import { MyExerQuestion } from '@/ts/my-exer-question.d';
 import { ExamQuestion } from '@/ts/paper.d';
 import { useIdleTrack } from '@/composables/xmky-idle-track';
 
 /************************变量定义相关***********************/
 defineProps({
-	exerId: [String, Number], // 根据实际类型调整
-	type: String
+	// [Vue warn]: Extraneous non-props attributes (exerId, id) were passed to component but could not be automatically inherited because component renders fragment or text root nodes.
+	exerId: String, // 根据实际类型调整
+	id: String
 });
-
 const dictStore = useDictStore();
 const pageParm = reactive({
 	exerId: 0,
-	type: 0
+	id: 0
 }); // 页面参数
 const toolbars = reactive({
-	// 工具栏
 	randShow: false,
 	answerShow: false
-});
+}); // 工具栏
 const myExerQuestions = ref<MyExerQuestion[]>([]); // 我的练习试题
 const questionCache = ref<Map<number, ExamQuestion>>(new Map()); // 试题缓存
 const windowSize = ref<number>(10); // 滑动窗口大小（一次性加载当前试题前后十道题，使练习时页面切换更加顺畅）
@@ -192,7 +209,6 @@ const curExamQuestion = ref<ExamQuestion>();
 
 const questionHeight = ref(0); // 试题滚动高度
 const timePercent = ref(2); // 进度条
-
 const exer = reactive<Exer>({
 	id: null,
 	name: '',
@@ -208,6 +224,8 @@ const marks = ref<number[]>([]); // 标记
 
 const inputDialog = ref();
 const idleTracker = useIdleTrack();
+const favQuestionIds = ref<number[]>([]);
+const wrongQuestions = ref<any[]>([]);
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
@@ -216,19 +234,17 @@ onLoad(async (options) => {
 		trackingIntervalSec: 60,
 		inactiveThresholdSec: 300,
 		onStatusUpdate: async (isIdle) => {
-
 			if (isIdle) return;
 
 			await myExerTrack({
-				exerId: options.exerId,
-				type: options.type
+				exerId: options.exerId
 			});
 		}
 	});
 
 	// 导航栏显示练习名称
 	pageParm.exerId = options.exerId;
-	pageParm.type = options.type;
+	pageParm.id = options.id;
 
 	await exerQuery();
 	uni.setNavigationBarTitle({
@@ -237,6 +253,8 @@ onLoad(async (options) => {
 
 	// 加载试题列表
 	await questionQuery();
+	await favQuestionQuery();
+	await wrongQuestionQuery();
 
 	// 显示第一题
 	curQuestionIndex.value = 0;
@@ -319,18 +337,28 @@ const isFav = computed(() => (index: number) => {
 /************************事件相关*****************************/
 // 练习查询
 async function exerQuery() {
-	const { data } = await myExerExerGet({ exerId: pageParm.exerId });
-	exer.id = data.id;
-	exer.name = data.name;
-	exer.questionBankId = data.questionBankId;
-	exer.state = data.state;
-	exer.rmkState = data.rmkState;
+	// const { data } = await myExerExerGet({ exerId: pageParm.exerId });
+	// exer.id = data.id;
+	// exer.name = data.name;
+	// exer.questionBankId = data.questionBankId;
+	// exer.state = data.state;
+	// exer.rmkState = data.rmkState;
 }
 
 // 试题列表查询
 async function questionQuery() {
-	const { data } = await myExerGenerate({ exerId: pageParm.exerId, type: pageParm.type });
+	const { data } = await myExerQuestionList({ id: pageParm.id });
 	myExerQuestions.value.push(...data);
+}
+// 收藏试题列表查询
+async function favQuestionQuery() {
+	const { data } = await myExerFavQuestionList({});
+	favQuestionIds.value.push(...data);
+}
+// 错题列表查询
+async function wrongQuestionQuery() {
+	const { data } = await myExerWrongQuestionList({});
+	wrongQuestions.value.push(...data);
 }
 
 /**
@@ -355,9 +383,9 @@ async function questionView() {
 	Promise.all(
 		uncacheQuestionId.map((questionId) =>
 			myExerQuestion({
-				exerId: pageParm.exerId,
+				id: pageParm.id,
 				questionId
-			}).then((res) => {
+			}).then((res: any) => {
 				questionCache.value.set(questionId as number, res.data);
 			})
 		)
@@ -374,7 +402,7 @@ async function answer() {
 	}
 
 	const { code, data } = await myExerAnswer({
-		exerId: pageParm.exerId,
+		id: pageParm.id,
 		questionId: curExamQuestion.value?.questionId,
 		userAnswers: curExamQuestion.value?.userAnswers,
 		userScore: ''
@@ -387,7 +415,15 @@ async function answer() {
 	_myExerQuestions.value[curQuestionIndex.value].userScore = data;
 
 	if (_myExerQuestions.value[curQuestionIndex.value].userScore !== _myExerQuestions.value[curQuestionIndex.value].score) {
-		_myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum = (_myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum as number) + 1;
+		const found = wrongQuestions.value.find((wq) => wq.questionId === _myExerQuestions.value[curQuestionIndex.value].questionId);
+		if (found) {
+			found.wrongNum += 1;
+		} else {
+			wrongQuestions.value.push({
+				questionId: _myExerQuestions.value[curQuestionIndex.value].questionId,
+				wrongNum: 1
+			});
+		}
 	}
 }
 
@@ -403,7 +439,7 @@ async function answerOfObjective(val: string) {
 	}
 
 	const { code, data } = await myExerAnswer({
-		exerId: pageParm.exerId,
+		id: pageParm.id,
 		questionId: curExamQuestion.value?.questionId,
 		userAnswers: curExamQuestion.value?.userAnswers,
 		userScore: userScore
@@ -430,32 +466,36 @@ async function mark(questionId: number) {
 }
 
 // 收藏试题
-async function fav() {
-	const { code } = await myExerFav({
-		exerId: pageParm.exerId,
+async function questionFav() {
+	const { code } = await myExerQuestionFav({
+		id: pageParm.id,
 		questionId: curExamQuestion.value?.questionId
 	});
 	if (code !== 200) {
 		return;
 	}
 
-	_myExerQuestions.value[curQuestionIndex.value].fav = _myExerQuestions.value[curQuestionIndex.value].fav === 1 ? 2 : 1;
+	const index = favQuestionIds.value.indexOf(curExamQuestion.value?.questionId as number);
+	if (index > -1) {
+		favQuestionIds.value.splice(index, 1);
+	} else {
+		favQuestionIds.value.push(curExamQuestion.value?.questionId as number);
+	}
 }
-
-// 错题重置（从历史错题中移除）
-async function wrongReset() {
-	const { code } = await myExerWrongReset({
-		exerId: pageParm.exerId,
+// 错题重置
+async function wrongQuestionReset() {
+	const { code } = await myExerWrongQuestionReset({
+		id: pageParm.id,
 		questionId: curExamQuestion.value?.questionId
 	});
 	if (code !== 200) {
 		return;
 	}
 
-	_myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum = 0;
-	_myExerQuestions.value[curQuestionIndex.value].userScore = null;
-	curExamQuestion.value!.userAnswers = [];
-	curExamQuestion.value!.userScore = null;
+	const currentId = _myExerQuestions.value[curQuestionIndex.value]?.questionId;
+	if (currentId == null) return;
+
+	wrongQuestions.value = wrongQuestions.value.filter((wq) => wq.questionId !== currentId);
 }
 </script>
 

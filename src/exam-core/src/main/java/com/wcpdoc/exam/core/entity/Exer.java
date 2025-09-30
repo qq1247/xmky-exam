@@ -22,13 +22,15 @@ public class Exer {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
 	private String name;
-	private Integer questionBankId;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> questionBankIds;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> userIds;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> orgIds;
 	private Integer state;
 	private Integer rmkState;
+	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;
 }

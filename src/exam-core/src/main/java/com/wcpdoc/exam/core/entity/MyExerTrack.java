@@ -23,7 +23,6 @@ public class MyExerTrack {
 	private Integer id;
 	private Integer exerId;
 	private Integer userId;
-	private Integer type;
 	private Integer ymd;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> minuteTicks;

@@ -27,13 +27,12 @@ public interface MyExerTrackDao extends RBaseDao<MyExerTrack> {
 	 * 
 	 * @param userId
 	 * @param exerId
-	 * @param type
 	 * @param ymd    yyyyMMdd
 	 * @return MyExerTrack
 	 */
-	default MyExerTrack getMyExerTrack(Integer exerId, Integer userId, Integer type, Integer ymd) {
+	default MyExerTrack getMyExerTrack(Integer exerId, Integer userId, Integer ymd) {
 		return selectOne(new LambdaQueryWrapper<MyExerTrack>().eq(MyExerTrack::getExerId, exerId)
-				.eq(MyExerTrack::getUserId, userId).eq(MyExerTrack::getType, type).eq(MyExerTrack::getYmd, ymd));
+				.eq(MyExerTrack::getUserId, userId).eq(MyExerTrack::getYmd, ymd));
 	}
 
 	/**

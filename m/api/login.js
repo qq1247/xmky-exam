@@ -18,4 +18,7 @@ export function loginSysTime(parm) {
 export function loginOut(parm) {
 	return request.post('/login/out', parm);
 }
+export function loginEncrypt(parm) {
+	return request.post('/login/encrypt', parm);
+}
 

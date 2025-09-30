@@ -368,7 +368,7 @@ const router = createRouter({
                     meta: { title: '练前阅读' },
                 },
                 {
-                    path: 'paper/:exerId/:type',
+                    path: 'paper/:exerId/:id',
                     component: () => import('@/views/my/my-exer/my-exer-paper.vue'),
                     meta: { title: '我的练习' },
                 },

@@ -33,48 +33,28 @@ public interface MyExerQuestionDao extends RBaseDao<MyExerQuestion> {
 	}
 
 	/**
-	 * 我的练习列表
+	 * 我的练习试题列表
 	 * 
 	 * v1.0 zhanghc 2025年6月15日下午2:57:26
 	 * 
-	 * @param exerId
-	 * @param userId
+	 * @param myExerId
 	 * @return List<MyExer>
 	 */
-	default List<MyExerQuestion> getList(Integer exerId, Integer userId) {
-		return selectList(new LambdaQueryWrapper<MyExerQuestion>().eq(MyExerQuestion::getExerId, exerId)
-				.eq(MyExerQuestion::getUserId, userId));
+	default List<MyExerQuestion> getList(Integer myExerId) {
+		return selectList(new LambdaQueryWrapper<MyExerQuestion>().eq(MyExerQuestion::getMyExerId, myExerId));
 	}
 
 	/**
-	 * 我的练习获取
+	 * 我的练习试题获取
 	 * 
 	 * v1.0 zhanghc 2025年6月16日下午9:11:49
 	 * 
-	 * @param exerId
-	 * @param userId
+	 * @param myExerId
 	 * @param questionId
 	 * @return MyExerQuestion
 	 */
-	default MyExerQuestion getMyExerQuestion(Integer exerId, Integer userId, Integer questionId) {
-		return selectOne(new LambdaQueryWrapper<MyExerQuestion>().eq(MyExerQuestion::getExerId, exerId)
-				.eq(MyExerQuestion::getUserId, userId).eq(MyExerQuestion::getQuestionId, questionId));
+	default MyExerQuestion getMyExerQuestion(Integer myExerId, Integer questionId) {
+		return selectOne(new LambdaQueryWrapper<MyExerQuestion>().eq(MyExerQuestion::getMyExerId, myExerId)
+				.eq(MyExerQuestion::getQuestionId, questionId));
 	}
-
-	/**
-	 * 答错数量列表
-	 * 
-	 * v1.0 zhanghc 2025年9月15日上午9:40:30
-	 * 
-	 * @param exerId
-	 * @return List<Map<String, Object>>
-	 */
-	default List<Map<String, Object>> getWrongAnswerNumList(Integer exerId) {
-		return selectMaps(new MPJQueryWrapper<MyExerQuestion>()
-				.select("USER_ID", "COUNT(*) AS TOTAL_QUESTION_NUM",
-						"SUM(CASE WHEN WRONG_ANSWER_NUM > 0 THEN 1 ELSE 0 END) AS WRONG_ANSWER_NUM", 
-						"SUM(CASE WHEN ANSWER_TIME IS NOT NULL THEN 1 ELSE 0 END) AS ANSWERED_NUM")
-				.eq("EXER_ID", exerId).groupBy("USER_ID"));
-	}
-
 }

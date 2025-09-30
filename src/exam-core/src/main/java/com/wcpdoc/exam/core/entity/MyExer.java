@@ -18,9 +18,15 @@ import lombok.Data;
 public class MyExer {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
+	private String name;
 	private Integer exerId;
 	private Integer userId;
 	private Integer type;
+	private Integer singleNum;
+	private Integer multipleNum;
+	private Integer fillBlankNum;
+	private Integer judgeNum;
+	private Integer qaNum;
 	private Integer updateUserId;
 	private Date updateTime;
 }

@@ -27,7 +27,7 @@ watch(() => route.path, (newPath, oldPath) => {
             { 'title': '练习详情', 'url': `/my-exer/read/${route.params.exerId}` },
         ]
         if (newPath.includes('/my-exer/paper')) {
-            navList.value[1] = { 'title': '我的练习', 'url': `/my-exer/paper/${route.params.exerId}/${route.params.type}` }
+            navList.value[1] = { 'title': '我的练习', 'url': `/my-exer/paper/${route.params.exerId}/${route.params.id}` }
         }
     })
 })

@@ -42,9 +42,8 @@
 						<text class="warn__title">注意事项</text>
 					</view>
 					<view class="warn__main" style="font-size: 26rpx">
-						<view>1、进入此页面，会自动增量更新最新试题到自己的练习</view>
-						<view>2、答错试题会收集到历史错题</view>
-						<view>3、需要重新练题，请点“重新练习”按钮</view>
+						<view>1、自组练习抽题：优先题库中未抽取到的试题，题数不足再补练习中未答试题，再补练习中已答试题，确保练习内容覆盖全面</view>
+						<view>2、单次练习5分钟无操作，将视为挂机，不计入有效练习时长</view>
 					</view>
 				</view>
 				<view class="exer">
@@ -55,7 +54,7 @@
 						<text class="exer__title">练习信息</text>
 					</view>
 					<view class="exer__main">
-						<qiun-data-charts type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" />
+						<qiun-data-charts canvas-id="chart-1" type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" canvas2d="true"/>
 						<!-- <view class="exer__row">
 							<text class="exer__label">练习名称：</text>
 							<text class="exer__value">{{ exer.name }}</text>
@@ -78,8 +77,37 @@
 							客观题{{ questionStatisData.markTypeStatis.objective }}道 主观题{{ questionStatisData.markTypeStatis.subjective }}道
 						</text>
 						<view>
-							<qiun-data-charts type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" />
+							<qiun-data-charts canvas-id="chart-2" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" canvas2d="true"/>
 						</view>
+					</view>
+				</view>
+				<view class="my-exer-list">
+					<view class="my-exer-list__head">
+						<view class="my-exer-list__icon">
+							<uni-icons customPrefix="iconfont" type="icon-wodekaoshi" color="white" size="26rpx"></uni-icons>
+						</view>
+						<text class="my-exer-list__title">最近练习</text>
+					</view>
+					<view class="my-exer-list__main">
+						<uni-list border-full>
+							<uni-list-item v-for="(myExer, index) in listpage.list" :key="index" showArrow :to="`/pages/myExer/myPaper?exerId=${exerId}&id=${myExer.id}`">
+								<template #body>
+									<view>
+										<view>
+											<text class="my-exer-list__name">{{ myExer.name }}</text>
+										</view>
+										<view class="my-exer-list__sub">
+											<text class="my-exer-list__lable">进度：</text>
+											<text class="my-exer-list__value">{{ myExer.answerNum }}/{{ myExer.questionNum }}</text>
+											<text class="my-exer-list__lable">正确率：</text>
+											<text class="my-exer-list__value">
+												{{ new Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber() || 0}}%
+											</text>
+										</view>
+									</view>
+								</template>
+							</uni-list-item>
+						</uni-list>
 					</view>
 				</view>
 				<view class="my-exer">
@@ -87,84 +115,138 @@
 						<view class="my-exer__icon">
 							<uni-icons customPrefix="iconfont" type="icon-wodekaoshi" color="white" size="26rpx"></uni-icons>
 						</view>
-						<text class="my-exer__title">我的练习</text>
+						<text class="my-exer__title">创建练习</text>
 					</view>
 					<view class="my-exer__main">
-						<uni-data-checkbox
-							mode="list"
-							v-model="exerType"
-							selectedColor="#04c7f2"
-							selectedTextColor="#04c7f2"
-							:localdata="[
-								{
-									text: `单选题（进度：${answerNum(1)}/${questionNum(1)}；正确率：${correctAnswerRate(1)}%）`,
-									value: 1,
-									disable: questionNum(1) === 0
-								},
-								{
-									text: `多选题（进度：${answerNum(2)}/${questionNum(2)}；正确率：${correctAnswerRate(2)}%）`,
-									value: 2,
-									disable: questionNum(2) === 0
-								},
-								{
-									text: `填空题（进度：${answerNum(3)}/${questionNum(3)}；正确率：${correctAnswerRate(3)}%）`,
-									value: 3,
-									disable: questionNum(3) === 0
-								},
-								{
-									text: `判断题（进度：${answerNum(4)}/${questionNum(4)}；正确率：${correctAnswerRate(4)}%）`,
-									value: 4,
-									disable: questionNum(4) === 0
-								},
-								{
-									text: `问答题（进度：${answerNum(5)}/${questionNum(5)}；正确率：${correctAnswerRate(5)}%）`,
-									value: 5,
-									disable: questionNum(5) === 0
-								},
-								{
-									text: `历史错题（${pullInfo.wrongAnswerNum}道）`,
-									value: 11,
-									disable: pullInfo.wrongAnswerNum === 0
-								},
-								{
-									text: `我的收藏（${pullInfo.favNum}道）`,
-									value: 12,
-									disable: pullInfo.favNum === 0
-								}
-							]"
-						></uni-data-checkbox>
+						<uni-forms ref="formRef" :label-width="75" :model="form" class="form">
+							<uni-forms-item label="类型：" name="type" required>
+								<uni-data-select
+									v-model="form.type"
+									:localdata="[
+										{
+											value: 1,
+											text: `自组（${
+												(myExerStatis.free?.[0]?.count ?? 0) +
+												(myExerStatis.free?.[1]?.count ?? 0) +
+												(myExerStatis.free?.[2]?.count ?? 0) +
+												(myExerStatis.free?.[3]?.count ?? 0) +
+												(myExerStatis.free?.[4]?.count ?? 0)
+											}题）`
+										},
+										{
+											value: 2,
+											text: `未练（${
+												(myExerStatis.unExer?.[0]?.count ?? 0) +
+												(myExerStatis.unExer?.[1]?.count ?? 0) +
+												(myExerStatis.unExer?.[2]?.count ?? 0) +
+												(myExerStatis.unExer?.[3]?.count ?? 0) +
+												(myExerStatis.unExer?.[4]?.count ?? 0)
+											}题）`
+										},
+										{
+											value: 3,
+											text: `错题（${
+												(myExerStatis.wrong?.[0]?.count ?? 0) +
+												(myExerStatis.wrong?.[1]?.count ?? 0) +
+												(myExerStatis.wrong?.[2]?.count ?? 0) +
+												(myExerStatis.wrong?.[3]?.count ?? 0) +
+												(myExerStatis.wrong?.[4]?.count ?? 0)
+											}题）`
+										},
+										{
+											value: 4,
+											text: `收藏（${
+												(myExerStatis.fav?.[0]?.count ?? 0) +
+												(myExerStatis.fav?.[1]?.count ?? 0) +
+												(myExerStatis.fav?.[2]?.count ?? 0) +
+												(myExerStatis.fav?.[3]?.count ?? 0) +
+												(myExerStatis.fav?.[4]?.count ?? 0)
+											}题）`
+										}
+									]"
+									@change="toggleExer"
+								></uni-data-select>
+							</uni-forms-item>
+							<uni-forms-item label="单选题：" name="singleNum" required>
+								<view class="my-exer__row">
+									<xm-number v-model="form.singleNum" :min="0" :max="questionMaxNum.singleNum" @input="nameUpdate" />
+									<text>，共{{ questionMaxNum.singleNum }}题</text>
+								</view>
+							</uni-forms-item>
+							<uni-forms-item label="多选题：" name="multipleNum" required>
+								<view class="my-exer__row">
+									<xm-number v-model="form.multipleNum" :min="0" :max="questionMaxNum.multipleNum" @input="nameUpdate" />
+									<text class="my-exer__label">，共{{ questionMaxNum.multipleNum }}题</text>
+								</view>
+							</uni-forms-item>
+							<uni-forms-item label="填空题：" name="fillBlankNum" required>
+								<view class="my-exer__row">
+									<xm-number v-model="form.fillBlankNum" :min="0" :max="questionMaxNum.fillBlankNum" @input="nameUpdate" />
+									<text class="my-exer__label">，共{{ questionMaxNum.fillBlankNum }}题</text>
+								</view>
+							</uni-forms-item>
+							<uni-forms-item label="判断题：" name="judgeNum" required>
+								<view class="my-exer__row">
+									<xm-number v-model="form.judgeNum" :min="0" :max="questionMaxNum.judgeNum" @input="nameUpdate" />
+									<text class="my-exer__label">，共{{ questionMaxNum.judgeNum }}题</text>
+								</view>
+							</uni-forms-item>
+							<uni-forms-item label="问答题：" name="qaNum" required>
+								<view class="my-exer__row">
+									<xm-number v-model="form.qaNum" :min="0" :max="questionMaxNum.qaNum" @input="nameUpdate" />
+									<text class="my-exer__label">，共{{ questionMaxNum.qaNum }}题</text>
+								</view>
+							</uni-forms-item>
+							<uni-forms-item label="名称：" name="loginName" required>
+								<view class="my-exer__row">
+									<uni-easyinput v-model="form.name" placeholder="请输入名称"></uni-easyinput>
+								</view>
+							</uni-forms-item>
+						</uni-forms>
+						<button :loading="loading" :disabled="loading" class="my-exer__btn my-exer__btn--active" type="primary" @click="toExer">
+							<text>创建练习</text>
+						</button>
 					</view>
 				</view>
 			</scroll-view>
 		</view>
-		<view class="myread-foot">
-			<button v-if="exerType >= 1 && exerType <= 5" class="myread-foot__exam-in myread-foot__exam-in--disable" type="primary" @click="reset">
-				<text>重新练习</text>
-			</button>
-			<button class="myread-foot__exam-in myread-foot__exam-in--active" type="primary" @click="toExer">
-				<text>进入练习</text>
-			</button>
-		</view>
+		<view class="myread-foot"></view>
 	</view>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import { User } from '@/ts/user.d';
-import { Exer } from '@/ts/exer.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
-import { myExerQuestionStatis, myExerPull, myExerListpage, myExerExerReset, myExerTrackList } from '@/api/my-exer';
+import { myExerListpage, myExerGet, myExerTrackList, myExerAdd } from '@/api/my-exer';
 import { loginSysTime } from '@/api/login';
-import { useDictStore } from '@/stores/dict';
-import { myExerExerGet } from '@/api/my-exer';
+import { exerListpage } from '@/api/exer';
 import { Page } from '@/ts/page.d';
+import XmNumber from '@/components/xm-number/xm-number.vue';
+import dayjs from 'dayjs';
+import Decimal from 'decimal.js';
 
 /************************变量定义相关***********************/
 // 变量定义
-const dictStore = useDictStore();
 const exerId = ref(0);
+const form = reactive<any>({
+	exerId: null,
+	type: 1,
+	singleNum: 0,
+	multipleNum: 0,
+	fillBlankNum: 0,
+	judgeNum: 0,
+	qaNum: 0
+});
+const questionMaxNum = reactive({
+	singleNum: 0,
+	multipleNum: 0,
+	fillBlankNum: 0,
+	judgeNum: 0,
+	qaNum: 0
+});
 const myreadMainHeight = ref(0);
 const user = reactive<User>({
 	id: null,
@@ -172,15 +254,6 @@ const user = reactive<User>({
 	loginName: '',
 	orgName: ''
 }); // 用户
-const exer = reactive<Exer>({
-	id: null,
-	name: '',
-	questionBankId: undefined,
-	userIds: [],
-	orgIds: [],
-	state: null,
-	rmkState: null
-}); // 练习
 const listpage = reactive<Page<any>>({
 	// 我的练习分页列表
 	curPage: 1,
@@ -188,13 +261,6 @@ const listpage = reactive<Page<any>>({
 	total: 0,
 	list: []
 });
-const pullInfo = reactive({
-	questionTypeStatis: {} as any,
-	questionBankUpdateNum: 0,
-	wrongAnswerNum: 0,
-	favNum: 0
-}); // 拉取信息
-const exerType = ref(1); // 当前选中练习类型
 
 let questionStatisData = reactive<PaperStatis>({
 	typeStatis: [],
@@ -223,46 +289,35 @@ const questionStatisOpts = reactive({
 	}
 });
 
+const myExerStatis = reactive({
+	free: [],
+	unExer: [],
+	wrong: [],
+	fav: []
+});
+
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	exerId.value = options.exerId;
+	form.exerId = options.exerId;
 	userQuery();
-	exerQuery();
-	questionStatisQueryWithInit();
+	questionBankStatisQuery();
 	exerTimeStatisQuery();
-
-	await pull();
 	myExerQuery();
+
+	await myExerStatisQuery();
+	toggleExer();
 });
 onReady(() => {
 	uni.createSelectorQuery()
 		.select('.myread-main__scroll')
 		.boundingClientRect((data: any) => {
-			myreadMainHeight.value = uni.getWindowInfo().windowHeight - data.top - 100;
+			myreadMainHeight.value = uni.getWindowInfo().windowHeight - data.top - 10;
 		})
 		.exec();
 });
 
 /************************计算属性相关*************************/
-const answerNum = computed(() => (type: number) => {
-	return listpage.list.filter((myExer) => myExer.type === type)[0]?.answerNum || 0;
-}); // 答题数量
-
-const questionNum = computed(() => (type: number) => {
-	return pullInfo.questionTypeStatis[type] || 0;
-}); // 试题数量
-const correctAnswerRate = computed(() => (type: number) => {
-	let answerNum = listpage.list.filter((myExer) => myExer.type === type)[0]?.answerNum || 0;
-	if (answerNum === 0) {
-		// 未答题默认正确率100%
-		return 100;
-	}
-
-	let correctAnswerNum = listpage.list.filter((myExer) => myExer.type === type)[0]?.correctAnswerNum || 0;
-
-	return Math.round((correctAnswerNum / answerNum) * 100);
-}); // 正确率
-
 const exerTimeStatisData = reactive({
 	// 不要单独更新某个属性，要作为一个整体，插件限制
 	data: {}
@@ -290,6 +345,8 @@ const exerTimeStatisOpts = reactive({
 	}
 });
 
+const loading = ref(false);
+
 /************************事件相关*****************************/
 // 用户查询
 async function userQuery() {
@@ -300,50 +357,24 @@ async function userQuery() {
 	user.orgName = data.orgName;
 }
 
-// 练习查询
-async function exerQuery() {
-	let { data } = await myExerExerGet({ exerId: exerId.value });
-	exer.id = data.id;
-	exer.name = data.name;
-	exer.questionBankId = data.questionBankId;
-	exer.state = data.state;
-	exer.rmkState = data.rmkState;
-}
-
-// 我的练习拉取
-async function pull() {
-	uni.showLoading({ title: '正在更新最新试题\n请等待。。。', mask: true });
-
-	const { code, msg, data } = await myExerPull({
-		exerId: exerId.value
+// 题库统计查询
+async function questionBankStatisQuery() {
+	let { code, data } = await exerListpage({
+		exerId: exerId.value,
+		curPage: 1,
+		pageSize: 1
 	});
 
-	if (code !== 200) {
-		uni.showLoading({ title: msg, mask: true });
-		return;
-	}
-
-	pullInfo.questionTypeStatis = data.questionTypeStatis;
-	pullInfo.questionBankUpdateNum = data.questionBankUpdateNum;
-	pullInfo.wrongAnswerNum = data.wrongAnswerNum;
-	pullInfo.favNum = data.favNum;
-
-	uni.hideLoading();
-}
-
-// 试题统计查询
-async function questionStatisQueryWithInit() {
-	let {
-		data: { typeStatis, markTypeStatis }
-	} = await myExerQuestionStatis({ exerId: exerId.value });
-	let datas = (typeStatis as any[]).map((d) => {
-		return {
-			name: dictStore.getValue('QUESTION_TYPE', d.type),
-			value: d.count
-		};
-	});
+	let datas = [];
+	datas.push({ name: '单选题', value: data.list[0].singleNum });
+	datas.push({ name: '多选题', value: data.list[0].multipleNum });
+	datas.push({ name: '填空题', value: data.list[0].fillBlankObjNum + data.list[0].fillBlankSubNum });
+	datas.push({ name: '判断题', value: data.list[0].judgeNum });
+	datas.push({ name: '问答题', value: data.list[0].qaSubNum });
 	questionStatisData.typeStatis = { series: [{ data: datas }] };
-	questionStatisData.markTypeStatis = markTypeStatis;
+
+	questionStatisData.markTypeStatis.subjective = data.list[0].subjectiveNum;
+	questionStatisData.markTypeStatis.objective = data.list[0].objectiveNum;
 }
 
 // 练习时间统计（近一年）
@@ -404,29 +435,66 @@ async function myExerQuery() {
 	listpage.total = data.total;
 }
 
-// 去练习
-async function toExer() {
-	uni.navigateTo({
-		url: `/pages/myExer/myPaper?exerId=${exerId.value}&type=${exerType.value}`
-	});
+// 我的练习统计查询
+async function myExerStatisQuery() {
+	const { data } = await myExerGet({ exerId: exerId.value });
+	myExerStatis.free = data.free;
+	myExerStatis.unExer = data.unExer;
+	myExerStatis.wrong = data.wrong;
+	myExerStatis.fav = data.fav;
 }
 
-// 重新练习
-async function reset() {
-	if (exerType.value === 11 || exerType.value === 12) {
-		return;
+// 切换练习
+function toggleExer() {
+	if (form.type === 1) {
+		questionMaxNum.singleNum = myExerStatis.free?.[0]?.count ?? 0;
+		questionMaxNum.multipleNum = myExerStatis.free?.[1]?.count ?? 0;
+		questionMaxNum.fillBlankNum = myExerStatis.free?.[2]?.count ?? 0;
+		questionMaxNum.judgeNum = myExerStatis.free?.[3]?.count ?? 0;
+		questionMaxNum.qaNum = myExerStatis.free?.[4]?.count ?? 0;
+	} else if (form.type === 2) {
+		questionMaxNum.singleNum = myExerStatis.unExer?.[0]?.count ?? 0;
+		questionMaxNum.multipleNum = myExerStatis.unExer?.[1]?.count ?? 0;
+		questionMaxNum.fillBlankNum = myExerStatis.unExer?.[2]?.count ?? 0;
+		questionMaxNum.judgeNum = myExerStatis.unExer?.[3]?.count ?? 0;
+		questionMaxNum.qaNum = myExerStatis.unExer?.[4]?.count ?? 0;
+	} else if (form.type === 3) {
+		questionMaxNum.singleNum = myExerStatis.wrong?.[0]?.count ?? 0;
+		questionMaxNum.multipleNum = myExerStatis.wrong?.[1]?.count ?? 0;
+		questionMaxNum.fillBlankNum = myExerStatis.wrong?.[2]?.count ?? 0;
+		questionMaxNum.judgeNum = myExerStatis.wrong?.[3]?.count ?? 0;
+		questionMaxNum.qaNum = myExerStatis.wrong?.[4]?.count ?? 0;
+	} else if (form.type === 4) {
+		questionMaxNum.singleNum = myExerStatis.fav?.[0]?.count ?? 0;
+		questionMaxNum.multipleNum = myExerStatis.fav?.[1]?.count ?? 0;
+		questionMaxNum.fillBlankNum = myExerStatis.fav?.[2]?.count ?? 0;
+		questionMaxNum.judgeNum = myExerStatis.fav?.[3]?.count ?? 0;
+		questionMaxNum.qaNum = myExerStatis.fav?.[4]?.count ?? 0;
 	}
 
-	const { code } = await myExerExerReset({
-		exerId: exerId.value,
-		type: exerType.value
-	});
+	nameUpdate();
+}
 
+// 名称更新
+function nameUpdate() {
+	const typeName = form.type === 1 ? '自组' : form.type === 2 ? '未练' : form.type === 3 ? '错题' : '收藏';
+	form.name = `${typeName}_单${form.singleNum || 0}多${form.multipleNum || 0}填${form.fillBlankNum || 0}判${form.judgeNum || 0}问${form.qaNum || 0}_${dayjs().format(
+		'YYYYMMDD'
+	)}`;
+}
+
+// 去练习
+async function toExer() {
+	loading.value = true;
+	const { code, data } = await myExerAdd({ ...form });
 	if (code !== 200) {
+		loading.value = false; // 错误显示，正确就跳转了
 		return;
 	}
 
-	toExer();
+	uni.navigateTo({
+		url: `/pages/myExer/myPaper?exerId=${exerId.value}&id=${data}`
+	});
 }
 </script>
 
@@ -435,6 +503,7 @@ async function reset() {
 	height: inherit;
 	display: flex;
 	flex-direction: column;
+
 	.myread-head {
 		display: flex;
 		flex-direction: column;
@@ -442,11 +511,13 @@ async function reset() {
 		height: 230rpx;
 		position: relative;
 		margin-bottom: 40rpx;
+
 		.myread-head__bg {
 			position: absolute;
 			width: 750rpx;
 			height: 230rpx;
 		}
+
 		.user {
 			display: flex;
 			flex-direction: column;
@@ -459,12 +530,14 @@ async function reset() {
 			border-radius: 30rpx 30rpx 30rpx 30rpx;
 			background: linear-gradient(to bottom, #bff3ff 0%, #e1f2ff 100%);
 			overflow: hidden;
+
 			.user__head {
 				display: flex;
 				align-items: center;
 				padding: 0rpx 30rpx;
 				height: 80rpx;
 				background: linear-gradient(to bottom, #bff3ff 0%, #b3eeff 100%);
+
 				//border: 1rpx solid red;
 				.user__icon {
 					display: flex;
@@ -475,6 +548,7 @@ async function reset() {
 					background: linear-gradient(to bottom right, #04c7f2 0%, #259ff8 100%);
 					border-radius: 8rpx 8rpx 8rpx 8rpx;
 				}
+
 				.user__title {
 					margin-left: 20rpx;
 					font-weight: bold;
@@ -482,30 +556,37 @@ async function reset() {
 					color: #333333;
 				}
 			}
+
 			.user__main {
 				flex: 1;
 				display: flex;
 				align-items: center;
 				margin: 0rpx 50rpx;
+
 				.user__avatar {
 					width: 100rpx;
 					height: 100rpx;
 					margin-right: 50rpx;
 				}
+
 				.user__wrapper {
 					flex: 1;
 					display: flex;
 					flex-direction: column;
+
 					.user__outer {
 						display: flex;
 						justify-content: space-between;
+
 						.user__inner {
 							display: flex;
+
 							.user__label {
 								font-size: 26rpx;
 								color: #8f939c;
 								line-height: 48rpx;
 							}
+
 							.user__value {
 								font-size: 26rpx;
 								color: #333333;
@@ -517,6 +598,7 @@ async function reset() {
 			}
 		}
 	}
+
 	.myread-main {
 		flex: 1;
 		display: flex;
@@ -527,6 +609,7 @@ async function reset() {
 		overflow: hidden;
 		box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 		border-radius: 30rpx 30rpx 30rpx 30rpx;
+
 		.myread-main__scroll {
 			.warn {
 				display: flex;
@@ -537,11 +620,13 @@ async function reset() {
 				box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 				border-radius: 16rpx;
 				overflow: hidden;
+
 				.warn__head {
 					display: flex;
 					align-items: center;
 					padding: 0rpx 30rpx;
 					height: 80rpx;
+
 					.warn__icon {
 						display: flex;
 						justify-content: center;
@@ -551,6 +636,7 @@ async function reset() {
 						background: linear-gradient(to bottom right, #04c7f2 0%, #259ff8 100%);
 						border-radius: 8rpx 8rpx 8rpx 8rpx;
 					}
+
 					.warn__title {
 						margin-left: 20rpx;
 						font-weight: bold;
@@ -558,6 +644,7 @@ async function reset() {
 						color: #333333;
 					}
 				}
+
 				.warn__main {
 					padding: 0rpx 30rpx;
 					font-size: 22rpx;
@@ -565,6 +652,7 @@ async function reset() {
 					color: #e43d33;
 				}
 			}
+
 			.exer {
 				display: flex;
 				flex-direction: column;
@@ -574,11 +662,13 @@ async function reset() {
 				box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 				border-radius: 16rpx;
 				overflow: hidden;
+
 				.exer__head {
 					display: flex;
 					align-items: center;
 					padding: 0rpx 30rpx;
 					height: 80rpx;
+
 					//border: 1rpx solid red;
 					.exer__icon {
 						display: flex;
@@ -589,6 +679,7 @@ async function reset() {
 						background: linear-gradient(to bottom right, #04c7f2 0%, #259ff8 100%);
 						border-radius: 8rpx 8rpx 8rpx 8rpx;
 					}
+
 					.exer__title {
 						margin-left: 20rpx;
 						font-weight: bold;
@@ -596,20 +687,78 @@ async function reset() {
 						color: #333333;
 					}
 				}
+
 				.exer__main {
 					padding: 0rpx 30rpx;
+
 					.exer__row {
 						height: 60rpx;
+
 						.exer__label {
 							font-size: 26rpx;
 							color: #8f939c;
 							line-height: 60rpx;
 						}
+
 						.exer__value {
 							font-size: 26rpx;
 							color: #333333;
 							line-height: 60rpx;
 						}
+					}
+				}
+			}
+			.my-exer-list {
+				display: flex;
+				flex-direction: column;
+				padding: 30rpx 0rpx;
+				margin-bottom: 20rpx;
+				background-color: white;
+				box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
+				border-radius: 16rpx;
+				overflow: hidden;
+
+				.my-exer-list__head {
+					display: flex;
+					align-items: center;
+					padding: 0rpx 30rpx;
+					height: 80rpx;
+
+					//border: 1rpx solid red;
+					.my-exer-list__icon {
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						height: 42rpx;
+						width: 42rpx;
+						background: linear-gradient(to bottom right, #04c7f2 0%, #259ff8 100%);
+						border-radius: 8rpx 8rpx 8rpx 8rpx;
+					}
+
+					.my-exer-list__title {
+						margin-left: 20rpx;
+						font-weight: bold;
+						font-size: 32rpx;
+						color: #333333;
+					}
+				}
+
+				.my-exer-list__main {
+					.my-exer-list__name {
+						font-size: 26rpx;
+						color: #3b4144;
+					}
+					.my-exer-list__sub {
+						margin-top: 4rpx;
+					}
+					.my-exer-list__lable {
+						font-size: 24rpx;
+						color: #999;
+					}
+					.my-exer-list__value {
+						font-size: 24rpx;
+						color: #3b4144;
+						margin-right: 30rpx;
 					}
 				}
 			}
@@ -623,12 +772,13 @@ async function reset() {
 				box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 				border-radius: 16rpx;
 				overflow: hidden;
+
 				.my-exer__head {
 					display: flex;
 					align-items: center;
 					padding: 0rpx 30rpx;
 					height: 80rpx;
-					//border: 1rpx solid red;
+
 					.my-exer__icon {
 						display: flex;
 						justify-content: center;
@@ -638,6 +788,7 @@ async function reset() {
 						background: linear-gradient(to bottom right, #04c7f2 0%, #259ff8 100%);
 						border-radius: 8rpx 8rpx 8rpx 8rpx;
 					}
+
 					.my-exer__title {
 						margin-left: 20rpx;
 						font-weight: bold;
@@ -645,11 +796,57 @@ async function reset() {
 						color: #333333;
 					}
 				}
+
 				.my-exer__main {
 					padding: 0rpx 30rpx;
-					:deep(.checklist-box) {
-						padding: 30rpx 15rpx;
+					.form {
 					}
+					.my-exer__row {
+						display: flex;
+						align-items: center;
+						.my-exer__value {
+							width: 200rpx;
+						}
+					}
+
+					.my-exer__btn {
+						display: flex;
+						flex-direction: row;
+						justify-content: center;
+						align-items: center;
+						width: 100%;
+						height: 100rpx;
+						border-radius: 50px;
+						line-height: 40rpx;
+					}
+
+					.my-exer__btn--active {
+						background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
+					}
+
+					.my-exer__btn--disable {
+						border: 1rpx solid #04c7f2;
+						color: #04c7f2;
+						background: linear-gradient(to right, #fff 0%, #fff 100%);
+					}
+
+					// display: flex;
+					// flex-direction: column;
+
+					// .my-exer__row {
+					// 	display: flex;
+					// 	height: 60rpx;
+					// 	.my-exer__label {
+					// 		font-size: 26rpx;
+					// 		color: #8f939c;
+					// 		line-height: 60rpx;
+					// 	}
+					// 	.my-exer__value {
+					// 		font-size: 26rpx;
+					// 		color: #333333;
+					// 		line-height: 60rpx;
+					// 	}
+					// }
 				}
 			}
 
@@ -662,11 +859,13 @@ async function reset() {
 				box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 				border-radius: 16rpx;
 				overflow: hidden;
+
 				.question-bank__head {
 					display: flex;
 					align-items: center;
 					padding: 0rpx 30rpx;
 					height: 80rpx;
+
 					//border: 1rpx solid red;
 					.question-bank__icon {
 						display: flex;
@@ -677,6 +876,7 @@ async function reset() {
 						background: linear-gradient(to bottom right, #04c7f2 0%, #259ff8 100%);
 						border-radius: 8rpx 8rpx 8rpx 8rpx;
 					}
+
 					.question-bank__title {
 						margin-left: 20rpx;
 						font-weight: bold;
@@ -684,9 +884,11 @@ async function reset() {
 						color: #333333;
 					}
 				}
+
 				.question-bank__main {
 					position: relative;
 					padding-left: 0rpx;
+
 					.question-bank__statis {
 						position: absolute;
 						left: 30rpx;
@@ -698,28 +900,8 @@ async function reset() {
 			}
 		}
 	}
+
 	.myread-foot {
-		display: flex;
-		margin: 20rpx 0rpx 50rpx 0rpx;
-		.myread-foot__exam-in {
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			width: 100%;
-			height: 100rpx;
-			border-radius: 50px;
-			margin: 0px 10px;
-			line-height: 40rpx;
-		}
-		.myread-foot__exam-in--active {
-			background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
-		}
-		.myread-foot__exam-in--disable {
-			border: 1rpx solid #04c7f2;
-			color: #04c7f2;
-			background: linear-gradient(to right, #fff 0%, #fff 100%);
-		}
 	}
 }
 </style>

@@ -56,56 +56,47 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		addValid(exer);
 
 		// 练习添加
+		exer.setCreateUserId(getCurUser().getId());
 		exer.setUpdateUserId(getCurUser().getId());
 		exer.setUpdateTime(new Date());
 		exer.setState(1);
-		exer.setRmkState(1);
 		save(exer);
 	}
 
 	@Override
 	public void update(Exer exer) {
 		// 数据校验
-		Exer entity = getById(exer.getId());
-		updateValid(exer, entity);
+		updateValid(exer);
 
 		// 练习修改
+		Exer entity = getById(exer.getId());
 		entity.setName(exer.getName());
-		// entity.setQuestionBankId(exer.getQuestionBankId());// 不允许修改
+		// entity.setQuestionBankIds(exer.getQuestionBankIds());// 不允许修改
 		entity.setUserIds(exer.getUserIds());
 		entity.setOrgIds(exer.getOrgIds());
 		// entity.setState(exer.getState());// 单独接口控制
-		// entity.setRmkState(exer.getRmkState());// 单独接口控制
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setUpdateTime(new Date());
 		updateById(entity);
 	}
 
-	private void updateValid(Exer exer, Exer entity) {
-		if (!ValidateUtil.isValid(exer.getId())) {
-			throw new MyException("参数错误：id");
-		}
-		
+	private void addValid(Exer exer) {
 		if (!ValidateUtil.isValid(exer.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		// if (!ValidateUtil.isValid(exer.getQuestionBankId())) {
-		// 	throw new MyException("参数错误：questionBankId");
-		// }// 不修改，无须校验
-		if (!ValidateUtil.isValid(exer.getRmkState())) {
-			throw new MyException("参数错误：rmkState");
-		}
-		if (exer.getRmkState().intValue() != 1 && exer.getRmkState().intValue() != 2) {
-			throw new MyException("值非法：rmkState");
+		if (!ValidateUtil.isValid(exer.getQuestionBankIds())) {
+			throw new MyException("参数错误：questionBankIds");
 		}
 		if (!ValidateUtil.isValid(exer.getOrgIds()) && !ValidateUtil.isValid(exer.getUserIds())) {
 			throw new MyException("参数错误：userIds");
 		}
-
-		QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());// 只能练习自己的题库
-		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-			throw new MyException("无操作权限");
+		for (Integer questionBankId : exer.getQuestionBankIds()) {
+			QuestionBank questionBank = questionBankService.getById(questionBankId);// 只能练习自己的题库
+			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
 		}
+
 		if (!CurLoginUserUtil.isAdmin()) {// 只能管理自己的用户
 			User curUser = baseCacheService.getUser(getCurUser().getId());
 			if (ValidateUtil.isValid(exer.getUserIds())) {
@@ -125,32 +116,21 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		}
 	}
 
-	private void addValid(Exer exer) {
+	private void updateValid(Exer exer) {
+		if (!ValidateUtil.isValid(exer.getId())) {
+			throw new MyException("参数错误：id");
+		}
+
 		if (!ValidateUtil.isValid(exer.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		if (!ValidateUtil.isValid(exer.getQuestionBankId())) {
-			throw new MyException("参数错误：questionBankId");
-		}
-		if (!ValidateUtil.isValid(exer.getRmkState())) {
-			throw new MyException("参数错误：rmkState");
-		}
-		if (exer.getRmkState().intValue() != 1 && exer.getRmkState().intValue() != 2) {
-			throw new MyException("值非法：rmkState");
-		}
+		// if (!ValidateUtil.isValid(exer.getQuestionBankIds())) {
+		// throw new MyException("参数错误：questionBankIds");
+		// }// 不修改，无须校验
 		if (!ValidateUtil.isValid(exer.getOrgIds()) && !ValidateUtil.isValid(exer.getUserIds())) {
 			throw new MyException("参数错误：userIds");
 		}
-		Exer exerDb = exerDao.getExer(exer.getQuestionBankId());
-		if (exerDb != null) {
-			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
-			throw new MyException(String.format("题库【%s】已存在", questionBank.getName()));
-		}
 
-		QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());// 只能练习自己的题库
-		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-			throw new MyException("无操作权限");
-		}
 		if (!CurLoginUserUtil.isAdmin()) {// 只能管理自己的用户
 			User curUser = baseCacheService.getUser(getCurUser().getId());
 			if (ValidateUtil.isValid(exer.getUserIds())) {

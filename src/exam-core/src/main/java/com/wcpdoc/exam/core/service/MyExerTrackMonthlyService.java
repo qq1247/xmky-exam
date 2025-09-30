@@ -35,18 +35,6 @@ public interface MyExerTrackMonthlyService extends BaseService<MyExerTrackMonthl
 	 * @param endYm
 	 * @return List<MyExerTrackMonthly>
 	 */
-	List<MyExerTrackMonthly> getList(Integer exerId, Integer startYm, Integer endYm);
-
-	/**
-	 * 我的练习跟踪月度列表
-	 * 
-	 * v1.0 zhanghc 2025年9月12日下午9:59:08
-	 * 
-	 * @param exerId
-	 * @param userId
-	 * @param startYm
-	 * @param endYm
-	 * @return List<MyExerTrackMonthly>
-	 */
 	List<MyExerTrackMonthly> getList(Integer exerId, Integer userId, Integer startYm, Integer endYm);
+
 }
