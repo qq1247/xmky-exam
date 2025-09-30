@@ -76,7 +76,7 @@
                             </div>
                             <div class="history__row">
                                 <span class="history__progress">进度：{{ myExer.answerNum }}/{{ myExer.questionNum
-                                    }}</span>
+                                }}</span>
                                 <span class="history__correct-rate">正确率：
                                     {{ new
                                         Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber()
@@ -289,10 +289,10 @@ const questionStatisOpts = ref({// 试题类型统计
 })
 
 const myExerStatis = reactive({
-    free: [],
-    unExer: [],
-    wrong: [],
-    fav: [],
+    free: [] as any[],
+    unExer: [] as any[],
+    wrong: [] as any[],
+    fav: [] as any[],
 })
 
 const loading = ref(false)

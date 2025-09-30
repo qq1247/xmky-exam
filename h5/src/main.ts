@@ -32,9 +32,10 @@ app.use(ElementPlus, {
 })
 app.use(vue3PhotoPreview);
 
-// ========== 初始化插件 ==========
-await initPlugins()
+(async () => {
+    // ========== 初始化插件 ==========
+    await initPlugins()
 
-// ========== 挂载应用到 DOM ==========
-app.mount('#app')
-
+    // ========== 挂载应用到 DOM ==========
+    app.mount('#app')
+})()

@@ -118,7 +118,7 @@ export function xmkyTimer() {
         startTracking,
         stopTracking,
     }
-})
+}
 
 /**
  * 练习行为跟踪配置

@@ -73,7 +73,7 @@
                     style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card title="登录页页脚" desc="用于设置登录页底部显示的备案、版权或自定义信息">
+        <xmks-edit-card title="登录页页脚" desc="用于设置登录页底部显示备案、版权或自定义信息">
             <template #card-main>
                 <el-form ref="icpFormRef" :model="icpForm" :rules="icpFormRules" label-width="100" size="large"
                     :inline="false" class="form">
