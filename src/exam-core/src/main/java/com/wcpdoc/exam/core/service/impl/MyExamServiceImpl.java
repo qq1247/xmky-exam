@@ -40,8 +40,8 @@ import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamHis;
-import com.wcpdoc.exam.core.entity.MyQuestion;
-import com.wcpdoc.exam.core.entity.MyQuestionHis;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestionHis;
 import com.wcpdoc.exam.core.entity.MySxe;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -163,7 +163,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	public void answer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer[] imgFileIds,
 			Integer[] videoFileIds) {
 		// 数据校验
-		MyQuestion myQuestion = answerValid(examId, userId, questionId, imgFileIds, videoFileIds);
+		MyExamQuestion myQuestion = answerValid(examId, userId, questionId, imgFileIds, videoFileIds);
 
 		// 答案保存
 		answerSave(questionId, answers, myQuestion, imgFileIds, videoFileIds);
@@ -253,10 +253,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		exam = examCacheService.getExam(examId);
 		if (exam.getGenType() == 1) {// 如果是人工组卷，直接生成我的试卷
 			List<ExamQuestion> examQuestionList = examQuestionService.getList(examId);
-			List<MyQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
+			List<MyExamQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
 			for (int i = 0; i < examQuestionList.size(); i++) {
 				ExamQuestion examQuestion = examQuestionList.get(i);
-				MyQuestion myQuestion = new MyQuestion();
+				MyExamQuestion myQuestion = new MyExamQuestion();
 				myQuestion.setChapterName(examQuestion.getChapterName());
 				myQuestion.setChapterTxt(examQuestion.getChapterTxt());
 				myQuestion.setType(examQuestion.getType());
@@ -279,7 +279,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 					if (ExamUtil.hasChapter(myQuestion) || i >= examQuestionList.size() - 1) {// 5章节；（如果是章节或最后一道题，乱序已经缓存的试题，前面不要加else，最后一道题的情况不处理）
 						Collections.shuffle(shuffleCacheList);// 3试题；2试题；4试题；
 						Integer maxNo = ExamUtil.hasChapter(myQuestion) ? myQuestion.getNo() - 1 : myQuestion.getNo();// 5章节
-						for (MyQuestion shuffleCache : shuffleCacheList) {
+						for (MyExamQuestion shuffleCache : shuffleCacheList) {
 							shuffleCache.setNo(maxNo--);
 							myQuestionService.updateById(myQuestion);// 1章节；4试题；2试题；3试题；
 						}
@@ -303,7 +303,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			for (int i = 0; i < examRuleList.size(); i++) {
 				ExamRule examRule = examRuleList.get(i);
 				if (examRule.getType() == 1) {// 如果是章节
-					MyQuestion myQuestion = new MyQuestion();
+					MyExamQuestion myQuestion = new MyExamQuestion();
 					myQuestion.setType(examRule.getType());
 					myQuestion.setChapterName(examRule.getChapterName());
 					myQuestion.setChapterTxt(examRule.getChapterTxt());
@@ -330,7 +330,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 							continue;
 						}
 
-						MyQuestion myQuestion = new MyQuestion();
+						MyExamQuestion myQuestion = new MyExamQuestion();
 						myQuestion.setType(examRule.getType());
 						myQuestion.setScore(examRule.getScore());
 						myQuestion.setMarkOptions(examRule.getMarkOptions());
@@ -435,9 +435,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExamHis.setId(null);
 		myExamHisService.save(myExamHis);
 
-		List<MyQuestion> myQuestionList = examCacheService.getMyQuestionList(examId, getCurUser().getId());
-		for (MyQuestion myQuestion : myQuestionList) {
-			MyQuestionHis myQuestionHis = new MyQuestionHis();
+		List<MyExamQuestion> myQuestionList = examCacheService.getMyQuestionList(examId, getCurUser().getId());
+		for (MyExamQuestion myQuestion : myQuestionList) {
+			MyExamQuestionHis myQuestionHis = new MyExamQuestionHis();
 			try {
 				BeanUtils.copyProperties(myQuestionHis, myQuestion);
 			} catch (Exception e) {
@@ -466,7 +466,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExam.setUpdateTime(new Date());
 		updateById(myExam);
 
-		for (MyQuestion myQuestion : myQuestionList) {
+		for (MyExamQuestion myQuestion : myQuestionList) {
 			myQuestion.setAnswerTime(null);
 			myQuestion.setUserAnswer(null);
 			myQuestion.setUserScore(null);
@@ -505,7 +505,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 
-	private void answerSave(Integer questionId, String[] answers, MyQuestion myQuestion, Integer[] imgFileIds,
+	private void answerSave(Integer questionId, String[] answers, MyExamQuestion myQuestion, Integer[] imgFileIds,
 			Integer[] videoFileIds) {
 		Question question = examCacheService.getQuestion(questionId);
 		if (!ValidateUtil.isValid(answers)) {
@@ -540,7 +540,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myQuestionService.updateById(myQuestion);
 	}
 
-	private void answerFileSave(MyQuestion myQuestion) {
+	private void answerFileSave(MyExamQuestion myQuestion) {
 		myQuestion.getImgFileIds().forEach(imgFileId -> {
 			fileService.upload(imgFileId);
 		});
@@ -549,7 +549,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		});
 	}
 
-	private MyQuestion answerValid(Integer examId, Integer userId, Integer questionId, Integer[] imgFileIds,
+	private MyExamQuestion answerValid(Integer examId, Integer userId, Integer questionId, Integer[] imgFileIds,
 			Integer[] videoFileIds) {
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
@@ -564,7 +564,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 //			throw new MyException("参数错误：answers");
 //		} 
 
-		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
+		MyExamQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
 		if (myQuestion == null) {
 			throw new MyException("未参与考试");
 		}

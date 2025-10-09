@@ -25,7 +25,7 @@ import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.ex.PaperPart;
 import com.wcpdoc.exam.core.service.ExamCacheService;
@@ -133,7 +133,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			+ "#examId + ':' + #userId")
 	public void score(Integer examId, Integer userId, Integer questionId, BigDecimal userScore, String remark) {
 		// 数据校验
-		MyQuestion myQuestion = scoreValid(examId, userId, questionId, userScore);
+		MyExamQuestion myQuestion = scoreValid(examId, userId, questionId, userScore);
 
 		// 打分
 		myQuestion.setUserScore(userScore);
@@ -162,7 +162,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		// 阅卷
 		BigDecimal totalScore = examCacheService.getMyQuestionList(examId, userId).stream()//
 				.filter(myQuestion -> myQuestion.getType() == 2)//
-				.map(MyQuestion::getUserScore).reduce(BigDecimal.ZERO, BigDecimal::add);
+				.map(MyExamQuestion::getUserScore).reduce(BigDecimal.ZERO, BigDecimal::add);
 		MyExam myExam = examCacheService.getMyExam(examId, userId);
 		Exam exam = examCacheService.getExam(examId);
 		myExam.setTotalScore(totalScore);
@@ -182,7 +182,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		return myMarkDao.getList(examId);
 	}
 
-	private MyQuestion scoreValid(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
+	private MyExamQuestion scoreValid(Integer examId, Integer userId, Integer questionId, BigDecimal userScore) {
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
@@ -205,7 +205,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (myExam.getState() == 1) {
 			throw new MyException("用户未参与考试，阅卷无效");
 		}
-		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
+		MyExamQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
 		if (myQuestion == null) {
 			throw new MyException("未参与考试");
 		}

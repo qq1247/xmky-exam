@@ -40,7 +40,7 @@ import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionBank;
@@ -174,7 +174,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Caching(evict = { //
 			@CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), //
 			@CacheEvict(value = ExamConstant.MYEXAM_CACHE, allEntries = true), })
-	public void time(Integer id, Integer timeType, Integer minute) {
+	public synchronized void time(Integer id, Integer timeType, Integer minute) {
 		// 数据校验
 		timeValid(id, timeType, minute);
 
@@ -210,7 +210,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	@Caching(evict = { @CacheEvict(value = ExamConstant.EXAM_CACHE, allEntries = true), })
-	public void userAdd(Integer id, Set<Integer> orgIds, Set<Integer> userIds) {
+	public synchronized void userAdd(Integer id, Set<Integer> orgIds, Set<Integer> userIds) {// bug修复：创建考试后再次添加人员，概率性错误。（快速点击造成的并发导致同一个人多次添加，改为前端控制按钮，后端加同步锁）
 		// 数据校验
 		userAddValid(id, orgIds, userIds);
 
@@ -243,11 +243,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myExamService.save(myExam);
 
 			if (exam.getGenType() == 1) {// 如果是人工组卷，直接生成我的试卷
-				List<MyQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
+				List<MyExamQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
 				List<ExamQuestion> examQuestionList = examQuestionService.getList(id);
 				for (int i = 0; i < examQuestionList.size(); i++) {
 					ExamQuestion examQuestion = examQuestionList.get(i);
-					MyQuestion myQuestion = new MyQuestion();
+					MyExamQuestion myQuestion = new MyExamQuestion();
 					myQuestion.setChapterName(examQuestion.getChapterName());
 					myQuestion.setChapterTxt(examQuestion.getChapterTxt());
 					myQuestion.setType(examQuestion.getType());
@@ -271,7 +271,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							Collections.shuffle(shuffleCacheList);// 3试题；2试题；4试题；
 							Integer maxNo = ExamUtil.hasChapter(myQuestion) ? myQuestion.getNo() - 1
 									: myQuestion.getNo();// 5章节
-							for (MyQuestion shuffleCache : shuffleCacheList) {
+							for (MyExamQuestion shuffleCache : shuffleCacheList) {
 								shuffleCache.setNo(maxNo--);
 								myQuestionService.updateById(myQuestion);// 1章节；4试题；2试题；3试题；
 							}
@@ -301,7 +301,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				for (int i = 0; i < examRuleList.size(); i++) {
 					ExamRule examRule = examRuleList.get(i);
 					if (examRule.getType() == 1) {// 如果是章节
-						MyQuestion myQuestion = new MyQuestion();
+						MyExamQuestion myQuestion = new MyExamQuestion();
 						myQuestion.setType(examRule.getType());
 						myQuestion.setChapterName(examRule.getChapterName());
 						myQuestion.setChapterTxt(examRule.getChapterTxt());
@@ -328,7 +328,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								continue;
 							}
 
-							MyQuestion myQuestion = new MyQuestion();
+							MyExamQuestion myQuestion = new MyExamQuestion();
 							myQuestion.setType(examRule.getType());
 							myQuestion.setScore(examRule.getScore());
 							myQuestion.setMarkOptions(examRule.getMarkOptions());
@@ -857,10 +857,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myExamService.save(myExam);
 
 			if (examInfo.getGenType() == 1) {// 如果是人工组卷，直接生成我的试卷
-				List<MyQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
+				List<MyExamQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
 				for (int i = 0; i < examInfo.getExamQuestions().size(); i++) {
 					ExamQuestionEx examQuestion = examInfo.getExamQuestions().get(i);
-					MyQuestion myQuestion = new MyQuestion();
+					MyExamQuestion myQuestion = new MyExamQuestion();
 					myQuestion.setChapterName(examQuestion.getChapterName());
 					myQuestion.setChapterTxt(examQuestion.getChapterTxt());
 					myQuestion.setType(examQuestion.getType());
@@ -884,7 +884,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							Collections.shuffle(shuffleCacheList);// 3试题；2试题；4试题；
 							Integer maxNo = ExamUtil.hasChapter(myQuestion) ? myQuestion.getNo() - 1
 									: myQuestion.getNo();// 5章节
-							for (MyQuestion shuffleCache : shuffleCacheList) {
+							for (MyExamQuestion shuffleCache : shuffleCacheList) {
 								shuffleCache.setNo(maxNo--);
 								myQuestionService.updateById(myQuestion);// 1章节；4试题；2试题；3试题；
 							}
@@ -911,7 +911,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				for (int i = 0; i < examInfo.getExamRules().size(); i++) {
 					ExamRule examRule = examInfo.getExamRules().get(i);
 					if (examRule.getType() == 1) {// 如果是章节
-						MyQuestion myQuestion = new MyQuestion();
+						MyExamQuestion myQuestion = new MyExamQuestion();
 						myQuestion.setType(examRule.getType());
 						myQuestion.setChapterName(examRule.getChapterName());
 						myQuestion.setChapterTxt(examRule.getChapterTxt());
@@ -938,7 +938,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								continue;
 							}
 
-							MyQuestion myQuestion = new MyQuestion();
+							MyExamQuestion myQuestion = new MyExamQuestion();
 							myQuestion.setType(examRule.getType());
 							myQuestion.setScore(examRule.getScore());
 							myQuestion.setMarkOptions(examRule.getMarkOptions());

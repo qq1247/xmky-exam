@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.MyQuestionHisDao;
-import com.wcpdoc.exam.core.entity.MyQuestionHis;
+import com.wcpdoc.exam.core.entity.MyExamQuestionHis;
 import com.wcpdoc.exam.core.service.MyQuestionHisService;
 
 /**
@@ -16,12 +16,12 @@ import com.wcpdoc.exam.core.service.MyQuestionHisService;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Service
-public class MyQuestionServiceHisImpl extends BaseServiceImp<MyQuestionHis> implements MyQuestionHisService {
+public class MyQuestionServiceHisImpl extends BaseServiceImp<MyExamQuestionHis> implements MyQuestionHisService {
 	@Resource
 	private MyQuestionHisDao myQuestionHisDao;
 
 	@Override
-	public RBaseDao<MyQuestionHis> getDao() {
+	public RBaseDao<MyExamQuestionHis> getDao() {
 		return myQuestionHisDao;
 	}
 

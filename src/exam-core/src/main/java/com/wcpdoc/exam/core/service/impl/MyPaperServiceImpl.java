@@ -26,7 +26,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -74,9 +74,9 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 	@Override
 	public List<PaperPart> generatePaper(Integer examId, Integer userId, Boolean scoreShow, Boolean answerShow) {
 		List<PaperPart> paper = new ArrayList<>();
-		List<MyQuestion> myQuestionList = examCacheService.getMyQuestionList(examId, userId);
+		List<MyExamQuestion> myQuestionList = examCacheService.getMyQuestionList(examId, userId);
 		Exam exam = examCacheService.getExam(examId);
-		for (MyQuestion myQuestion : myQuestionList) {
+		for (MyExamQuestion myQuestion : myQuestionList) {
 			if (myQuestion.getType() == 1) {// 章节组装
 				ChapterPart chapterPart = new ChapterPart();
 				chapterPart.setType(myQuestion.getType());
@@ -277,7 +277,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 
 	private BigDecimal doMarkObjectiveHandle(Integer examId, Integer userId) {
 		// 查找当前试卷的所有客观题，进行批阅
-		List<MyQuestion> objectiveQuestionList = examCacheService.getMyQuestionList(examId, userId).stream()//
+		List<MyExamQuestion> objectiveQuestionList = examCacheService.getMyQuestionList(examId, userId).stream()//
 				.filter(myQuestion -> myQuestion.getType() == 2
 						&& QuestionUtil.hasObjective(examCacheService.getQuestion(myQuestion.getQuestionId())))
 				.map(myQuestion -> {
@@ -301,7 +301,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 
 		// 返回客观题总分
 		return objectiveQuestionList.stream()//
-				.map(MyQuestion::getUserScore)//
+				.map(MyExamQuestion::getUserScore)//
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
@@ -418,7 +418,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 						myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间
 					}
 
-					List<MyQuestion> questionList = examCacheService.getMyQuestionList(exam.getId(), myExam.getUserId())//
+					List<MyExamQuestion> questionList = examCacheService.getMyQuestionList(exam.getId(), myExam.getUserId())//
 							.stream()//
 							.filter(myQuestion -> myQuestion.getType() == 2)// 忽略章节
 							.collect(Collectors.toList());
@@ -431,7 +431,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 								myQuestionService.updateById(myQuestion);
 							});
 
-					myExam.setTotalScore(questionList.stream().map(MyQuestion::getUserScore).reduce(BigDecimal.ZERO,
+					myExam.setTotalScore(questionList.stream().map(MyExamQuestion::getUserScore).reduce(BigDecimal.ZERO,
 							BigDecimal::add));// 记录成绩
 					myExam.setAnswerState(
 							myExam.getTotalScore().doubleValue() >= exam.getPassScore().doubleValue() ? 1 : 2);// 标记及格状态

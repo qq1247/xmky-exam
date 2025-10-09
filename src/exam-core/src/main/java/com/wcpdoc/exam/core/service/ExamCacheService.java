@@ -5,7 +5,7 @@ import java.util.List;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -106,6 +106,6 @@ public interface ExamCacheService extends BaseService<Object> {
 	 * @param userId
 	 * @return List<MyQuestion>
 	 */
-	List<MyQuestion> getMyQuestionList(Integer examId, Integer userId);
+	List<MyExamQuestion> getMyQuestionList(Integer examId, Integer userId);
 
 }

@@ -6,14 +6,14 @@ import java.util.stream.Collectors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wcpdoc.core.dao.RBaseDao;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 
 /**
  * 我的试题数据访问层接口
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
-public interface MyQuestionDao extends RBaseDao<MyQuestion> {
+public interface MyQuestionDao extends RBaseDao<MyExamQuestion> {
 
 	/**
 	 * 获取我的试题列表
@@ -23,9 +23,9 @@ public interface MyQuestionDao extends RBaseDao<MyQuestion> {
 	 * @param myExamId
 	 * @return List<MyQuestion>
 	 */
-	default List<MyQuestion> getList(Integer examId, Integer userId) {
-		return selectList(new LambdaQueryWrapper<MyQuestion>().eq(MyQuestion::getExamId, examId)
-				.eq(MyQuestion::getUserId, userId).orderByAsc(MyQuestion::getNo));
+	default List<MyExamQuestion> getList(Integer examId, Integer userId) {
+		return selectList(new LambdaQueryWrapper<MyExamQuestion>().eq(MyExamQuestion::getExamId, examId)
+				.eq(MyExamQuestion::getUserId, userId).orderByAsc(MyExamQuestion::getNo));
 	}
 
 	/**
@@ -38,9 +38,9 @@ public interface MyQuestionDao extends RBaseDao<MyQuestion> {
 	 * @param questionId
 	 * @return MyQuestion
 	 */
-	default MyQuestion getMyQuestion(Integer examId, Integer userId, Integer questionId) {
-		return selectOne(new LambdaQueryWrapper<MyQuestion>().eq(MyQuestion::getExamId, examId)
-				.eq(MyQuestion::getUserId, userId).eq(MyQuestion::getQuestionId, questionId));
+	default MyExamQuestion getMyQuestion(Integer examId, Integer userId, Integer questionId) {
+		return selectOne(new LambdaQueryWrapper<MyExamQuestion>().eq(MyExamQuestion::getExamId, examId)
+				.eq(MyExamQuestion::getUserId, userId).eq(MyExamQuestion::getQuestionId, questionId));
 	}
 
 	/**
@@ -51,7 +51,7 @@ public interface MyQuestionDao extends RBaseDao<MyQuestion> {
 	 * @param examId void
 	 */
 	default void clear(Integer examId) {
-		delete(new LambdaQueryWrapper<MyQuestion>().eq(MyQuestion::getExamId, examId));
+		delete(new LambdaQueryWrapper<MyExamQuestion>().eq(MyExamQuestion::getExamId, examId));
 	}
 
 	/**
@@ -63,12 +63,12 @@ public interface MyQuestionDao extends RBaseDao<MyQuestion> {
 	 * @return List<Integer>
 	 */
 	default List<Integer> getExamIdList(Integer questionId) {
-		return selectList(new QueryWrapper<MyQuestion>()//
+		return selectList(new QueryWrapper<MyExamQuestion>()//
 				.select("DISTINCT EXAM_ID")//
 				.lambda()//
-				.eq(MyQuestion::getQuestionId, questionId))//
+				.eq(MyExamQuestion::getQuestionId, questionId))//
 				.stream()//
-				.map(MyQuestion::getExamId)//
+				.map(MyExamQuestion::getExamId)//
 				.collect(Collectors.toList());
 	}
 }

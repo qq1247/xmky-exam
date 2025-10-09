@@ -15,7 +15,7 @@
                             <span class="iconfont icon-fabu-10 exam-info__tag-icon"></span>
                             <span class="exam-info__tag-txt">{{ dictStore.getValue('LOGIN_TYPE', form.loginType as
                                 number)
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-11 exam-info__tag-icon"></span>
@@ -129,7 +129,7 @@
                     </el-form>
                 </template>
                 <template #card-side>
-                    <el-button type="primary" class="form__btn" @click="time"
+                    <el-button type="primary" class="form__btn" @click="time" :disabled="commit"
                         style="margin-bottom: 40px;">保存设置</el-button>
                 </template>
             </xmks-edit-card>
@@ -228,7 +228,7 @@
                     </el-form>
                 </template>
                 <template #card-side>
-                    <el-button type="primary" class="form__btn" @click="userAdd"
+                    <el-button type="primary" class="form__btn" @click="userAdd" :disabled="commit"
                         style="margin-bottom: 40px;">保存设置</el-button>
                 </template>
             </xmks-edit-card>
@@ -396,6 +396,8 @@ const userFormRules = reactive<FormRules>({// 表单校验规则
 
 })
 
+const commit = ref(false) // bug修复：创建考试后再次添加人员，概率性错误。（快速点击造成的并发导致同一个人多次添加，改为前端控制按钮，后端加同步锁）
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     load()
@@ -521,11 +523,13 @@ async function time() {
     }
 
     // 时间变更
+    commit.value = true
     const { data: { code } } = await examTime({
         id: timeForm.id,
         timeType: timeForm.timeType,
         minute: timeForm.add === 1 ? -timeForm.minute : timeForm.minute
     })
+    commit.value = false
     if (code !== 200) {
         return
     }
@@ -585,7 +589,9 @@ async function userAdd() {
     }
 
     // 用户添加
+    commit.value = true
     const { data: { code } } = await examUserAdd({ ...userForm })
+    commit.value = false
     if (code !== 200) {
         return
     }

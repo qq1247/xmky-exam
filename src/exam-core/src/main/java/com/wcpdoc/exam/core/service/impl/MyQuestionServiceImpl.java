@@ -12,7 +12,7 @@ import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.MyQuestionDao;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
@@ -23,7 +23,7 @@ import com.wcpdoc.exam.core.service.MyQuestionService;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Service
-public class MyQuestionServiceImpl extends BaseServiceImp<MyQuestion> implements MyQuestionService {
+public class MyQuestionServiceImpl extends BaseServiceImp<MyExamQuestion> implements MyQuestionService {
 	@Resource
 	private MyQuestionDao myQuestionDao;
 	@Resource
@@ -33,17 +33,17 @@ public class MyQuestionServiceImpl extends BaseServiceImp<MyQuestion> implements
 	private MyExamService myExamService;
 
 	@Override
-	public RBaseDao<MyQuestion> getDao() {
+	public RBaseDao<MyExamQuestion> getDao() {
 		return myQuestionDao;
 	}
 
 	@Override
-	public MyQuestion getMyQuestion(Integer examId, Integer userId, Integer questionId) {
+	public MyExamQuestion getMyQuestion(Integer examId, Integer userId, Integer questionId) {
 		return myQuestionDao.getMyQuestion(examId, userId, questionId);
 	}
 
 	@Override
-	public List<MyQuestion> getList(Integer examId, Integer userId) {
+	public List<MyExamQuestion> getList(Integer examId, Integer userId) {
 		return myQuestionDao.getList(examId, userId);
 	}
 

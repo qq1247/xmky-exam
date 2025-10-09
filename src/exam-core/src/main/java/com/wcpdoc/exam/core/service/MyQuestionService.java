@@ -3,14 +3,14 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 
 import com.wcpdoc.core.service.BaseService;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 
 /**
  * 我的试题服务层接口
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
-public interface MyQuestionService extends BaseService<MyQuestion> {
+public interface MyQuestionService extends BaseService<MyExamQuestion> {
 	/**
 	 * 获取我的试题
 	 * 
@@ -21,7 +21,7 @@ public interface MyQuestionService extends BaseService<MyQuestion> {
 	 * @param questionId
 	 * @return MyQuestion
 	 */
-	MyQuestion getMyQuestion(Integer examId, Integer userId, Integer questionId);
+	MyExamQuestion getMyQuestion(Integer examId, Integer userId, Integer questionId);
 
 	/**
 	 * 获取我的试题
@@ -32,7 +32,7 @@ public interface MyQuestionService extends BaseService<MyQuestion> {
 	 * @param userId
 	 * @return List<MyQuestion>
 	 */
-	List<MyQuestion> getList(Integer examId, Integer userId);
+	List<MyExamQuestion> getList(Integer examId, Integer userId);
 
 	/**
 	 * 我的试题清理

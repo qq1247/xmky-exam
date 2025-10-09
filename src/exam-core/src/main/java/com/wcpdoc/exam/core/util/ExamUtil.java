@@ -4,7 +4,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 
 /**
  * 考试工具类
@@ -52,7 +52,7 @@ public class ExamUtil {
 	 * @param examQuestion
 	 * @return boolean
 	 */
-	public static boolean hasChapter(MyQuestion myQuestion) {
+	public static boolean hasChapter(MyExamQuestion myQuestion) {
 		return myQuestion.getType() == 1;
 	}
 	
@@ -96,7 +96,7 @@ public class ExamUtil {
 	 * @param examQuestion
 	 * @return boolean
 	 */
-	public static boolean hasQuestion(MyQuestion myQuestion) {
+	public static boolean hasQuestion(MyExamQuestion myQuestion) {
 		return !hasChapter(myQuestion);
 	}
 	

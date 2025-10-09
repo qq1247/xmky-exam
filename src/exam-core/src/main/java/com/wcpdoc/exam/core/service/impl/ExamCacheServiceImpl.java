@@ -21,7 +21,7 @@ import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.dao.QuestionOptionDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -150,11 +150,11 @@ public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements Exam
 	@Override
 	@Cacheable(value = ExamConstant.MYQUESTION_CACHE, key = ExamConstant.MYQUESTION_LIST_KEY_PRE
 			+ "#examId + ':' + #userId", sync = true)
-	public List<MyQuestion> getMyQuestionList(Integer examId, Integer userId) {
-		List<MyQuestion> myQuestionList = myQuestionDao.getList(examId, userId);
+	public List<MyExamQuestion> getMyQuestionList(Integer examId, Integer userId) {
+		List<MyExamQuestion> myQuestionList = myQuestionDao.getList(examId, userId);
 		if (log.isDebugEnabled()) {
 			log.debug("缓存我的试题列表：{examId: {}, userId: {}, questionId: {}}", examId, userId, myQuestionList.stream()//
-					.map(MyQuestion::getQuestionId)//
+					.map(MyExamQuestion::getQuestionId)//
 					.collect(Collectors.toList()));
 		}
 		return myQuestionList;

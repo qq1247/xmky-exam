@@ -10,7 +10,7 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 
@@ -73,7 +73,7 @@ public class MyExamUtil {
 	 * @param questionAnswerList 试题答案
 	 * @param myQuestion         我的试题 void
 	 */
-	public static void qAHandle(Question question, List<QuestionAnswer> questionAnswerList, MyQuestion myQuestion) {
+	public static void qAHandle(Question question, List<QuestionAnswer> questionAnswerList, MyExamQuestion myQuestion) {
 		// 数据校验
 		if (QuestionUtil.hasSubjective(question)) {
 			return;
@@ -118,7 +118,7 @@ public class MyExamUtil {
 	 * @param myQuestion         我的试题 void
 	 */
 	public static void singleChoiceHandle(Question question, List<QuestionAnswer> questionAnswerList,
-			MyQuestion myQuestion) {
+			MyExamQuestion myQuestion) {
 		// 数据校验
 		if (QuestionUtil.hasSubjective(question)) {
 			return;
@@ -147,7 +147,7 @@ public class MyExamUtil {
 	 * @param myQuestion         我的试题 void
 	 */
 	public static void multipleChoiceHandle(Question question, List<QuestionAnswer> questionAnswerList,
-			MyQuestion myQuestion) {
+			MyExamQuestion myQuestion) {
 		// 数据校验
 		if (QuestionUtil.hasSubjective(question)) {
 			return;
@@ -180,7 +180,7 @@ public class MyExamUtil {
 	 * @param myQuestion         我的试题 void
 	 */
 	public static void fillBlankHandle(Question question, List<QuestionAnswer> questionAnswerList,
-			MyQuestion myQuestion) {
+			MyExamQuestion myQuestion) {
 		// 数据校验
 		if (QuestionUtil.hasSubjective(question)) {
 			return;

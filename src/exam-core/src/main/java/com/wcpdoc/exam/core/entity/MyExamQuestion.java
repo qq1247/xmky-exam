@@ -16,13 +16,13 @@ import com.wcpdoc.core.mybatis.IntTypeHandler;
 import lombok.Data;
 
 /**
- * 我的试题历史实体
+ * 我的试题实体
  * 
- * v1.0 zhanghc 2025年7月12日下午1:53:42
+ * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Data
-@TableName(value = "EXM_MY_QUESTION_HIS", autoResultMap = true)
-public class MyQuestionHis {
+@TableName(value = "EXM_MY_EXAM_QUESTION", autoResultMap = true)
+public class MyExamQuestion {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
 	private String chapterName;
@@ -45,6 +45,13 @@ public class MyQuestionHis {
 	private Integer markUserId;
 	private Date markTime;
 	private Integer ver;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> imgFileIds;
+	@TableField(typeHandler = IntTypeHandler.class)
+	private List<Integer> videoFileIds;
+	private String remark;
+	private Integer remarkUserId;
+	private Date remarkTime;
 	private Integer updateUserId;
 	private Date updateTime;
 

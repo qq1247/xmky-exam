@@ -34,7 +34,7 @@ import com.wcpdoc.exam.core.entity.MyExerQuestion;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
 import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 import com.wcpdoc.exam.core.entity.MyFavQuestion;
-import com.wcpdoc.exam.core.entity.MyQuestion;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.MyWrongQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -153,7 +153,7 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 		Question question = examCacheService.getQuestion(myExerQuestion.getQuestionId());
 		List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(questionId);
 
-		MyQuestion myQuestion = new MyQuestion();
+		MyExamQuestion myQuestion = new MyExamQuestion();
 		myQuestion.setScore(myExerQuestion.getScore());
 		myQuestion.setScores(myExerQuestion.getScores());
 		myQuestion.setMarkOptions(myExerQuestion.getMarkOptions());
