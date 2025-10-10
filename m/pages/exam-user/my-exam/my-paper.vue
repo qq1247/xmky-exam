@@ -31,7 +31,7 @@
 			<xm-swiper ref="swiperRef" v-model="curQuestionIndex" :items="examQuestions" :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
 				<template #default="{ item: examQuestion }">
 					<scroll-view scroll-y="true" style="height: 100%">
-						<xm-question
+						<xmky-question
 							v-if="examQuestion.type === 2"
 							v-model="examQuestion.userAnswers"
 							:type="examQuestion.questionType"
@@ -132,7 +132,7 @@
 									</view>
 								</view>
 							</template>
-						</xm-question>
+						</xmky-question>
 						<view v-else>
 							<view>{{ examQuestion.chapterName }}</view>
 							<view>{{ examQuestion.chapterTxt }}</view>

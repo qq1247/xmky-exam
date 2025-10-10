@@ -32,8 +32,8 @@ export function createApp() {
 
 // #ifdef H5
 if (process.env.NODE_ENV === 'development') {
-  import('vconsole').then(({ default: VConsole }) => {
-    new VConsole()
-  })
+	// import('vconsole').then(({ default: VConsole }) => {
+	//   new VConsole()
+	// })
 }
 // #endif

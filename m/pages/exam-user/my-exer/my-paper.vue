@@ -62,7 +62,7 @@
 			</view>
 			<view :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
 				<scroll-view scroll-y="true" style="height: 100%">
-					<xm-question
+					<xmky-question
 						v-if="curExamQuestion"
 						v-model="curExamQuestion.userAnswers"
 						:type="curExamQuestion?.questionType"
@@ -86,7 +86,7 @@
 						<template #title-post>
 							<text>（{{ curExamQuestion.score }}分）</text>
 						</template>
-					</xm-question>
+					</xmky-question>
 				</scroll-view>
 			</view>
 		</view>
@@ -329,10 +329,6 @@ const isWrong = computed(() => (index: number) => {
 const isMark = computed(() => (questionId: number) => {
 	return marks.value.includes(questionId);
 }); // 是否标记
-const isFav = computed(() => (index: number) => {
-	const myExerQuestion = _myExerQuestions.value[index];
-	return myExerQuestion?.fav === 1;
-}); // 是否收藏
 
 /************************事件相关*****************************/
 // 练习查询
@@ -453,15 +449,6 @@ async function answerOfObjective(val: string) {
 
 	if (_myExerQuestions.value[curQuestionIndex.value].userScore !== _myExerQuestions.value[curQuestionIndex.value].score) {
 		_myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum = (_myExerQuestions.value[curQuestionIndex.value].wrongAnswerNum as number) + 1;
-	}
-}
-
-// 标记试题
-async function mark(questionId: number) {
-	if (marks.value.includes(questionId)) {
-		marks.value = marks.value.filter((_questionId) => _questionId != questionId);
-	} else {
-		marks.value.push(questionId);
 	}
 }
 

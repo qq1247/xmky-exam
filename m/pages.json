@@ -1,33 +1,50 @@
 {
 	"pages": [{
-		"path": "pages/login/login"
-	}, {
-		"path": "pages/home/home"
-	}, {
-		"path": "pages/myExam/myExam"
-	}, {
-		"path": "pages/myExam/myPaper"
-	}, {
-		"path": "pages/myExam/myRank"
-	}, {
-		"path": "pages/myExam/myRead"
-	}, {
-		"path": "pages/myExer/myExer"
-	}, {
-		"path": "pages/myExer/myRead"
-	}, {
-		"path": "pages/myExer/myPaper"
-	}, {
-		"path": "pages/center/center"
-	}, {
-		"path": "pages/bulletin/bulletin"
-	}, {
-		"path": "pages/bulletin/bulletinDetail"
-	}, {
-		"path": "pages/center/pwd"
-	}, {
-		"path": "pages/center/custom"
-	}],
+			"path": "pages/login/login"
+		},
+
+		{
+			"path": "pages/exam-user/home/home"
+		}, {
+			"path": "pages/exam-user/my-exam/my-exam"
+		}, {
+			"path": "pages/exam-user/my-exam/my-paper"
+		}, {
+			"path": "pages/exam-user/my-exam/my-rank"
+		}, {
+			"path": "pages/exam-user/my-exam/my-read"
+		}, {
+			"path": "pages/exam-user/my-exer/my-exer"
+		}, {
+			"path": "pages/exam-user/my-exer/my-read"
+		}, {
+			"path": "pages/exam-user/my-exer/my-paper"
+		},
+
+		{
+			"path": "pages/admin/home/home"
+		}, {
+			"path": "pages/admin/question-bank/question-bank"
+		}, {
+			"path": "pages/admin/question-bank/question"
+		}, {
+			"path": "pages/admin/question-bank/question-view"
+		}, {
+			"path": "pages/admin/exam/exam"
+		},
+
+		{
+			"path": "pages/center/center"
+		}, {
+			"path": "pages/bulletin/bulletin"
+		}, {
+			"path": "pages/bulletin/bulletinDetail"
+		}, {
+			"path": "pages/center/pwd"
+		}, {
+			"path": "pages/center/custom"
+		}
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "",
@@ -38,31 +55,13 @@
 		}
 
 	},
+	// #ifdef H5 
 	"tabBar": {
 		"color": "#7A7E83",
 		"selectedColor": "#0d9df6",
 		"borderStyle": "black",
 		"backgroundColor": "#F8F8F8",
-		"list": [{
-			"pagePath": "pages/home/home",
-			"iconPath": "/static/img/tabtar/home.png",
-			"selectedIconPath": "/static/img/tabtar/home-active.png",
-			"text": "首页"
-		}, {
-			"pagePath": "pages/myExam/myExam",
-			"iconPath": "/static/img/tabtar/exam.png",
-			"selectedIconPath": "/static/img/tabtar/exam-active.png",
-			"text": "考试"
-		}, {
-			"pagePath": "pages/myExer/myExer",
-			"iconPath": "/static/img/tabtar/exer.png",
-			"selectedIconPath": "/static/img/tabtar/exer-active.png",
-			"text": "练习"
-		}, {
-			"pagePath": "pages/center/center",
-			"iconPath": "/static/img/tabtar/center.png",
-			"selectedIconPath": "/static/img/tabtar/center-active.png",
-			"text": "个人中心"
-		}]
+		"list": [] // 因为不同角色显示的底部导航栏不一样，所以使用自定义tabbar
 	}
+	// #endif
 }

@@ -84,7 +84,7 @@ import { useParmStore } from '@/stores/parm';
 import { myExamGeneratePaper } from '@/api/myExam';
 import { escape2Html } from '@/util/htmlUtil';
 // #ifdef MP-WEIXIN
-import WxmpRsa from 'wxmp-rsa'
+import WxmpRsa from 'wxmp-rsa';
 // #endif
 // #ifdef H5
 import forge from 'node-forge';
@@ -97,8 +97,8 @@ const dictStore = useDictStore();
 const baseUrl = ref(uni.getStorageSync('BASE_URL'));
 const redirectPath = ref('');
 const form = reactive({
-	loginName: '',
-	pwd: ''
+	loginName: 'admin',
+	pwd: '111111'
 });
 const formRef = ref();
 const formRules = {
@@ -171,15 +171,15 @@ async function login() {
 		const lines = base64Key.match(/.{1,64}/g) || [];
 		const pemKey = `-----BEGIN PUBLIC KEY-----\n${lines.join('\n')}\n-----END PUBLIC KEY-----`;
 		const publicKey = forge.pki.publicKeyFromPem(pemKey);
-		
+
 		const encryptedBytes = publicKey.encrypt(`${_encrypt.nonce}:${form.pwd}`, 'RSAES-PKCS1-V1_5');
 		encryptedPwd = forge.util.encode64(encryptedBytes);
 		// #endif
-		
+
 		// #ifdef MP-WEIXIN
-		const rsa = new WxmpRsa()
-		rsa.setPublicKey(_encrypt.publicKey)
-		encryptedPwd = rsa.encryptLong(`${_encrypt.nonce}:${form.pwd}`)
+		const rsa = new WxmpRsa();
+		rsa.setPublicKey(_encrypt.publicKey);
+		encryptedPwd = rsa.encryptLong(`${_encrypt.nonce}:${form.pwd}`);
 		// #endif
 	} catch (error) {
 		uni.showToast({ title: '生成秘钥失败', icon: 'error' });
@@ -194,10 +194,6 @@ async function login() {
 	if (code !== 200) {
 		return;
 	}
-	if (!(data.type === 1 || data.type === 4)) {
-		uni.showToast({ title: '暂不支持管理员登录', icon: 'error' });
-		return;
-	}
 
 	// 用户信息保存
 	userStore.user.id = data.userId;
@@ -210,13 +206,17 @@ async function login() {
 	dictStore.dicts = dicts;
 
 	// 进入相关页面
-	if (uni.getStorageSync('redirectPath')) {
-		let _redirectPath = uni.getStorageSync('redirectPath'); // 过期登录返回之前页面
-		uni.removeStorageSync('redirectPath');
-		uni.reLaunch({ url: _redirectPath });
-	} else {
-		uni.switchTab({ url: '/pages/home/home' });
+
+	if (userStore.user.type === 0 || userStore.user.type == 2) {
+		uni.redirectTo({ url: '/pages/admin/question-bank/question-bank' });
 	}
+	// if (uni.getStorageSync('redirectPath')) {
+	// 	let _redirectPath = uni.getStorageSync('redirectPath'); // 过期登录返回之前页面
+	// 	uni.removeStorageSync('redirectPath');
+	// 	uni.reLaunch({ url: _redirectPath });
+	// } else {
+	// 	uni.switchTab({ url: '/pages/exam-user/home/home' });
+	// }
 }
 
 // 登录
@@ -287,7 +287,13 @@ async function anonLogin() {
 </script>
 <style lang="scss" scoped>
 .login {
-	height: inherit;
+	// #ifdef H5
+	height: calc(100vh - 44px);
+	// #endif
+	// #ifdef MP-WEIXIN
+	height: calc(100vh - 44px);
+	// #endif
+
 	display: flex;
 	flex-direction: column;
 	.login-head {

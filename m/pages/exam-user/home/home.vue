@@ -122,7 +122,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { onShow, onReady } from '@dcloudio/uni-app';
+import { onShow, onLoad, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { myExamListpage } from '@/api/myExam';
 import { bulletinListpage } from '@/api/bulletin';
@@ -155,6 +155,13 @@ onShow(async () => {
 	myExamQuery();
 	myExerQuery();
 	bulletinQuery();
+});
+
+onLoad(() => {
+	uni.setTabBarItem({ index: 0, text: '首页', pagePath: 'pages/exam-user/home/home', visible: true });
+	uni.setTabBarItem({ index: 1, text: '考试', pagePath: 'pages/exam-user/my-exam/my-exam', visible: true });
+	uni.setTabBarItem({ index: 2, text: '练习', pagePath: 'pages/exam-user/my-exer/my-exer', visible: true });
+	uni.setTabBarItem({ index: 3, text: '', pagePath: '1', "iconPath": "", visible: true });
 });
 
 onReady(() => {
@@ -227,7 +234,7 @@ function quickNav({ detail: { index } }) {
 		});
 		return;
 	}
-	if (index === 4) {
+	if (index === 2) {
 		uni.switchTab({
 			url: '/pages/center/center'
 		});

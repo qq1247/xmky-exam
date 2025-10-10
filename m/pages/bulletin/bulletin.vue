@@ -31,7 +31,7 @@
 				@change="(item: any) => (curTabIndex = item.index)"
 			></uv-tabs>
 			<scroll-view scroll-y="true" class="bulletin-main__scroll" :style="{ height: taskListHeight + 'px' }">
-				<xm-card
+				<xmky-card
 					v-if="curTabIndex === 0"
 					v-for="(bulletin, index) in bulletinListpage.list"
 					:key="index"
@@ -52,14 +52,14 @@
 							<text @click="toBulletin(bulletin)" class="bulletin-main__in">查看详情 >></text>
 						</view>
 					</template>
-				</xm-card>
+				</xmky-card>
 				<uni-load-more
 					v-if="curTabIndex === 0 && bulletinListpage.list?.length"
 					:status="bulletinListpage.status"
 					:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
 					@clickLoadMore="bulletinQuery(true)"
 				></uni-load-more>
-				<xm-empty v-if="curTabIndex === 0 && !bulletinListpage.list?.length"></xm-empty>
+				<xmky-emtpy> v-if="curTabIndex === 0 && !bulletinListpage.list?.length"></xmky-emtpy>
 			</scroll-view>
 		</view>
 		<view class="bulletin-bottom"></view>
@@ -176,7 +176,7 @@ async function toBulletin(bulletin: any) {
 		}
 		//#endif
 		.bulletin-main__scroll {
-			:deep(.xm-card__content) {
+			:deep(.xmky-card__content) {
 				margin-top: 0rpx;
 			}
 			.bulletin-main__opt {

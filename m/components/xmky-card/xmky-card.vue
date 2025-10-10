@@ -1,16 +1,16 @@
 <template>
-	<view class="xm-card__list">
-		<view class="xm-card__title">
-			<text v-if="preTxt" class="xm-card__pre-txt">{{ preTxt }}</text>
-			<text class="xm-card__name">{{ name }}</text>
-			<view v-if="tagName" class="xm-card__tag">
+	<view class="xmky-card__list">
+		<view class="xmky-card__title">
+			<text v-if="preTxt" class="xmky-card__pre-txt">{{ preTxt }}</text>
+			<text class="xmky-card__name">{{ name }}</text>
+			<view v-if="tagName" class="xmky-card__tag">
 				<text>{{ tagName }}</text>
 			</view>
 		</view>
-		<view class="xm-card__content">
+		<view class="xmky-card__content">
 			<slot name="content"></slot>
 		</view>
-		<view class="xm-card__opt">
+		<view class="xmky-card__opt">
 			<slot name="opt"></slot>
 		</view>
 	</view>
@@ -29,16 +29,16 @@ const props = withDefaults(
 </script>
 
 <style lang="scss" scoped>
-.xm-card__list {
+.xmky-card__list {
 	background: #ffffff;
 	border-radius: 16rpx;
 	margin: 20rpx 0rpx 30rpx 0rpx;
 	padding: 30rpx 30rpx 20rpx 30rpx;
-	.xm-card__title {
+	.xmky-card__title {
 		display: flex;
 		align-items: flex-end;
 		margin: 20rpx 0rpx;
-		.xm-card__pre-txt {
+		.xmky-card__pre-txt {
 			display: inline-block;
 			width: 55rpx;
 			height: 42rpx;
@@ -50,7 +50,7 @@ const props = withDefaults(
 			margin-right: 10rpx;
 			background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 		}
-		.xm-card__name {
+		.xmky-card__name {
 			display: inline-block;
 			height: 34rpx;
 			line-height: 34rpx;
@@ -60,7 +60,7 @@ const props = withDefaults(
 			font-size: 32rpx;
 			color: #333333;
 		}
-		.xm-card__tag {
+		.xmky-card__tag {
 			display: inline-block;
 			margin-left: 10rpx;
 			min-width: 76rpx;
@@ -77,13 +77,13 @@ const props = withDefaults(
 			color: #04c7f2;
 		}
 	}
-	.xm-card__content {
+	.xmky-card__content {
 		font-size: 26rpx;
 		color: #8f939c;
 		margin: 30rpx 0rpx 10rpx 0rpx;
 		line-height: 62rpx;
 	}
-	.xm-card__opt {
+	.xmky-card__opt {
 		display: flex;
 		align-items: center;
 		border-top: 1rpx solid #e5e5e5;

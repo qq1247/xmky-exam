@@ -1,6 +1,7 @@
 import he from 'he'
 
 const escapeString = (str: string): string => {
+	if (!str) return '' 
     return he.decode(str)
 };
 export const escape2Html = <T extends string | string[]>(txt: T): T => {

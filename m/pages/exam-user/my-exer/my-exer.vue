@@ -14,7 +14,7 @@
 		</view>
 		<view class="myexer-main">
 			<scroll-view scroll-y="true" class="myexer-main__scroll" :style="{ height: taskListHeight + 'px' }">
-				<xm-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
+				<xmky-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
 					<template #content>
 						<view class="myexer-main__head">
 							<text>主观：</text>
@@ -44,14 +44,14 @@
 							<button type="primary" @click="toExer(exer)" class="myexer-main__exer-in">进入练习</button>
 						</view>
 					</template>
-				</xm-card>
+				</xmky-card>
 				<uni-load-more
 					v-if="listpage.list?.length"
 					:status="listpage.status"
 					:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
 					@clickLoadMore="query(true)"
 				></uni-load-more>
-				<xm-empty v-if="!listpage.list?.length"></xm-empty>
+				<xmky-empty> v-if="!listpage.list?.length"></xmky-empty>
 			</scroll-view>
 		</view>
 		<view class="myexer-bottom"></view>

@@ -40,7 +40,7 @@
 				@change="(item) => (curTabIndex = item.index)"
 			></uv-tabs>
 			<scroll-view scroll-y="true" class="myexam-main__scroll" :style="{ height: taskListHeight + 'px' }">
-				<xm-card
+				<xmky-card
 					v-if="curTabIndex === 0"
 					v-for="(myExam, index) in myExamListpage.list"
 					:key="index"
@@ -106,16 +106,16 @@
 							</button>
 						</view>
 					</template>
-				</xm-card>
+				</xmky-card>
 				<uni-load-more
 					v-if="curTabIndex === 0 && myExamListpage.list?.length"
 					:status="myExamListpage.status"
 					:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
 					@clickLoadMore="myExamQuery(true)"
 				></uni-load-more>
-				<xm-empty v-if="curTabIndex === 0 && !myExamListpage.list?.length"></xm-empty>
+				<xmky-empty> v-if="curTabIndex === 0 && !myExamListpage.list?.length"></xmky-empty>
 
-				<xm-card
+				<xmky-card
 					v-if="curTabIndex === 1"
 					v-for="(todoExam, index) in todoExamListpage.list"
 					:key="index"
@@ -143,14 +143,14 @@
 							<button type="primary" @click="toExam(todoExam)" class="myexam-main__exam-in">进入考试</button>
 						</view>
 					</template>
-				</xm-card>
+				</xmky-card>
 				<uni-load-more
 					v-if="curTabIndex === 1 && todoExamListpage.list?.length"
 					:status="todoExamListpage.status"
 					:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
 					@clickLoadMore="todoExamQuery(true)"
 				></uni-load-more>
-				<xm-empty v-if="curTabIndex === 1 && !todoExamListpage.list?.length"></xm-empty>
+				<xmky-emtpy> v-if="curTabIndex === 1 && !todoExamListpage.list?.length"></xmky-emtpy>
 			</scroll-view>
 		</view>
 		<view class="myexam-bottom"></view>

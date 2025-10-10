@@ -54,7 +54,7 @@
 						<text class="exer__title">练习信息</text>
 					</view>
 					<view class="exer__main">
-						<qiun-data-charts canvas-id="chart-1" type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" canvas2d="true"/>
+						<qiun-data-charts canvas-id="chart-1" type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" :canvas2d="true"/>
 						<!-- <view class="exer__row">
 							<text class="exer__label">练习名称：</text>
 							<text class="exer__value">{{ exer.name }}</text>
@@ -77,7 +77,7 @@
 							客观题{{ questionStatisData.markTypeStatis.objective }}道 主观题{{ questionStatisData.markTypeStatis.subjective }}道
 						</text>
 						<view>
-							<qiun-data-charts canvas-id="chart-2" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" canvas2d="true"/>
+							<qiun-data-charts canvas-id="chart-2" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" :canvas2d="true"/>
 						</view>
 					</view>
 				</view>
@@ -169,31 +169,31 @@
 							</uni-forms-item>
 							<uni-forms-item label="单选题：" name="singleNum" required>
 								<view class="my-exer__row">
-									<xm-number v-model="form.singleNum" :min="0" :max="questionMaxNum.singleNum" @input="nameUpdate" />
+									<xmky-number v-model="form.singleNum" :min="0" :max="questionMaxNum.singleNum" @input="nameUpdate" />
 									<text>，共{{ questionMaxNum.singleNum }}题</text>
 								</view>
 							</uni-forms-item>
 							<uni-forms-item label="多选题：" name="multipleNum" required>
 								<view class="my-exer__row">
-									<xm-number v-model="form.multipleNum" :min="0" :max="questionMaxNum.multipleNum" @input="nameUpdate" />
+									<xmky-number v-model="form.multipleNum" :min="0" :max="questionMaxNum.multipleNum" @input="nameUpdate" />
 									<text class="my-exer__label">，共{{ questionMaxNum.multipleNum }}题</text>
 								</view>
 							</uni-forms-item>
 							<uni-forms-item label="填空题：" name="fillBlankNum" required>
 								<view class="my-exer__row">
-									<xm-number v-model="form.fillBlankNum" :min="0" :max="questionMaxNum.fillBlankNum" @input="nameUpdate" />
+									<xmky-number v-model="form.fillBlankNum" :min="0" :max="questionMaxNum.fillBlankNum" @input="nameUpdate" />
 									<text class="my-exer__label">，共{{ questionMaxNum.fillBlankNum }}题</text>
 								</view>
 							</uni-forms-item>
 							<uni-forms-item label="判断题：" name="judgeNum" required>
 								<view class="my-exer__row">
-									<xm-number v-model="form.judgeNum" :min="0" :max="questionMaxNum.judgeNum" @input="nameUpdate" />
+									<xmky-number v-model="form.judgeNum" :min="0" :max="questionMaxNum.judgeNum" @input="nameUpdate" />
 									<text class="my-exer__label">，共{{ questionMaxNum.judgeNum }}题</text>
 								</view>
 							</uni-forms-item>
 							<uni-forms-item label="问答题：" name="qaNum" required>
 								<view class="my-exer__row">
-									<xm-number v-model="form.qaNum" :min="0" :max="questionMaxNum.qaNum" @input="nameUpdate" />
+									<xmky-number v-model="form.qaNum" :min="0" :max="questionMaxNum.qaNum" @input="nameUpdate" />
 									<text class="my-exer__label">，共{{ questionMaxNum.qaNum }}题</text>
 								</view>
 							</uni-forms-item>
@@ -224,7 +224,6 @@ import { myExerListpage, myExerGet, myExerTrackList, myExerAdd } from '@/api/my-
 import { loginSysTime } from '@/api/login';
 import { exerListpage } from '@/api/exer';
 import { Page } from '@/ts/page.d';
-import XmNumber from '@/components/xm-number/xm-number.vue';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
