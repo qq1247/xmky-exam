@@ -131,7 +131,7 @@ const exerTrackListpage = reactive<Listpage>({// 练习跟踪分页列表
     total: 0,
     list: [],
 })
-const exerWrongQuestionListpage = reactive<Listpage>({// 练习跟踪分页列表
+const exerWrongQuestionListpage = reactive<Listpage>({// 练习错题分页列表
     curPage: 1,
     pageSize: 10,
     total: 0,

@@ -30,6 +30,14 @@
 		}, {
 			"path": "pages/admin/question-bank/question-view"
 		}, {
+			"path": "pages/admin/exer/exer"
+		}, {
+			"path": "pages/admin/exer/exer-statis"
+		}, {
+			"path": "pages/admin/exer/exer-track-chart"
+		}, {
+			"path": "pages/admin/exer/exer-wrong-question"
+		}, {
 			"path": "pages/admin/exam/exam"
 		},
 

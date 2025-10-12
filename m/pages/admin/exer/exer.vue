@@ -1,20 +1,20 @@
 <template>
 	<xmky-layout
 		:tabs="[
-			{ pagePath: '/pages/admin/question-bank/question-bank', text: '题库', icon: 'icon-icon-top_01' },
+			{ pagePath: '/pages/admin/question-bank/question-bank', text: '练习', icon: 'icon-icon-top_01' },
 			{ pagePath: '/pages/admin/exer/exer', text: '练习', icon: 'icon-icon-pencil' },
 			{ pagePath: '/pages/admin/exam/exam', text: '考试', icon: 'icon-icon-pen' },
 			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
 		]"
 	>
-		<view class="question-bank">
-			<view class="question-bank__head">
+		<view class="exer">
+			<view class="exer__head">
 				<uni-search-bar
 					v-model="queryForm.name"
 					bgColor="#fff"
 					clearButton="auto"
 					radius="10"
-					placeholder="请输入题库名称"
+					placeholder="请输入练习名称"
 					class="query"
 					@confirm="
 						() => {
@@ -35,42 +35,32 @@
 					"
 				></uni-search-bar>
 			</view>
-			<view class="question-bank__main">
-				<scroll-view scroll-y="true" class="question-bank__scroll" :style="{ height: scrollHeight + 'px' }">
-					<xmky-card
-						v-for="(questionBank, index) in listpage.list"
-						:key="index"
-						:preTxt="(index + 1).toString().padStart(2, '0')"
-						:name="questionBank.name"
-						tag-name="题库"
-					>
+			<view class="exer__main">
+				<scroll-view scroll-y="true" class="exer__scroll" :style="{ height: scrollHeight + 'px' }">
+					<xmky-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
 						<template #content>
-							<view class="question-bank__row">
-								<text>主观</text>
-								<text class="question-bank__value">{{ questionBank.objectiveNum }}道</text>
-								<text>客观</text>
-								<text class="question-bank__value">{{ questionBank.subjectiveNum }}道</text>
+							<view class="exer__row">
+								<text>练习已</text>
+								<text class="exer__value">{{ dictStore.getValue('STATE_PS', exer.state) }}</text>
 							</view>
 							<view>
-								<text>单选</text>
-								<text class="question-bank__value">{{ questionBank.singleNum }}道</text>
-								<text>多选</text>
-								<text class="question-bank__value">{{ questionBank.multipleNum }}道</text>
-								<text>填空</text>
-								<text class="question-bank__value">{{ questionBank.fillBlankObjNum + questionBank.fillBlankSubNum }}道</text>
-								<text>判断</text>
-								<text class="question-bank__value">{{ questionBank.judgeNum }}道</text>
-								<text>问答</text>
-								<text class="question-bank__value">{{ questionBank.qaObjNum + questionBank.qaSubNum }}道</text>
+								<text>题库选</text>
+								<text class="exer__value">{{ exer.questionBankIds.length }}个</text>
+								<text>试题共</text>
+								<text class="exer__value">{{ exer.objectiveNum + exer.subjectiveNum }}道</text>
+								<text>机构选</text>
+								<text class="exer__value">{{ exer.orgIds.length }}个</text>
+								<text>用户选</text>
+								<text class="exer__value">{{ exer.userIds.length }}个</text>
 							</view>
 						</template>
 						<template #opt>
-							<view class="question-bank__opt">
+							<view class="exer__opt">
 								<view>
-									<view class="question-bank__state">{{questionBank.createUserName}}</view>
-									<view class="question-bank__state">{{questionBank.updateTime}}</view>
+									<view class="exer__state">{{exer.createUserName}}</view>
+									<view class="exer__state">{{exer.updateTime}}</view>
 								</view>
-								<button type="primary" @click="toQuestion(questionBank.id)" class="question-bank__btn">进入题库</button>
+								<button type="primary" @click="toExerStatis(exer.id)" class="exer__btn">进入练习</button>
 							</view>
 						</template>
 					</xmky-card>
@@ -83,7 +73,7 @@
 					<xmky-empty v-if="!listpage.list?.length"></xmky-empty>
 				</scroll-view>
 			</view>
-			<view class="question-bank__foot"></view>
+			<view class="exer__foot"></view>
 		</view>
 	</xmky-layout>
 </template>
@@ -91,11 +81,13 @@
 import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
-import { questionBankListpage } from '@/api/question-bank';
+import { exerListpage } from '@/api/exer';
+import { useDictStore } from '@/stores/dict';
 
 /************************变量定义相关***********************/
+const dictStore = useDictStore();
 const queryForm = reactive({
-	name: '' // 题库名称
+	name: '' // 练习名称
 });
 const listpage = reactive<Page<any>>({
 	curPage: 1,
@@ -103,7 +95,7 @@ const listpage = reactive<Page<any>>({
 	total: 0,
 	list: [],
 	status: 'more'
-}); // 题库列表
+}); // 练习列表
 const scrollHeight = ref(0); // 列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
@@ -113,7 +105,7 @@ onShow(async () => {
 
 onReady(() => {
 	uni.createSelectorQuery()
-		.select('.question-bank__scroll')
+		.select('.exer__scroll')
 		.boundingClientRect((data: any) => {
 			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
 		})
@@ -121,12 +113,12 @@ onReady(() => {
 });
 
 /************************事件相关*****************************/
-// 题库列表查询
+// 练习列表查询
 async function query(append: boolean) {
 	listpage.status = 'loading';
 	listpage.curPage = append ? listpage.curPage + 1 : 1;
 
-	let { data } = await questionBankListpage({
+	let { data } = await exerListpage({
 		...queryForm,
 		curPage: listpage.curPage,
 		pageSize: listpage.pageSize
@@ -141,17 +133,17 @@ async function query(append: boolean) {
 	listpage.status = listpage.list.length < listpage.total ? 'more' : 'no-more';
 }
 
-// 去试题页面
-async function toQuestion(id: number) {
-	uni.navigateTo({ url: `/pages/admin/question-bank/question?questionBankId=${id}` });
+// 去练习统计页面
+async function toExerStatis(id: number) {
+	uni.navigateTo({ url: `/pages/admin/exer/exer-statis?exerId=${id}` });
 }
 </script>
 <style lang="scss" scoped>
-.question-bank {
+.exer {
 	display: flex;
 	flex-direction: column;
 	padding: 20rpx;
-	.question-bank__head {
+	.exer__head {
 		:deep(.query) {
 			padding: 0px;
 			margin-bottom: 10rpx;
@@ -166,29 +158,29 @@ async function toQuestion(id: number) {
 			}
 		}
 	}
-	.question-bank__main {
-		.question-bank__scroll {
-			.question-bank__opt {
+	.exer__main {
+		.exer__scroll {
+			.exer__opt {
 				flex: 1;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				.question-bank__state {
+				.exer__state {
 					display: inline-block;
 					margin-right: 40rpx;
-					.question-bank__state-name {
+					.exer__state-name {
 						margin-left: 4rpx;
 						font-size: 26rpx;
 						color: #8f939c;
 					}
-					.question-bank__state-name--warn {
+					.exer__state-name--warn {
 						color: #ff5d15;
 					}
-					.question-bank__state-name--succ {
+					.exer__state-name--succ {
 						color: #18bc38;
 					}
 				}
-				.question-bank__btn {
+				.exer__btn {
 					width: 180rpx;
 					height: 66rpx;
 					margin: initial;
@@ -199,10 +191,10 @@ async function toQuestion(id: number) {
 					background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 				}
 			}
-			.question-bank__row {
+			.exer__row {
 				display: flex;
 			}
-			.question-bank__value {
+			.exer__value {
 				color: #333;
 				margin-right: 20rpx;
 			}

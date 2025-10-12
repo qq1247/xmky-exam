@@ -121,10 +121,10 @@ function toView(id: number) {
 <style lang="scss" scoped>
 .question {
 	// #ifdef H5
-	min-height: calc(100vh - 44px);
+	height: calc(100vh - 44px);
 	// #endif
 	// #ifdef MP-WEIXIN
-	min-height: calc(100vh - 0px);
+	height: calc(100vh - 0px);
 	// #endif
 	display: flex;
 	flex-direction: column;

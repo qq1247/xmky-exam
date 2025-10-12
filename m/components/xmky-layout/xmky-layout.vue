@@ -35,9 +35,6 @@ function updateCurrentIndex() {
 
 <style lang="scss" scoped>
 .xmky-layout {
-	min-height: calc(100vh - 44px);
-	background-color: #f3f6f9;
-	padding-bottom: 60px; /* 防止内容被 tabBar 遮挡 */
-	padding: inherit;
+	
 }
 </style>

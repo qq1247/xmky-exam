@@ -97,8 +97,8 @@ const dictStore = useDictStore();
 const baseUrl = ref(uni.getStorageSync('BASE_URL'));
 const redirectPath = ref('');
 const form = reactive({
-	loginName: 'admin',
-	pwd: '111111'
+	loginName: '',
+	pwd: ''
 });
 const formRef = ref();
 const formRules = {
@@ -291,11 +291,12 @@ async function anonLogin() {
 	height: calc(100vh - 44px);
 	// #endif
 	// #ifdef MP-WEIXIN
-	height: calc(100vh - 44px);
+	height: calc(100vh);
 	// #endif
 
 	display: flex;
 	flex-direction: column;
+
 	.login-head {
 		display: flex;
 		height: 480rpx;
@@ -312,6 +313,7 @@ async function anonLogin() {
 			flex-direction: column;
 			align-items: center;
 			z-index: 1;
+
 			.login-head__logo {
 				margin: 40rpx;
 				padding: 18rpx;
@@ -321,28 +323,34 @@ async function anonLogin() {
 				border-radius: 50%;
 				box-shadow: 0rpx 0rpx 0rpx 10rpx #02a0f6;
 			}
+
 			.login-head__sysname {
 				font-size: 36rpx;
 				color: #fff;
 			}
 		}
 	}
+
 	.login-main {
 		padding: 0rpx 60rpx;
+
 		:deep(.is-input-border) {
 			border-width: 0rpx;
 			border-bottom-width: 1rpx;
 			border-radius: 0rpx;
 		}
+
 		.login-main__btn-group {
 			display: flex;
 			flex-direction: column;
 			align-items: flex-end;
+
 			.login-main__switc-btn {
 				// 包含switch，微信小程序编译不通过
 				margin: 0px 10px 0px 0px;
 				color: #0d9df6;
 			}
+
 			.login-main__login {
 				margin-top: 60rpx;
 				width: 628rpx;
@@ -362,6 +370,7 @@ async function anonLogin() {
 		padding: 20rpx 0rpx;
 		font-size: 22rpx;
 		color: #888;
+
 		:deep(a) {
 			color: #888;
 			text-decoration: none;

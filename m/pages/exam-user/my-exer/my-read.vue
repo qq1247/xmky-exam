@@ -54,7 +54,7 @@
 						<text class="exer__title">练习信息</text>
 					</view>
 					<view class="exer__main">
-						<qiun-data-charts canvas-id="chart-1" type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" :canvas2d="true"/>
+						<qiun-data-charts canvas-id="chart-1" type="line" :opts="exerTimeStatisOpts" :chartData="exerTimeStatisData.data" :ontouch="true" :canvas2d="true" />
 						<!-- <view class="exer__row">
 							<text class="exer__label">练习名称：</text>
 							<text class="exer__value">{{ exer.name }}</text>
@@ -77,7 +77,7 @@
 							客观题{{ questionStatisData.markTypeStatis.objective }}道 主观题{{ questionStatisData.markTypeStatis.subjective }}道
 						</text>
 						<view>
-							<qiun-data-charts canvas-id="chart-2" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" :canvas2d="true"/>
+							<qiun-data-charts canvas-id="chart-2" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" :canvas2d="true" />
 						</view>
 					</view>
 				</view>
@@ -101,7 +101,7 @@
 											<text class="my-exer-list__value">{{ myExer.answerNum }}/{{ myExer.questionNum }}</text>
 											<text class="my-exer-list__lable">正确率：</text>
 											<text class="my-exer-list__value">
-												{{ new Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber() || 0}}%
+												{{ new Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber() || 0 }}%
 											</text>
 										</view>
 									</view>
@@ -318,8 +318,7 @@ onReady(() => {
 
 /************************计算属性相关*************************/
 const exerTimeStatisData = reactive({
-	// 不要单独更新某个属性，要作为一个整体，插件限制
-	data: {}
+	data: {} // 不要单独更新某个属性，要作为一个整体，插件限制
 });
 const exerTimeStatisOpts = reactive({
 	color: ['#4692D8', '#06BCE3', '#978CEC', '#DD8CEC', '#85e3a4'],

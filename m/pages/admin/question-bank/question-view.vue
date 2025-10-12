@@ -68,10 +68,10 @@ onLoad(async (options) => {
 .question-view {
 	padding: 20rpx;
 	// #ifdef H5
-	min-height: calc(100vh - 44px);
+	height: calc(100vh - 44px);
 	// #endif
 	// #ifdef MP-WEIXIN
-	min-height: calc(100vh - 0px);
+	height: calc(100vh - 0px);
 	// #endif
 	background-color: #fff;
 	.question-view__head {
