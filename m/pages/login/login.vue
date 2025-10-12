@@ -14,7 +14,7 @@
 						v-model="form.loginName"
 						prefixIcon="person"
 						:focus="true"
-						:styles="{ backgroundColor: '#F3F6F9' }"
+						:styles="{ backgroundColor: '#F3F6F9', color: '#333' }"
 						placeholder="请输入账号"
 						class="login-main__input"
 					/>
@@ -24,7 +24,7 @@
 						v-model="form.pwd"
 						type="password"
 						prefixIcon="locked"
-						:styles="{ backgroundColor: '#F3F6F9' }"
+						:styles="{ backgroundColor: '#F3F6F9', color: '#333' }"
 						clearable
 						placeholder="请输入密码"
 						class="login-main__input"
