@@ -2,6 +2,7 @@
 export interface Exam {
 	id: number | null; // ID
 	name: string; // 考试名称
+	paperName: ''// 试卷名称
 	startTime: string; // 考试开始时间（yyyy-MM-dd HH:mm:ss）
 	endTime: string; // 考试结束时间（yyyy-MM-dd HH:mm:ss）
 	markStartTime: string; //阅卷开始时间（yyyy-MM-dd HH:mm:ss）

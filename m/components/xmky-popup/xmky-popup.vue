@@ -1,11 +1,11 @@
 <template>
-	<uni-popup ref="popup" type="share" safeArea background-color="#fff" border-radius="10px 10px 10px 10px" class="xm-popup">
-		<view class="xm-popup-head">
-			<text class="xm-popup-head__name">{{ name }}</text>
-			<uni-icons customPrefix="iconfont" type="icon-guanbi" @click="popup.close()" color="#231815" size="34rpx" class="xm-popup-head__close-btn"></uni-icons>
+	<uni-popup ref="popup" type="share" safeArea background-color="#fff" border-radius="10px 10px 10px 10px" class="xmky-popup">
+		<view class="xmky-popup-head">
+			<text class="xmky-popup-head__name">{{ name }}</text>
+			<uni-icons customPrefix="iconfont" type="icon-guanbi" @click="popup.close()" color="#231815" size="34rpx" class="xmky-popup-head__close-btn"></uni-icons>
 		</view>
-		<view class="xm-popup-main">
-			<scroll-view scroll-y="true" class="xm-popup-main__scroll">
+		<view class="xmky-popup-main">
+			<scroll-view scroll-y="true" class="xmky-popup-main__scroll">
 				<slot></slot>
 			</scroll-view>
 		</view>
@@ -40,28 +40,28 @@ function close() {
 </script>
 
 <style lang="scss" scoped>
-.xm-popup {
-	.xm-popup-head {
+.xmky-popup {
+	.xmky-popup-head {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0rpx 30rpx;
 
 		height: 120rpx;
-		.xm-popup-head__name {
+		.xmky-popup-head__name {
 			font-weight: bold;
 			font-size: 42rpx;
 			color: #303133;
 		}
-		.xm-popup-head__close-btn {
+		.xmky-popup-head__close-btn {
 			position: absolute;
 			right: 40rpx;
 			top: 40rpx;
 		}
 	}
-	.xm-popup-main {
+	.xmky-popup-main {
 		padding: 0rpx 30rpx;
-		.xm-popup-main__scroll {
+		.xmky-popup-main__scroll {
 			height: 40vh;
 		}
 	}

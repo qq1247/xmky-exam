@@ -3,14 +3,14 @@
 		<view class="mypaper-head">
 			<view class="mypaper-head__time">
 				<uni-icons customPrefix="iconfont" type="icon-shijian1" color="#231815" size="34rpx"></uni-icons>
-				<xm-count-down
+				<xmky-count-down
 					:expireTime="myExam.answerEndTime"
 					@end="finishAuto"
 					preTxt=" 剩余"
 					color="#8F939C"
 					@change="percent"
 					class="mypaper-head__time-count-down"
-				></xm-count-down>
+				></xmky-count-down>
 			</view>
 			<progress :percent="timePercent" activeColor="#10AEFF" class="mypaper-head__time-progress" stroke-width="2" />
 		</view>
@@ -28,7 +28,7 @@
 					@click="mark(examQuestions[curQuestionIndex].no)"
 				></uni-icons>
 			</view>
-			<xm-swiper ref="swiperRef" v-model="curQuestionIndex" :items="examQuestions" :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
+			<xmky-swiper ref="swiperRef" v-model="curQuestionIndex" :items="examQuestions" :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
 				<template #default="{ item: examQuestion }">
 					<scroll-view scroll-y="true" style="height: 100%">
 						<xmky-question
@@ -139,7 +139,7 @@
 						</view>
 					</scroll-view>
 				</template>
-			</xm-swiper>
+			</xmky-swiper>
 		</view>
 		<view class="mypaper-foot">
 			<view class="answer-nav" @click="answerSheet.open()">
@@ -157,7 +157,7 @@
 			<button v-if="examing" class="mypaper-foot__finish" type="primary" @click="finish">交卷</button>
 			<button v-if="!examing" class="mypaper-foot__finish" type="primary" @click="toHome">返回</button>
 
-			<xm-popup ref="answerSheet" name="答题卡" class="answer-sheet">
+			<xmky-popup ref="answerSheet" name="答题卡" class="answer-sheet">
 				<view class="answer-sheet-head">
 					<view class="answer-sheet-head__state answer-sheet-head__state--mark"></view>
 					<text class="answer-sheet-head__name">标记</text>
@@ -180,7 +180,7 @@
 						</view>
 					</template>
 				</view>
-			</xm-popup>
+			</xmky-popup>
 		</view>
 	</view>
 </template>
@@ -478,9 +478,9 @@ function prompt(msg: string) {
 		cancelText: '返回首页',
 		success: function (res) {
 			if (res.confirm) {
-				uni.navigateTo({ url: `/pages/myExam/myRead?examId=${exam.id}` });
+				uni.navigateTo({ url: `/pages/exam-user/my-exam/my-read?examId=${exam.id}` });
 			} else if (res.cancel) {
-				uni.switchTab({ url: '/pages/home/home' });
+				uni.navigateTo({ url: '/pages/exam-user/home/home' });
 			}
 		}
 	});
@@ -488,7 +488,7 @@ function prompt(msg: string) {
 
 // 去首页
 function toHome() {
-	uni.switchTab({ url: '/pages/home/home' });
+	uni.navigateTo({ url: '/pages/exam-user/home/home' });
 }
 
 // 预览图片

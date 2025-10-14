@@ -1,61 +1,84 @@
 <template>
-	<view class="myexer">
-		<view class="myexer-head">
-			<uni-search-bar
-				v-model="queryForm.name"
-				bgColor="#fff"
-				clearButton="auto"
-				cancelButton="none"
-				radius="16"
-				placeholder="请输入练习名称"
-				@confirm="query(false)"
-				@cancel="query(false)"
-			></uni-search-bar>
-		</view>
-		<view class="myexer-main">
-			<scroll-view scroll-y="true" class="myexer-main__scroll" :style="{ height: taskListHeight + 'px' }">
-				<xmky-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
-					<template #content>
-						<view class="myexer-main__head">
-							<text>主观：</text>
-							<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
-							<text>客观：</text>
-							<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
-						</view>
-						<view>
-							<text>单选：</text>
-							<text class="myexer-main__value">{{ exer.singleNum }}</text>
-							<text>多选：</text>
-							<text class="myexer-main__value">{{ exer.multipleNum }}</text>
-							<text>填空：</text>
-							<text class="myexer-main__value">{{ exer.fillBlankObjNum + exer.fillBlankSubNum }}</text>
-							<text>判断：</text>
-							<text class="myexer-main__value">{{ exer.judgeNum }}</text>
-							<text>问答：</text>
-							<text class="myexer-main__value">{{ exer.qaObjNum + exer.qaSubNum }}</text>
-						</view>
-					</template>
-					<template #opt>
-						<view class="myexer-main__opt">
-							<view>
-								<view class="myexer-main__state"></view>
-								<view class="myexer-main__state"></view>
+	<xmky-layout
+		:tabs="[
+			{ pagePath: '/pages/exam-user/home/home', text: '首页', icon: 'icon-icon-home' },
+			{ pagePath: '/pages/exam-user/my-exer/my-exer', text: '练习', icon: 'icon-icon-pencil' },
+			{ pagePath: '/pages/exam-user/my-exam/my-exam', text: '考试', icon: 'icon-icon-pen' },
+			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
+		]"
+	>
+		<view class="myexer">
+			<view class="myexer-head">
+				<uni-search-bar
+					v-model="queryForm.name"
+					bgColor="#fff"
+					radius="10"
+					placeholder="请输入练习名称"
+					class="query"
+					@confirm="
+						() => {
+							query(false);
+						}
+					"
+					@cancel="
+						() => {
+							queryForm.name = '';
+							query(false);
+						}
+					"
+					@clear="
+						() => {
+							queryForm.name = '';
+							query(false);
+						}
+					"
+				></uni-search-bar>
+			</view>
+			<view class="myexer-main">
+				<scroll-view scroll-y="true" class="myexer-main__scroll" :style="{ height: taskListHeight + 'px' }">
+					<xmky-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
+						<template #content>
+							<view class="myexer-main__head">
+								<text>主观：</text>
+								<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
+								<text>客观：</text>
+								<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
 							</view>
-							<button type="primary" @click="toExer(exer)" class="myexer-main__exer-in">进入练习</button>
-						</view>
-					</template>
-				</xmky-card>
-				<uni-load-more
-					v-if="listpage.list?.length"
-					:status="listpage.status"
-					:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
-					@clickLoadMore="query(true)"
-				></uni-load-more>
-				<xmky-empty> v-if="!listpage.list?.length"></xmky-empty>
-			</scroll-view>
+							<view>
+								<text>单选：</text>
+								<text class="myexer-main__value">{{ exer.singleNum }}</text>
+								<text>多选：</text>
+								<text class="myexer-main__value">{{ exer.multipleNum }}</text>
+								<text>填空：</text>
+								<text class="myexer-main__value">{{ exer.fillBlankObjNum + exer.fillBlankSubNum }}</text>
+								<text>判断：</text>
+								<text class="myexer-main__value">{{ exer.judgeNum }}</text>
+								<text>问答：</text>
+								<text class="myexer-main__value">{{ exer.qaObjNum + exer.qaSubNum }}</text>
+							</view>
+						</template>
+						<template #opt>
+							<view class="myexer-main__opt">
+								<view>
+									<view class="myexer-main__state"></view>
+									<view class="myexer-main__state"></view>
+								</view>
+								<button type="primary" @click="toExer(exer)" class="myexer-main__exer-in">进入练习</button>
+							</view>
+						</template>
+					</xmky-card>
+					<uni-load-more
+						v-if="listpage.list?.length"
+						:status="listpage.status"
+						:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
+						@clickLoadMore="query(true)"
+					></uni-load-more>
+					<xmky-empty v-if="!listpage.list?.length"></xmky-empty>
+				</scroll-view>
+			</view>
+			<view class="myexer-bottom"></view>
 		</view>
-		<view class="myexer-bottom"></view>
-	</view>
+	</xmky-layout>
 </template>
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
@@ -115,7 +138,7 @@ async function query(append: boolean) {
 
 // 去练习
 async function toExer(exer: Exer) {
-	uni.navigateTo({ url: `/pages/myExer/myRead?exerId=${exer.id}` });
+	uni.navigateTo({ url: `/pages/exam-user/my-exer/my-read?exerId=${exer.id}` });
 }
 </script>
 <style lang="scss" scoped>
@@ -124,6 +147,19 @@ async function toExer(exer: Exer) {
 	flex-direction: column;
 	padding: 20rpx;
 	.myexer-head {
+		:deep(.query) {
+			padding: 0px;
+			margin-bottom: 10rpx;
+			// #ifdef MP-WEIXIN
+			.uni-searchbar {
+				padding: 0px;
+				margin-bottom: 10rpx;
+			}
+			// #endif
+			.uni-searchbar__box {
+				height: 86rpx;
+			}
+		}
 	}
 	.myexer-main {
 		.myexer-main__scroll {

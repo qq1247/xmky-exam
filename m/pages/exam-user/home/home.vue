@@ -1,124 +1,134 @@
 <template>
-	<view class="home">
-		<view class="home-head">
-			<image class="home-head__bg" src="@/static/img/home-bg.png"></image>
-			<text class="home-head__sysname">{{ parmStore.sysName }}</text>
-			<text class="home-head__goodluck">祝考试之旅一帆风顺，成就满满！</text>
-		</view>
-		<view class="home-main">
-			<view class="home-main__nav-wrap">
-				<view class="home-main__nav">
-					<swiper class="home-main__nav-inner">
-						<swiper-item>
-							<uni-grid :column="navBtnList.length" :show-border="false" :square="false" @change="quickNav">
-								<uni-grid-item v-for="(navBtn, index) in navBtnList" :key="index" :index="index">
-									<view class="home-main__nav-btn">
-										<uni-icons custom-prefix="iconfont" :type="navBtn.icon" color="white" size="50rpx"></uni-icons>
-									</view>
-									<text class="home-main__nav-name">{{ navBtn.name }}</text>
-								</uni-grid-item>
-							</uni-grid>
-						</swiper-item>
-					</swiper>
+	<xmky-layout
+		:tabs="[
+			{ pagePath: '/pages/exam-user/home/home', text: '首页', icon: 'icon-icon-home' },
+			{ pagePath: '/pages/exam-user/my-exer/my-exer', text: '练习', icon: 'icon-icon-pencil' },
+			{ pagePath: '/pages/exam-user/my-exam/my-exam', text: '考试', icon: 'icon-icon-pen' },
+			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
+		]"
+	>
+		<view class="home">
+			<view class="home-head">
+				<image class="home-head__bg" src="@/static/img/home-bg.png"></image>
+				<text class="home-head__sysname">{{ parmStore.sysName }}</text>
+				<text class="home-head__goodluck">祝考试之旅一帆风顺，成就满满！</text>
+			</view>
+			<view class="home-main">
+				<view class="home-main__nav-wrap">
+					<view class="home-main__nav">
+						<swiper class="home-main__nav-inner">
+							<swiper-item>
+								<uni-grid :column="navBtnList.length" :show-border="false" :square="false" @change="quickNav">
+									<uni-grid-item v-for="(navBtn, index) in navBtnList" :key="index" :index="index">
+										<view class="home-main__nav-btn">
+											<uni-icons custom-prefix="iconfont" :type="navBtn.icon" color="white" size="50rpx"></uni-icons>
+										</view>
+										<text class="home-main__nav-name">{{ navBtn.name }}</text>
+									</uni-grid-item>
+								</uni-grid>
+							</swiper-item>
+						</swiper>
+					</view>
+				</view>
+				<view class="home-main__bulletin">
+					<xzw-notice :list="bulletinList" theme="warning" @goItem="toBulletin" @goMore="toBulletin" />
 				</view>
 			</view>
-			<view class="home-main__bulletin">
-				<xzw-notice :list="bulletinList" theme="warning" @goItem="toBulletin" @goMore="toBulletin" />
+			<view class="home-foot">
+				<uv-tabs
+					:list="[
+						{ name: '我的练习', badge: { value: myExerList?.length } },
+						{ name: '我的考试', badge: { value: todoExamList?.length } }
+					]"
+					:current="curTabIndex"
+					:scrollable="false"
+					lineHeight="4rpx"
+					lineWidth="350rpx"
+					lineColor="#0D9DF6"
+					:activeStyle="{
+						fontSize: '32rpx',
+						color: '#333333'
+					}"
+					:inactiveStyle="{
+						fontSize: '30rpx',
+						color: '#8F939C'
+					}"
+					@change="(item: any) => (curTabIndex = item.index)"
+				></uv-tabs>
+				<scroll-view scroll-y="true" class="home-foot__scroll" :style="{ height: taskListHeight + 'px' }">
+					<xmky-card
+						v-if="curTabIndex === 0 && myExerList?.length"
+						v-for="(exer, index) in myExerList"
+						:key="index"
+						:preTxt="(index + 1).toString().padStart(2, '0')"
+						:name="exer.name"
+						tag-name="练习"
+					>
+						<template #content>
+							<view class="myexer-main__head">
+								<text>主观：</text>
+								<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
+								<text>客观：</text>
+								<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
+							</view>
+							<view>
+								<text>单选：</text>
+								<text class="myexer-main__value">{{ exer.singleNum }}</text>
+								<text>多选：</text>
+								<text class="myexer-main__value">{{ exer.multipleNum }}</text>
+								<text>填空：</text>
+								<text class="myexer-main__value">{{ exer.fillBlankObjNum + exer.fillBlankSubNum }}</text>
+								<text>判断：</text>
+								<text class="myexer-main__value">{{ exer.judgeNum }}</text>
+								<text>问答：</text>
+								<text class="myexer-main__value">{{ exer.qaObjNum + exer.qaSubNum }}</text>
+							</view>
+						</template>
+						<template #opt>
+							<view class="home-foot__opt">
+								<view></view>
+								<button type="primary" @click="toExer(exer)" class="home-foot__exam-in">进入练习</button>
+							</view>
+						</template>
+					</xmky-card>
+					<xmky-empty v-if="curTabIndex === 0 && !myExerList?.length"></xmky-empty>
+					
+					<xmky-card
+						v-if="curTabIndex === 1 && todoExamList?.length"
+						v-for="(todoExam, index) in todoExamList"
+						:key="index"
+						:preTxt="(index + 1).toString().padStart(2, '0')"
+						:name="todoExam.examName"
+						tag-name="考试"
+					>
+						<template #content>
+							<view>
+								<text>{{ todoExam.examStartTime }} 至 {{ todoExam.examEndTime }}</text>
+							</view>
+							<view>
+								<text>分数：</text>
+								<text class="home-foot__value">{{ todoExam.examPassScore }} / {{ todoExam.examTotalScore }}</text>
+								<text>限时：</text>
+								<text class="home-foot__value">{{ todoExam.examLimitMinute === 0 ? '无' : todoExam.examLimitMinute + '分钟' }}</text>
+							</view>
+						</template>
+						<template #opt>
+							<view class="home-foot__opt">
+								<view>
+									<text v-if="todoExam.state === 1">距离考试开始：</text>
+									<xmky-count-down v-if="todoExam.state === 1" :expireTime="todoExam.examStartTime"></xmky-count-down>
+									<text v-if="todoExam.state === 2">距离考试结束：</text>
+									<xmky-count-down v-if="todoExam.state === 2" :expireTime="todoExam.answerEndTime"></xmky-count-down>
+								</view>
+								<button type="primary" @click="toExam(todoExam)" class="home-foot__exam-in">进入考试</button>
+							</view>
+						</template>
+					</xmky-card>
+					<xmky-empty v-if="curTabIndex === 1 && !todoExamList?.length"></xmky-empty>
+				</scroll-view>
 			</view>
 		</view>
-		<view class="home-foot">
-			<uv-tabs
-				:list="[
-					{ name: '我的考试', badge: { value: todoExamList?.length } },
-					{ name: '我的练习', badge: { value: myExerList?.length } }
-				]"
-				:current="curTabIndex"
-				:scrollable="false"
-				lineHeight="4rpx"
-				lineWidth="350rpx"
-				lineColor="#0D9DF6"
-				:activeStyle="{
-					fontSize: '32rpx',
-					color: '#333333'
-				}"
-				:inactiveStyle="{
-					fontSize: '30rpx',
-					color: '#8F939C'
-				}"
-				@change="(item: any) => (curTabIndex = item.index)"
-			></uv-tabs>
-			<scroll-view scroll-y="true" class="home-foot__scroll" :style="{ height: taskListHeight + 'px' }">
-				<xm-card
-					v-if="curTabIndex === 0 && todoExamList?.length"
-					v-for="(todoExam, index) in todoExamList"
-					:key="index"
-					:preTxt="(index + 1).toString().padStart(2, '0')"
-					:name="todoExam.examName"
-					tag-name="考试"
-				>
-					<template #content>
-						<view>
-							<text>{{ todoExam.examStartTime }} 至 {{ todoExam.examEndTime }}</text>
-						</view>
-						<view>
-							<text>分数：</text>
-							<text class="home-foot__value">{{ todoExam.examPassScore }} / {{ todoExam.examTotalScore }}</text>
-							<text>限时：</text>
-							<text class="home-foot__value">{{ todoExam.examLimitMinute === 0 ? '无' : todoExam.examLimitMinute + '分钟' }}</text>
-						</view>
-					</template>
-					<template #opt>
-						<view class="home-foot__opt">
-							<view>
-								<text v-if="todoExam.state === 1">距离考试开始：</text>
-								<xm-count-down v-if="todoExam.state === 1" :expireTime="todoExam.examStartTime"></xm-count-down>
-								<text v-if="todoExam.state === 2">距离考试结束：</text>
-								<xm-count-down v-if="todoExam.state === 2" :expireTime="todoExam.answerEndTime"></xm-count-down>
-							</view>
-							<button type="primary" @click="toExam(todoExam)" class="home-foot__exam-in">进入考试</button>
-						</view>
-					</template>
-				</xm-card>
-				<xm-empty v-if="curTabIndex === 0 && !todoExamList?.length"></xm-empty>
-				<xm-card
-					v-if="curTabIndex === 1 && myExerList.length"
-					v-for="(exer, index) in myExerList"
-					:key="index"
-					:preTxt="(index + 1).toString().padStart(2, '0')"
-					:name="exer.name"
-					tag-name="练习"
-				>
-					<template #content>
-						<view class="myexer-main__head">
-							<text>主观：</text>
-							<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
-							<text>客观：</text>
-							<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
-						</view>
-						<view>
-							<text>单选：</text>
-							<text class="myexer-main__value">{{ exer.singleNum }}</text>
-							<text>多选：</text>
-							<text class="myexer-main__value">{{ exer.multipleNum }}</text>
-							<text>填空：</text>
-							<text class="myexer-main__value">{{ exer.fillBlankObjNum + exer.fillBlankSubNum }}</text>
-							<text>判断：</text>
-							<text class="myexer-main__value">{{ exer.judgeNum }}</text>
-							<text>问答：</text>
-							<text class="myexer-main__value">{{ exer.qaObjNum + exer.qaSubNum }}</text>
-						</view>
-					</template>
-					<template #opt>
-						<view class="home-foot__opt">
-							<view></view>
-							<button type="primary" @click="toExer(exer)" class="home-foot__exam-in">进入练习</button>
-						</view>
-					</template>
-				</xm-card>
-				<xm-empty v-if="curTabIndex === 1 && !myExerList?.length"></xm-empty>
-			</scroll-view>
-		</view>
-	</view>
+	</xmky-layout>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
@@ -137,8 +147,8 @@ const myExerList = ref<any[]>(); // 我的练习列表
 const bulletinList = ref<any[]>(); // 公告列表
 const curTabIndex = ref(0); // 当前选择标签页
 const navBtnList = ref([
-	{ name: '考试', icon: 'icon-icon-pen' },
 	{ name: '练习', icon: 'icon-icon-pencil' },
+	{ name: '考试', icon: 'icon-icon-pen' },
 	/* { name: '错题', icon: 'icon-icon-top_01' },
 	{ name: '收藏', icon: 'icon-icon-top-05' }, */
 	{ name: '个人中心', icon: 'icon-icon-people' }
@@ -155,13 +165,6 @@ onShow(async () => {
 	myExamQuery();
 	myExerQuery();
 	bulletinQuery();
-});
-
-onLoad(() => {
-	uni.setTabBarItem({ index: 0, text: '首页', pagePath: 'pages/exam-user/home/home', visible: true });
-	uni.setTabBarItem({ index: 1, text: '考试', pagePath: 'pages/exam-user/my-exam/my-exam', visible: true });
-	uni.setTabBarItem({ index: 2, text: '练习', pagePath: 'pages/exam-user/my-exer/my-exer', visible: true });
-	uni.setTabBarItem({ index: 3, text: '', pagePath: '1', "iconPath": "", visible: true });
 });
 
 onReady(() => {
@@ -212,30 +215,30 @@ function toBulletin(bulletin: any) {
 
 // 去考试
 async function toExam(todoExam: any) {
-	uni.navigateTo({ url: `/pages/myExam/myRead?examId=${todoExam.examId}` });
+	uni.navigateTo({ url: `/pages/exam-user/my-exam/my-read?examId=${todoExam.examId}` });
 }
 
 // 去练习
 async function toExer(myExer: any) {
-	uni.navigateTo({ url: `/pages/myExer/myRead?exerId=${myExer.id}` });
+	uni.navigateTo({ url: `/pages/exam-user/my-exer/my-read?exerId=${myExer.id}` });
 }
 
 // 快速导航
 function quickNav({ detail: { index } }) {
 	if (index === 0) {
-		uni.switchTab({
-			url: '/pages/myExam/myExam'
+		uni.navigateTo({
+			url: '/pages/exam-user/my-exer/my-exer'
 		});
 		return;
 	}
 	if (index === 1) {
-		uni.switchTab({
-			url: '/pages/myExer/myExer'
+		uni.navigateTo({
+			url: '/pages/exam-user/my-exam/my-exam'
 		});
 		return;
 	}
 	if (index === 2) {
-		uni.switchTab({
+		uni.navigateTo({
 			url: '/pages/center/center'
 		});
 		return;

@@ -20,10 +20,7 @@
 		</view>
 		<view class="exer-statis__main">
 			<uv-tabs
-				:list="[
-					{ name: '练习时长', badge: { value: exerTrackListpage.total } },
-					{ name: '答错数量', badge: { value: exerTrackListpage.total } }
-				]"
+				:list="[{ name: '练习时长' }, { name: '答错数量' }]"
 				:current="curTabIndex"
 				:scrollable="false"
 				lineHeight="4rpx"
@@ -37,7 +34,7 @@
 					fontSize: '30rpx',
 					color: '#8F939C'
 				}"
-				@change="(item) => (curTabIndex = item.index)"
+				@change="(item: any) => (curTabIndex = item.index)"
 			></uv-tabs>
 			<scroll-view scroll-y="true" class="exer-statis__scroll" :style="{ height: taskListHeight + 'px' }">
 				<template v-if="curTabIndex === 0">
@@ -141,7 +138,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.exer-statis__scroll')
 		.boundingClientRect((data: any) => {
-			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top;
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 20;
 		})
 		.exec();
 });
@@ -257,6 +254,7 @@ async function toWrongQuestionChart(tracks: []) {
 		}
 		//#endif
 		.exer-statis__scroll {
+			margin-top: 20rpx;
 			.list {
 				display: flex;
 				border-bottom: 1px solid #dfdfdf;

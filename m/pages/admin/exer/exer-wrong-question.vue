@@ -4,7 +4,7 @@
 			<view class="list__wrap">
 				<view class="list__title">{{ index + 1 }}、{{ question.title }}</view>
 				<view class="list__outer">
-					<view class="list__tag list__tag--type">错{{ question.wrongAnswerNum }}次</view>
+					<view class="list__tag list__tag--type">答错{{ question.wrongAnswerNum }}次</view>
 				</view>
 			</view>
 		</view>

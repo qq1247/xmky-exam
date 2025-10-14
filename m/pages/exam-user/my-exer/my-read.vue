@@ -90,7 +90,7 @@
 					</view>
 					<view class="my-exer-list__main">
 						<uni-list border-full>
-							<uni-list-item v-for="(myExer, index) in listpage.list" :key="index" showArrow :to="`/pages/myExer/myPaper?exerId=${exerId}&id=${myExer.id}`">
+							<uni-list-item v-for="(myExer, index) in listpage.list" :key="index" showArrow :to="`/pages/exam-user/my-exer/my-paper?exerId=${exerId}&id=${myExer.id}`">
 								<template #body>
 									<view>
 										<view>
@@ -491,7 +491,7 @@ async function toExer() {
 	}
 
 	uni.navigateTo({
-		url: `/pages/myExer/myPaper?exerId=${exerId.value}&id=${data}`
+		url: `/pages/exam-user/my-exer/my-paper?exerId=${exerId.value}&id=${data}`
 	});
 }
 </script>

@@ -12,7 +12,6 @@
 				<uni-search-bar
 					v-model="queryForm.name"
 					bgColor="#fff"
-					clearButton="auto"
 					radius="10"
 					placeholder="请输入题库名称"
 					class="query"
@@ -67,8 +66,8 @@
 						<template #opt>
 							<view class="question-bank__opt">
 								<view>
-									<view class="question-bank__state">{{questionBank.createUserName}}</view>
-									<view class="question-bank__state">{{questionBank.updateTime}}</view>
+									<view class="question-bank__state">{{ questionBank.createUserName }}</view>
+									<view class="question-bank__state">{{ questionBank.updateTime }}</view>
 								</view>
 								<button type="primary" @click="toQuestion(questionBank.id)" class="question-bank__btn">进入题库</button>
 							</view>

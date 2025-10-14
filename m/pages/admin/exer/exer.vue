@@ -1,7 +1,7 @@
 <template>
 	<xmky-layout
 		:tabs="[
-			{ pagePath: '/pages/admin/question-bank/question-bank', text: '练习', icon: 'icon-icon-top_01' },
+			{ pagePath: '/pages/admin/question-bank/question-bank', text: '题库', icon: 'icon-icon-top_01' },
 			{ pagePath: '/pages/admin/exer/exer', text: '练习', icon: 'icon-icon-pencil' },
 			{ pagePath: '/pages/admin/exam/exam', text: '考试', icon: 'icon-icon-pen' },
 			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
@@ -12,7 +12,6 @@
 				<uni-search-bar
 					v-model="queryForm.name"
 					bgColor="#fff"
-					clearButton="auto"
 					radius="10"
 					placeholder="请输入练习名称"
 					class="query"

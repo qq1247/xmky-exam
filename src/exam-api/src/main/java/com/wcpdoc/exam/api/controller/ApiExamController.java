@@ -288,7 +288,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("examRules", examRules)//
 					.addAttr("limitMinute", exam.getLimitMinute())//
 					.addAttr("retakeNum", exam.getRetakeNum())//
-					;
+			;
 		} catch (MyException e) {
 			log.error("考试获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -388,7 +388,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("orgIds", exam.getOrgIds())//
 					.addAttr("limitMinute", exam.getLimitMinute())//
 					.addAttr("retakeNum", exam.getRetakeNum())//
-					;//
+			;//
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -399,7 +399,7 @@ public class ApiExamController extends BaseController {
 	}
 
 	/**
-	 * 考试获取
+	 * 考试获取（用于免登录考试）
 	 * 
 	 * v1.0 zhanghc 2021年12月21日下午4:36:14
 	 * 

@@ -74,7 +74,7 @@
                         <span class="exam__exam-time">
                             考试时间：<span class="exam__time">{{ exam.startTime.substring(0, 16) }} - {{
                                 exam.endTime.substring(0, 16)
-                            }}</span>
+                                }}</span>
                         </span>
                     </div>
                     <div class="exam__row">
@@ -102,7 +102,7 @@
                         </div>
                         <div class="exam__inner">
                             <span v-if="exam.limitMinute" class="exam__value">
-                                60<span class="exam__unit">分钟</span>
+                                {{ exam.limitMinute }}<span class="exam__unit">分钟</span>
                             </span>
                             <span v-else class="exam__value">无</span>
                             <span class="exam__lab">限时</span>

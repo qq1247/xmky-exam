@@ -124,7 +124,7 @@
 			</button>
 			<button v-show="!toolbars.answerShow && curExamQuestion?.userScore == null" class="question-confirm" type="primary" @click="answer">确认作答</button>
 
-			<xm-popup ref="answerSheet" name="答题卡" class="answer-sheet">
+			<xmky-popup ref="answerSheet" name="答题卡" class="answer-sheet">
 				<view class="answer-sheet__head">
 					<!-- <view class="answer-sheet__state answer-sheet__state--mark"></view>
 					<text class="answer-sheet__name">标记</text> -->
@@ -159,7 +159,7 @@
 						</view>
 					</template>
 				</view>
-			</xm-popup>
+			</xmky-popup>
 		</view>
 	</view>
 	<uni-popup ref="inputDialog" type="dialog">

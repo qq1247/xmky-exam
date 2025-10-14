@@ -2,19 +2,18 @@
 	<xmky-layout
 		:tabs="[
 			{ pagePath: '/pages/admin/question-bank/question-bank', text: '题库', icon: 'icon-icon-top_01' },
+			{ pagePath: '/pages/admin/exer/exer', text: '练习', icon: 'icon-icon-pencil' },
 			{ pagePath: '/pages/admin/exam/exam', text: '考试', icon: 'icon-icon-pen' },
-			{ pagePath: '/pages/admin/exam/exam', text: '练习', icon: 'icon-icon-pencil' },
 			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
 		]"
 	>
-		<view class="question-bank">
-			<view class="question-bank__head">
+		<view class="exam">
+			<view class="exam__head">
 				<uni-search-bar
 					v-model="queryForm.name"
 					bgColor="#fff"
-					clearButton="auto"
 					radius="10"
-					placeholder="请输入题库名称"
+					placeholder="请输入考试名称"
 					class="query"
 					@confirm="
 						() => {
@@ -35,42 +34,64 @@
 					"
 				></uni-search-bar>
 			</view>
-			<view class="question-bank__main">
-				<scroll-view scroll-y="true" class="question-bank__scroll" :style="{ height: scrollHeight + 'px' }">
-					<xmky-card
-						v-for="(questionBank, index) in listpage.list"
-						:key="index"
-						:preTxt="(index + 1).toString().padStart(2, '0')"
-						:name="questionBank.name"
-						tag-name="题库"
-					>
+			<view class="exam__main">
+				<scroll-view scroll-y="true" class="exam__scroll" :style="{ height: scrollHeight + 'px' }">
+					<xmky-card v-for="(exam, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exam.name" tag-name="考试">
 						<template #content>
-							<view class="question-bank__row">
-								<text>主观：</text>
-								<text class="question-bank__value">{{ questionBank.objectiveNum }}</text>
-								<text>客观：</text>
-								<text class="question-bank__value">{{ questionBank.subjectiveNum }}</text>
+							<view>
+								<text>组卷方式：</text>
+								<text class="exam__value">{{ dictStore.getValue('PAPER_GEN_TYPE', exam.genType) }}</text>
+								<text>登录方式：</text>
+								<text class="exam__value">{{ dictStore.getValue('LOGIN_TYPE', exam.loginType) }}</text>
 							</view>
 							<view>
-								<text>单选：</text>
-								<text class="question-bank__value">{{ questionBank.singleNum }}</text>
-								<text>多选：</text>
-								<text class="question-bank__value">{{ questionBank.multipleNum }}</text>
-								<text>填空：</text>
-								<text class="question-bank__value">{{ questionBank.fillBlankObjNum + questionBank.fillBlankSubNum }}</text>
-								<text>判断：</text>
-								<text class="question-bank__value">{{ questionBank.judgeNum }}</text>
-								<text>问答：</text>
-								<text class="question-bank__value">{{ questionBank.qaObjNum + questionBank.qaSubNum }}</text>
+								<text>阅卷方式：</text>
+								<text class="exam__value">{{ dictStore.getValue('MARK_STATE', exam.markState) }}</text>
+								<text>发布状态：</text>
+								<text class="exam__value">{{ dictStore.getValue('STATE_PS', exam.state) }}</text>
+							</view>
+							<view>
+								<text>考试时间：</text>
+								<text class="exam__value">{{ exam.startTime.substring(0, 16) }} - {{ exam.endTime.substring(0, 16) }}</text>
+							</view>
+							<view>
+								<text>阅卷时间：</text>
+								<text v-if="exam.markType === 2" class="exam__value">{{ exam.markStartTime.substring(0, 16) }} - {{ exam.markEndTime.substring(0, 16) }}</text>
+								<text v-else class="exam__value">考试结束自动阅卷</text>
+							</view>
+							<view>
+								<text>试卷：</text>
+								<text class="exam__value">{{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType) }}</text>
+								<text>及格分数：</text>
+								<text class="exam__value">{{ exam.passScore || '-' }}/{{ exam.totalScore }}</text>
+							</view>
+							<view>
+								<text>限时：</text>
+								<text class="exam__value">{{ exam.limitMinute ? exam.limitMinute + '分钟' : '无' }}</text>
+								<text>考试人数：</text>
+								<text class="exam__value">{{ exam.userNum }}人</text>
+							</view>
+							<view>
+								<text>防作弊：</text>
+								<text class="exam__value">{{ exam.sxes.length > 0 ? '是' : '否' }}</text>
+								<text>查询成绩：</text>
+								<text class="exam__value">{{ dictStore.getValue('SCORE_STATE', exam.scoreState) }}</text>
+							</view>
+							<view>
+								<text>排名：</text>
+								<text class="exam__value">{{ dictStore.getValue('STATE_ON', exam.rankState) }}</text>
+								<text>协助阅卷：</text>
+								<text v-if="exam.markUserNum" class="exam__value">{{ exam.markUserNum }}人</text>
+								<text v-else class="exam__value">无</text>
 							</view>
 						</template>
 						<template #opt>
-							<view class="question-bank__opt">
+							<view class="exam__opt">
 								<view>
-									<view class="question-bank__state"></view>
-									<view class="question-bank__state"></view>
+									<view class="exam__state"></view>
+									<view class="exam__state"></view>
 								</view>
-								<button type="primary" @click="toQuestion(questionBank.id)" class="question-bank__btn">进入题库</button>
+								<button type="primary" @click="toQuestion(exam.id)" class="exam__btn">进入考试</button>
 							</view>
 						</template>
 					</xmky-card>
@@ -83,7 +104,7 @@
 					<xmky-empty v-if="!listpage.list?.length"></xmky-empty>
 				</scroll-view>
 			</view>
-			<view class="question-bank__foot"></view>
+			<view class="exam__foot"></view>
 		</view>
 	</xmky-layout>
 </template>
@@ -91,11 +112,13 @@
 import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
-import { questionBankListpage } from '@/api/question-bank';
+import { examListpage } from '@/api/exam';
+import { useDictStore } from '@/stores/dict';
 
 /************************变量定义相关***********************/
+const dictStore = useDictStore();
 const queryForm = reactive({
-	name: '' // 题库名称
+	name: '' // 考试名称
 });
 const listpage = reactive<Page<any>>({
 	curPage: 1,
@@ -103,7 +126,7 @@ const listpage = reactive<Page<any>>({
 	total: 0,
 	list: [],
 	status: 'more'
-}); // 题库列表
+}); // 考试列表
 const scrollHeight = ref(0); // 列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
@@ -113,7 +136,7 @@ onShow(async () => {
 
 onReady(() => {
 	uni.createSelectorQuery()
-		.select('.question-bank__scroll')
+		.select('.exam__scroll')
 		.boundingClientRect((data: any) => {
 			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
 		})
@@ -126,7 +149,7 @@ async function query(append: boolean) {
 	listpage.status = 'loading';
 	listpage.curPage = append ? listpage.curPage + 1 : 1;
 
-	let { data } = await questionBankListpage({
+	let { data } = await examListpage({
 		...queryForm,
 		curPage: listpage.curPage,
 		pageSize: listpage.pageSize
@@ -143,15 +166,15 @@ async function query(append: boolean) {
 
 // 去试题页面
 async function toQuestion(id: number) {
-	uni.navigateTo({ url: `/pages/admin/question-bank/question?questionBankId=${id}` });
+	uni.navigateTo({ url: `/pages/admin/exam/exam-statis?examId=${id}` });
 }
 </script>
 <style lang="scss" scoped>
-.question-bank {
+.exam {
 	display: flex;
 	flex-direction: column;
 	padding: 20rpx;
-	.question-bank__head {
+	.exam__head {
 		:deep(.query) {
 			padding: 0px;
 			margin-bottom: 10rpx;
@@ -166,29 +189,29 @@ async function toQuestion(id: number) {
 			}
 		}
 	}
-	.question-bank__main {
-		.question-bank__scroll {
-			.question-bank__opt {
+	.exam__main {
+		.exam__scroll {
+			.exam__opt {
 				flex: 1;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				.question-bank__state {
+				.exam__state {
 					display: inline-block;
 					margin-right: 40rpx;
-					.question-bank__state-name {
+					.exam__state-name {
 						margin-left: 4rpx;
 						font-size: 26rpx;
 						color: #8f939c;
 					}
-					.question-bank__state-name--warn {
+					.exam__state-name--warn {
 						color: #ff5d15;
 					}
-					.question-bank__state-name--succ {
+					.exam__state-name--succ {
 						color: #18bc38;
 					}
 				}
-				.question-bank__btn {
+				.exam__btn {
 					width: 180rpx;
 					height: 66rpx;
 					margin: initial;
@@ -199,13 +222,9 @@ async function toQuestion(id: number) {
 					background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 				}
 			}
-			.question-bank__row {
-				display: flex;
-				justify-content: center;
-			}
-			.question-bank__value {
+			.exam__value {
 				color: #333;
-				margin-right: 20rpx;
+				margin-right: 40rpx;
 			}
 		}
 	}

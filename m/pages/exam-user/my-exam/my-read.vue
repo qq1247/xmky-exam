@@ -193,14 +193,14 @@
 		</view>
 		<view class="myread-foot">
 			<button class="myread-foot__btn" :class="{ 'myread-foot__btn--active': examActive, 'myread-foot__btn--disable': !examActive }" type="primary" @click="toExam">
-				<xm-count-down
+				<xmky-count-down
 					v-if="!examActive"
 					:expireTime="exam.startTime"
 					preTxt="等待 "
 					color="#fff"
 					class="myread-foot__time-count-down"
 					@end="examActive = !examActive"
-				></xm-count-down>
+				></xmky-count-down>
 				<text>进入考试</text>
 			</button>
 			<button
@@ -343,7 +343,7 @@ function toExam() {
 	}
 
 	uni.navigateTo({
-		url: '/pages/myExam/myPaper?examId=' + examId.value
+		url: '/pages/exam-user/my-exam/my-paper?examId=' + examId.value
 	});
 }
 

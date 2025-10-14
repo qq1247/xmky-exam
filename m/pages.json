@@ -39,6 +39,10 @@
 			"path": "pages/admin/exer/exer-wrong-question"
 		}, {
 			"path": "pages/admin/exam/exam"
+		}, {
+			"path": "pages/admin/exam/exam-statis"
+		}, {
+			"path": "pages/admin/exam/exam-paper"
 		},
 
 		{
