@@ -22,8 +22,6 @@
 		},
 
 		{
-			"path": "pages/admin/home/home"
-		}, {
 			"path": "pages/admin/question-bank/question-bank"
 		}, {
 			"path": "pages/admin/question-bank/question"
@@ -43,6 +41,8 @@
 			"path": "pages/admin/exam/exam-statis"
 		}, {
 			"path": "pages/admin/exam/exam-paper"
+		}, {
+			"path": "pages/admin/user/user"
 		},
 
 		{

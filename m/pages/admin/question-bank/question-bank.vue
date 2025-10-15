@@ -1,12 +1,5 @@
 <template>
-	<xmky-layout
-		:tabs="[
-			{ pagePath: '/pages/admin/question-bank/question-bank', text: '题库', icon: 'icon-icon-top_01' },
-			{ pagePath: '/pages/admin/exer/exer', text: '练习', icon: 'icon-icon-pencil' },
-			{ pagePath: '/pages/admin/exam/exam', text: '考试', icon: 'icon-icon-pen' },
-			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
-		]"
-	>
+	<xmky-layout :tabs="tabbarStore.admin">
 		<view class="question-bank">
 			<view class="question-bank__head">
 				<uni-search-bar
@@ -91,8 +84,10 @@ import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
 import { questionBankListpage } from '@/api/question-bank';
+import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
+const tabbarStore = useTabbarStore();
 const queryForm = reactive({
 	name: '' // 题库名称
 });

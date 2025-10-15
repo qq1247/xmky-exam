@@ -1,12 +1,5 @@
 <template>
-	<xmky-layout
-		:tabs="[
-			{ pagePath: '/pages/admin/question-bank/question-bank', text: '题库', icon: 'icon-icon-top_01' },
-			{ pagePath: '/pages/admin/exer/exer', text: '练习', icon: 'icon-icon-pencil' },
-			{ pagePath: '/pages/admin/exam/exam', text: '考试', icon: 'icon-icon-pen' },
-			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
-		]"
-	>
+	<xmky-layout :tabs="tabbarStore.admin">
 		<view class="exam">
 			<view class="exam__head">
 				<uni-search-bar
@@ -114,8 +107,10 @@ import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
 import { examListpage } from '@/api/exam';
 import { useDictStore } from '@/stores/dict';
+import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
+const tabbarStore = useTabbarStore();
 const dictStore = useDictStore();
 const queryForm = reactive({
 	name: '' // 考试名称
