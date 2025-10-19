@@ -13,89 +13,81 @@
 					{{ objectiveQestions[curQuestionIndex]?.type === 1 ? '章节' : dictStore.getValue('QUESTION_TYPE', objectiveQestions[curQuestionIndex]?.questionType) }}
 				</button>
 			</view>
-			<xmky-swiper ref="swiperRef" v-model="curQuestionIndex" :items="objectiveQestions" :style="{ height: scrollHeight + 'px' }" class="my-paper__scroll">
-				<template #default="{ item: examQuestion }">
-					<scroll-view scroll-y="true" style="height: 100%">
-						<xmky-question
-							v-if="hasQuestionShow"
-							v-model="examQuestion.userAnswers"
-							:type="examQuestion.questionType"
-							:mark-type="examQuestion.markType"
-							:title="examQuestion.title"
-							:img-ids="examQuestion.imgFileIds"
-							:video-id="examQuestion.videoFileId"
-							:score="examQuestion.score"
-							:answers="examQuestion.answers"
-							:user-score="examQuestion.userScore"
-							:options="examQuestion.options"
-							:analysis="examQuestion.analysis"
-							:editable="false"
-							:analysis-show="true"
-							@change=""
-						>
-							<template #title-pre>
-								<text class="question__no">{{ examQuestion.no }}、</text>
-							</template>
-							<template #title-post>
-								<text>（{{ examQuestion.score }}分）</text>
-							</template>
-							<template #user-answer-post>
-								<view v-if="examQuestion.questionType === 5 && examQuestion.markType === 2" class="user-files">
-									<view class="img-group">
-										<view class="img-group__inner">
-											<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="img">
-												<image
-													:src="`${host}/file/download?id=${imgFileId}`"
-													mode="aspectFit"
-													view
-													@click="preview(examQuestion.answerImgFileIds, index)"
-													class="img__inner"
-												></image>
-												<view>
-													<text class="img__txt">图{{ toChinaNum(index + 1) }}</text>
-												</view>
-											</view>
-										</view>
-									</view>
-									<view class="video-group">
-										<view class="video-group__inner">
-											<view v-if="examQuestion.answerVideoFileIds?.length > 0" class="video">
-												<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="video__inner"></video>
-												<view>
-													<text class="video__txt">视频</text>
-												</view>
+			<view :style="{ height: scrollHeight + 'px' }" class="my-paper__scroll">
+				<scroll-view scroll-y="true" style="height: 100%">
+					<xmky-question
+						v-if="hasQuestionShow"
+						v-model="examQuestion.userAnswers"
+						:type="examQuestion.questionType"
+						:mark-type="examQuestion.markType"
+						:title="examQuestion.title"
+						:img-ids="examQuestion.imgFileIds"
+						:video-id="examQuestion.videoFileId"
+						:score="examQuestion.score"
+						:answers="examQuestion.answers"
+						:user-score="examQuestion.userScore"
+						:options="examQuestion.options"
+						:analysis="examQuestion.analysis"
+						:editable="false"
+						:analysis-show="true"
+						@change=""
+					>
+						<template #title-pre>
+							<text class="question__no">{{ examQuestion.no }}、</text>
+						</template>
+						<template #title-post>
+							<text>（{{ examQuestion.score }}分）</text>
+						</template>
+						<template #user-answer-post>
+							<view v-if="examQuestion.questionType === 5 && examQuestion.markType === 2" class="user-files">
+								<view class="img-group">
+									<view class="img-group__inner">
+										<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="img">
+											<image
+												:src="`${host}/file/download?id=${imgFileId}`"
+												mode="aspectFit"
+												view
+												@click="preview(examQuestion.answerImgFileIds, index)"
+												class="img__inner"
+											></image>
+											<view>
+												<text class="img__txt">图{{ toChinaNum(index + 1) }}</text>
 											</view>
 										</view>
 									</view>
 								</view>
-							</template>
-							<template #user-score-post>
-								<view v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)" class="question-qa-answer">
-									<text class="question-qa-answer__label">阅题</text>
-									<uni-forms :label-width="70" class="question-qa-answer__content">
-										<uni-forms-item label="本题：" name="num" required>
-											<uni-number-box v-model="examQuestion.userScore" :min="0" :max="examQuestion.score" :step="0.5" @change="() => score(examQuestion)" />
-											分
-										</uni-forms-item>
-										<uni-forms-item label="批语" name="num" required>
-											<uni-easyinput
-												type="textarea"
-												v-model="examQuestion.remark"
-												placeholder="请输入批语"
-												:maxlength="48"
-												@blur="() => score(examQuestion)"
-											/>
-										</uni-forms-item>
-									</uni-forms>
-									<!-- <view>
+								<view class="video-group">
+									<view class="video-group__inner">
+										<view v-if="examQuestion.answerVideoFileIds?.length > 0" class="video">
+											<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="video__inner"></video>
+											<view>
+												<text class="video__txt">视频</text>
+											</view>
+										</view>
+									</view>
+								</view>
+							</view>
+						</template>
+						<template #user-score-post>
+							<view v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)" class="question-qa-answer">
+								<text class="question-qa-answer__label">阅题</text>
+								<uni-forms :label-width="70" class="question-qa-answer__content">
+									<uni-forms-item label="本题：" name="num" required>
+										<uni-number-box v-model="examQuestion.userScore" :min="0" :max="examQuestion.score" :step="0.5" @change="() => score(examQuestion)" />
+										分
+									</uni-forms-item>
+									<uni-forms-item label="批语" name="num" required>
+										<uni-easyinput type="textarea" v-model="examQuestion.remark" placeholder="请输入批语" :maxlength="48" @blur="() => score(examQuestion)" />
+									</uni-forms-item>
+								</uni-forms>
+								<!-- <view>
 										<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
 									</view> -->
-								</view>
-							</template>
-						</xmky-question>
-					</scroll-view>
-				</template>
-			</xmky-swiper>
+							</view>
+						</template>
+					</xmky-question>
+				</scroll-view>
+			</view>
 		</view>
 		<view class="my-paper__foot">
 			<view class="answer-nav" @click="answerSheet.open()">
@@ -108,11 +100,27 @@
 					<text class="answer-nav__text">答题卡</text>
 				</view>
 			</view>
-			<button v-if="curQuestionIndex >= 0" :class="['my-paper__btn', { 'my-paper__btn--inactive': curQuestionIndex <= 0 }]" @click="swiperRef.pre()">上一题</button>
+			<button
+				v-if="curQuestionIndex >= 0"
+				:class="['my-paper__btn', { 'my-paper__btn--inactive': curQuestionIndex <= 0 }]"
+				@click="
+					() => {
+						if (curQuestionIndex <= 0) return;
+						curQuestionIndex--;
+					}
+				"
+			>
+				上一题
+			</button>
 			<button
 				v-if="curQuestionIndex <= objectiveQestions.length - 1"
 				:class="['my-paper__btn', { 'my-paper__btn--inactive': curQuestionIndex >= objectiveQestions.length - 1 }]"
-				@click="swiperRef.next()"
+				@click="
+					() => {
+						if (curQuestionIndex >= examQuestions.length - 1) return;
+						curQuestionIndex++;
+					}
+				"
 			>
 				下一题
 			</button>
@@ -230,6 +238,9 @@ const isHalf = computed(() => (question: ExamQuestion) => question.userScore != 
 const isRight = computed(() => (question: ExamQuestion) => question.userScore != null && question.userScore === question.score); // 是否答对
 const isWrong = computed(() => (question: ExamQuestion) => question.userScore != null && question.userScore === 0); // 是否答错
 const unMarkQuestions = computed(() => objectiveQestions.value.filter((examQuestion) => examQuestion.markType === 2 && examQuestion.userScore == null)); // 未批阅试题
+const examQuestion = computed(() => {
+	return examQuestions.value[curQuestionIndex.value];
+});
 
 /************************事件相关*****************************/
 // 考试查询

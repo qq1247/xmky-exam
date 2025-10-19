@@ -7,40 +7,38 @@
 					{{ examQuestions[curQuestionIndex].type === 1 ? '章节' : dictStore.getValue('QUESTION_TYPE', examQuestions[curQuestionIndex].questionType) }}
 				</button>
 			</view>
-			<xmky-swiper ref="swiperRef" v-model="curQuestionIndex" :items="examQuestions" :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
-				<template #default="{ item: examQuestion }">
-					<scroll-view scroll-y="true" style="height: 100%">
-						<xmky-question
-							v-if="examQuestion.type === 2"
-							v-model="examQuestion.userAnswers"
-							:type="examQuestion.questionType"
-							:mark-type="examQuestion.markType"
-							:title="examQuestion.title"
-							:img-ids="examQuestion.imgFileIds"
-							:video-id="examQuestion.videoFileId"
-							:score="examQuestion.score"
-							:answers="examQuestion.answers"
-							:user-score="examQuestion.userScore"
-							:options="examQuestion.options"
-							:analysis="examQuestion.analysis"
-							:editable="false"
-							:analysis-show="true"
-							@change=""
-						>
-							<template #title-pre>
-								<text class="mypaper-main__question-cur-no">{{ examQuestion.no }}、</text>
-							</template>
-							<template #title-post>
-								<text>（{{ examQuestion.score }}分）</text>
-							</template>
-						</xmky-question>
-						<view v-else>
-							<view>{{ examQuestion.chapterName }}</view>
-							<view>{{ examQuestion.chapterTxt }}</view>
-						</view>
-					</scroll-view>
-				</template>
-			</xmky-swiper>
+			<view :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
+				<scroll-view scroll-y="true" style="height: 100%">
+					<xmky-question
+						v-if="examQuestion.type === 2"
+						v-model="examQuestion.userAnswers"
+						:type="examQuestion.questionType"
+						:mark-type="examQuestion.markType"
+						:title="examQuestion.title"
+						:img-ids="examQuestion.imgFileIds"
+						:video-id="examQuestion.videoFileId"
+						:score="examQuestion.score"
+						:answers="examQuestion.answers"
+						:user-score="examQuestion.userScore"
+						:options="examQuestion.options"
+						:analysis="examQuestion.analysis"
+						:editable="false"
+						:analysis-show="true"
+						@change=""
+					>
+						<template #title-pre>
+							<text class="mypaper-main__question-cur-no">{{ examQuestion.no }}、</text>
+						</template>
+						<template #title-post>
+							<text>（{{ examQuestion.score }}分）</text>
+						</template>
+					</xmky-question>
+					<view v-else>
+						<view>{{ examQuestion.chapterName }}</view>
+						<view>{{ examQuestion.chapterTxt }}</view>
+					</view>
+				</scroll-view>
+			</view>
 		</view>
 		<view class="mypaper-foot">
 			<view class="answer-nav" @click="answerSheet.open()">
@@ -53,8 +51,14 @@
 					<text class="answer-nav__text">答题卡</text>
 				</view>
 			</view>
-			<button class="mypaper-foot__pre-question" type="primary" @click="swiperRef.pre()">上一题</button>
-			<button class="mypaper-foot__next-question" type="primary" @click="swiperRef.next()">下一题</button>
+			<button class="mypaper-foot__pre-question" type="primary" @click="() => {
+						if (curQuestionIndex <= 0) return;
+						curQuestionIndex--;
+					}">上一题</button>
+			<button class="mypaper-foot__next-question" type="primary" @click="() => {
+						if (curQuestionIndex >= examQuestions.length - 1) return;
+						curQuestionIndex++;
+					}">下一题</button>
 			<button class="mypaper-foot__finish" type="primary" @click="$router.go(-1)">返回</button>
 
 			<xmky-popup ref="answerSheet" name="答题卡" class="answer-sheet">
@@ -88,7 +92,6 @@ import { useUserStore } from '@/stores/user';
 /************************变量定义相关***********************/
 const dictStore = useDictStore();
 const userStore = useUserStore();
-const swiperRef = ref(); // 滑块索引
 const questionHeight = ref(0); // 试题滚动高度
 const curQuestionIndex = ref(0); // 当前试题索引
 const examQuestions = ref([{}] as ExamQuestion[]);
@@ -125,6 +128,9 @@ const questionNum = computed(() => {
 	}, 0);
 }); // 试题数量
 const isAnswer = computed(() => (examQuestion: ExamQuestion) => examQuestion.userAnswers?.some((userAnswer) => userAnswer.length)); // 是否作答
+const examQuestion = computed(() => {
+	return examQuestions.value[curQuestionIndex.value];
+});
 
 /************************事件相关*****************************/
 // 试卷查询

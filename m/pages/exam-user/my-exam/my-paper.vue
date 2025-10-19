@@ -28,118 +28,116 @@
 					@click="mark(examQuestions[curQuestionIndex].no)"
 				></uni-icons>
 			</view>
-			<xmky-swiper ref="swiperRef" v-model="curQuestionIndex" :items="examQuestions" :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
-				<template #default="{ item: examQuestion }">
-					<scroll-view scroll-y="true" style="height: 100%">
-						<xmky-question
-							v-if="examQuestion.type === 2"
-							v-model="examQuestion.userAnswers"
-							:type="examQuestion.questionType"
-							:mark-type="examQuestion.markType"
-							:title="examQuestion.title"
-							:img-ids="examQuestion.imgFileIds"
-							:video-id="examQuestion.videoFileId"
-							:score="examQuestion.score"
-							:answers="examQuestion.answers"
-							:user-score="examQuestion.userScore"
-							:options="examQuestion.options"
-							:analysis="examQuestion.analysis"
-							:editable="examing"
-							:analysis-show="analysisShow"
-							@change="(answers: string[]) => {
+			<view :style="{ height: questionHeight + 'px' }" class="mypaper-main__scroll">
+				<scroll-view scroll-y="true" style="height: 100%">
+					<xmky-question
+						v-if="examQuestion.type === 2"
+						v-model="examQuestion.userAnswers"
+						:type="examQuestion.questionType"
+						:mark-type="examQuestion.markType"
+						:title="examQuestion.title"
+						:img-ids="examQuestion.imgFileIds"
+						:video-id="examQuestion.videoFileId"
+						:score="examQuestion.score"
+						:answers="examQuestion.answers"
+						:user-score="examQuestion.userScore"
+						:options="examQuestion.options"
+						:analysis="examQuestion.analysis"
+						:editable="examing"
+						:analysis-show="analysisShow"
+						@change="(answers: string[]) => {
 								examQuestion.userAnswers = answers;
 								answer(examQuestion)
 							}"
-						>
-							<template #title-pre>
-								<text class="mypaper-main__question-cur-no">{{ examQuestion.no }}、</text>
-							</template>
-							<template #title-post>
-								<text>（{{ examQuestion.score }}分）</text>
-							</template>
-							<template #user-answer-post>
-								<view v-if="examQuestion.questionType === 5 && examQuestion.markType === 2" class="user-files">
-									<view class="img-group">
-										<view class="img-group__inner">
-											<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="img">
-												<image
-													:src="`${host}/file/download?id=${imgFileId}`"
-													mode="aspectFit"
-													view
-													@click="preview(examQuestion.answerImgFileIds, index)"
-													class="img__inner"
-												></image>
-												<view>
-													<text class="img__txt">图{{ toChinaNum(index + 1) }}</text>
-													<uni-icons
-														v-if="myExam.state === 2"
-														customPrefix="iconfont"
-														type="icon-icon-close"
-														color="#8c939d"
-														size="32rpx"
-														class="img__icon"
-														@click="() => {
+					>
+						<template #title-pre>
+							<text class="mypaper-main__question-cur-no">{{ examQuestion.no }}、</text>
+						</template>
+						<template #title-post>
+							<text>（{{ examQuestion.score }}分）</text>
+						</template>
+						<template #user-answer-post>
+							<view v-if="examQuestion.questionType === 5 && examQuestion.markType === 2" class="user-files">
+								<view class="img-group">
+									<view class="img-group__inner">
+										<view v-for="(imgFileId, index) in examQuestion.answerImgFileIds" :key="index" class="img">
+											<image
+												:src="`${host}/file/download?id=${imgFileId}`"
+												mode="aspectFit"
+												view
+												@click="preview(examQuestion.answerImgFileIds, index)"
+												class="img__inner"
+											></image>
+											<view>
+												<text class="img__txt">图{{ toChinaNum(index + 1) }}</text>
+												<uni-icons
+													v-if="myExam.state === 2"
+													customPrefix="iconfont"
+													type="icon-icon-close"
+													color="#8c939d"
+													size="32rpx"
+													class="img__icon"
+													@click="() => {
 															examQuestion.answerImgFileIds = examQuestion.answerImgFileIds.filter((answerImgFileId: number) => answerImgFileId != imgFileId)
 															answer(examQuestion);
 														}"
-													></uni-icons>
-												</view>
+												></uni-icons>
 											</view>
 										</view>
-										<view v-if="myExam.state === 2" class="upload-btn" @click="uploadImg(examQuestion)">
-											<uni-icons customPrefix="iconfont" type="icon-shipin" color="#FFF" size="32rpx" class="upload-btn__icon"></uni-icons>
-											<text class="upload-btn__txt">照片</text>
-										</view>
 									</view>
-									<view class="video-group">
-										<view class="video-group__inner">
-											<view v-if="examQuestion.answerVideoFileIds?.length > 0" class="video">
-												<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="video__inner"></video>
-												<view>
-													<text class="video__txt">视频</text>
-													<uni-icons
-														v-if="myExam.state === 2"
-														customPrefix="iconfont"
-														type="icon-icon-close"
-														color="#8c939d"
-														size="32rpx"
-														class="video__icon"
-														@click="
-															() => {
-																examQuestion.answerVideoFileIds = [];
-																answer(examQuestion);
-															}
-														"
-													></uni-icons>
-												</view>
+									<view v-if="myExam.state === 2" class="upload-btn" @click="uploadImg(examQuestion)">
+										<uni-icons customPrefix="iconfont" type="icon-shipin" color="#FFF" size="32rpx" class="upload-btn__icon"></uni-icons>
+										<text class="upload-btn__txt">照片</text>
+									</view>
+								</view>
+								<view class="video-group">
+									<view class="video-group__inner">
+										<view v-if="examQuestion.answerVideoFileIds?.length > 0" class="video">
+											<video :src="`${host}/file/download?id=${examQuestion.answerVideoFileIds[0]}`" class="video__inner"></video>
+											<view>
+												<text class="video__txt">视频</text>
+												<uni-icons
+													v-if="myExam.state === 2"
+													customPrefix="iconfont"
+													type="icon-icon-close"
+													color="#8c939d"
+													size="32rpx"
+													class="video__icon"
+													@click="
+														() => {
+															examQuestion.answerVideoFileIds = [];
+															answer(examQuestion);
+														}
+													"
+												></uni-icons>
 											</view>
 										</view>
-										<view v-if="myExam.state === 2" class="upload-btn" @click="uploadVideo(examQuestion)">
-											<uni-icons customPrefix="iconfont" type="icon-zhaopian" color="#FFF" size="32rpx" class="upload-btn__icon"></uni-icons>
-											<text class="upload-btn__txt">视频</text>
-										</view>
+									</view>
+									<view v-if="myExam.state === 2" class="upload-btn" @click="uploadVideo(examQuestion)">
+										<uni-icons customPrefix="iconfont" type="icon-zhaopian" color="#FFF" size="32rpx" class="upload-btn__icon"></uni-icons>
+										<text class="upload-btn__txt">视频</text>
 									</view>
 								</view>
-							</template>
-							<template #user-score-post>
-								<view
-									v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5) && myExam.markState === 3"
-									class="question-qa-answer"
-								>
-									<text class="question-qa-answer__label">批语</text>
-									<view>
-										<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
-									</view>
+							</view>
+						</template>
+						<template #user-score-post>
+							<view
+								v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5) && myExam.markState === 3"
+								class="question-qa-answer"
+							>
+								<text class="question-qa-answer__label">批语</text>
+								<view>
+									<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
 								</view>
-							</template>
-						</xmky-question>
-						<view v-else>
-							<view>{{ examQuestion.chapterName }}</view>
-							<view>{{ examQuestion.chapterTxt }}</view>
-						</view>
-					</scroll-view>
-				</template>
-			</xmky-swiper>
+							</view>
+						</template>
+					</xmky-question>
+					<view v-else>
+						<view>{{ examQuestion.chapterName }}</view>
+						<view>{{ examQuestion.chapterTxt }}</view>
+					</view>
+				</scroll-view>
+			</view>
 		</view>
 		<view class="mypaper-foot">
 			<view class="answer-nav" @click="answerSheet.open()">
@@ -152,8 +150,30 @@
 					<text class="answer-nav__text">答题卡</text>
 				</view>
 			</view>
-			<button class="mypaper-foot__pre-question" type="primary" @click="swiperRef.pre()">上一题</button>
-			<button class="mypaper-foot__next-question" type="primary" @click="swiperRef.next()">下一题</button>
+			<button
+				class="mypaper-foot__pre-question"
+				type="primary"
+				@click="
+					() => {
+						if (curQuestionIndex <= 0) return;
+						curQuestionIndex--;
+					}
+				"
+			>
+				上一题
+			</button>
+			<button
+				class="mypaper-foot__next-question"
+				type="primary"
+				@click="
+					() => {
+						if (curQuestionIndex >= examQuestions.length - 1) return;
+						curQuestionIndex++;
+					}
+				"
+			>
+				下一题
+			</button>
 			<button v-if="examing" class="mypaper-foot__finish" type="primary" @click="finish">交卷</button>
 			<button v-if="!examing" class="mypaper-foot__finish" type="primary" @click="toHome">返回</button>
 
@@ -200,7 +220,6 @@ import { useUserStore } from '@/stores/user';
 /************************变量定义相关***********************/
 const dictStore = useDictStore();
 const userStore = useUserStore();
-const swiperRef = ref(); // 滑块索引
 const questionHeight = ref(0); // 试题滚动高度
 const timePercent = ref(0); // 时间进度条
 const curQuestionIndex = ref(0); // 当前试题索引
@@ -292,6 +311,9 @@ const userAnswerNum = computed(() => {
 }); // 用户答题数量
 const isAnswer = computed(() => (examQuestion: ExamQuestion) => examQuestion.userAnswers?.some((userAnswer) => userAnswer.length)); // 是否作答
 const isMark = computed(() => (examQuestion: ExamQuestion) => marks.value.includes(examQuestion.no)); // 是否标记
+const examQuestion = computed(() => {
+	return examQuestions.value[curQuestionIndex.value];
+});
 
 /************************事件相关*****************************/
 // 考试查询
@@ -511,12 +533,12 @@ function uploadImg(examQuestion: ExamQuestion) {
 	uni.chooseImage({
 		extension: ['jpg', 'png', 'jpeg', 'JPG', 'PNG', 'JPEG'],
 		success: (chooseImageRes) => {
-			console.log(chooseImageRes.tempFiles[0].size)
+			console.log(chooseImageRes.tempFiles[0].size);
 			if (chooseImageRes.tempFiles[0].size / 1024 > 2048) {
 				uni.showToast({ title: '图片最大支持2兆', icon: 'error' });
-				return
+				return;
 			}
-			
+
 			const tempFilePaths = chooseImageRes.tempFilePaths;
 			uni.uploadFile({
 				url: `${host.value}/file/upload`,
@@ -548,16 +570,16 @@ function uploadVideo(examQuestion: ExamQuestion) {
 			// #ifdef H5
 			if (chooseVideoRes.tempFile.size / 1024 > 10240) {
 				uni.showToast({ title: '视频最大支持10兆', icon: 'error' });
-				return
+				return;
 			}
-			// #endif 
+			// #endif
 			// #ifdef MP-WEIXIN
 			if (chooseVideoRes.size / 1024 > 10240) {
 				uni.showToast({ title: '视频最大支持10兆', icon: 'error' });
-				return
+				return;
 			}
-			// #endif 
-			
+			// #endif
+
 			uni.uploadFile({
 				url: `${host.value}/file/upload`,
 				filePath: chooseVideoRes.tempFilePath,
@@ -574,6 +596,8 @@ function uploadVideo(examQuestion: ExamQuestion) {
 		}
 	});
 }
+
+function pre() {}
 </script>
 
 <style lang="scss" scoped>
