@@ -19,6 +19,12 @@
 			"path": "pages/exam-user/my-exer/my-read"
 		}, {
 			"path": "pages/exam-user/my-exer/my-paper"
+		}, {
+			"path": "pages/exam-user/profile/profile"
+		}, {
+			"path": "pages/exam-user/profile/pwd"
+		}, {
+			"path": "pages/exam-user/profile/custom"
 		},
 
 		{
@@ -43,6 +49,12 @@
 			"path": "pages/admin/exam/exam-paper"
 		}, {
 			"path": "pages/admin/user/user"
+		}, {
+			"path": "pages/admin/profile/profile"
+		}, {
+			"path": "pages/admin/profile/pwd"
+		}, {
+			"path": "pages/admin/profile/custom"
 		},
 
 		{
@@ -51,20 +63,20 @@
 			"path": "pages/mark-user/my-mark/my-read"
 		}, {
 			"path": "pages/mark-user/my-mark/my-user"
-		},{
+		}, {
 			"path": "pages/mark-user/my-mark/my-paper"
+		}, {
+			"path": "pages/mark-user/profile/profile"
+		}, {
+			"path": "pages/mark-user/profile/pwd"
+		}, {
+			"path": "pages/mark-user/profile/custom"
 		},
 
 		{
-			"path": "pages/center/center"
-		}, {
 			"path": "pages/bulletin/bulletin"
 		}, {
 			"path": "pages/bulletin/bulletinDetail"
-		}, {
-			"path": "pages/center/pwd"
-		}, {
-			"path": "pages/center/custom"
 		}
 	],
 	"globalStyle": {

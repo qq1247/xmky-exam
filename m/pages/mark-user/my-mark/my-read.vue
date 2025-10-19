@@ -159,14 +159,14 @@
 							<view class="my-mark__row">
 								<text class="my-mark__label">阅卷结束：{{ exam.markEndTime }}</text>
 							</view>
-							<button class="my-mark__btn" :class="{ 'my-mark__btn--active': examActive, 'my-mark__btn--disable': !examActive }" type="primary" @click="toMark">
+							<button class="my-mark__btn" :class="{ 'my-mark__btn--active': hasStartMark, 'my-mark__btn--disable': !hasStartMark }" type="primary" @click="toMark">
 								<xmky-count-down
-									v-if="!examActive"
-									:expireTime="exam.startTime"
+									v-if="!hasStartMark"
+									:expireTime="exam.markStartTime"
 									preTxt="等待 "
 									color="#fff"
 									class="time-count-down"
-									@end="examActive = !examActive"
+									@end="hasStartMark = true"
 								></xmky-count-down>
 								<text>进入阅卷</text>
 							</button>
@@ -201,7 +201,6 @@ const form = reactive<any>({
 	num: 0 // 新批阅份数
 });
 const scrollHeight = ref(0);
-const examActive = ref(false);
 const user = reactive<User>({
 	id: null,
 	name: '',
@@ -280,6 +279,7 @@ const claimInfo = reactive({
 	myClaimNum: 0,
 	myMarkNum: 0
 });
+const hasStartMark = ref(false);
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
@@ -314,6 +314,11 @@ const rankshow = computed(() => exam.rankState === 1);
 /************************事件相关*****************************/
 // 去阅卷
 function toMark() {
+	if (!hasStartMark.value) {
+		uni.showToast({ title: '阅卷未开始，请等待', icon: 'error' });
+		return;
+	}
+
 	if (!claimInfo.myClaimNum) {
 		uni.showToast({ title: '未领取试卷', icon: 'error' });
 		return;
@@ -643,6 +648,7 @@ async function claim() {
 							}
 						}
 						.form__btn--disable {
+							border: initial;
 							background: linear-gradient(to right, #dfdfdf 0%, #cacaca 100%);
 						}
 						.my-mark__btn {
@@ -653,6 +659,9 @@ async function claim() {
 							font-size: 30rpx;
 							color: #fefeff;
 							background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
+							&.my-mark__btn--disable {
+								background: linear-gradient(to right, #dfdfdf 0%, #cacaca 100%);
+							}
 						}
 					}
 				}

@@ -23,7 +23,7 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 
 /************************变量定义相关***********************/
-const questions = ref(); // 当前选择标签页
+const questions = ref([]); // 当前选择标签页
 
 /************************组件生命周期相关*********************/
 onLoad(async (option) => {

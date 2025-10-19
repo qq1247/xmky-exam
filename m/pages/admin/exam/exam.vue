@@ -81,6 +81,7 @@
 						<template #opt>
 							<view class="exam__opt">
 								<button v-if="exam.markType === 2" type="primary" @click="toMark(exam.id)" class="exam__btn">进入阅卷</button>
+								<view v-else></view>
 								<button type="primary" @click="toExam(exam.id)" class="exam__btn">进入考试</button>
 							</view>
 						</template>

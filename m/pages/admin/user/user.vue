@@ -130,7 +130,7 @@ const orgListpage = reactive<Page<any>>({
 }); // 机构列表
 const examUserListpage = reactive<Page<any>>({
 	curPage: 1,
-	pageSize: 2,
+	pageSize: 10,
 	total: 0,
 	list: [],
 	status: 'more'

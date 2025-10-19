@@ -90,7 +90,12 @@
 					</view>
 					<view class="my-exer-list__main">
 						<uni-list border-full>
-							<uni-list-item v-for="(myExer, index) in listpage.list" :key="index" showArrow :to="`/pages/exam-user/my-exer/my-paper?exerId=${exerId}&id=${myExer.id}`">
+							<uni-list-item
+								v-for="(myExer, index) in listpage.list"
+								:key="index"
+								showArrow
+								:to="`/pages/exam-user/my-exer/my-paper?exerId=${exerId}&id=${myExer.id}`"
+							>
 								<template #body>
 									<view>
 										<view>
@@ -216,7 +221,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { onLoad, onReady } from '@dcloudio/uni-app';
+import { onLoad, onReady, onShow } from '@dcloudio/uni-app';
 import { User } from '@/ts/user.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
@@ -299,6 +304,16 @@ const myExerStatis = reactive({
 onLoad(async (options) => {
 	exerId.value = options.exerId;
 	form.exerId = options.exerId;
+	// userQuery();
+	// questionBankStatisQuery();
+	// exerTimeStatisQuery();
+	// myExerQuery();
+
+	// await myExerStatisQuery();
+	// toggleExer();
+});
+onShow(async () => {
+	// 进入练习后返回来需要
 	userQuery();
 	questionBankStatisQuery();
 	exerTimeStatisQuery();
@@ -357,7 +372,7 @@ async function userQuery() {
 
 // 题库统计查询
 async function questionBankStatisQuery() {
-	let { code, data } = await exerListpage({
+	let { data } = await exerListpage({
 		exerId: exerId.value,
 		curPage: 1,
 		pageSize: 1
@@ -485,8 +500,8 @@ function nameUpdate() {
 async function toExer() {
 	loading.value = true;
 	const { code, data } = await myExerAdd({ ...form });
+	loading.value = false;
 	if (code !== 200) {
-		loading.value = false; // 错误显示，正确就跳转了
 		return;
 	}
 

@@ -117,7 +117,7 @@
 				:class="['my-paper__btn', { 'my-paper__btn--inactive': curQuestionIndex >= objectiveQestions.length - 1 }]"
 				@click="
 					() => {
-						if (curQuestionIndex >= examQuestions.length - 1) return;
+						if (curQuestionIndex >= unMarkQuestions.length - 1) return;
 						curQuestionIndex++;
 					}
 				"
@@ -239,7 +239,7 @@ const isRight = computed(() => (question: ExamQuestion) => question.userScore !=
 const isWrong = computed(() => (question: ExamQuestion) => question.userScore != null && question.userScore === 0); // 是否答错
 const unMarkQuestions = computed(() => objectiveQestions.value.filter((examQuestion) => examQuestion.markType === 2 && examQuestion.userScore == null)); // 未批阅试题
 const examQuestion = computed(() => {
-	return examQuestions.value[curQuestionIndex.value];
+	return objectiveQestions.value[curQuestionIndex.value];
 });
 
 /************************事件相关*****************************/

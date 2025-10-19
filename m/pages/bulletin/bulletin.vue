@@ -59,7 +59,7 @@
 					:contentText="{ contentdown: '点击查看更多', contentrefresh: '加载中', contentnomore: '没有更多数据了' }"
 					@clickLoadMore="bulletinQuery(true)"
 				></uni-load-more>
-				<xmky-emtpy> v-if="curTabIndex === 0 && !bulletinListpage.list?.length"></xmky-emtpy>
+				<xmky-empty v-if="curTabIndex === 0 && !bulletinListpage.list?.length"></xmky-empty>
 			</scroll-view>
 		</view>
 		<view class="bulletin-bottom"></view>

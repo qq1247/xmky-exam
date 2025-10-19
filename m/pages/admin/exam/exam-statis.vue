@@ -77,7 +77,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="statis">
+					<view v-if="exam.markState === 3" class="statis">
 						<view class="statis__head">
 							<view class="statis__icon">
 								<uni-icons customPrefix="iconfont" type="icon-icon-pen" color="white" size="26rpx"></uni-icons>
@@ -88,7 +88,7 @@
 							<qiun-data-charts canvas-id="chart-2" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" :canvas2d="true" />
 						</view>
 					</view>
-					<view class="statis">
+					<view v-if="exam.markState === 3" class="statis">
 						<view class="statis__head">
 							<view class="statis__icon">
 								<uni-icons customPrefix="iconfont" type="icon-icon-pen" color="white" size="26rpx"></uni-icons>

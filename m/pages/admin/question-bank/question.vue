@@ -31,7 +31,7 @@
 			<scroll-view scroll-y="true" class="question__scroll" :style="{ height: scrollHeight + 'px' }">
 				<view v-for="(question, index) in listpage.list" :key="index" class="list">
 					<view class="list__wrap">
-						<view class="list__title">{{ index + 1 }}、{{ question.title }}</view>
+						<view class="list__title">{{ index + 1 }}、{{ escape2Html(question.title) }}</view>
 						<view class="list__outer">
 							<view class="list__tag list__tag--type">{{ dictStore.getValue('QUESTION_TYPE', question.type) }}</view>
 							<view class="list__tag llist__tag--mark-type">{{ dictStore.getValue('PAPER_MARK_TYPE', question.markType) }}</view>
@@ -61,6 +61,7 @@ import { onLoad, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
 import { questionListpage } from '@/api/question';
 import { useDictStore } from '@/stores/dict';
+import { escape2Html } from '@/util/htmlUtil';
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore();

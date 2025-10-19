@@ -32,6 +32,14 @@
 						<template #title-post>
 							<text>（{{ examQuestion.score }}分）</text>
 						</template>
+						<template #user-score-post>
+							<view v-if="examQuestion.markType === 2 && (examQuestion.questionType === 3 || examQuestion.questionType === 5)" class="question-qa-answer">
+								<text class="question-qa-answer__label">批语</text>
+								<view>
+									<text class="question-qa-answer__content">{{ examQuestion.remark }}</text>
+								</view>
+							</view>
+						</template>
 					</xmky-question>
 					<view v-else>
 						<view>{{ examQuestion.chapterName }}</view>
@@ -51,15 +59,31 @@
 					<text class="answer-nav__text">答题卡</text>
 				</view>
 			</view>
-			<button class="mypaper-foot__pre-question" type="primary" @click="() => {
+			<button
+				class="mypaper-foot__pre-question"
+				type="primary"
+				@click="
+					() => {
 						if (curQuestionIndex <= 0) return;
 						curQuestionIndex--;
-					}">上一题</button>
-			<button class="mypaper-foot__next-question" type="primary" @click="() => {
+					}
+				"
+			>
+				上一题
+			</button>
+			<button
+				class="mypaper-foot__next-question"
+				type="primary"
+				@click="
+					() => {
 						if (curQuestionIndex >= examQuestions.length - 1) return;
 						curQuestionIndex++;
-					}">下一题</button>
-			<button class="mypaper-foot__finish" type="primary" @click="$router.go(-1)">返回</button>
+					}
+				"
+			>
+				下一题
+			</button>
+			<button class="mypaper-foot__finish" type="primary" @click="uni.navigateBack()">返回</button>
 
 			<xmky-popup ref="answerSheet" name="答题卡" class="answer-sheet">
 				<view class="answer-sheet-head">

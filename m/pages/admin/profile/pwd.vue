@@ -4,10 +4,26 @@
 		<view class="pwd-main">
 			<uni-forms class="pwd-main__form" ref="formRef" :model="form" :rules="formRules">
 				<uni-forms-item name="oldPwd">
-					<uni-easyinput v-model="form.oldPwd" type="password" prefixIcon="locked" :styles="{ backgroundColor: '#F3F6F9' }" focus clearable placeholder="请输入旧密码" />
+					<uni-easyinput
+						v-model="form.oldPwd"
+						type="password"
+						prefixIcon="locked"
+						:styles="{ backgroundColor: '#F3F6F9', color: '#333' }"
+						focus
+						clearable
+						placeholder="请输入旧密码"
+					/>
 				</uni-forms-item>
 				<uni-forms-item name="newPwd">
-					<uni-easyinput v-model="form.newPwd" type="password" prefixIcon="locked" :styles="{ backgroundColor: '#F3F6F9' }" focus clearable placeholder="请输入新密码" />
+					<uni-easyinput
+						v-model="form.newPwd"
+						type="password"
+						prefixIcon="locked"
+						:styles="{ backgroundColor: '#F3F6F9', color: '#333' }"
+						focus
+						clearable
+						placeholder="请输入新密码"
+					/>
 				</uni-forms-item>
 			</uni-forms>
 			<button class="pwd-main__confirm" type="primary" @click="pwd">确定</button>
