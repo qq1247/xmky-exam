@@ -91,13 +91,13 @@ function synIndex(newSwiperIndex: number) {
 
 // 上一个
 async function pre() {
-	curItemIndex.value <= 0 ? (curItemIndex.value = props.items.length - 1) : curItemIndex.value--;
+	curItemIndex.value <= 0 ? (curItemIndex.value = 0) : curItemIndex.value--;
 	emit('update:modelValue', curItemIndex.value);
 }
 
 // 下一个
 async function next() {
-	curItemIndex.value >= props.items.length - 1 ? (curItemIndex.value = 0) : curItemIndex.value++;
+	curItemIndex.value >= props.items.length - 1 ? (curItemIndex.value = props.items.length - 1) : curItemIndex.value++;
 	emit('update:modelValue', curItemIndex.value);
 }
 </script>

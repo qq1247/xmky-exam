@@ -161,6 +161,8 @@ async function toQuestion(id: number) {
 		}
 	}
 	.question-bank__main {
+		overflow: hidden;
+		border-radius: 30rpx 30rpx 30rpx 30rpx;
 		.question-bank__scroll {
 			.question-bank__opt {
 				flex: 1;

@@ -1,7 +1,7 @@
 <template>
-	<xmky-layout :tabs="tabbarStore.admin">
-		<view class="exam">
-			<view class="exam__head">
+	<xmky-layout :tabs="tabbarStore.markUser">
+		<view class="my-mark">
+			<view class="my-mark__head">
 				<uni-search-bar
 					v-model="queryForm.name"
 					bgColor="#fff"
@@ -27,61 +27,66 @@
 					"
 				></uni-search-bar>
 			</view>
-			<view class="exam__main">
-				<scroll-view scroll-y="true" class="exam__scroll" :style="{ height: scrollHeight + 'px' }">
-					<xmky-card v-for="(exam, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exam.name" tag-name="考试">
+			<view class="my-mark__main">
+				<scroll-view scroll-y="true" class="my-mark__scroll" :style="{ height: scrollHeight + 'px' }">
+					<xmky-card v-for="(myMark, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="myMark.examName" tag-name="考试">
 						<template #content>
 							<view>
 								<text>组卷方式：</text>
-								<text class="exam__value">{{ dictStore.getValue('PAPER_GEN_TYPE', exam.genType) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('PAPER_GEN_TYPE', myMark.examGenType) }}</text>
 								<text>登录方式：</text>
-								<text class="exam__value">{{ dictStore.getValue('LOGIN_TYPE', exam.loginType) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('LOGIN_TYPE', myMark.examLoginType) }}</text>
 							</view>
 							<view>
 								<text>阅卷方式：</text>
-								<text class="exam__value">{{ dictStore.getValue('MARK_STATE', exam.markState) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('MARK_STATE', myMark.examMarkState) }}</text>
 								<text>发布状态：</text>
-								<text class="exam__value">{{ dictStore.getValue('STATE_PS', exam.state) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('STATE_PS', myMark.examState) }}</text>
 							</view>
 							<view>
 								<text>考试时间：</text>
-								<text class="exam__value">{{ exam.startTime.substring(0, 16) }} - {{ exam.endTime.substring(0, 16) }}</text>
+								<text class="my-mark__value">{{ myMark.examStartTime.substring(0, 16) }} - {{ myMark.examEndTime.substring(0, 16) }}</text>
 							</view>
 							<view>
 								<text>阅卷时间：</text>
-								<text v-if="exam.markType === 2" class="exam__value">{{ exam.markStartTime.substring(0, 16) }} - {{ exam.markEndTime.substring(0, 16) }}</text>
-								<text v-else class="exam__value">考试结束自动阅卷</text>
+								<text v-if="myMark.examMarkType === 2" class="my-mark__value">
+									{{ myMark.examMarkStartTime.substring(0, 16) }} - {{ myMark.examMarkEndTime.substring(0, 16) }}
+								</text>
+								<text v-else class="my-mark__value">考试结束自动阅卷</text>
 							</view>
 							<view>
 								<text>试卷：</text>
-								<text class="exam__value">{{ dictStore.getValue('PAPER_MARK_TYPE', exam.markType) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('PAPER_MARK_TYPE', myMark.examMarkType) }}</text>
 								<text>及格分数：</text>
-								<text class="exam__value">{{ exam.passScore || '-' }}/{{ exam.totalScore }}</text>
+								<text class="my-mark__value">{{ myMark.examPassScore || '-' }}/{{ myMark.examTotalScore }}</text>
 							</view>
 							<view>
 								<text>限时：</text>
-								<text class="exam__value">{{ exam.limitMinute ? exam.limitMinute + '分钟' : '无' }}</text>
+								<text class="my-mark__value">{{ myMark.examLimitMinute ? myMark.examLimitMinute + '分钟' : '无' }}</text>
 								<text>考试人数：</text>
-								<text class="exam__value">{{ exam.userNum }}人</text>
+								<text class="my-mark__value">{{ myMark.examUserNum }}人</text>
 							</view>
 							<view>
 								<text>防作弊：</text>
-								<text class="exam__value">{{ exam.sxes.length > 0 ? '是' : '否' }}</text>
+								<text class="my-mark__value">{{ myMark.examSxes.length > 0 ? '是' : '否' }}</text>
 								<text>查询成绩：</text>
-								<text class="exam__value">{{ dictStore.getValue('SCORE_STATE', exam.scoreState) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('SCORE_STATE', myMark.examScoreState) }}</text>
 							</view>
 							<view>
 								<text>排名：</text>
-								<text class="exam__value">{{ dictStore.getValue('STATE_ON', exam.rankState) }}</text>
+								<text class="my-mark__value">{{ dictStore.getValue('STATE_ON', myMark.examRankState) }}</text>
 								<text>协助阅卷：</text>
-								<text v-if="exam.markUserNum" class="exam__value">{{ exam.markUserNum }}人</text>
-								<text v-else class="exam__value">无</text>
+								<text v-if="myMark.examMarkUserNum" class="my-mark__value">{{ myMark.examMarkUserNum }}人</text>
+								<text v-else class="my-mark__value">无</text>
 							</view>
 						</template>
 						<template #opt>
-							<view class="exam__opt">
-								<button v-if="exam.markType === 2" type="primary" @click="toMark(exam.id)" class="exam__btn">进入阅卷</button>
-								<button type="primary" @click="toExam(exam.id)" class="exam__btn">进入考试</button>
+							<view class="my-mark__opt">
+								<view>
+									<view class="my-mark__state"></view>
+									<view class="my-mark__state"></view>
+								</view>
+								<button type="primary" @click="toMark(myMark.examId)" class="my-mark__btn">进入阅卷</button>
 							</view>
 						</template>
 					</xmky-card>
@@ -94,7 +99,7 @@
 					<xmky-empty v-if="!listpage.list?.length"></xmky-empty>
 				</scroll-view>
 			</view>
-			<view class="exam__foot"></view>
+			<view class="my-mark__foot"></view>
 		</view>
 	</xmky-layout>
 </template>
@@ -102,7 +107,7 @@
 import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
-import { examListpage } from '@/api/exam';
+import { myMarkListpage } from '@/api/my-mark';
 import { useDictStore } from '@/stores/dict';
 import { useTabbarStore } from '@/stores/tabbar';
 
@@ -128,7 +133,7 @@ onShow(async () => {
 
 onReady(() => {
 	uni.createSelectorQuery()
-		.select('.exam__scroll')
+		.select('.my-mark__scroll')
 		.boundingClientRect((data: any) => {
 			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
 		})
@@ -136,12 +141,12 @@ onReady(() => {
 });
 
 /************************事件相关*****************************/
-// 题库列表查询
+// 考试列表查询
 async function query(append: boolean) {
 	listpage.status = 'loading';
 	listpage.curPage = append ? listpage.curPage + 1 : 1;
 
-	let { data } = await examListpage({
+	let { data } = await myMarkListpage({
 		...queryForm,
 		curPage: listpage.curPage,
 		pageSize: listpage.pageSize
@@ -156,21 +161,17 @@ async function query(append: boolean) {
 	listpage.status = listpage.list.length < listpage.total ? 'more' : 'no-more';
 }
 
-// 进入考试页面
-async function toExam(id: number) {
-	uni.navigateTo({ url: `/pages/admin/exam/exam-statis?examId=${id}` });
-}
-// 进入阅卷页面
+// 去阅卷页面
 async function toMark(id: number) {
 	uni.navigateTo({ url: `/pages/mark-user/my-mark/my-read?examId=${id}` });
 }
 </script>
 <style lang="scss" scoped>
-.exam {
+.my-mark {
 	display: flex;
 	flex-direction: column;
 	padding: 20rpx;
-	.exam__head {
+	.my-mark__head {
 		:deep(.query) {
 			padding: 0px;
 			margin-bottom: 10rpx;
@@ -185,31 +186,29 @@ async function toMark(id: number) {
 			}
 		}
 	}
-	.exam__main {
-		overflow: hidden;
-		border-radius: 30rpx 30rpx 30rpx 30rpx;
-		.exam__scroll {
-			.exam__opt {
+	.my-mark__main {
+		.my-mark__scroll {
+			.my-mark__opt {
 				flex: 1;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				.exam__state {
+				.my-mark__state {
 					display: inline-block;
 					margin-right: 40rpx;
-					.exam__state-name {
+					.my-mark__state-name {
 						margin-left: 4rpx;
 						font-size: 26rpx;
 						color: #8f939c;
 					}
-					.exam__state-name--warn {
+					.my-mark__state-name--warn {
 						color: #ff5d15;
 					}
-					.exam__state-name--succ {
+					.my-mark__state-name--succ {
 						color: #18bc38;
 					}
 				}
-				.exam__btn {
+				.my-mark__btn {
 					width: 180rpx;
 					height: 66rpx;
 					margin: initial;
@@ -220,7 +219,7 @@ async function toMark(id: number) {
 					background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 				}
 			}
-			.exam__value {
+			.my-mark__value {
 				color: #333;
 				margin-right: 40rpx;
 			}

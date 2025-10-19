@@ -265,6 +265,8 @@ async function subAdminQuery(append: boolean) {
 	.user__head {
 	}
 	.user__main {
+		overflow: hidden;
+		border-radius: 30rpx 30rpx 30rpx 30rpx;
 		// 小程序没有uni-scroll-view-content
 		// #ifdef H5
 		:deep(.uni-scroll-view-content) {
@@ -304,6 +306,8 @@ async function subAdminQuery(append: boolean) {
 		}
 		//#endif
 		.user__scroll {
+			overflow: hidden;
+			border-radius: 30rpx 30rpx 30rpx 30rpx;
 			margin-top: 20rpx;
 			.list {
 				display: flex;

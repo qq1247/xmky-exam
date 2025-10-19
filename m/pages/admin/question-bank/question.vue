@@ -147,6 +147,8 @@ function toView(id: number) {
 	.question__main {
 		flex: 1;
 		margin-top: 10rpx;
+		overflow: hidden;
+		border-radius: 30rpx 30rpx 30rpx 30rpx;
 		.list {
 			display: flex;
 			border-bottom: 1px solid #dfdfdf;

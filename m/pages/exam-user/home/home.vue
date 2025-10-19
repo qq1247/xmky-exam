@@ -1,12 +1,5 @@
 <template>
-	<xmky-layout
-		:tabs="[
-			{ pagePath: '/pages/exam-user/home/home', text: '首页', icon: 'icon-icon-home' },
-			{ pagePath: '/pages/exam-user/my-exer/my-exer', text: '练习', icon: 'icon-icon-pencil' },
-			{ pagePath: '/pages/exam-user/my-exam/my-exam', text: '考试', icon: 'icon-icon-pen' },
-			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
-		]"
-	>
+	<xmky-layout :tabs="tabbarStore.examUser">
 		<view class="home">
 			<view class="home-head">
 				<image class="home-head__bg" src="@/static/img/home-bg.png"></image>
@@ -92,7 +85,7 @@
 						</template>
 					</xmky-card>
 					<xmky-empty v-if="curTabIndex === 0 && !myExerList?.length"></xmky-empty>
-					
+
 					<xmky-card
 						v-if="curTabIndex === 1 && todoExamList?.length"
 						v-for="(todoExam, index) in todoExamList"
@@ -138,8 +131,10 @@ import { myExamListpage } from '@/api/myExam';
 import { bulletinListpage } from '@/api/bulletin';
 import { exerListpage } from '@/api/exer';
 import { useParmStore } from '@/stores/parm';
+import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
+const tabbarStore = useTabbarStore();
 const userStore = useUserStore(); // 用户存储
 const parmStore = useParmStore(); // 参数存储
 const todoExamList = ref<any[]>(); // 未完成考试列表

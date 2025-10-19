@@ -46,6 +46,16 @@
 		},
 
 		{
+			"path": "pages/mark-user/my-mark/my-mark"
+		}, {
+			"path": "pages/mark-user/my-mark/my-read"
+		}, {
+			"path": "pages/mark-user/my-mark/my-user"
+		},{
+			"path": "pages/mark-user/my-mark/my-paper"
+		},
+
+		{
 			"path": "pages/center/center"
 		}, {
 			"path": "pages/bulletin/bulletin"

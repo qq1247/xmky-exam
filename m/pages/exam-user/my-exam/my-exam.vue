@@ -1,12 +1,5 @@
 <template>
-	<xmky-layout
-		:tabs="[
-			{ pagePath: '/pages/exam-user/home/home', text: '首页', icon: 'icon-icon-home' },
-			{ pagePath: '/pages/exam-user/my-exer/my-exer', text: '练习', icon: 'icon-icon-pencil' },
-			{ pagePath: '/pages/exam-user/my-exam/my-exam', text: '考试', icon: 'icon-icon-pen' },
-			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
-		]"
-	>
+	<xmky-layout :tabs="tabbarStore.examUser">
 		<view class="myexam">
 			<view class="myexam-head">
 				<uni-search-bar
@@ -183,8 +176,10 @@ import { useDictStore } from '@/stores/dict';
 import { MyExam } from '@/ts/myExam.d';
 import { Page } from '@/ts/page.d';
 import { myExamListpage as _myExamListpage } from '@/api/myExam';
+import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
+const tabbarStore = useTabbarStore();
 const curTabIndex = ref(0); // 当前选择标签页
 const dictStore = useDictStore();
 const queryForm = reactive({

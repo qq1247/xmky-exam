@@ -152,7 +152,8 @@ public class ApiMyMarkController extends BaseController {
 								return true;
 							}
 						} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户看自己领取的
-							return myExam.getMarkUserId().intValue() == getCurUser().getId();
+							return myExam.getMarkUserId() != null
+									&& myExam.getMarkUserId().intValue() == getCurUser().getId();
 						}
 						return false;
 					}).map(myExam -> {
@@ -271,7 +272,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @param userId     考试用户ID
 	 * @param questionId 试题ID
 	 * @param userScore  批分
-	 * @param remark  批语
+	 * @param remark     批语
 	 * @return PageResult
 	 */
 	@RequestMapping("/score")
@@ -287,7 +288,7 @@ public class ApiMyMarkController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 我的阅卷完成
 	 * 

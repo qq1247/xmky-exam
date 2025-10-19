@@ -207,6 +207,7 @@ const curQuestionIndex = ref(0); // 当前试题索引
 const exam = reactive<Exam>({
 	id: null,
 	name: '',
+	paperName: '',
 	startTime: '',
 	endTime: '',
 	markStartTime: '',

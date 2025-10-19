@@ -1,12 +1,5 @@
 <template>
-	<xmky-layout
-		:tabs="[
-			{ pagePath: '/pages/exam-user/home/home', text: '首页', icon: 'icon-icon-home' },
-			{ pagePath: '/pages/exam-user/my-exer/my-exer', text: '练习', icon: 'icon-icon-pencil' },
-			{ pagePath: '/pages/exam-user/my-exam/my-exam', text: '考试', icon: 'icon-icon-pen' },
-			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
-		]"
-	>
+	<xmky-layout :tabs="tabbarStore.examUser">
 		<view class="myexer">
 			<view class="myexer-head">
 				<uni-search-bar
@@ -86,8 +79,10 @@ import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
 import { exerListpage } from '@/api/exer';
 import { Exer } from '@/ts/exer.d';
+import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
+const tabbarStore = useTabbarStore();
 const queryForm = reactive({
 	name: '' // 练习名称
 });
@@ -162,6 +157,8 @@ async function toExer(exer: Exer) {
 		}
 	}
 	.myexer-main {
+		overflow: hidden;
+		border-radius: 30rpx;
 		.myexer-main__scroll {
 			.myexer-main__opt {
 				flex: 1;

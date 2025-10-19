@@ -254,6 +254,8 @@ async function toWrongQuestionChart(tracks: []) {
 		}
 		//#endif
 		.exer-statis__scroll {
+			overflow: hidden;
+			border-radius: 30rpx 30rpx 30rpx 30rpx;
 			margin-top: 20rpx;
 			.list {
 				display: flex;

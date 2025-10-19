@@ -153,6 +153,8 @@ async function toExerStatis(id: number) {
 		}
 	}
 	.exer__main {
+		overflow: hidden;
+		border-radius: 30rpx 30rpx 30rpx 30rpx;
 		.exer__scroll {
 			.exer__opt {
 				flex: 1;

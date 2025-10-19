@@ -11,8 +11,18 @@ export const useTabbarStore = defineStore(
 			{ pagePath: '/pages/admin/user/user', text: '机构用户', icon: 'icon-liebiao-06' },
 			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
 		]);
+		const examUser = ref([
+			{ pagePath: '/pages/exam-user/home/home', text: '首页', icon: 'icon-icon-home' },
+			{ pagePath: '/pages/exam-user/my-exer/my-exer', text: '练习', icon: 'icon-icon-pencil' },
+			{ pagePath: '/pages/exam-user/my-exam/my-exam', text: '考试', icon: 'icon-icon-pen' },
+			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
+		]);
+		const markUser = ref([
+			{ pagePath: '/pages/mark-user/my-mark/my-mark', text: '阅卷', icon: 'icon-icon-pencil' },
+			{ pagePath: '/pages/center/center', text: '个人中心', icon: 'icon-icon-people' }
+		]);
 
-		return { admin };
+		return { admin, examUser, markUser };
 	},
 	{
 		unistorage: true

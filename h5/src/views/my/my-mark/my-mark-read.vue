@@ -13,7 +13,7 @@
                 <xmks-card-guide title="注意事项" icon="icon-tubiaoziti-34" class="notes__head"></xmks-card-guide>
                 <div class="notes__main">
                     <span class="notes__txt">
-                        1、阅卷结束时间到，系统会自动结束阅卷。请注意把握时间。<br />
+                        1、阅卷结束时间到，系统会自动结束阅卷，请注意把握时间。<br />
                     </span>
                 </div>
             </div>
@@ -136,12 +136,12 @@
                                 阅卷时长：<span class="myexam__value">-</span>
                             </span>
                             <span class="myexam__label">
-                                参与阅卷：<span class="my-mark__tag">2人</span>
+                                参与阅卷：<span class="my-mark__tag">-</span>
                             </span>
                             <el-button type="primary" class="my-mark__btn"
                                 :class="{ 'my-mark__btn--active': hasStartMark, 'my-mark__btn--disable': !hasStartMark }"
                                 @click="markIn">
-                                <xmks-count-down v-if="!hasStartMark" :expireTime="exam.markStartTime" preTxt="距考试开始："
+                                <xmks-count-down v-if="!hasStartMark" :expireTime="exam.markStartTime" preTxt="距阅卷开始："
                                     :remind="60" color="#FFFFFF" remind-color="#E43D33" @end="hasStartMark = true">
                                 </xmks-count-down>
                                 <span v-else> {{ exam.markState as number === 2 ? '进入阅卷' : '查阅试卷' }}</span>
