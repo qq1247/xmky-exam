@@ -159,7 +159,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		user.setLoginName(null);// 无登录账号
 		user.setType(4);
 		user.setRegistTime(new Date());
-		user.setOrgId(1);
+		user.setOrgId(0);
 		user.setState(1);
 		user.setUpdateUserId(1);
 		user.setUpdateTime(new Date());
