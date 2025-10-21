@@ -246,6 +246,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		// myExam.setMarkUserId(1); //由管理员、子管理员或阅卷用户自己领取自己分配
 		myExam.setState(1);// 未考试
 		myExam.setMarkState(1);// 未阅卷
+		myExam.setVer(1);
 		myExam.setUpdateTime(new Date());
 		myExam.setUpdateUserId(getCurUser().getId());
 		save(myExam);
