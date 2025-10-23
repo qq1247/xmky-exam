@@ -150,37 +150,40 @@ public class ApiExerController extends BaseController {
 		}
 	}
 
-//	/**
-//	 * 练习删除
-//	 * 
-//	 * v1.0 chenyun 2021-03-02 13:43:21
-//	 * 
-//	 * @param id
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/del")
-//	public PageResult del(Integer id) {
-//		try {
-//			// 数据校验
-//			Exer exer = exerService.getById(id);
-////			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-////				throw new MyException("无操作权限");
-////			}
-//
-//			// 删除
-//			exer.setState(0);
-//			exer.setUpdateTime(new Date());
-//			exer.setUpdateUserId(getCurUser().getId());
-//			exerService.updateById(exer);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("练习删除错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("练习删除错误：", e);
-//			return PageResult.err();
-//		}
-//	}
+	/**
+	 * 练习删除
+	 * 
+	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/del")
+	public PageResult del(Integer id) {
+		try {
+			// 数据校验
+			Exer exer = exerService.getById(id);
+			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			if (exer.getState().intValue() == 0) {
+				throw new MyException("已删除");
+			}
+
+			// 删除
+			exer.setState(0);
+			exer.setUpdateTime(new Date());
+			exer.setUpdateUserId(getCurUser().getId());
+			exerService.updateById(exer);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("练习删除错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("练习删除错误：", e);
+			return PageResult.err();
+		}
+	}
 
 	/**
 	 * 练习获取

@@ -45,7 +45,7 @@
                 </el-form>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="form.id" title="发布练习" desc="考试期间请暂停练习">
+        <xmks-edit-card v-if="form.id" title="发布练习" desc="考试期间请暂停练习，以免考试用户可以边考边查询答案。">
             <template #card-main>
                 <el-form size="large" class="form">
                     <el-radio-group v-model="form.state">
@@ -58,6 +58,12 @@
             </template>
             <template #card-side>
                 <el-button type="primary" class="form__btn" @click="state" style="margin-bottom: 30px;">保存设置</el-button>
+            </template>
+        </xmks-edit-card>
+        <xmks-edit-card v-if="form.id" title="删除练习" desc="删除练习">
+            <template #card-side>
+                <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': delConfirm }" @click="del"
+                    style="margin-bottom: 14px;">删除练习</el-button>
             </template>
         </xmks-edit-card>
         <!-- <xmks-edit-card v-if="form.id" title="允许评论" desc="解题技巧互评，用同伴视角发现解题盲点">
@@ -79,7 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-import { exerAdd, exerEdit, exerGet, exerState } from '@/api/exam/exer'
+import { exerAdd, exerDel, exerEdit, exerGet, exerState } from '@/api/exam/exer'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import xmksSelect from '@/components/xmks-select.vue'
 import { useDictStore } from '@/stores/dict'
@@ -123,6 +129,7 @@ const formRules = reactive<FormRules>({// 表单规则
         { required: false, message: '请选择练习机构', trigger: 'blur' },
     ],
 })
+const delConfirm = ref(false) // 删除确认
 const questionBanks = ref<Record<string, unknown>[]>([]) // 题库列表
 const users = ref<Record<string, unknown>[]>([]) // 用户列表
 const orgs = ref<Record<string, unknown>[]>([]) // 机构列表
@@ -186,6 +193,21 @@ async function edit() {
 // 发布
 async function state() {
     const { data: { code } } = await exerState({ id: form.id })
+    if (code !== 200) {
+        return
+    }
+
+    router.push("/exer-list")
+}
+
+// 删除
+async function del() {
+    if (!delConfirm.value) {
+        delConfirm.value = true
+        return
+    }
+
+    const { data: { code } } = await exerDel({ id: form.id })
     if (code !== 200) {
         return
     }
