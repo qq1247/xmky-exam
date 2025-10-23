@@ -85,6 +85,7 @@ public class ApiQuestionBankController extends BaseController {
 			questionBank.setQaSubNum(0);
 			questionBank.setQaObjNum(0);
 			questionBank.setQuestionNum(0);
+			questionBank.setState(1);
 			questionBank.setCreateUserId(getCurUser().getId());
 			questionBank.setUpdateTime(new Date());
 			questionBank.setUpdateUserId(getCurUser().getId());

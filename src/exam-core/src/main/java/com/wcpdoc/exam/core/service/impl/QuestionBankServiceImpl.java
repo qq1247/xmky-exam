@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionBankDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.QuestionBank;
@@ -40,10 +43,22 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 			throw new MyException("无操作权限");
 		}
+
 		// 题库删除
-		// entity.setUpdateTime(new Date());// 物理删除，不需要再记录
-		// entity.setUpdateUserId(getCurUser().getId());
-		removeById(entity.getId());
+		entity.setObjectiveNum(0);
+		entity.setSubjectiveNum(0);
+		entity.setSingleNum(0);
+		entity.setMultipleNum(0);
+		entity.setFillBlankObjNum(0);
+		entity.setFillBlankSubNum(0);
+		entity.setJudgeNum(0);
+		entity.setQaObjNum(0);
+		entity.setQaSubNum(0);
+		entity.setQuestionNum(0);
+		entity.setState(0);// bug：直接删除会导致练习引用为空
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		updateById(entity);
 
 		// 题库扩展删除
 		questionBankExService.del(entity);
@@ -51,6 +66,14 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 
 	@Override
 	public void clear(Integer id) {
+		// 数据校验
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误：id");
+		}
+		QuestionBank entity = getById(id);
+		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			throw new MyException("无操作权限");
+		}
 		// 题库清理
 		QuestionBank questionBank = getById(id);
 		questionBank.setQuestionNum(0);

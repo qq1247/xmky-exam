@@ -8,16 +8,15 @@ import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionBank;
-import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionBankExService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
+import com.wcpdoc.exam.core.service.QuestionService;
 
 /**
  * 题库扩展服务层实现
@@ -49,15 +48,6 @@ public class QuestionBankExServiceImpl extends BaseServiceImp<QuestionBank> impl
 
 	@Override
 	public void clear(Integer id) {
-		// 数据校验
-		if (!ValidateUtil.isValid(id)) {
-			throw new MyException("参数错误：id");
-		}
-		QuestionBank entity = questionBankService.getById(id);
-		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-			throw new MyException("无操作权限");
-		}
-
 		// 题库清空
 		List<Question> questionList = questionService.getList(id);
 		for (Question question : questionList) {
