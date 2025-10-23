@@ -37,7 +37,7 @@
                             </el-form-item>
                             <el-form-item>
                                 <div class="login-win__btn-group">
-                                    <span @click="loginType = 2" class="login-win__switch‌-btn">临时考试</span>
+                                    <span @click="loginType = 2" class="login-win__switch‌-btn">临时登录</span>
                                     <el-button type="primary" class="login-win__login-btn" @click="login">登录</el-button>
                                 </div>
                             </el-form-item>
@@ -122,6 +122,7 @@ const anonFormRef = ref<FormInstance>()// 表单引用
 const anonFormRules = reactive<FormRules>({// 表单规则
     userName: [
         { required: true, message: '请输入姓名和手机号', trigger: 'blur' },
+        { min: 2, max: 16, message: '长度介于2-16', trigger: 'blur' }
     ],
     examName: [
         { required: true, message: '请输入考试名称', trigger: 'blur' },

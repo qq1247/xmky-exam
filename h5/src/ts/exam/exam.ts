@@ -5,7 +5,7 @@ export interface Exam {
     paperName: ''// 试卷名称
     genType: number | null // 组卷方式（1：人工组卷；2：随机组卷）
     markType: number | null // 阅卷类型（1：客观题；2：主观题）
-    loginType: number | null // 登录方式（1：正常登录；2：免登录；）
+    loginType: number | null // 登录方式（1：账号登录；2：临时登录；）
     startTime: string // 考试开始时间
     endTime: string // 考试结束时间
     limitMinute: number | null // 限制分钟

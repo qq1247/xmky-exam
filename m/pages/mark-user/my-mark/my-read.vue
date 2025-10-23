@@ -113,7 +113,7 @@
 					<view class="paper__content">
 						<text class="paper__txt">客观题{{ questionStatisData.markTypeStatis.objective }}道 主观题{{ questionStatisData.markTypeStatis.subjective }}道</text>
 						<view>
-							<qiun-data-charts type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" />
+							<qiun-data-charts canvas-id="mark-user-pie" type="pie" :opts="questionStatisOpts" :chartData="questionStatisData.typeStatis" :canvas2d="true" />
 						</view>
 					</view>
 				</view>

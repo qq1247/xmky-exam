@@ -4,10 +4,10 @@
 			<view class="profile__head">
 				<image class="profile__bg" src="@/static/img/home-bg.png"></image>
 				<view class="avatar">
-					<image class="avatar__outer" src="@/static/img/user-avatar.png"></image>
+					<image class="avatar__wrap" src="@/static/img/user-avatar.png"></image>
 					<view class="avatar__inner">
-						<view class="avatar__name">{{ user.name }}</view>
-						<view class="avatar__orgname">{{ user.orgName }}</view>
+						<view class="avatar__name">{{ userStore.user.name }}</view>
+						<view class="avatar__orgname">{{ userStore.user.type === 3 ? '阅卷用户' : '未知' }}</view>
 					</view>
 				</view>
 			</view>
@@ -47,24 +47,12 @@
 import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
-import { User } from '@/ts/user.d';
-import { userGet } from '@/api/user';
 import { loginOut } from '@/api/login';
 import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
 const tabbarStore = useTabbarStore();
 const userStore = useUserStore(); // 用户存储
-const user = reactive<User>({
-	id: null, // 用户信息
-	name: '',
-	loginName: '',
-	orgName: ''
-});
-const custom = reactive({
-	title: '', // 自定义内容
-	content: ''
-});
 const scrollHeight = ref(0); // 下侧列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
@@ -73,8 +61,6 @@ onShow(async () => {
 		uni.navigateTo({ url: '/pages/login/login' });
 		return;
 	}
-
-	userQuery();
 });
 
 onReady(() => {
@@ -87,15 +73,6 @@ onReady(() => {
 });
 
 /************************事件相关*****************************/
-// 用户查询
-async function userQuery() {
-	let { data } = await userGet();
-	user.id = data.id;
-	user.name = data.name;
-	user.loginName = data.loginName;
-	user.orgName = data.orgName;
-}
-
 // 退出登录
 async function out() {
 	await loginOut();
@@ -114,27 +91,27 @@ async function out() {
 		.avatar {
 			display: flex;
 			padding: 30rpx;
-			.avatar__outer {
+			.avatar__wrap {
 				margin: 0rpx 20rpx;
 				height: 130rpx;
 				width: 130rpx;
 				z-index: 0;
-				.avatar__inner {
-					display: flex;
-					flex-direction: column;
-					justify-content: profile;
-					z-index: 0;
-					.avatar__name {
-						font-weight: bold;
-						font-size: 36rpx;
-						line-height: 60rpx;
-						color: #ffffff;
-					}
-					.avatar__orgname {
-						font-size: 26rpx;
-						line-height: 60rpx;
-						color: #ffffff;
-					}
+			}
+			.avatar__inner {
+				display: flex;
+				flex-direction: column;
+				justify-content: profile;
+				z-index: 0;
+				.avatar__name {
+					font-weight: bold;
+					font-size: 36rpx;
+					line-height: 60rpx;
+					color: #ffffff;
+				}
+				.avatar__orgname {
+					font-size: 26rpx;
+					line-height: 60rpx;
+					color: #ffffff;
 				}
 			}
 		}

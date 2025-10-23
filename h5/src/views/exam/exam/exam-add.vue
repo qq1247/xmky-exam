@@ -154,7 +154,7 @@ async function nextStep() {
         try {
             if (await component.value.next()) {
                 curStep.value++
-                if (form.loginType === 2) {// 如果是免登录，不需要选择考试用户
+                if (form.loginType === 2) {// 如果是临时登录，不需要选择考试用户
                     curStep.value++
                 }
             }
@@ -191,7 +191,7 @@ async function preStep() {
         return
     }
 
-    if (curStep.value === 3 && form.loginType === 2) {// 如果是免登录，不需要选择考试用户
+    if (curStep.value === 3 && form.loginType === 2) {// 如果是临时登录，不需要选择考试用户
         curStep.value--
         return
     }

@@ -21,7 +21,7 @@
                 </uni-forms-item>
                 <uni-forms-item>
                     <view class="login-main__btn-group">
-                        <text @click="loginType = 2" class="login-main__switc-btn">临时考试</text>
+                        <text @click="loginType = 2" class="login-main__switc-btn">临时登录</text>
                         <button class="login-main__login" type="primary" @click="login">登录</button>
                     </view>
                 </uni-forms-item>

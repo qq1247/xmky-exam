@@ -73,8 +73,10 @@
 								<text class="question-qa-answer__label">阅题</text>
 								<uni-forms :label-width="70" class="question-qa-answer__content">
 									<uni-forms-item label="本题：" name="num" required>
-										<uni-number-box v-model="examQuestion.userScore" :min="0" :max="examQuestion.score" :step="0.5" @change="() => score(examQuestion)" />
-										分
+										<view style="display: flex;align-items: center;"><!-- 微信小程序的结构，会把text放到外面，特殊处理一下 -->
+											<uni-number-box v-model="examQuestion.userScore" :min="0" :max="examQuestion.score" :step="0.5" @change="() => score(examQuestion)" />
+											<text>分</text>
+										</view>
 									</uni-forms-item>
 									<uni-forms-item label="批语" name="num" required>
 										<uni-easyinput type="textarea" v-model="examQuestion.remark" placeholder="请输入批语" :maxlength="48" @blur="() => score(examQuestion)" />
@@ -117,7 +119,7 @@
 				:class="['my-paper__btn', { 'my-paper__btn--inactive': curQuestionIndex >= objectiveQestions.length - 1 }]"
 				@click="
 					() => {
-						if (curQuestionIndex >= unMarkQuestions.length - 1) return;
+						if (curQuestionIndex >= objectiveQestions.length - 1) return;
 						curQuestionIndex++;
 					}
 				"

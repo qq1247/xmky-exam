@@ -22,7 +22,7 @@ export const useExamStore = defineStore('exam', () => {
     const passScore = ref(0) // 及格分数
     const sxes = ref<number[]>([]) // 防作弊
     const showType = ref(1) // 展示方式
-    const loginType = ref(1) // 登录方式（1：正常登录；2：免登录；）
+    const loginType = ref(1) // 登录方式（1：账号登录；2：临时登录；）
     const anonState = ref(2) // 匿名阅卷（1：是；2：否）
     const scoreState = ref(2) // 成绩查询（1：考试结束后；2：不公布；3：交卷后）
     const rankState = ref(2) // 排名公布（1：是；2：否）

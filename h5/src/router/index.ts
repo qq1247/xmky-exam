@@ -103,7 +103,7 @@ const router = createRouter({
                         {
                             path: 'dict-list',
                             component: () => import('@/views/sys/dict/dict-list.vue'),
-                            meta: { title: '字典' },
+                            meta: { title: '数据字典' },
                         },
                         {
                             path: 'parm-list',

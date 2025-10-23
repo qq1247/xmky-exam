@@ -4,7 +4,7 @@
 			<view class="profile__head">
 				<image class="profile__bg" src="@/static/img/home-bg.png"></image>
 				<view class="avatar">
-					<image class="avatar__outer" src="@/static/img/user-avatar.png"></image>
+					<image class="avatar__wrap" src="@/static/img/user-avatar.png"></image>
 					<view class="avatar__inner">
 						<view class="avatar__name">{{ user.name }}</view>
 						<view class="avatar__orgname">{{ user.orgName }}</view>
@@ -114,27 +114,27 @@ async function out() {
 		.avatar {
 			display: flex;
 			padding: 30rpx;
-			.avatar__outer {
+			.avatar__wrap {
 				margin: 0rpx 20rpx;
 				height: 130rpx;
 				width: 130rpx;
 				z-index: 0;
-				.avatar__inner {
-					display: flex;
-					flex-direction: column;
-					justify-content: profile;
-					z-index: 0;
-					.avatar__name {
-						font-weight: bold;
-						font-size: 36rpx;
-						line-height: 60rpx;
-						color: #ffffff;
-					}
-					.avatar__orgname {
-						font-size: 26rpx;
-						line-height: 60rpx;
-						color: #ffffff;
-					}
+			}
+			.avatar__inner {
+				display: flex;
+				flex-direction: column;
+				justify-content: profile;
+				z-index: 0;
+				.avatar__name {
+					font-weight: bold;
+					font-size: 36rpx;
+					line-height: 60rpx;
+					color: #ffffff;
+				}
+				.avatar__orgname {
+					font-size: 26rpx;
+					line-height: 60rpx;
+					color: #ffffff;
 				}
 			}
 		}
