@@ -90,7 +90,7 @@ public class DbBackJob implements Job {
 		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(dbBakDir,
 				FileFilterUtils.suffixFileFilter("sql"), TrueFileFilter.INSTANCE);
 		Date beforTime = DateUtil.getNextDay(new Date(), -7);
-		for (int i = 0; i < fileList.size() - 1; i++) {
+		for (int i = 0; i < fileList.size(); i++) {
 			java.io.File file = fileList.get(fileList.size() - i - 1);
 			if ((file.isDirectory() && file.listFiles().length == 0)
 					|| (file.isFile() && FileUtils.isFileOlder(file, beforTime))) { // 如果是空目录或过期附件
