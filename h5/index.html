@@ -35,12 +35,14 @@
         background-color: #F2F3F5;
         font-family: '黑体', 'Heiti SC', 'Droidsansfallback';
 
-        #app {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
+    }
+
+    #app {
+        /* bug：#app放到body里面，在win7旧版火狐上属性未添加 */
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
     }
 
     .el-input {
