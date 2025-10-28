@@ -784,6 +784,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						questionBank.setQaSubNum(0);
 						questionBank.setQaObjNum(0);
 						questionBank.setQuestionNum(0);
+						questionBank.setState(1);
 						questionBank.setCreateUserId(getCurUser().getId());
 						questionBank.setUpdateTime(new Date());
 						questionBank.setUpdateUserId(getCurUser().getId());
