@@ -554,8 +554,8 @@ public class ApiReportController extends BaseController {
 						data.put("answerTime", DateUtil.diffMinute(
 								Date.from(
 										((LocalDateTime) data.get("myExamAnswerStartTime")).toInstant(ZoneOffset.UTC)),
-								Date.from(((LocalDateTime) data.get("myExamAnswerStartTime"))
-										.toInstant(ZoneOffset.UTC))));
+								Date.from(((LocalDateTime) data.get("myExamAnswerEndTime"))
+										.toInstant(ZoneOffset.UTC))) + 1 + "");// 变成字符串，要不数字显示会加英文逗号
 					} else {
 						data.put("answerTime", "-");
 					}
