@@ -3,8 +3,6 @@ package com.wcpdoc.base.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +12,15 @@ import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.EncryptUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 用户服务层实现
@@ -28,13 +28,10 @@ import com.wcpdoc.core.util.ValidateUtil;
  * v1.0 zhanghc 2016-6-15下午17:24:19
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends BaseServiceImp<User> implements UserService {
-	@Resource
-	private UserDao userDao;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private OnlineUserService onlineUserService;
+	private final UserDao userDao;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<User> getDao() {
@@ -52,16 +49,16 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		user.setUpdateTime(curTime);
 		user.setUpdateUserId(getCurUser().getId());
 		user.setState(1);
-		if (getCurUser().getType() == 0 && user.getType() == 1) {// 如果是管理员添加考试用户
+		if (CurLoginUserUtil.isAdmin() && user.hasExamUser()) {// 如果是管理员添加考试用户
 			user.setOrgId(ValidateUtil.isValid(user.getOrgId()) ? user.getOrgId() : 1);// 页面没选机构，默认根机构
 			user.setParentId(getCurUser().getId());// 考试用户归管理员管
-		} else if (getCurUser().getType() == 0 && user.getType() == 2) {// 如果是管理员添加子管理员
+		} else if (CurLoginUserUtil.isAdmin() && user.hasSubAdmin()) {// 如果是管理员添加子管理员
 			user.setOrgId(0);// 不属于任何机构
 			user.setParentId(getCurUser().getId());// 子管理员归管理员管
-		} else if (getCurUser().getType() == 0 && user.getType() == 3) {// 如果是管理员添加阅卷用户
+		} else if (CurLoginUserUtil.isAdmin() && user.hasMarkUser()) {// 如果是管理员添加阅卷用户
 			user.setOrgId(0);// 不属于任何机构
 			user.setParentId(getCurUser().getId());// 阅卷用户归管理员管
-		} else if (getCurUser().getType() == 2) {// 如果是子管理员添加阅卷用户
+		} else if (CurLoginUserUtil.isSubAdmin()) {// 如果是子管理员添加阅卷用户
 			user.setOrgId(0);// 不属于任何机构
 			user.setParentId(getCurUser().getId());// 阅卷用户归子管理员管
 		}
@@ -76,12 +73,12 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 		// 用户修改
 		User entity = baseCacheService.getUser(user.getId());
-		if (getCurUser().getType() == 0 && user.getType() == 1) {// 如果是管理员修改考试用户，更新机构信息
+		if (CurLoginUserUtil.isAdmin() && user.hasExamUser()) {// 如果是管理员修改考试用户，更新机构信息
 			entity.setOrgId(ValidateUtil.isValid(user.getOrgId()) ? user.getOrgId() : 1);// 页面没选机构，默认根机构
-		} else if (getCurUser().getType() == 0 && user.getType() == 2) {// 如果是管理员修改子管理员
+		} else if (CurLoginUserUtil.isAdmin() && user.hasSubAdmin()) {// 如果是管理员修改子管理员
 			entity.setUserIds(user.getUserIds());// 更新可管理的用户
 			entity.setOrgIds(user.getOrgIds());// 更新可管理的机构
-		} else if (getCurUser().getType() == 2) {// 如果是子管理员，
+		} else if (CurLoginUserUtil.isSubAdmin()) {// 如果是子管理员，
 			// 没有特殊需要处理的
 		}
 		// entity.setType(null); // 不允许修改类型
@@ -106,7 +103,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		updateById(user);
 
 		// 如果是子管理，删除他的阅卷用户
-		if (user.getType() == 2) {
+		if ("SUB_ADMIN".equals(user.getRole())) {
 			List<User> markUserList = userDao.getMarkUserlist(user.getId());
 			for (User markUser : markUserList) {
 				markUser.setState(0);
@@ -147,9 +144,6 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		User user = baseCacheService.getUser(id);
 		user.setState(state);
 		updateById(user);
-
-		// 用户下线
-		onlineUserService.out(id);
 	}
 
 	@Override
@@ -184,20 +178,21 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (!ValidateUtil.isValid(user.getLoginName())) {
 			throw new MyException("参数错误：loginName");
 		}
-		if (!(user.getType() >= 1 && user.getType() <= 3)) {// 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
-			throw new MyException("参数错误：type");
+		if (!"EXAM_USER".equals(user.getRole()) && !"SUB_ADMIN".equals(user.getRole())
+				&& !"MARK_USER".equals(user.getRole())) {
+			throw new MyException("参数错误：role");
 		}
-		// if (getCurUser().getType() == 0 && (user.getType() == 3)) {//
+		// if (CurLoginUserUtil.isAdmin() && ("MARK_USER".equals(user.getRole()))) {//
 		// 当前用户是管理员，不能直接添加阅卷用户
 		// throw new MyException("管理员不能直接添加阅卷用户");// 相对简单不启动子管理的情况下，管理员也能添加
 		// }
-		if (getCurUser().getType() == 1 || getCurUser().getType() == 3) {// 当前用户是考试用户或阅卷用户，不能添加用户
+		if (CurLoginUserUtil.isExamUser() || CurLoginUserUtil.isMarkUser()) {// 当前用户是考试用户或阅卷用户，不能添加用户
 			throw new MyException("无权限");
 		}
-		if (getCurUser().getType() == 2 && user.getType() != 3) {// 当前用户是子管理员，只能添加阅卷用户
+		if (CurLoginUserUtil.isSubAdmin() && !"MARK_USER".equals(user.getRole())) {// 当前用户是子管理员，只能添加阅卷用户
 			throw new MyException("子管理员只能添加阅卷用户");
 		}
-		if (getCurUser().getType() != 0) { // 不是管理员，设置管理用户或机构无效
+		if (!CurLoginUserUtil.isAdmin()) { // 不是管理员，设置管理用户或机构无效
 			if (ValidateUtil.isValid(user.getOrgIds())) {
 				throw new MyException("非管理员，设置管理用户无效");
 			}
@@ -214,26 +209,26 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
-		if (!(getCurUser().getType() == 0 || getCurUser().getType() == 2)) {// 管理员和子管理才能删除用户
+		if (!(CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin())) {// 管理员和子管理才能删除用户
 			throw new MyException("参数错误：type");
 		}
 		User user = baseCacheService.getUser(id);
-		if (getCurUser().getType() == 0) {
-			if (user.getType() == 0) {
+		if (CurLoginUserUtil.isAdmin()) {
+			if ("ADMIN".equals(user.getRole())) {
 				throw new MyException("管理员不能删除管理员");
 			}
-//			if (user.getType() == 3) {// bug修复：自己创建的自己不能删除
+//			if ("MARK_USER".equals(user.getRole())) {// bug修复：自己创建的自己不能删除
 //				throw new MyException("管理员不能删除阅卷用户");
 //			}
 		}
-		if (getCurUser().getType() == 2) {
-			if (user.getType() == 0) {
+		if (CurLoginUserUtil.isSubAdmin()) {
+			if ("ADMIN".equals(user.getRole())) {
 				throw new MyException("子管理员不能删除管理员");
 			}
-			if (user.getType() == 1) {
+			if ("EXAM_USER".equals(user.getRole())) {
 				throw new MyException("子管理员不能删除考试用户");
 			}
-			if (user.getType() == 2) {
+			if ("SUB_ADMIN".equals(user.getRole())) {
 				throw new MyException("子管理员不能删除子管理员");
 			}
 		}
@@ -246,26 +241,26 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (!ValidateUtil.isValid(state)) {
 			throw new MyException("参数错误：state");
 		}
-		if (!(getCurUser().getType() == 0 || getCurUser().getType() == 2)) {// 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
+		if (!(CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin())) {// 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
 			throw new MyException("参数错误：type");
 		}
 		User user = baseCacheService.getUser(id);
-		if (getCurUser().getType() == 0) {
-			if (user.getType() == 0) {
+		if (CurLoginUserUtil.isAdmin()) {
+			if ("ADMIN".equals(user.getRole())) {
 				throw new MyException("管理员不能冻结管理员");
 			}
-			// if (user.getType() == 3) {
+			// if ("MARK_USER".equals(user.getRole())) {
 			// throw new MyException("管理员不能冻结阅卷用户");
 			// }
 		}
-		if (getCurUser().getType() == 2) {
-			if (user.getType() == 0) {
+		if (CurLoginUserUtil.isSubAdmin()) {
+			if ("ADMIN".equals(user.getRole())) {
 				throw new MyException("子管理员不能冻结管理员");
 			}
-			if (user.getType() == 1) {
+			if ("EXAM_USER".equals(user.getRole())) {
 				throw new MyException("子管理员不能冻结考试用户");
 			}
-			if (user.getType() == 2) {
+			if ("SUB_ADMIN".equals(user.getRole())) {
 				throw new MyException("子管理员不能冻结子管理员");
 			}
 		}
@@ -289,26 +284,26 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
-		if (!(getCurUser().getType() == 0 || getCurUser().getType() == 2)) {// 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
+		if (!(CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin())) {// 类型（0：管理员；1：考试用户；2：子管理员；3：阅卷用户）
 			throw new MyException("参数错误：type");
 		}
 		User user = baseCacheService.getUser(id);
-		if (getCurUser().getType() == 0) {
-			if (user.getType() == 0) {
+		if (CurLoginUserUtil.isAdmin()) {
+			if ("ADMIN".equals(user.getRole())) {
 				throw new MyException("管理员不能初始化管理员密码");
 			}
-			// if (user.getType() == 3) {
+			// if ("MARK_USER".equals(user.getRole())) {
 			// throw new MyException("管理员不能初始化阅卷用户密码");
 			// }
 		}
-		if (getCurUser().getType() == 2) {
-			if (user.getType() == 0) {
+		if (CurLoginUserUtil.isSubAdmin()) {
+			if ("ADMIN".equals(user.getRole())) {
 				throw new MyException("子管理员不能初始化管理员密码");
 			}
-			if (user.getType() == 1) {
+			if ("EXAM_USER".equals(user.getRole())) {
 				throw new MyException("子管理员不能初始化考试用户密码");
 			}
-			if (user.getType() == 2) {
+			if ("SUB_ADMIN".equals(user.getRole())) {
 				throw new MyException("子管理员不能初始化子管理员密码");
 			}
 		}

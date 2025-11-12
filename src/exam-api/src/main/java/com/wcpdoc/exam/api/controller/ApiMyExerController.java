@@ -9,20 +9,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.MyExer;
@@ -31,6 +31,7 @@ import com.wcpdoc.exam.core.entity.MyFavQuestion;
 import com.wcpdoc.exam.core.entity.MyWrongQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.ex.QuestionPart;
 import com.wcpdoc.exam.core.service.ExamCacheService;
@@ -43,6 +44,7 @@ import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -51,28 +53,19 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2025年6月8日下午9:22:47
  */
 @RestController
-@RequestMapping("/api/myExer")
+@RequestMapping("/api/my-exer")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiMyExerController extends BaseController {
-
-	@Resource
-	private MyExerService myExerService;
-	@Resource
-	private ExerService exerService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private MyExerQuestionService myExerQuestionService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private MyWrongQuestionService myWrongQuestionService;
-	@Resource
-	private MyFavQuestionService myFavQuestionService;
+	private final MyExerService myExerService;
+	private final ExerService exerService;
+	private final BaseCacheService baseCacheService;
+	private final MyExerQuestionService myExerQuestionService;
+	private final ExamCacheService examCacheService;
+	private final QuestionService questionService;
+	private final MyWrongQuestionService myWrongQuestionService;
+	private final MyFavQuestionService myFavQuestionService;
+	private final QuestionBankService questionBankService;
 
 	/**
 	 * 我的练习列表
@@ -90,6 +83,61 @@ public class ApiMyExerController extends BaseController {
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的练习列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 练习列表
+	 * 
+	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * 
+	 * @param pageIn
+	 * @return PageResult
+	 */
+	@RequestMapping("/exer-listpage")
+	public PageResult exerListpage(PageIn pageIn) {
+		try {
+			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
+
+			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员登录，各看各的创建的
+				pageIn.addParm("subAdminUserId", getCurUser().getId());
+			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户看（管理或子管理）分配给自己的
+				User user = baseCacheService.getUser(getCurUser().getId());
+				pageIn.addParm("examUserId", user.getId());
+				pageIn.addParm("examOrgId", user.getOrgId());
+			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户没有权限
+				throw new MyException("无权限");
+			}
+
+			PageOut pageOut = exerService.getListpage(pageIn);
+			for (Map<String, Object> map : pageOut.getList()) {
+				List<Integer> questionBankIds = StringUtil.toIntList((String) map.remove("questionBankIds"));
+				List<Integer> userIds = StringUtil.toIntList((String) map.remove("userIds"));
+				List<Integer> orgIds = StringUtil.toIntList((String) map.remove("orgIds"));
+
+				List<QuestionBank> questionBankList = questionBankIds.stream()
+						.map(questionBankId -> questionBankService.getById(questionBankId))
+						.collect(Collectors.toList());
+				map.put("objectiveNum", questionBankList.stream().mapToInt(QuestionBank::getObjectiveNum).sum());
+				map.put("subjectiveNum", questionBankList.stream().mapToInt(QuestionBank::getSubjectiveNum).sum());
+				map.put("singleNum", questionBankList.stream().mapToInt(QuestionBank::getSingleNum).sum());
+				map.put("multipleNum", questionBankList.stream().mapToInt(QuestionBank::getMultipleNum).sum());
+				map.put("fillBlankObjNum", questionBankList.stream().mapToInt(QuestionBank::getFillBlankObjNum).sum());
+				map.put("fillBlankSubNum", questionBankList.stream().mapToInt(QuestionBank::getFillBlankSubNum).sum());
+				map.put("judgeNum", questionBankList.stream().mapToInt(QuestionBank::getJudgeNum).sum());
+				map.put("qaObjNum", questionBankList.stream().mapToInt(QuestionBank::getQaObjNum).sum());
+				map.put("qaSubNum", questionBankList.stream().mapToInt(QuestionBank::getQaSubNum).sum());
+
+				if (CurLoginUserUtil.isAdmin() || CurLoginUserUtil.isSubAdmin()) {// 管理员和子管理员显示
+					map.put("questionBankIds", questionBankIds);
+					map.put("userIds", userIds);
+					map.put("orgIds", orgIds);
+				}
+			}
+			return PageResultEx.ok().data(pageOut);
+		} catch (Exception e) {
+			log.error("练习列表错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -243,7 +291,7 @@ public class ApiMyExerController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/questionList")
+	@RequestMapping("/question-list")
 	public PageResult questionList(Integer id) {
 		try {
 			// 数据校验
@@ -497,8 +545,8 @@ public class ApiMyExerController extends BaseController {
 	 * 
 	 * @return PageResult
 	 */
-	@RequestMapping("/favQuestionList")
-	public PageResult questionFavList() {
+	@RequestMapping("/fav-question-list")
+	public PageResult favQuestionList() {
 		try {
 			List<MyFavQuestion> myFavQuestionList = myFavQuestionService.getList(getCurUser().getId());
 			return PageResultEx.ok()
@@ -519,7 +567,7 @@ public class ApiMyExerController extends BaseController {
 	 * 
 	 * @return PageResult
 	 */
-	@RequestMapping("/wrongQuestionList")
+	@RequestMapping("/wrong-question-list")
 	public PageResult wrongQuestionList() {
 		try {
 			List<MyWrongQuestion> myFavQuestionList = myWrongQuestionService.getList(getCurUser().getId());
@@ -707,7 +755,7 @@ public class ApiMyExerController extends BaseController {
 	 * @param endDate   yyyy-MM-dd
 	 * @return PageResult
 	 */
-	@RequestMapping("/trackList")
+	@RequestMapping("/track-list")
 	public PageResult trackList(Integer exerId, String startDate, String endDate) {
 		try {
 			List<Map<String, Object>> myExerTrackList = myExerService.getTrackList(exerId, startDate, endDate).stream()
@@ -739,7 +787,7 @@ public class ApiMyExerController extends BaseController {
 	 * @param endYm   yyyy-MM
 	 * @return PageResult
 	 */
-	@RequestMapping("/trackMonthlyList")
+	@RequestMapping("/track-monthly-list")
 	public PageResult trackMonthlyList(Integer exerId, String startYm, String endYm) {
 		try {
 			List<Map<String, Object>> myExerTrackMonthlyList = myExerService.getTrackMonthlyList(exerId, startYm, endYm)

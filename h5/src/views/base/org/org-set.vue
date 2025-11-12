@@ -89,7 +89,7 @@ async function add() {
     }
 
     // 添加
-    const { data: { code } } = await orgAdd({ ...form })
+    const { data: { code } } = orgAdd({ ...form })
     if (code !== 200) {
         return
     }
@@ -107,7 +107,7 @@ async function edit() {
     }
 
     // 修改
-    const { data: { code } } = await orgEdit({ ...form })
+    const { data: { code } } = orgEdit({ ...form })
     if (code !== 200) {
         return
     }
@@ -122,7 +122,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await orgDel({
+    const { data: { code } } = orgDel({
         id: form.id,
     })
     if (code !== 200) {

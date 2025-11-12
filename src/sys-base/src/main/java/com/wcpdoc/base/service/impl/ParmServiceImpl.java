@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,14 +28,12 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 chenyun 2021-03-04 15:02:18
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService {
-	@Resource
-	private ParmDao parmDao;
-	@Resource
-	private ParmExService parmExService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final ParmDao parmDao;
+	private final ParmExService parmExService;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<Parm> getDao() {

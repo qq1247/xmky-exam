@@ -212,7 +212,7 @@ async function pwdSave() {
     }
 
     // 修改
-    const { data: { code } } = await parmPwd({ ...pwdForm })
+    const { data: { code } } = parmPwd({ ...pwdForm })
     if (code !== 200) {
         return
     }
@@ -226,7 +226,7 @@ async function sysSave() {
         return
     }
 
-    const { data: { code } } = await parmSys({ ...sysForm })
+    const { data: { code } } = parmSys({ ...sysForm })
     if (code !== 200) {
         return
     }
@@ -244,7 +244,7 @@ async function mSave() {
         return
     }
 
-    const { data: { code } } = await parmM({ ...mForm })
+    const { data: { code } } = parmM({ ...mForm })
     if (code !== 200) {
         return
     }
@@ -259,7 +259,7 @@ async function supportSave() {
         return
     }
 
-    const { data: { code } } = await parmSupport({ ...supportForm })
+    const { data: { code } } = parmSupport({ ...supportForm })
     if (code !== 200) {
         return
     }
@@ -278,7 +278,7 @@ async function icpSave() {
         return
     }
 
-    const { data: { code } } = await parmIcp({ ...icpForm })
+    const { data: { code } } = parmIcp({ ...icpForm })
     if (code !== 200) {
         return
     }
@@ -290,7 +290,7 @@ async function icpSave() {
 
 // 刷新缓存
 async function refresh() {
-    const { data: { code } } = await cacheRefresh({
+    const { data: { code } } = cacheRefresh({
         cacheNames: ['USER_CACHE', 'ORG_CACHE', 'PARM_CACHE', 'PROGRESS_BAR_CACHE', 'QUESTION_CACHE', 'EXAM_CACHE', 'MYEXAM_CACHE', 'MYQUESTION_CACHE']
     })
     if (code !== 200) {

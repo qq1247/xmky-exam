@@ -2,8 +2,6 @@ package com.wcpdoc.quartz.runner;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.quartz.Job;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,6 +11,7 @@ import com.wcpdoc.quartz.entity.Cron;
 import com.wcpdoc.quartz.service.CronService;
 import com.wcpdoc.quartz.util.QuartzUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,11 +20,10 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2019年12月16日下午11:32:55
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class SysQuartzRunner implements ApplicationRunner {
-
-	@Resource
-	private CronService cronService;
+	private final CronService cronService;
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {

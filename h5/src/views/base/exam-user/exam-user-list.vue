@@ -2,17 +2,17 @@
     <div class="exam-user">
         <div class="exam-user__head">
             <div class="opt">
-                <el-button v-if="userStore.type === 0" type="success" class="opt__btn"
+                <el-button v-if="userStore.isAdmin()" type="success" class="opt__btn"
                     @click="$router.push('/exam-user-nav/add')">
                     <span class="iconfont icon-tubiaoziti2-02 opt__btn-icon"></span>
                     <span class="opt__btn-txt">添加</span>
                 </el-button>
-                <el-button v-if="userStore.type === 0" type="success" class="opt__btn opt__btn--secondary"
+                <el-button v-if="userStore.isAdmin()" type="success" class="opt__btn opt__btn--secondary"
                     @click="download">
                     <span class="iconfont icon-xiazaimoban opt__btn-icon"></span>
                     <span class="opt__btn-txt">模板下载</span>
                 </el-button>
-                <el-upload v-if="userStore.type === 0" :action="`${http.defaults.baseURL}file/upload`"
+                <el-upload v-if="userStore.isAdmin()" :action="`${http.defaults.baseURL}file/upload`"
                     :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
                     :before-upload="uploadBefore" :on-success="uploadSuccess">
                     <el-button type="success" class="opt__btn opt__btn--secondary">
@@ -50,7 +50,7 @@
                         <span v-else>{{ dictStore.getValue('STATE_NF', scope.row.state) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column v-if="userStore.type === 0" prop="" label="操作" align="center" width="300">
+                <el-table-column v-if="userStore.isAdmin()" prop="" label="操作" align="center" width="300">
                     <template #default="scope">
                         <el-tooltip ffect="dark" content="设置">
                             <span class="iconfont icon-liebiao-01 table__btn"
@@ -81,7 +81,7 @@ const dictStore = useDictStore()// 字典缓存
 const queryForm = reactive({// 查询表单
     name: '',
     state: '',
-    type: 1,// 查询考试用户
+    role: 'EXAM_USER',// 查询考试用户
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,

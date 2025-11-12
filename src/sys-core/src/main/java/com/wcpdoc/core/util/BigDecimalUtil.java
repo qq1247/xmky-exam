@@ -1,6 +1,7 @@
 package com.wcpdoc.core.util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 计算工具类
@@ -90,7 +91,7 @@ public class BigDecimalUtil {
 			throw new RuntimeException("参数错误：scale");
 		}
 		validateValue(value);
-		result = result.divide(new BigDecimal(value.toString()), scale, BigDecimal.ROUND_HALF_UP);
+		result = result.divide(new BigDecimal(value.toString()), scale, RoundingMode.HALF_UP);
 		return this;
 	}
 

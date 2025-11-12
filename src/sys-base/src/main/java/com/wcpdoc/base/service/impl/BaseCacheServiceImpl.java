@@ -2,8 +2,6 @@ package com.wcpdoc.base.service.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +16,7 @@ import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,16 +25,13 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2024年4月14日下午9:36:00
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class BaseCacheServiceImpl implements BaseCacheService {
-	@Resource
-	private UserDao userDao;
-	@Resource
-	private OrgDao orgDao;
-	@Resource
-	private ParmDao parmDao;
-	@Resource
-	private DictDao dictDao;
+	private final UserDao userDao;
+	private final OrgDao orgDao;
+	private final ParmDao parmDao;
+	private final DictDao dictDao;
 
 	@Override
 	@Cacheable(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id", sync = true)

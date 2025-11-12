@@ -2,8 +2,6 @@ package com.wcpdoc.base.service.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +12,17 @@ import com.wcpdoc.base.service.DictService;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 数据字典服务层实现
  * 
  * v1.0 zhanghc 2016-11-3下午9:03:40
  */
 @Service
+@RequiredArgsConstructor
 public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService {
-	@Resource
-	private DictDao dictDao;
+	private final DictDao dictDao;
 
 	public RBaseDao<Dict> getDao() {
 		return dictDao;

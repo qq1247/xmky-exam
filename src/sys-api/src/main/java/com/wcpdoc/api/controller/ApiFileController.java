@@ -4,8 +4,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +17,8 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,11 +28,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/file")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiFileController extends BaseController {
-
-	@Resource
-	private FileService fileService;
+	private final HttpServletResponse response;
+	private final FileService fileService;
 
 	/**
 	 * 附件上传（临时）

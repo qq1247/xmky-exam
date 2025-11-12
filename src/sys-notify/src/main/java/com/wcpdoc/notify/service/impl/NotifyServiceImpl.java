@@ -1,8 +1,5 @@
 package com.wcpdoc.notify.service.impl;
 
-import javax.annotation.Resource;
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +8,8 @@ import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
 
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,10 +18,10 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2019年10月15日下午15:51:27
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class NotifyServiceImpl implements NotifyService {
-	@Resource
-	private EmailService emailService;
+	private final EmailService emailService;
 
 	@Override
 	public void emailPush(String from, String to, String title, String content) throws NotifyException {

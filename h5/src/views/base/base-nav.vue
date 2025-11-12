@@ -2,12 +2,12 @@
     <div class="base-nav">
         <div class="base-nav__head">
             <el-menu :default-active="$route.path" mode="horizontal" :router="true" class="base-nav__menu">
-                <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                     index="/base-nav/org-list">机构管理</el-menu-item>
-                <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                     index="/base-nav/exam-user-list">考试用户</el-menu-item>
-                <el-menu-item v-if="userStore.type === 0" index="/base-nav/sub-admin-list">子管理员</el-menu-item>
-                <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                <el-menu-item v-if="userStore.isAdmin()" index="/base-nav/sub-admin-list">子管理员</el-menu-item>
+                <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                     index="/base-nav/mark-user-list">阅卷用户</el-menu-item>
             </el-menu>
         </div>

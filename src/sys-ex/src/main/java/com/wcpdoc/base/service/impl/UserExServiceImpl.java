@@ -5,14 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.read.listener.PageReadListener;
-import com.wcpdoc.auth.realm.JWTRealm;
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.entity.UserRowData;
@@ -26,21 +23,19 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 用户扩展服务层实现
  * 
  * v1.0 zhanghc 2021年10月15日下午1:44:08
  */
 @Service
+@RequiredArgsConstructor
 public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExService {
-	@Resource
-	private JWTRealm jwtRealm;
-	@Resource
-	private FileService fileService;
-	@Resource
-	private OrgService orgService;
-	@Resource
-	@Lazy
+	private final FileService fileService;
+	private final OrgService orgService;
+
 	private UserService userService;
 
 	@Override
@@ -134,7 +129,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 				user.setUpdateTime(curTime);
 				user.setUpdateUserId(getCurUser().getId());
 				user.setState(1);
-				user.setType(1);
+				user.setRole(BaseConstant.EXAM_USER);
 				user.setParentId(getCurUser().getId());// 该接口只有admin可访问
 				userService.save(user);
 			}

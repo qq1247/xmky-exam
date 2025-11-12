@@ -2,8 +2,6 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.RBaseDao;
@@ -12,15 +10,17 @@ import com.wcpdoc.exam.core.dao.MyExerTrackDao;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
 import com.wcpdoc.exam.core.service.MyExerTrackService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 我的练习跟踪服务层实现
  * 
  * v1.0 zhanghc 2025年9月8日下午7:25:39
  */
 @Service
+@RequiredArgsConstructor
 public class MyExerTrackServiceImpl extends BaseServiceImp<MyExerTrack> implements MyExerTrackService {
-	@Resource
-	private MyExerTrackDao myExerTrackDao;
+	private final MyExerTrackDao myExerTrackDao;
 
 	@Override
 	public RBaseDao<MyExerTrack> getDao() {

@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -24,16 +22,18 @@ import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionBank;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionExService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.file.service.FileService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 试题服务层实现
@@ -41,21 +41,15 @@ import com.wcpdoc.file.service.FileService;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 @Service
+@RequiredArgsConstructor
 public class QuestionServiceImpl extends BaseServiceImp<Question> implements QuestionService {
-	@Resource
-	private QuestionDao questionDao;
-	@Resource
-	private QuestionExService questionExService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private FileService fileService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private QuestionAnswerService questionAnswerService;
-	@Resource
-	private QuestionOptionService questionOptionService;
+	private final QuestionDao questionDao;
+	private final QuestionExService questionExService;
+	private final QuestionBankService questionBankService;
+	private final FileService fileService;
+	private final ExamCacheService examCacheService;
+	private final QuestionAnswerService questionAnswerService;
+	private final QuestionOptionService questionOptionService;
 
 	@Override
 	public RBaseDao<Question> getDao() {

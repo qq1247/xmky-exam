@@ -2,18 +2,15 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.ExerRmkDao;
 import com.wcpdoc.exam.core.entity.ExerRmk;
-import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExerRmkService;
-import com.wcpdoc.exam.core.service.ExerService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 练习评论服务层实现
@@ -21,14 +18,9 @@ import com.wcpdoc.exam.core.service.ExerService;
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
 @Service
+@RequiredArgsConstructor
 public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerRmkService {
-	@Resource
-	private ExerRmkDao exerRmkDao;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	@Lazy
-	private ExerService exerService;
+	private final ExerRmkDao exerRmkDao;
 
 	@Override
 	public RBaseDao<ExerRmk> getDao() {

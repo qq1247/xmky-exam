@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.quartz.Job;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +20,7 @@ import com.wcpdoc.quartz.entity.Cron;
 import com.wcpdoc.quartz.service.CronService;
 import com.wcpdoc.quartz.util.QuartzUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,11 +30,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/cron")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiCronController extends BaseController {
-
-	@Resource
-	private CronService cronService;
+	private final CronService cronService;
 
 	/**
 	 * 定时任务列表
@@ -166,7 +164,7 @@ public class ApiCronController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/startTask")
+	@RequestMapping("/start-task")
 	public PageResult startTask(Integer id) {
 		try {
 			cronService.startTask(id);
@@ -188,7 +186,7 @@ public class ApiCronController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/stopTask")
+	@RequestMapping("/stop-task")
 	public PageResult stopTask(Integer id) {
 		try {
 			cronService.stopTask(id);
@@ -210,7 +208,7 @@ public class ApiCronController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/runOnceTask")
+	@RequestMapping("/run-once-task")
 	public PageResult runOnceTask(Integer id) {
 		try {
 			cronService.runOnceTask(id);

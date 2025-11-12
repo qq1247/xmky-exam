@@ -4,7 +4,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.TransactionDefinition;
@@ -12,6 +11,8 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 事务配置
@@ -28,10 +29,10 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * v1.0 zhanghc 2019年4月12日下午4:06:03
  */
 @Aspect
+@RequiredArgsConstructor
 @Configuration
 public class TransactionConf {
-	@Autowired
-	private TransactionManager transactionManager;
+	private final TransactionManager transactionManager;
 
 	@Bean
 	public TransactionInterceptor txAdvice() {

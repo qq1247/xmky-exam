@@ -3,8 +3,6 @@ package com.wcpdoc.base.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -19,19 +17,19 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 机构服务层实现
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
 @Service
+@RequiredArgsConstructor
 public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
-	@Resource
-	private OrgDao orgDao;
-	@Resource
-	private OrgExService orgExService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final OrgDao orgDao;
+	private final OrgExService orgExService;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<Org> getDao() {
@@ -83,13 +81,13 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 
 		// 机构删除
 		orgExService.del(id);
-		
+
 		Org org = baseCacheService.getOrg(id);
 		org.setState(0);
 		org.setUpdateTime(new Date());
 		org.setUpdateUserId(getCurUser().getId());
 		updateById(org);
-		
+
 	}
 
 	@Override
@@ -122,7 +120,6 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		List<Org> subSourceList = orgDao.getList(source.getId());
 		doMove(source, subSourceList);
 	}
-	
 
 	@Override
 	public List<Org> getList() {

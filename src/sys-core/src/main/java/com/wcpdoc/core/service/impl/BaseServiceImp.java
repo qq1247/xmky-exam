@@ -8,6 +8,7 @@ import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
+import com.wcpdoc.core.service.LoginUserService;
 
 /**
  * 基础服务层实现
@@ -17,6 +18,7 @@ import com.wcpdoc.core.service.BaseService;
  * @param <T>
  */
 public abstract class BaseServiceImp<T> extends MPJBaseServiceImpl<MPJBaseMapper<T>, T> implements BaseService<T> {
+	protected LoginUserService loginUserService;
 
 	public abstract RBaseDao<T> getDao();
 

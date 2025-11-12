@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +27,7 @@ import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,18 +36,14 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
 @RestController
-@RequestMapping("/api/myMark")
+@RequestMapping("/api/my-mark")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiMyMarkController extends BaseController {
-
-	@Resource
-	private MyMarkService myMarkService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private ExamQuestionService examQuestionService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final MyMarkService myMarkService;
+	private final ExamCacheService examCacheService;
+	private final ExamQuestionService examQuestionService;
+	private final BaseCacheService baseCacheService;
 
 	/**
 	 * 我的阅卷列表
@@ -125,6 +120,52 @@ public class ApiMyMarkController extends BaseController {
 	}
 
 	/**
+	 * 考试获取
+	 * 
+	 * v1.0 zhanghc 2021年12月21日下午4:36:14
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/exam-get")
+	public PageResult examGet(Integer id) {
+		try {
+			Exam exam = examCacheService.getExam(id);
+			return PageResultEx.ok()//
+					.addAttr("id", exam.getId())//
+					.addAttr("name", exam.getName())//
+					.addAttr("paperName", exam.getPaperName())//
+					.addAttr("startTime", exam.getStartTime())//
+					.addAttr("endTime", exam.getEndTime())//
+					.addAttr("markStartTime", exam.getMarkStartTime())//
+					.addAttr("markEndTime", exam.getMarkEndTime())//
+					.addAttr("markState", exam.getMarkState())//
+					.addAttr("scoreState", exam.getScoreState())//
+					.addAttr("rankState", exam.getRankState())//
+					.addAttr("anonState", exam.getAnonState())//
+					.addAttr("passScore", exam.getPassScore())//
+					.addAttr("totalScore", exam.getTotalScore())//
+					.addAttr("markType", exam.getMarkType())//
+					.addAttr("loginType", exam.getLoginType())//
+					.addAttr("genType", exam.getGenType())//
+					.addAttr("sxes", exam.getSxes())//
+					.addAttr("state", exam.getState())//
+					.addAttr("userNum", exam.getUserIds().size())//
+					.addAttr("userIds", exam.getUserIds())//
+					.addAttr("orgIds", exam.getOrgIds())//
+					.addAttr("limitMinute", exam.getLimitMinute())//
+					.addAttr("retakeNum", exam.getRetakeNum())//
+			;//
+		} catch (MyException e) {
+			log.error("获取考试错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取考试错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
 	 * 我的阅卷列表
 	 * 
 	 * v1.0 zhanghc 2025年2月16日上午11:56:47
@@ -132,7 +173,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @param pageIn
 	 * @return PageResult
 	 */
-	@RequestMapping("/markList")
+	@RequestMapping("/mark-list")
 	public PageResult markList(Integer examId) {
 		try {
 			Exam exam = examCacheService.getExam(examId);
@@ -190,7 +231,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/claimInfo")
+	@RequestMapping("/claim-info")
 	public PageResult claimInfo(Integer examId) {
 		try {
 			List<MyExam> myExamList = examCacheService.getMyExamList(examId);
@@ -320,7 +361,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/questionStatis")
+	@RequestMapping("/question-statis")
 	public PageResult questionStatis(Integer examId) {
 		try {
 			List<ExamQuestion> examQuestionList = examQuestionService.getList(examId);

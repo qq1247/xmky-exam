@@ -5,11 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.User;
@@ -24,8 +21,8 @@ import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.MyExamQuestion;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.ex.PaperPart;
 import com.wcpdoc.exam.core.service.ExamCacheService;
@@ -34,6 +31,7 @@ import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.MyPaperService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,21 +40,15 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkService {
-	@Resource
-	private MyMarkDao myMarkDao;
-	@Resource
-	@Lazy
-	private MyExamService myExamService;
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private MyPaperService myPaperService;
+	private final MyMarkDao myMarkDao;
+	private final MyExamService myExamService;
+	private final MyQuestionService myQuestionService;
+	private final ExamCacheService examCacheService;
+	private final BaseCacheService baseCacheService;
+	private final MyPaperService myPaperService;
 
 	@Override
 	public RBaseDao<MyMark> getDao() {

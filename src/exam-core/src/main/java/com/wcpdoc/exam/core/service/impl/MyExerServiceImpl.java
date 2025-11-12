@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -29,12 +27,12 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.constant.ExamConstant;
 import com.wcpdoc.exam.core.dao.MyExerDao;
 import com.wcpdoc.exam.core.entity.Exer;
+import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExer;
 import com.wcpdoc.exam.core.entity.MyExerQuestion;
 import com.wcpdoc.exam.core.entity.MyExerTrack;
 import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 import com.wcpdoc.exam.core.entity.MyFavQuestion;
-import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.MyWrongQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -52,38 +50,28 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 我的练习服务层实现
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
 @Service
+@RequiredArgsConstructor
 public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerService {
-	@Resource
-	private MyExerDao myExerDao;
-	@Resource
-	private ExerService exerService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private MyExerQuestionService myExerQuestionService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private ReadWriteLockManager readWriteLockManager;
-	@Resource
-	private CacheManager cacheManager;
-	@Resource
-	private MyExerTrackService myExerTrackService;
-	@Resource
-	private MyExerTrackMonthlyService myExerTrackMonthlyService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private MyFavQuestionService myFavQuestionService;
-	@Resource
+	private final MyExerDao myExerDao;
+	private final ExerService exerService;
+	private final BaseCacheService baseCacheService;
+	private final QuestionService questionService;
+	private final MyExerQuestionService myExerQuestionService;
+	private final ExamCacheService examCacheService;
+	private final ReadWriteLockManager readWriteLockManager;
+	private final CacheManager cacheManager;
+	private final MyExerTrackService myExerTrackService;
+	private final MyExerTrackMonthlyService myExerTrackMonthlyService;
+	private final QuestionBankService questionBankService;
+	private final MyFavQuestionService myFavQuestionService;
 	private MyWrongQuestionService myWrongQuestionService;
 
 	@Override

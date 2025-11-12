@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -45,7 +44,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
-import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
@@ -83,6 +81,8 @@ import com.wcpdoc.file.service.FileService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -92,37 +92,23 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/report")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiReportController extends BaseController {
-
-	@Resource
-	private ReportService reportService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private MyPaperService myPaperService;
-	@Resource
-	private FileService fileService;
-	@Resource
-	private ExerService exerService;
-	@Resource
-	private UserService userService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private MyExerTrackMonthlyService myExerTrackMonthlyService;
-	@Resource
-	private OrgService orgService;
-	@Resource
-	private MyExerQuestionService myExerQuestionService;
-	@Resource
-	private MyExerService myExerService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private MyWrongQuestionService myWrongQuestionService;
+	private final HttpServletResponse response;
+	private final ReportService reportService;
+	private final BaseCacheService baseCacheService;
+	private final ExamCacheService examCacheService;
+	private final MyPaperService myPaperService;
+	private final FileService fileService;
+	private final ExerService exerService;
+	private final UserService userService;
+	private final QuestionBankService questionBankService;
+	private final MyExerTrackMonthlyService myExerTrackMonthlyService;
+	private final MyExerQuestionService myExerQuestionService;
+	private final MyExerService myExerService;
+	private final QuestionService questionService;
+	private final MyWrongQuestionService myWrongQuestionService;
 
 	@Value("classpath:templates/prism.js")
 	private org.springframework.core.io.Resource prismJsResource;
@@ -309,7 +295,7 @@ public class ApiReportController extends BaseController {
 	 * 
 	 * @return PageResult
 	 */
-	@RequestMapping("/exam/rankListpage")
+	@RequestMapping("/exam/rank-listpage")
 	public PageResult examRankListpage(PageIn pageIn) {
 		try {// 不校验，任何时候都能查询
 			PageOut pageOut = reportService.examRankListpage(pageIn);
@@ -339,7 +325,7 @@ public class ApiReportController extends BaseController {
 	 * @param userId
 	 * @return PageResult
 	 */
-	@RequestMapping("/paper/exportPDF")
+	@RequestMapping("/paper/export-pdf")
 	public void paperExportPDF(Integer examId, Integer userId) {
 		try {
 			// 数据校验
@@ -351,7 +337,7 @@ public class ApiReportController extends BaseController {
 				throw new MyException("阅卷中");
 			}
 			Exam exam = examCacheService.getExam(examId);
-			if (getCurUser().getType() == 2 && exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+			if (CurLoginUserUtil.isSubAdmin() && exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 				throw new MyException("无权限");
 			}
 
@@ -507,7 +493,7 @@ public class ApiReportController extends BaseController {
 	 * 
 	 * @param examId void
 	 */
-	@RequestMapping("/rank/exportPDF")
+	@RequestMapping("/rank/export-pdf")
 	public void rankExportPDF(Integer examId, String userName, String orgName) {
 		try {
 			// 数据校验
@@ -518,7 +504,7 @@ public class ApiReportController extends BaseController {
 			if (exam.getMarkState() == 2) {
 				throw new MyException("阅卷中");
 			}
-			if (getCurUser().getType() == 2 && exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+			if (CurLoginUserUtil.isSubAdmin() && exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 				throw new MyException("无权限");// 只有0、2有url权限，这里判断的是子管理员是否有数据权限
 			}
 
@@ -554,8 +540,8 @@ public class ApiReportController extends BaseController {
 						data.put("answerTime", DateUtil.diffMinute(
 								Date.from(
 										((LocalDateTime) data.get("myExamAnswerStartTime")).toInstant(ZoneOffset.UTC)),
-								Date.from(((LocalDateTime) data.get("myExamAnswerEndTime"))
-										.toInstant(ZoneOffset.UTC))) + 1 + "");// 变成字符串，要不数字显示会加英文逗号
+								Date.from(((LocalDateTime) data.get("myExamAnswerEndTime")).toInstant(ZoneOffset.UTC)))
+								+ 1 + "");// 变成字符串，要不数字显示会加英文逗号
 					} else {
 						data.put("answerTime", "-");
 					}
@@ -651,7 +637,7 @@ public class ApiReportController extends BaseController {
 	 * @param pageSize void
 	 * 
 	 */
-	@RequestMapping("/exer/trackListpage")
+	@RequestMapping("/exer/track-listpage")
 	public PageResult exerTrackList(Integer exerId, String startYm, String endYm, Integer curPage, Integer pageSize) {
 		try {
 			// 数据校验
@@ -752,7 +738,7 @@ public class ApiReportController extends BaseController {
 	 * @param pageSize
 	 * @return PageResult
 	 */
-	@RequestMapping("/exer/wrongQuestionListpage")
+	@RequestMapping("/exer/wrong-question-listpage")
 	public PageResult exerWrongQuestionListpage(Integer exerId, Integer curPage, Integer pageSize) {
 		try {
 			// 数据校验

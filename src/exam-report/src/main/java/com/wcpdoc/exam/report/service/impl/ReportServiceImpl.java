@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.jsoup.Jsoup;
@@ -22,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.query.MPJQueryWrapper;
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
@@ -50,8 +49,9 @@ import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.report.service.ReportService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 报表服务层实现
@@ -59,32 +59,19 @@ import com.wcpdoc.exam.report.service.ReportService;
  * v1.0 zhanghc 2017年8月29日下午2:03:36
  */
 @Service
+@RequiredArgsConstructor
 public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportService {
-
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private MyMarkService myMarkService;
-	@Resource
-	private DictService dictService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private ExamQuestionService examQuestionService;
-	@Resource
-	private ExamRuleService examRuleService;
-	@Resource
-	private ExerService exerService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private ExamService examService;
-	@Resource
-	private MyExamService myExamService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private UserService userService;
+	private final MyMarkService myMarkService;
+	private final DictService dictService;
+	private final BaseCacheService baseCacheService;
+	private final ExamQuestionService examQuestionService;
+	private final ExamRuleService examRuleService;
+	private final ExerService exerService;
+	private final ExamCacheService examCacheService;
+	private final ExamService examService;
+	private final MyExamService myExamService;
+	private final QuestionService questionService;
+	private final UserService userService;
 
 	@Override
 	public RBaseDao<Object> getDao() {
@@ -145,7 +132,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		// 首页展示考试用户数量，包括管理员和子管理员创建的考试用户
 		long userNum = userService.count(new LambdaQueryWrapper<User>()//
 				.in(User::getState, 1, 2)//
-				.eq(User::getType, 1));
+				.eq(User::getRole, BaseConstant.EXAM_USER));
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("examNum", examNum);

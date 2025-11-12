@@ -1,7 +1,5 @@
 package com.wcpdoc.api.controller;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +11,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,13 +21,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/parm")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiParmController extends BaseController {
-
-	@Resource
-	private ParmService parmService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final ParmService parmService;
+	private final BaseCacheService baseCacheService;
 
 	/**
 	 * 系统修改

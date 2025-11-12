@@ -1,7 +1,5 @@
 package com.wcpdoc.base.service.impl;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +7,7 @@ import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.entity.ProgressBar;
 import com.wcpdoc.base.service.ProgressBarService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2024年4月14日下午9:36:00
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ProgressBarServiceImpl implements ProgressBarService {
-	@Resource
-	private CacheManager cacheManager;
+	private final CacheManager cacheManager;
 
 	@Override
 	public void setProgressBar(String id, Double curNum, Double totalNum, Integer code, String msg, Object data) {

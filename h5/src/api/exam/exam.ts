@@ -34,7 +34,7 @@ export function examRank(parm: object) {
     return request.post('/exam/rank', parm);
 }
 export function examMarkUserList(parm: object) {
-    return request.post('/exam/markUserList', parm);
+    return request.post('/exam/mark-user-list', parm);
 }
 export function examAssist(parm: object) {
     return request.post('/exam/assist', parm);
@@ -43,10 +43,10 @@ export function examPaper(parm: object) {
     return request.post('/exam/paper', parm);
 }
 export function examUserAdd(parm: object) {
-    return request.post('/exam/userAdd', parm);
+    return request.post('/exam/user-add', parm);
 }
 export function examExamGet(parm: object) {
-    return request.post('/exam/examGet', parm);
+    return request.post('/exam/exam-get', parm);
 }
 export function examUser(parm: object) {
     return request.post('/exam/user', parm);

@@ -10,19 +10,19 @@
                     <el-menu :default-active="curActiveMenu" mode="horizontal" :router="true" :ellipsis="false"
                         class="nav-menu">
                         <el-menu-item index="/home">首页</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                        <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                             index="/question-bank-list">题库</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                        <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                             index="/exer-list">练习</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 1" index="/my-exer-list">练习</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                        <el-menu-item v-if="userStore.isExamUser()" index="/my-exer-list">练习</el-menu-item>
+                        <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                             index="/exam-list">考试</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 3" index="/my-mark-list">阅卷</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 1 || userStore.type === 4"
+                        <el-menu-item v-if="userStore.isMarkUser()" index="/my-mark-list">阅卷</el-menu-item>
+                        <el-menu-item v-if="userStore.isExamUser() || userStore.isTempUser()"
                             index="/my-exam-list">考试</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 0 || userStore.type === 2"
+                        <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                             index="/base-nav/exam-user-list">用户</el-menu-item>
-                        <el-menu-item v-if="userStore.type === 0" index="/sys-nav/bulletin-list">系统</el-menu-item>
+                        <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/bulletin-list">系统</el-menu-item>
                     </el-menu>
                     <el-dropdown @command="dropdownCmd" :teleported="false" class="nav-user__wrap">
                         <div class="nav-user">

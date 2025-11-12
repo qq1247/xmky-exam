@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.context.annotation.Lazy;
+
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.User;
@@ -43,6 +41,8 @@ import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import cn.hutool.extra.spring.SpringUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -51,20 +51,12 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2024年3月5日下午2:46:04
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPaperService {
-	@Resource
-	@Lazy
-	private MyExamService myExamService;
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	@Lazy
-	private ExamService examService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final MyQuestionService myQuestionService;
+	private final ExamCacheService examCacheService;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<Object> getDao() {
@@ -209,13 +201,13 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					.getResult().doubleValue() >= 0 ? 1 : 2);// 标记用户是否及格
 			myExam.setState(3);// 标记为已交卷
 			myExam.setMarkState(3);// 标记为已阅卷
-			myExamService.updateById(myExam);
+			SpringUtil.getBean(MyExamService.class).updateById(myExam);
 		}
 		// 如果是主观题考试，等待人工阅卷
 		else if (exam.getMarkType() == 2) {
 			myExam.setState(3);// 标记为已交卷
 			myExam.setObjectiveScore(objectiveScore);
-			myExamService.updateById(myExam);
+			SpringUtil.getBean(MyExamService.class).updateById(myExam);
 		}
 
 		return myExam;
@@ -350,7 +342,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 						.thenComparing(Comparator.comparing(MyExam::getAnswerMs)))// 分数相同，答题时间短排在前面
 				.forEach(myExam -> {// 更新排名
 					myExam.setNo(no.getAndIncrement());
-					myExamService.updateById(myExam);
+					SpringUtil.getBean(MyExamService.class).updateById(myExam);
 
 					User examUser = baseCacheService.getUser(myExam.getUserId());
 					log.info("自动结束【{}-{}】下【{}-{}】的考试，得{}分，排{}名", exam.getId(), exam.getName(), examUser.getId(),
@@ -380,7 +372,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					myExam.setObjectiveScore(BigDecimal.ZERO);// 客观题0分
 					myExam.setTotalScore(BigDecimal.ZERO);// 总分0分
 					myExam.setAnswerState(2);// 标记用户为不及格
-					myExamService.updateById(myExam);
+					SpringUtil.getBean(MyExamService.class).updateById(myExam);
 
 					User examUser = baseCacheService.getUser(myExam.getUserId());
 					log.info("自动结束【{}-{}】下【{}-{}】的考试，未考试", exam.getId(), exam.getName(), examUser.getId(),
@@ -395,7 +387,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 		// 考试结束
 		exam.setMarkState(3);// 标记考试为已阅卷
 		exam.setState(1);// bug修复：删除考试，提示已暂停；发布考试，提示考试已结束。
-		examService.updateById(exam);
+		SpringUtil.getBean(ExamService.class).updateById(exam);
 	}
 
 	private void doExamSubjectiveHandle(Exam exam, List<MyExam> myExamList) {
@@ -405,7 +397,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 
 			exam.setMarkState(2);
 			exam.setState(1); // bug修复：删除考试，提示已暂停；发布考试，提示考试已结束。
-			examService.updateById(exam);
+			SpringUtil.getBean(ExamService.class).updateById(exam);
 			return;
 		}
 
@@ -418,7 +410,8 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 						myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间
 					}
 
-					List<MyExamQuestion> questionList = examCacheService.getMyQuestionList(exam.getId(), myExam.getUserId())//
+					List<MyExamQuestion> questionList = examCacheService
+							.getMyQuestionList(exam.getId(), myExam.getUserId())//
 							.stream()//
 							.filter(myQuestion -> myQuestion.getType() == 2)// 忽略章节
 							.collect(Collectors.toList());
@@ -436,7 +429,7 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 					myExam.setAnswerState(
 							myExam.getTotalScore().doubleValue() >= exam.getPassScore().doubleValue() ? 1 : 2);// 标记及格状态
 					myExam.setMarkState(3);// 标记为阅卷结束
-					myExamService.updateById(myExam);
+					SpringUtil.getBean(MyExamService.class).updateById(myExam);
 
 					User examUser = baseCacheService.getUser(myExam.getUserId());
 					log.info("自动结束【{}-{}】下【{}-{}】的考试，未阅卷完成", exam.getId(), exam.getName(), examUser.getId(),
@@ -448,6 +441,6 @@ public class MyPaperServiceImpl extends BaseServiceImp<Object> implements MyPape
 
 		// 考试结束
 		exam.setMarkState(3);// 标记考试为已阅卷
-		examService.updateById(exam);
+		SpringUtil.getBean(ExamService.class).updateById(exam);
 	}
 }

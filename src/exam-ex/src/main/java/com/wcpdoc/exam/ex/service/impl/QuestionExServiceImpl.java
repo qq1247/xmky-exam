@@ -2,8 +2,6 @@ package com.wcpdoc.exam.ex.service.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.RBaseDao;
@@ -16,17 +14,18 @@ import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.QuestionExService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 试题扩展服务层实现
  * 
  * v1.0 zhanghc 2022年9月6日上午9:54:24
  */
 @Service
+@RequiredArgsConstructor
 public class QuestionExServiceImpl extends BaseServiceImp<Question> implements QuestionExService {
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	private ExamCacheService examCacheService;
+	private final MyQuestionService myQuestionService;
+	private final ExamCacheService examCacheService;
 
 	@Override
 	public RBaseDao<Question> getDao() {

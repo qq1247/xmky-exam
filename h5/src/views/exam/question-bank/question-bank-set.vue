@@ -126,7 +126,7 @@ async function add() {
     }
 
     // 添加
-    const { data: { code } } = await questionBankAdd({ ...form })
+    const { data: { code } } = questionBankAdd({ ...form })
     if (code !== 200) {
         return
     }
@@ -144,7 +144,7 @@ async function edit() {
     }
 
     // 修改
-    const { data: { code } } = await questionBankEdit({ ...form })
+    const { data: { code } } = questionBankEdit({ ...form })
     if (code !== 200) {
         return
     }
@@ -159,7 +159,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await questionBankDel({ id: form.id })
+    const { data: { code } } = questionBankDel({ id: form.id })
     if (code !== 200) {
         return
     }
@@ -177,7 +177,7 @@ async function move() {
     }
 
     // 修改
-    const { data: { code } } = await questionMove({ ids: moveForm.questionIds, questionBankId: moveForm.questionBankId })
+    const { data: { code } } questionMove({ ids: moveForm.questionIds, questionBankId: moveForm.questionBankId })
     if (code !== 200) {
         return
     }
@@ -192,7 +192,7 @@ async function clear() {
         return
     }
 
-    const { data: { code } } = await questionBankClear({ id: form.id })
+    const { data: { code } } = questionBankClear({ id: form.id })
     if (code !== 200) {
         return
     }

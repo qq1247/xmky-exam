@@ -1,13 +1,10 @@
 package com.wcpdoc.exam.core.job;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.annotation.Resource;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -21,8 +18,8 @@ import com.wcpdoc.exam.core.entity.MyExerTrackMonthly;
 import com.wcpdoc.exam.core.service.MyExerTrackMonthlyService;
 import com.wcpdoc.exam.core.service.MyExerTrackService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
 
 /**
  * 练习跟踪任务
@@ -30,24 +27,22 @@ import net.sf.ehcache.Ehcache;
  * v1.0 zhanghc 2025年9月8日下午8:54:47
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class ExerTrackJob {
-	@Resource
-	private MyExerTrackService myExerTrackService;
-	@Resource
-	private MyExerTrackMonthlyService myExerTrackMonthlyService;
-	@Resource
-	private ReadWriteLockManager lockManager;
-	@Resource
-	private CacheManager cacheManager;
+	private final MyExerTrackService myExerTrackService;
+	private final MyExerTrackMonthlyService myExerTrackMonthlyService;
+	private final ReadWriteLockManager lockManager;
+	private final CacheManager cacheManager;
 
 	@Scheduled(fixedDelay = 5 * 60 * 1000)
 	public void execute() {
 		try {
 			Cache cache = cacheManager.getCache(ExamConstant.EXER_TIME_CACHE);
 			@SuppressWarnings("unchecked")
-			List<String> keyList = (List<String>) ((Ehcache) cache.getNativeCache()).getKeys();
-			for (String key : keyList) {
+			com.github.benmanes.caffeine.cache.Cache<String, Set<Integer>> caffeineCache = (com.github.benmanes.caffeine.cache.Cache<String, Set<Integer>>) cache
+					.getNativeCache();
+			for (String key : caffeineCache.asMap().keySet()) {
 				Lock writeLock = lockManager.getLock(key).writeLock();
 				writeLock.lock();
 

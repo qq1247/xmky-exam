@@ -1,7 +1,5 @@
 package com.wcpdoc.sys.service.impl;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.Parm;
@@ -11,15 +9,17 @@ import com.wcpdoc.notify.entity.Email;
 import com.wcpdoc.notify.exception.EmailException;
 import com.wcpdoc.notify.service.EmailExService;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 资源扩展服务层实现
  * 
  * v1.0 zhanghc 2016-6-11下午8:57:40
  */
 @Service
+@RequiredArgsConstructor
 public class EmailExServiceImpl implements EmailExService {
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public Email getEmail() throws EmailException {

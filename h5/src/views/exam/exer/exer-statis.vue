@@ -21,12 +21,12 @@
                                 <el-table-column prop="" label="当月练习" align="center">
                                     <template #default="scope">{{ scope.row.tracks[scope.row.tracks.length -
                                         1].minuteCount
-                                        }}分钟</template>
+                                    }}分钟</template>
                                 </el-table-column>
                                 <el-table-column prop="" label="上月练习" align="center">
                                     <template #default="scope">{{ scope.row.tracks[scope.row.tracks.length -
                                         2].minuteCount
-                                        }}分钟</template>
+                                    }}分钟</template>
                                 </el-table-column>
                                 <el-table-column prop="" label="近一年练习" align="center">
                                     <template #default="scope">

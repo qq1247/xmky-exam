@@ -1,8 +1,5 @@
 package com.wcpdoc.notify.service.impl;
 
-import javax.annotation.Resource;
-
-import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
@@ -12,6 +9,7 @@ import com.wcpdoc.notify.exception.EmailException;
 import com.wcpdoc.notify.service.EmailExService;
 import com.wcpdoc.notify.service.EmailService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,14 +18,11 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2016-6-11下午8:57:40
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 	private JavaMailSender javaMailSender;
-	@Resource
-	@Lazy
-	private EmailService emailService;
-	@Resource
-	private EmailExService emailExService;
+	private final EmailExService emailExService;
 
 	@Override
 	public JavaMailSender getJavaMailSender() throws EmailException {

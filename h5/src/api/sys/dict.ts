@@ -16,5 +16,5 @@ export function dictGet(parm: object) {
     return request.post('/dict/get', parm);
 }
 export function dictIndexList(parm: object) {
-    return request.post('/dict/indexList', parm);
+    return request.post('/dict/index-list', parm);
 }

@@ -25,10 +25,10 @@
                         </el-form-item>
                         <!-- state：不查询冻结用户 -->
                         <el-form-item label="" prop="userIds">
-                            <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
-                                search-parm-name="name" option-label="name" option-value="id" :options="users"
-                                :multiple="true" clearable :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选"
-                                placeholder="请输入机构名称或用户名称进行筛选">
+                            <xmks-select v-model="form.userIds" url="user/listpage"
+                                :params="{ state: 1, role: 'EXAM_USER' }" search-parm-name="name" option-label="name"
+                                option-value="id" :options="users" :multiple="true" clearable :page-size="100"
+                                search-placeholder="请输入机构名称或用户名称进行筛选" placeholder="请输入机构名称或用户名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }}
                                 </template>
@@ -41,8 +41,8 @@
         <div class="exam-user-select__side">
             <div class="user-add">
                 <span class="user-add__title">尚未添加考试用户？</span>
-                <span class="user-add__desc">{{ userStore.type === 0 ? '快去添加吧！' : '请联系管理员' }}</span>
-                <el-button v-if="userStore.type === 0" type="" class="user-add__btn" @click="toUserAdd">
+                <span class="user-add__desc">{{ userStore.isAdmin() ? '快去添加吧！' : '请联系管理员' }}</span>
+                <el-button v-if="userStore.isAdmin()" type="" class="user-add__btn" @click="toUserAdd">
                     <span class="iconfont icon-tubiaoziti2-02 user-add__btn-icon"></span>
                     <span class="user-add__btn-txt">添加</span>
                 </el-button>

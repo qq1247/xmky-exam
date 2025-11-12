@@ -68,7 +68,7 @@ const form = reactive<User>({
     id: null,
     name: '',
     loginName: '',
-    type: 3,
+    role: 'MARK_USER',
     state: 1
 })
 const delConfirm = ref(false) // 删除确认
@@ -171,7 +171,7 @@ async function del() {
 
 // 冻结
 async function frozen() {
-    const { data: { code } } = await userFrozen({ id: form.id, state: form.state })
+    const { data: { code } } = userFrozen({ id: form.id, state: form.state })
     if (code !== 200) {
         return
     }

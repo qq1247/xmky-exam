@@ -127,7 +127,7 @@
 import { ref } from 'vue';
 import { onShow, onLoad, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
-import { myExamListpage } from '@/api/myExam';
+import { myExamListpage } from '@/@/api/my-exam';
 import { bulletinListpage } from '@/api/bulletin';
 import { exerListpage } from '@/api/exer';
 import { useParmStore } from '@/stores/parm';

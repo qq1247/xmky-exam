@@ -28,10 +28,10 @@
                         </xmks-select>
                     </el-form-item>
                     <el-form-item label="" prop="userIds">
-                        <xmks-select v-model="form.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
-                            search-parm-name="name" option-label="name" option-value="id" :options="users"
-                            :multiple="true" clearable :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选"
-                            placeholder="请选择用户">
+                        <xmks-select v-model="form.userIds" url="user/listpage"
+                            :params="{ state: 1, role: 'EXAM_USER' }" search-parm-name="name" option-label="name"
+                            option-value="id" :options="users" :multiple="true" clearable :page-size="100"
+                            search-placeholder="请输入机构名称或用户名称进行筛选" placeholder="请选择用户">
                             <template #default="{ option }">
                                 {{ option.name }} - {{ option.orgName }}
                             </template>
@@ -164,7 +164,7 @@ async function add() {
     }
 
     // 添加
-    const { data: { code } } = await exerAdd({ ...form })
+    const { data: { code } } = exerAdd({ ...form })
     if (code !== 200) {
         return
     }
@@ -182,7 +182,7 @@ async function edit() {
     }
 
     // 修改
-    const { data: { code } } = await exerEdit({ ...form })
+    const { data: { code } } = exerEdit({ ...form })
     if (code !== 200) {
         return
     }
@@ -192,7 +192,7 @@ async function edit() {
 
 // 发布
 async function state() {
-    const { data: { code } } = await exerState({ id: form.id })
+    const { data: { code } } = exerState({ id: form.id })
     if (code !== 200) {
         return
     }
@@ -207,7 +207,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await exerDel({ id: form.id })
+    const { data: { code } } = exerDel({ id: form.id })
     if (code !== 200) {
         return
     }

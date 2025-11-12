@@ -16,11 +16,11 @@ export function cronGet(parm: object) {
     return request.post('/cron/get', parm);
 }
 export function cronStartTask(parm: object) {
-    return request.post('/cron/startTask', parm);
+    return request.post('/cron/start-task', parm);
 }
 export function cronStopTask(parm: object) {
-    return request.post('/cron/stopTask', parm);
+    return request.post('/cron/stop-task', parm);
 }
 export function cronRunOnceTask(parm: object) {
-    return request.post('/cron/runOnceTask', parm);
+    return request.post('/cron/run-once-task', parm);
 }

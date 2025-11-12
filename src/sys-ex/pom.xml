@@ -25,12 +25,6 @@
 			<artifactId>sys-file</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成系统授权 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-auth</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成系统通知 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>

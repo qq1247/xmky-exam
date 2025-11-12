@@ -179,7 +179,7 @@ const user = reactive<User>({
     orgId: 1,
     name: '',
     loginName: '',
-    type: 1,
+    role: 'EXAM_USER',
     state: 0,
 })
 const load = reactive({// 加载

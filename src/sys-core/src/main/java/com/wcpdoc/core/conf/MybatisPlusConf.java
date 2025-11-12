@@ -5,7 +5,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.MybatisMapWrapperFactory;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
@@ -38,4 +41,15 @@ public class MybatisPlusConf {
 		return prop -> prop.setBanner(false);// 不显示banner
 	}
 
+	@Bean
+	public MybatisPlusPropertiesCustomizer mybatisPlusPropertiesCustomizer() {
+		return properties -> {
+			GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
+			dbConfig.setUpdateStrategy(FieldStrategy.ALWAYS);// 更新数据库时，无论字段值是否为null或空，都强制更新
+			GlobalConfig globalConfig = new GlobalConfig();
+			globalConfig.setDbConfig(dbConfig);
+			globalConfig.setBanner(false);
+			properties.setGlobalConfig(globalConfig);
+		};
+	}
 }

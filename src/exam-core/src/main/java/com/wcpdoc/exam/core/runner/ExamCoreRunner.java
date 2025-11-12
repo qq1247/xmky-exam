@@ -9,11 +9,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import com.wcpdoc.base.entity.User;
@@ -27,6 +25,7 @@ import com.wcpdoc.exam.core.exception.BatchMarkException;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.MyPaperService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,15 +34,12 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2019年9月29日下午2:32:16
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class ExamCoreRunner implements ApplicationRunner {
-
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private MyPaperService myPaperService;
+	private final ExamCacheService examCacheService;
+	private final BaseCacheService baseCacheService;
+	private final MyPaperService myPaperService;
 
 	private static final int CPU_NUM = Runtime.getRuntime().availableProcessors();
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(CPU_NUM);
@@ -115,9 +111,9 @@ public class ExamCoreRunner implements ApplicationRunner {
 									} catch (BatchMarkException e) {
 										log.error(String.format("自动结束【%s-%s】的考试错误：%s，尝试清除缓存后在试", exam.getId(),
 												exam.getName(), e.getMessage()));
-										SpringUtil.getBean(EhCacheCacheManager.class)
-												.getCache(ExamConstant.MYEXAM_CACHE)
-												.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));// "'UNMARK_LIST'" '是注解拼接表达式需要，手动触发不能有'
+										SpringUtil.getBean(CacheManager.class).getCache(ExamConstant.MYEXAM_CACHE)
+												.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));// "'UNMARK_LIST'"
+																												// '是注解拼接表达式需要，手动触发不能有'
 									} catch (Exception e) {// bug：如果有人进入考试后退出，不交卷不触发刷新缓存，导致一直存在未阅卷而不能结束考试。
 										log.error(String.format("自动结束【%s-%s】的考试错误：", exam.getId(), exam.getName()), e);
 									}
@@ -199,7 +195,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 				} catch (InterruptedException e) {
 				}
 				log.debug("自动清除未阅卷列表缓存");
-				SpringUtil.getBean(EhCacheCacheManager.class).getCache(ExamConstant.MYEXAM_CACHE)
+				SpringUtil.getBean(CacheManager.class).getCache(ExamConstant.MYEXAM_CACHE)
 						.evict(ExamConstant.MYEXAM_UNMARK_LIST_KEY.replaceAll("'", ""));
 			}
 		}).start();

@@ -2,8 +2,6 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.User;
@@ -16,12 +14,10 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExerDao;
 import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.QuestionBank;
-import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
-import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
-import com.wcpdoc.exam.core.service.QuestionOptionService;
-import com.wcpdoc.exam.core.service.QuestionService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 练习服务层实现
@@ -29,21 +25,11 @@ import com.wcpdoc.exam.core.service.QuestionService;
  * v1.0 chenyun 2021-03-02 13:43:21
  */
 @Service
+@RequiredArgsConstructor
 public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService {
-	@Resource
-	private ExerDao exerDao;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private QuestionOptionService questionOptionService;
-	@Resource
-	private QuestionAnswerService questionAnswerService;
-	@Resource
-	private ExerRmkService exerRmkService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final ExerDao exerDao;
+	private final QuestionBankService questionBankService;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public RBaseDao<Exer> getDao() {

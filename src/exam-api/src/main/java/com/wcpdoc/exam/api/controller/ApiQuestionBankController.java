@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +16,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,12 +25,11 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @RestController
-@RequestMapping("/api/questionBank")
+@RequestMapping("/api/question-bank")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiQuestionBankController extends BaseController {
-
-	@Resource
-	private QuestionBankService questionBankService;
+	private final QuestionBankService questionBankService;
 
 	/**
 	 * 题库列表

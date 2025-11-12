@@ -369,7 +369,7 @@ function toExam() {
 
 // 重考
 async function toRetake() {
-    const { data: { code } } = await myExamRetake({ examId: route.params.examId })
+    const { data: { code } } = myExamRetake({ examId: route.params.examId })
     if (code !== 200) {
         return;
     }

@@ -22,7 +22,7 @@
         </div>
         <div class="home__main">
             <el-scrollbar max-height="calc(100vh - 300px)" class="task-wrap">
-                <div v-if="userStore.type === 0 || userStore.type === 2 || userStore.type === 3" class="task">
+                <div v-if="userStore.isAdmin() || userStore.isSubAdmin() || userStore.isMarkUser()" class="task">
                     <xmks-card-guide title="阅卷任务" icon="icon-tubiaoziti22-22" class="task__head"></xmks-card-guide>
                     <div class="task__main">
                         <xmks-card-empty v-if="unMarkList.length === 0" name="暂无阅卷"
@@ -122,7 +122,7 @@
                         </xmks-card-data>
                     </div>
                 </div>
-                <div v-if="userStore.type === 0 || userStore.type === 2" class="task">
+                <div v-if="userStore.isAdmin() || userStore.isSubAdmin()" class="task">
                     <xmks-card-guide title="练习任务" icon="icon-icon_xiugaishijian" class="task__head"></xmks-card-guide>
                     <div class="task__main">
                         <xmks-card-empty v-if="exerList.length === 0" name="暂无练习"
@@ -161,7 +161,7 @@
                         </xmks-card-data>
                     </div>
                 </div>
-                <div v-if="userStore.type === 1" class="task">
+                <div v-if="userStore.isExamUser()" class="task">
                     <xmks-card-guide title="我的考试" icon="icon-tubiaoziti22-22" class="task__head"></xmks-card-guide>
                     <div class="task__main">
                         <xmks-card-empty v-if="unExamList.length === 0" name="暂无考试"
@@ -185,14 +185,14 @@
                                     <span class="my-exam__num">
                                         {{ myExam.totalScore || '-' }}<span class="my-exam__unit">/{{
                                             myExam.examTotalScore
-                                            }}</span>
+                                        }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的分数</span>
                                 </div>
                                 <div class="my-exam__inner">
                                     <span class="my-exam__num">
                                         {{ myExam.no || '-' }}<span class="my-exam__unit">/{{ myExam.userNum || '-'
-                                            }}</span>
+                                        }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的排名</span>
                                 </div>
@@ -228,7 +228,7 @@
                         </xmks-card-data>
                     </div>
                 </div>
-                <div v-if="userStore.type === 1" class="task">
+                <div v-if="userStore.isExamUser()" class="task">
                     <xmks-card-guide title="我的练习" icon="icon-icon_xiugaishijian" class="task__head"></xmks-card-guide>
                     <div class="task__main">
                         <xmks-card-empty v-if="exerList.length === 0" name="暂无练习"
@@ -313,7 +313,7 @@
                     </template>
                 </el-calendar>
                 <el-scrollbar height="calc(100vh - 660px)" class="calendar__foot">
-                    <div v-if="userStore.type === 0 || userStore.type === 2" class="calendar__task-list">
+                    <div v-if="userStore.isAdmin() || userStore.isSubAdmin()" class="calendar__task-list">
                         <div v-for="(myMark, index) in myMarkGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
                             class="calendar-task">
                             <div class="calendar-task__outer">
@@ -337,7 +337,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="userStore.type === 1" class="calendar__task-list">
+                    <div v-if="userStore.isExamUser()" class="calendar__task-list">
                         <div v-for="(myExam, index) in myExamGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
                             class="calendar-task">
                             <div class="calendar-task__outer">
@@ -361,7 +361,7 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="userStore.type === 3" class="calendar__task-list">
+                    <div v-if="userStore.isMarkUser()" class="calendar__task-list">
                         <div v-for="(myMark, index) in myMarkGroup[dayjs(calendar).format('YYYY-MM-DD')]" :key="index"
                             class="calendar-task">
                             <div class="calendar-task__outer">
@@ -423,22 +423,17 @@ const bulletinList = ref<any[]>([])// 公告列表
 
 // 组件挂载完成后，执行如下方法
 onMounted(async () => {
-    // 如果未登录，跳转到登录页面
-    if (!userStore.id) {
-        router.push('/login')
-    }
-
     // 更新日历日期为今天（不要依赖前端）
     calendarQuery()
 
     // 任务查询
-    if (userStore.type === 0 || userStore.type === 2) {
+    if (userStore.isAdmin() || userStore.isSubAdmin()) {
         myMarkListQuery()
         exerListQuery();
-    } else if (userStore.type === 1) {
+    } else if (userStore.isExamUser()) {
         myExamListQuery()
         exerListQuery()
-    } else if (userStore.type === 3) {
+    } else if (userStore.isMarkUser()) {
         myMarkListQuery()
     }
 
@@ -474,20 +469,20 @@ const myExamGroup = computed(() => {
     }, {});
 });
 const hasFinishedTask = computed(() => (date: string): boolean => {
-    if (userStore.type === 0 || userStore.type === 2) {
+    if (userStore.isAdmin() || userStore.isSubAdmin()) {
         if (!myMarkGroup.value[date]) {// 当天没有任务
             return false
         }
         return (myMarkGroup.value[date] == null || myMarkGroup.value[date].every((myMark: any) => myMark.examMarkState === 3)) // 当天阅卷任务都完成
     }
 
-    if (userStore.type === 1) {
+    if (userStore.isExamUser()) {
         if (!myExamGroup.value[date]) {// 当天没有任务
             return false
         }
         return (myExamGroup.value[date] == null || myExamGroup.value[date].every((myExam: any) => myExam.markState === 3)) // 当天考试任务都完成
     }
-    if (userStore.type === 3) {
+    if (userStore.isMarkUser()) {
         if (!myMarkGroup.value[date]) {// 当天没有任务
             return false
         }
@@ -496,7 +491,7 @@ const hasFinishedTask = computed(() => (date: string): boolean => {
     return false
 })
 const hasOngoingTask = computed(() => (date: string): boolean => {
-    if (userStore.type === 0 || userStore.type === 2) {
+    if (userStore.isAdmin() || userStore.isSubAdmin()) {
         if (!myMarkGroup.value[date]) {// 当天没有任务
             return false
         }
@@ -504,7 +499,7 @@ const hasOngoingTask = computed(() => (date: string): boolean => {
         return (myMarkGroup.value[date] != null && myMarkGroup.value[date]?.some((myMark: any) => myMark.examMarkState !== 3)) // 只要有一个阅卷任务未完成
     }
 
-    if (userStore.type === 1) {
+    if (userStore.isExamUser()) {
         if (!myExamGroup.value[date]) {// 当天没有任务
             return false
         }
@@ -512,7 +507,7 @@ const hasOngoingTask = computed(() => (date: string): boolean => {
         return (myExamGroup.value[date] != null && myExamGroup.value[date]?.some((myExam: any) => myExam.markState !== 3)) // 只要有一个考试任务未完成
 
     }
-    if (userStore.type === 3) {
+    if (userStore.isMarkUser()) {
         if (!myMarkGroup.value[date]) {// 当天没有任务
             return false
         }
@@ -525,7 +520,7 @@ const hasOngoingTask = computed(() => (date: string): boolean => {
 /************************事件相关*****************************/
 // 日历查询
 async function calendarQuery() {
-    const { data: { data: data } } = await loginSysTime({})
+    const { data: { data } } = await loginSysTime({})
     const curTime = dayjs(data, 'YYYY-MM-DD HH:mm:ss').toDate()
     calendar.value = curTime
 }

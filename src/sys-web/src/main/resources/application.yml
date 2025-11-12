@@ -1,9 +1,6 @@
 server:
   port: 8000
-
 spring:
-  resources:
-    static-locations: pc:./h5/;mobile:./m/
   servlet:
     multipart:
       max-file-size: 10MB
@@ -18,90 +15,7 @@ spring:
     hikari:
       minimum-idle: 10
       maximum-pool-size: 100 #mysql5.7默认151，预留一些，防止其他人调试连接不上
-mybatis-plus:
-  global-config:
-    db-config:
-      update-strategy: ALWAYS
-runtime:
-  monitor: true
-  timeout: 1000
-  exUrl: /api/report/server/parm
-  
-token:
-  expireMinute: 1440
-  refreshMinute: 60
-  
-shiro-filter:
-  urls: 
-    ? "/api/login/**": anon
-    ? /api/file/download: anon
-    ? /api/exam/examGet: anon
-  
-    ? /api/file/upload: jwt
-    ? /api/dict/indexList: jwt
-    ? /api/bulletin/listpage: jwt
-    ? /api/bulletin/get: jwt
-    ? /api/user/get: jwt
-    ? /api/progressBar/**: jwt
-    
-    ? /api/user/listpage: jwt,anyRolesEx[0,2]
-    ? /api/org/listpage: jwt,anyRolesEx[0,2]
-    ? /api/user/add: jwt,anyRolesEx[0,2]
-    ? /api/user/edit: jwt,anyRolesEx[0,2]
-    ? /api/user/del: jwt,anyRolesEx[0,2]
-    ? /api/user/pwdInit: jwt,anyRolesEx[0,2]
-    ? /api/user/frozen: jwt,anyRolesEx[0,2]
-    ? /api/questionBank/**: jwt,anyRolesEx[0,2]
-    ? /api/question/**: jwt,anyRolesEx[0,2]
-    ? /api/exer/listpage: jwt,anyRolesEx[0,1,2]
-    ? /api/exer/**: jwt,anyRolesEx[0,2]
-    ? /api/exam/get: jwt,anyRolesEx[0,2,3]
-    ? /api/exam/**: jwt,anyRolesEx[0,2]
-    ? /api/myMark/**: jwt,anyRolesEx[0,2,3]
-    ? /api/report/exam/rankListpage: jwt,anyRolesEx[0,2]
-    ? /api/report/exam/statis: jwt,anyRolesEx[0,2]
-    ? /api/report/paper/exportPDF: jwt,anyRolesEx[0,2]
-    ? /api/report/rank/exportPDF: jwt,anyRolesEx[0,2]
-    ? /api/report/exer/trackListpage: jwt,anyRolesEx[0,2]
-    ? /api/report/exer/wrongQuestionListpage: jwt,anyRolesEx[0,2]
-    ? /api/parm/get: jwt,anyRolesEx[0,2]
-     
-    ? /api/myExam/**: jwt,anyRolesEx[1,4]
-    ? /api/myExer/**: jwt,anyRolesEx[1]
-     
-    ? /api/**: jwt,anyRolesEx[0]
-  demo:
-    mode: false
-    urls:
-      ? /api/**/del: demoMode
-      ? /api/parm/ent: demoMode
-      ? /api/parm/email: demoMode
-      ? /api/parm/file: demoMode
-      ? /api/parm/db: demoMode
-      ? /api/parm/pwd: demoMode
-      ? /api/parm/custom: demoMode
-      ? /api/parm/m: demoMode
-       
-      ? /api/cron/add: demoMode
-      ? /api/cron/edit: demoMode
-      ? /api/cron/startTask: demoMode
-      ? /api/cron/stopTask: demoMode
-      ? /api/cron/runOnceTask: demoMode
-       
-      ? /api/dict/add: demoMode
-      ? /api/dict/edit: demoMode
-       
-      ? /api/org/add: demoMode
-      ? /api/org/edit: demoMode
-      ? /api/org/move: demoMode
-       
-      ? /api/user/edit: demoMode
-      ? /api/user/frozen: demoMode
-      ? /api/user/pwdInit: demoMode
-      ? /api/login/pwd: demoMode
-       
-      ? /api/questionBank/edit: demoMode
-      ? /api/questionBank/clear: demoMode
-      
+demo:
+  mode: false  
 sys:
   ver: 5.7.0

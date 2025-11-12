@@ -3,8 +3,6 @@ package com.wcpdoc.quartz.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.quartz.Job;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +16,17 @@ import com.wcpdoc.quartz.exception.QuartzException;
 import com.wcpdoc.quartz.service.CronService;
 import com.wcpdoc.quartz.util.QuartzUtil;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * 定时任务服务层实现
  * 
  * v1.0 zhanghc 2019-07-29 10:38:17
  */
 @Service
+@RequiredArgsConstructor
 public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService {
-	@Resource
-	private CronDao cronDao;
+	private final CronDao cronDao;
 
 	@Override
 	public RBaseDao<Cron> getDao() {
@@ -149,7 +149,7 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 			throw new MyException("实例化异常");
 		}
 		try {
-			jobClass.newInstance().execute(null);
+			jobClass.getDeclaredConstructor().newInstance().execute(null);
 		} catch (Exception e) {
 			throw new MyException(e);
 		}

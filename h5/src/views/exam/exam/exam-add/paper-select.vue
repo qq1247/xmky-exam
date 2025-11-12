@@ -104,7 +104,7 @@ async function copy(id: number) {
     form.retakeNum = data.retakeNum
 
     form.questionNoUpdate()
-    if (form.loginType === 1) {// 匿名考试不需要导入考试用户
+    if (form.loginType === 1) {// 临时考试不需要导入考试用户
         if (importUser.value === 'all') {
             const { data: { data: myExams } } = await examUser({ id })
             myExams.forEach((myExam: { userId: number; answerState: number; }) => {

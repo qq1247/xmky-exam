@@ -5,26 +5,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,19 +34,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiUserController extends BaseController {
-
-	@Resource
-	private UserService userService;
-	@Resource
-	private UserExService userExService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private FileService fileService;
-	@Resource
-	private OnlineUserService onlineUserService;
+	private final UserService userService;
+	private final UserExService userExService;
+	private final BaseCacheService baseCacheService;
+	private final FileService fileService;
 
 	/**
 	 * 用户列表
@@ -59,34 +53,34 @@ public class ApiUserController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			if (getCurUser().getType() == 0) {// 如果是管理员
-				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class))) {// 默认查询考试用户
-					pageIn.addParm("type", "1");
+			if (CurLoginUserUtil.isAdmin()) {// 如果是管理员
+				if (!ValidateUtil.isValid(pageIn.getParm("role", String.class))) {// 默认查询考试用户
+					pageIn.addParm("role", BaseConstant.EXAM_USER);
 				} else {
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
-			} else if (getCurUser().getType() == 2) {// 如果是子管理
-				if (!ValidateUtil.isValid(pageIn.getParm("type", String.class)) || pageIn.getParm("type").equals("1")) {// 默认查询考试用户
+			} else if (CurLoginUserUtil.isSubAdmin()) {// 如果是子管理
+				if (!ValidateUtil.isValid(pageIn.getParm("role", String.class)) || pageIn.getParm("role").equals(BaseConstant.EXAM_USER)) {// 默认查询考试用户
 					User user = baseCacheService.getUser(getCurUser().getId());
-					if (!ValidateUtil.isValid(user.getUserIds()) && !ValidateUtil.isValid(user.getOrgIds())){
+					if (!ValidateUtil.isValid(user.getUserIds()) && !ValidateUtil.isValid(user.getOrgIds())) {
 						List<Integer> orgIds = new ArrayList<>();
 						orgIds.add(-1);
 						pageIn.addParm("_orgIds", orgIds);// 没有就不显示
 					} else {
 						if (ValidateUtil.isValid(user.getUserIds())) {
 							pageIn.addParm("_ids", user.getUserIds());// 只看自己可以管理的考试用户，不要用ids，这个是页面过滤用的，如考试选择用户回显。
-						} 
+						}
 						if (ValidateUtil.isValid(user.getOrgIds())) {
 							pageIn.addParm("_orgIds", user.getOrgIds());
-						} 
+						}
 					}
-					
+
 				} else {// 查看阅卷用户
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
-			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限
+			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户没有角色权限
 
-			} else if (getCurUser().getType() == 1) {// 考试用户没有角色权限
+			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有角色权限
 
 			}
 			PageOut pageOut = userService.getListpage(pageIn);
@@ -229,7 +223,7 @@ public class ApiUserController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/pwdInit")
+	@RequestMapping("/pwd-init")
 	public PageResult pwdInit(Integer id) {
 		try {
 			String pwdInit = userService.pwdInit(id);
@@ -264,25 +258,6 @@ public class ApiUserController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("用户冻结错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 退出登陆
-	 * 
-	 * v1.0 zhanghc 2016年8月27日上午11:36:55
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/out")
-	public PageResult out(Integer id) {
-		try {
-			onlineUserService.out(id);
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("退出登陆错误：", e);
 			return PageResult.err();
 		}
 	}

@@ -3,8 +3,6 @@ package com.wcpdoc.exam.core.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +25,7 @@ import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,20 +34,15 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2024年4月14日下午9:36:00
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements ExamCacheService {
-	@Resource
-	private QuestionDao questionDao;
-	@Resource
-	private QuestionOptionDao questionOptionDao;
-	@Resource
-	private QuestionAnswerDao questionAnswerDao;
-	@Resource
-	private ExamDao examDao;
-	@Resource
-	private MyExamDao myExamDao;
-	@Resource
-	private MyQuestionDao myQuestionDao;
+	private final QuestionDao questionDao;
+	private final QuestionOptionDao questionOptionDao;
+	private final QuestionAnswerDao questionAnswerDao;
+	private final ExamDao examDao;
+	private final MyExamDao myExamDao;
+	private final MyQuestionDao myQuestionDao;
 
 	@Override
 	public RBaseDao<Object> getDao() {

@@ -3,9 +3,8 @@ package com.wcpdoc.api.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
-import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,8 +13,8 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Cache;
 
 /**
  * 缓存控制层
@@ -24,10 +23,10 @@ import net.sf.ehcache.Cache;
  */
 @RestController
 @RequestMapping("/api/cache")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiCacheController extends BaseController {
-	@Resource
-	private EhCacheCacheManager ehCacheCacheManager;
+	private final CacheManager cacheManager;
 
 	/**
 	 * 缓存列表
@@ -40,12 +39,18 @@ public class ApiCacheController extends BaseController {
 	public PageResult list() {
 		try {
 			Map<Object, Object> data = new HashMap<>();
-			ehCacheCacheManager.getCacheNames().forEach(cacheName -> {
-				Cache cache = (Cache) ehCacheCacheManager.getCache(cacheName).getNativeCache();
-				for (Object key : cache.getKeys()) {
-					data.put(key, cache.get(key).getObjectValue());
-				}
-			});
+			for (String cacheName : cacheManager.getCacheNames()) {
+				Cache cache = cacheManager.getCache(cacheName);
+				Object nativeCache = cache.getNativeCache();
+
+				@SuppressWarnings("unchecked")
+				com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache = (com.github.benmanes.caffeine.cache.Cache<Object, Object>) nativeCache;
+				caffeineCache.asMap().forEach((key, value) -> {
+					String fullKey = cacheName + ":" + key;
+					data.put(fullKey, value);
+				});
+			}
+
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("缓存列表错误：{}", e.getMessage());
@@ -67,8 +72,13 @@ public class ApiCacheController extends BaseController {
 	@RequestMapping("/refresh")
 	public PageResult refresh(String[] cacheNames) {
 		try {
+			if (cacheNames == null || cacheNames.length == 0) {
+				return PageResult.err().msg("缓存名称不能为空");
+			}
+
 			for (String cacheName : cacheNames) {
-				ehCacheCacheManager.getCache(cacheName).clear();
+				Cache cache = cacheManager.getCache(cacheName);
+				cache.clear();
 				log.info("缓存清理：{}", cacheName);
 			}
 			return PageResult.ok();

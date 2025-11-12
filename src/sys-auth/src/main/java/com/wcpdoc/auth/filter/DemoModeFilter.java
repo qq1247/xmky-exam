@@ -1,34 +1,55 @@
 package com.wcpdoc.auth.filter;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.shiro.web.filter.AccessControlFilter;
-import org.apache.shiro.web.util.WebUtils;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 演示模式过滤器
  * 
  * v1.0 zhanghc 2025年4月3日上午9:10:02
  */
-public class DemoModeFilter extends AccessControlFilter {
+@Component
+@RequiredArgsConstructor
+@ConfigurationProperties(prefix = "demo")
+public class DemoModeFilter extends OncePerRequestFilter {
+	private boolean mode;
 
-    @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        // 演示模式下直接拒绝操作
-        return false;
-    }
+	private static final List<String> DEMO_PROTECTED_PATHS = Arrays.asList("/api/**/del", "/api/parm/ent",
+			"/api/parm/email", "/api/parm/file", "/api/parm/db", "/api/parm/pwd", "/api/parm/custom", "/api/parm/m",
+			"/api/cron/add", "/api/cron/edit", "/api/cron/startTask", "/api/cron/stopTask", "/api/cron/runOnceTask",
+			"/api/dict/add", "/api/dict/edit", "/api/org/add", "/api/org/edit", "/api/org/move", "/api/user/edit",
+			"/api/user/frozen", "/api/user/pwdInit", "/api/login/pwd", "/api/questionBank/edit",
+			"/api/questionBank/clear");
 
-    @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-    	HttpServletResponse httpResponse = WebUtils.toHttp(response);
-		httpResponse.setCharacterEncoding("UTF-8");
-		httpResponse.setContentType("application/json;charset=UTF-8");
-		httpResponse.setStatus(HttpStatus.OK.value());
-		httpResponse.getWriter()
-				.write(String.format("{\"code\": %s, \"msg\": \"演示模式\"}", HttpStatus.FORBIDDEN.value()));
-		return false;
-    }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		if (mode) {
+			String path = request.getRequestURI();
+			AntPathMatcher matcher = new AntPathMatcher();
+			for (String pattern : DEMO_PROTECTED_PATHS) {
+				if (matcher.match(pattern, path)) {
+					response.setStatus(HttpStatus.OK.value());
+					response.setContentType("application/json;charset=UTF-8");
+					response.getWriter().write("{\"code\":403,\"msg\":\"演示模式\"}");
+					return;
+				}
+			}
+		}
+
+		filterChain.doFilter(request, response);
+	}
 }

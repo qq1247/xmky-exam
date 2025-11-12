@@ -10,8 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,10 +41,10 @@ import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -56,27 +54,17 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/exam")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiExamController extends BaseController {
-
-	@Resource
-	private ExamService examService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private ExamQuestionService examQuestionService;
-	@Resource
-	private ExamRuleService examRuleService;
-	@Resource
-	private MyExamService myExamService;
-	@Resource
-	private MyMarkService myMarkService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private ProgressBarService progressBarService;
-	@Resource
-	private UserService userService;
+	private final ExamService examService;
+	private final ExamCacheService examCacheService;
+	private final ExamQuestionService examQuestionService;
+	private final ExamRuleService examRuleService;
+	private final MyMarkService myMarkService;
+	private final BaseCacheService baseCacheService;
+	private final ProgressBarService progressBarService;
+	private final UserService userService;
 
 	/**
 	 * 考试列表
@@ -406,7 +394,7 @@ public class ApiExamController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/examGet")
+	@RequestMapping("/exam-get")
 	public PageResult examGet(String name) {
 		try {
 			Exam exam = examService.getExam(name);
@@ -483,7 +471,7 @@ public class ApiExamController extends BaseController {
 	 * @param userIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/userAdd")
+	@RequestMapping("/user-add")
 	public PageResult userAdd(Integer id, Integer[] orgIds, Integer[] userIds) {
 		try {
 			Set<Integer> orgIdSet = CollectionUtil.toSet(orgIds);
@@ -581,7 +569,7 @@ public class ApiExamController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/markUserList")
+	@RequestMapping("/mark-user-list")
 	public PageResult markUserList(Integer id) {
 		try {
 			// 数据校验

@@ -379,7 +379,7 @@ async function sxes(type: number, content: string) {
 };
 
 const answer = _.debounce(async function (examQuestion: ExamQuestion) {// // 答题  _.debounce返回的包装后的函数，所以能正常传参
-    const { data: { code } } = await myExamAnswer({
+    const { data: { code } } = myExamAnswer({
         examId: route.params.examId,
         questionId: examQuestion.questionId,
         answers: examQuestion.userAnswers,

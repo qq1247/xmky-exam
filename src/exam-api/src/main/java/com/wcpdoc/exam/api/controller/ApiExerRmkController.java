@@ -3,8 +3,6 @@ package com.wcpdoc.exam.api.controller;
 import java.util.Date;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +16,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,12 +25,11 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 chenyun 2021年8月31日上午9:54:28
  */
 @RestController
-@RequestMapping("/api/exerRmk")
+@RequestMapping("/api/exer-rmk")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiExerRmkController extends BaseController {
-
-	@Resource
-	private ExerRmkService exerRmkService;
+	private final ExerRmkService exerRmkService;
 
 	/**
 	 * 练习评论列表

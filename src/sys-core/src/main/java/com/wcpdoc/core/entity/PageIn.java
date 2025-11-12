@@ -1,13 +1,12 @@
 package com.wcpdoc.core.entity;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

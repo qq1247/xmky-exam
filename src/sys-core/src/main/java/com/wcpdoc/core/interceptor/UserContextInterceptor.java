@@ -1,16 +1,16 @@
 package com.wcpdoc.core.interceptor;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.entity.LoginUser;
-import com.wcpdoc.core.service.UserContextService;
+import com.wcpdoc.core.service.LoginUserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 用户上下文拦截器
@@ -18,9 +18,9 @@ import com.wcpdoc.core.service.UserContextService;
  * v1.0 zhanghc 2021年10月8日下午5:40:00
  */
 @Component
+@RequiredArgsConstructor
 public class UserContextInterceptor implements HandlerInterceptor {
-	@Resource
-	private UserContextService userContextService;
+	private final LoginUserService loginUserService;
 
 	/**
 	 * 请求开始前，解析当前登录用户，绑定到当前线程上
@@ -29,11 +29,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		LoginUser user = userContextService.getUser(request, response, handler);
-		if (!userContextService.valide(user)) { // 解决后台强制退出后，前台访问任意接口携带令牌，导致再次被解析，显示用户在线的问题
-			return true;
-		}
-
+		LoginUser user = loginUserService.getLoginUser();
 		UserContext.set(user);
 		return true;
 	}
@@ -45,7 +41,6 @@ public class UserContextInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-
 	}
 
 	/**

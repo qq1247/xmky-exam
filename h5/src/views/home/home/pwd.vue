@@ -71,7 +71,7 @@ async function pwd() {
     }
 
     // 密码修改
-    const { data: { code } } = await loginPwd({ ...form })
+    const { data: { code } } = loginPwd({ ...form })
     if (code !== 200) {
         return
     }

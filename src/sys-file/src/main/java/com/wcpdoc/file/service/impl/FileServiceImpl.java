@@ -7,10 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -29,6 +25,9 @@ import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileExService;
 import com.wcpdoc.file.service.FileService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,16 +36,13 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2016-11-16下午10:13:48
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class FileServiceImpl extends BaseServiceImp<File> implements FileService {
-	@Resource
-	private FileDao fileDao;
-	@Resource
-	private FileExService fileExService;
-	@Resource
-	protected HttpServletRequest request;
-	@Resource
-	protected HttpServletResponse response;
+	private final FileDao fileDao;
+	private final FileExService fileExService;
+	protected final HttpServletRequest request;
+	protected final HttpServletResponse response;
 	private static final String TEMP = "temp";
 
 	@Override
@@ -95,7 +91,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			// file.setPath(destFile.getAbsolutePath().replaceAll(getTempDir().getAbsolutePath(),
 			// ""));// 斜杠为特殊符号
 			file.setPath(destFile.getAbsolutePath().substring(getUploadDir().getAbsolutePath().length()));
-			file.setIp(request.getRemoteHost());
+			file.setIp(request.getRemoteAddr());
 			file.setState(0);
 			file.setUpdateUserId(getCurUser().getId());
 			file.setUpdateTime(new Date());
@@ -127,7 +123,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 				String.format("%s%s", getUploadDir().getAbsolutePath(), file.getPath()));
 		file.setState(1);
 		file.setPath(tempFile.getAbsolutePath().substring(getTempDir().getAbsolutePath().length()));
-		file.setIp(request.getRemoteHost());
+		file.setIp(request.getRemoteAddr());
 		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
 		updateById(file);
@@ -224,8 +220,10 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		// 复制文件
-		java.io.File sourceFile = new java.io.File(String.format("%s%s", getUploadDir().getAbsolutePath(), fileOld.getPath()));
-		java.io.File destFile = new java.io.File(String.format("%s%s%s", sourceFile.getAbsoluteFile().getParent(), java.io.File.separator, UUID.randomUUID().toString()));
+		java.io.File sourceFile = new java.io.File(
+				String.format("%s%s", getUploadDir().getAbsolutePath(), fileOld.getPath()));
+		java.io.File destFile = new java.io.File(String.format("%s%s%s", sourceFile.getAbsoluteFile().getParent(),
+				java.io.File.separator, UUID.randomUUID().toString()));
 		try {
 			FileUtils.copyFile(sourceFile, destFile);
 		} catch (Exception e) {
@@ -241,10 +239,10 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			log.error(e.getMessage());
 			throw new MyException("拷贝附件错误");
 		}
-		
+
 		fileNew.setId(null);
 		fileNew.setPath(destFile.getAbsolutePath().substring(getUploadDir().getAbsolutePath().length()));
-		fileNew.setIp(request.getRemoteHost());
+		fileNew.setIp(request.getRemoteAddr());
 		fileNew.setUpdateUserId(getCurUser().getId());
 		fileNew.setUpdateTime(new Date());
 		save(fileNew);

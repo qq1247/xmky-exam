@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +25,7 @@ import com.wcpdoc.exam.core.service.ExamCacheService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,13 +35,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/question")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiQuestionController extends BaseController {
-
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private ExamCacheService examCacheService;
+	private final QuestionService questionService;
+	private final ExamCacheService examCacheService;
 
 	/**
 	 * 试题列表
@@ -65,9 +62,9 @@ public class ApiQuestionController extends BaseController {
 				Integer type = (Integer) result.get("type");
 				Integer markType = (Integer) result.get("markType");
 				if (result.get("imgFileIds") != null) {
-					result.put("imgFileIds", StringUtil.toIntList((String)result.get("imgFileIds")));
+					result.put("imgFileIds", StringUtil.toIntList((String) result.get("imgFileIds")));
 				}
-				
+
 				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
 					result.put("markOptions", StringUtil.toIntList((String) result.get("markOptions")));
 				} else {
@@ -241,7 +238,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("state", question.getState())//
 					.addAttr("imgFileIds", question.getImgFileIds())//
 					.addAttr("videoFileId", question.getVideoFileId())//
-					;
+			;
 			return pageResult;
 		} catch (MyException e) {
 			log.error("试题获取错误：{}", e.getMessage());
@@ -273,11 +270,12 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 试题移动
 	 * 
 	 * v1.0 zhanghc 2025年5月18日下午4:23:23
+	 * 
 	 * @param ids
 	 * @param questionBankId
 	 * @return PageResult
@@ -292,7 +290,7 @@ public class ApiQuestionController extends BaseController {
 		} catch (MyException e) {
 			log.error("试题移动错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			log.error("试题移动错误：", e);
 			return PageResult.err();
 		}

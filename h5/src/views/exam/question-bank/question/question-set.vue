@@ -582,7 +582,7 @@ async function add() {
     }
     params.imgFileIds = imgFileList.value.map((file: UploadUserFile) => file.uid)
     params.videoFileId = videoFileList.value[0]?.uid || null
-    const { data: { code } } = await questionAdd({ ...params })
+    const { data: { code } } = questionAdd({ ...params })
     if (code !== 200) {
         return
     }
@@ -608,7 +608,7 @@ async function edit() {
     }
     params.imgFileIds = imgFileList.value.map((file: UploadUserFile) => file.uid)
     params.videoFileId = videoFileList.value[0]?.uid || null
-    const { data: { code } } = await questionEdit({ ...params })
+    const { data: { code } } = questionEdit({ ...params })
     if (code !== 200) {
         return
     }
@@ -624,7 +624,7 @@ async function de1() {
         return
     }
 
-    const { data: { code } } = await questionDel({ ids: form.id })
+    const { data: { code } } = questionDel({ ids: form.id })
     if (code !== 200) {
         return
     }
@@ -635,7 +635,7 @@ async function de1() {
 
 // 复制
 async function copy() {
-    const { data: { code } } = await questionCopy({ id: form.id })
+    const { data: { code } } = questionCopy({ id: form.id })
     if (code !== 200) {
         return
     }
@@ -677,7 +677,7 @@ async function move() {
     }
 
     // 修改
-    const { data: { code } } = await questionMove({ ids: moveForm.id, questionBankId: moveForm.questionBankId })
+    const { data: { code } } = questionMove({ ids: moveForm.id, questionBankId: moveForm.questionBankId })
     if (code !== 200) {
         return
     }

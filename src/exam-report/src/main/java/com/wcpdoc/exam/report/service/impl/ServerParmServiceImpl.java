@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
 import org.apache.catalina.util.ServerInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +15,7 @@ import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.report.service.ServerPramService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -29,13 +28,13 @@ import oshi.software.os.OSFileStore;
  * v1.0 zhanghc 2021年12月14日上午11:15:01
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ServerParmServiceImpl implements ServerPramService {
 	@Value("${spring.datasource.url}")
 	private String dbUrl;
 	private static final SystemInfo SYSTEM_INFO = new SystemInfo();
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final BaseCacheService baseCacheService;
 
 	@Override
 	public List<Map<String, Object>> getList() {

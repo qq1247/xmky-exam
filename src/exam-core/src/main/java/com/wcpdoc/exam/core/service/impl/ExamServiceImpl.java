@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -39,8 +37,8 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.MyExamQuestion;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionBank;
@@ -59,6 +57,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -67,33 +66,21 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService {
-
-	@Resource
-	private ExamDao examDao;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private ExamQuestionService examQuestionService;
-	@Resource
-	private ExamRuleService examRuleService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private MyExamService myExamService;
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	private UserService userService;
-	@Resource
-	private MyMarkService myMarkService;
-	@Resource
-	private ProgressBarService progressBarService;
+	private final ExamDao examDao;
+	private final ExamCacheService examCacheService;
+	private final BaseCacheService baseCacheService;
+	private final QuestionService questionService;
+	private final ExamQuestionService examQuestionService;
+	private final ExamRuleService examRuleService;
+	private final QuestionBankService questionBankService;
+	private final MyExamService myExamService;
+	private final MyQuestionService myQuestionService;
+	private final UserService userService;
+	private final MyMarkService myMarkService;
+	private final ProgressBarService progressBarService;
 
 	@Override
 	public RBaseDao<Exam> getDao() {
@@ -1020,7 +1007,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException("考试用户重复");
 		}
 
-		if (getCurUser().getType() != 0) {// 验证子管理员（考试用户、阅卷用户没有权限）
+		if (!CurLoginUserUtil.isAdmin()) {// 验证子管理员（考试用户、阅卷用户没有权限）
 			User curUser = baseCacheService.getUser(getCurUser().getId());
 			examInfo.getUserIds().forEach(userId -> {// 控制层把机构下的用户合并到了userIds
 				User user = baseCacheService.getUser(userId);
@@ -1567,7 +1554,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException("考试已结束");
 		}
 
-		if (getCurUser().getType() != 0) {// 验证子管理员（考试用户、阅卷用户没有权限）
+		if (!CurLoginUserUtil.isAdmin()) {// 验证子管理员（考试用户、阅卷用户没有权限）
 			User curUser = baseCacheService.getUser(getCurUser().getId());
 			userIds.forEach(userId -> {// 控制层把机构下的用户合并到了userIds
 				User user = baseCacheService.getUser(userId);
@@ -1583,7 +1570,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 		userIds.forEach(userId -> {// 非考试用户校验
 			User user = baseCacheService.getUser(userId);
-			if (user.getType() != 1) {
+			if (!user.hasExamUser()) {
 				throw new MyException(String.format("【%s-%s】非考试用户", user.getId(), user.getName()));
 			}
 		});

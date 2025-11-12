@@ -320,7 +320,7 @@ async function answer() {
 
 // 收藏试题
 async function questionFav() {
-    const { data: { code } } = await myExerQuestionFav({
+    const { data: { code } } = myExerQuestionFav({
         id: route.params.id,
         questionId: curExamQuestion.value?.questionId,
     })
@@ -337,7 +337,7 @@ async function questionFav() {
 }
 // 错题重置
 async function wrongQuestionReset() {
-    const { data: { code } } = await myExerWrongQuestionReset({
+    const { data: { code } } = myExerWrongQuestionReset({
         id: route.params.id,
         questionId: curExamQuestion.value?.questionId,
     })

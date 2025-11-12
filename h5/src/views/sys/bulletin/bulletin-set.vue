@@ -101,7 +101,7 @@ async function add() {
     }
 
     // 添加
-    const { data: { code } } = await bulletinAdd({
+    const { data: { code } } = bulletinAdd({
         startTime: form.times[0],
         endTime: form.times[1],
         title: form.title,
@@ -124,7 +124,7 @@ async function edit() {
     }
 
     // 修改
-    const { data: { code } } = await bulletinEdit({
+    const { data: { code } } = bulletinEdit({
         id: form.id,
         startTime: form.times[0],
         endTime: form.times[1],
@@ -145,7 +145,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await bulletinDel({
+    const { data: { code } } = bulletinDel({
         id: form.id,
     })
     if (code !== 200) {

@@ -96,7 +96,7 @@ async function add() {
     }
 
     // 添加
-    const { data: { code } } = await dictAdd({ ...form })
+    const { data: { code } } = dictAdd({ ...form })
     if (code !== 200) {
         return
     }
@@ -114,7 +114,7 @@ async function edit() {
     }
 
     // 修改
-    const { data: { code } } = await dictEdit({ ...form })
+    const { data: { code } } = dictEdit({ ...form })
     if (code !== 200) {
         return
     }
@@ -129,7 +129,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await dictDel({
+    const { data: { code } } = dictDel({
         id: form.id,
     })
     if (code !== 200) {

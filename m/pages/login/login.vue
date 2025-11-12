@@ -60,7 +60,7 @@ import { dictIndexList } from '@/api/dict';
 import { useUserStore } from '@/stores/user';
 import { useDictStore } from '@/stores/dict';
 import { useParmStore } from '@/stores/parm';
-import { myExamGeneratePaper } from '@/api/myExam';
+import { myExamGeneratePaper } from '@/@/api/my-exam';
 import { escape2Html } from '@/util/htmlUtil';
 // #ifdef MP-WEIXIN
 import WxmpRsa from 'wxmp-rsa';

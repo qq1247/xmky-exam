@@ -3,10 +3,7 @@ package com.wcpdoc.base.service.impl;
 import java.io.File;
 import java.io.IOException;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.Parm;
@@ -17,9 +14,9 @@ import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
-import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,15 +25,11 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2016-6-11下午8:57:40
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExService {
-	@Resource
-	@Lazy
-	private EmailService emailService;
-	@Resource
-	private NotifyService notifyService;
-	@Resource
-	private FileService fileService;
+	private final NotifyService notifyService;
+	private final FileService fileService;
 
 	@Override
 	public RBaseDao<Parm> getDao() {

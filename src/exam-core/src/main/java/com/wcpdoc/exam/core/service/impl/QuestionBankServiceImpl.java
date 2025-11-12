@@ -2,8 +2,6 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.util.CurLoginUserUtil;
@@ -12,10 +10,11 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionBankDao;
-import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankExService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * 题库服务层实现
@@ -23,13 +22,10 @@ import com.wcpdoc.exam.core.service.QuestionBankService;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Service
+@RequiredArgsConstructor
 public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implements QuestionBankService {
-	@Resource
-	private QuestionBankDao questionBankDao;
-	@Resource
-	private QuestionBankExService questionBankExService;
-	@Resource
-	private QuestionDao questionDao;
+	private final QuestionBankDao questionBankDao;
+	private final QuestionBankExService questionBankExService;
 
 	@Override
 	public RBaseDao<QuestionBank> getDao() {

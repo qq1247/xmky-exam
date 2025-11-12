@@ -1,9 +1,5 @@
 package com.wcpdoc.core.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -11,6 +7,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,15 +18,12 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2021年10月15日上午9:33:58
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class RunTimeInterceptor implements HandlerInterceptor {
 	private static final ThreadLocal<Long> context = new ThreadLocal<>();
-	@Value("${runtime.timeout}")
-	private Integer TIME_OUT;// 超时时间
-	@Value("${runtime.exUrl}")
-	private String EX_URL;// 排除链接
-	@Value("${runtime.monitor}")
-	private boolean MONITOR;// 是否监听
+	private Integer TIME_OUT = 1000;
+	private String EX_URL = "";// 排除链接
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -40,10 +36,6 @@ public class RunTimeInterceptor implements HandlerInterceptor {
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		if (!MONITOR) {
-			return;
-		}
-
 		if (ValidateUtil.isValid(EX_URL) && EX_URL.contains(request.getRequestURI())) {
 			return;
 		}
@@ -59,8 +51,8 @@ public class RunTimeInterceptor implements HandlerInterceptor {
 		long runTime = endTime - startTime;
 		if (runTime > TIME_OUT) {
 			log.error("请求耗时异常：链接：{}， 耗时：{}毫秒，用户：{}，ip:{}，参数:{}", request.getRequestURI(), runTime,
-					UserContext.get() != null ? UserContext.get().getLoginName() : "匿名", request.getRemoteHost(),
-					request.getParameterMap());
+					UserContext.get().getLoginName() != null ? UserContext.get().getLoginName() : "匿名",
+					request.getRemoteAddr(), request.getParameterMap());
 		}
 	}
 

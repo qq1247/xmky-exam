@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -62,6 +60,7 @@ import com.wcpdoc.exam.core.util.MyExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.file.service.FileService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -70,33 +69,21 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamService {
-
-	@Resource
-	private MyExamDao myExamDao;
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	private MyPaperService myPaperService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private ExamQuestionService examQuestionService;
-	@Resource
-	private ExamRuleService examRuleService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
-	private MySxeService mySxeService;
-	@Resource
-	private MyExamHisService myExamHisService;
-	@Resource
-	private MyQuestionHisService myQuestionHisService;
-	@Resource
-	private FileService fileService;
+	private final MyExamDao myExamDao;
+	private final MyQuestionService myQuestionService;
+	private final MyPaperService myPaperService;
+	private final ExamCacheService examCacheService;
+	private final BaseCacheService baseCacheService;
+	private final ExamQuestionService examQuestionService;
+	private final ExamRuleService examRuleService;
+	private final QuestionService questionService;
+	private final MySxeService mySxeService;
+	private final MyExamHisService myExamHisService;
+	private final MyQuestionHisService myQuestionHisService;
+	private final FileService fileService;
 
 	@Override
 	public RBaseDao<MyExam> getDao() {

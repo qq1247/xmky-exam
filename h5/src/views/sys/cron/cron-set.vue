@@ -113,7 +113,7 @@ async function add() {
     }
 
     // 添加
-    const { data: { code } } = await cronAdd({ ...form })
+    const { data: { code } } = cronAdd({ ...form })
     if (code !== 200) {
         return
     }
@@ -131,7 +131,7 @@ async function edit() {
     }
 
     // 修改
-    const { data: { code } } = await cronEdit({ ...form })
+    const { data: { code } } = cronEdit({ ...form })
     if (code !== 200) {
         return
     }
@@ -146,7 +146,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await cronDel({
+    const { data: { code } } = cronDel({
         id: form.id,
     })
     if (code !== 200) {
@@ -159,14 +159,14 @@ async function del() {
 // 执行任务
 async function execute() {
     if (form.state === 1) {
-        const { data: { code } } = await cronStartTask({ ...form })
+        const { data: { code } } = cronStartTask({ ...form })
         if (code !== 200) {
             return
         }
     }
 
     if (form.state === 2) {
-        const { data: { code } } = await cronStopTask({ ...form })
+        const { data: { code } } = cronStopTask({ ...form })
         if (code !== 200) {
             return
         }
@@ -177,7 +177,7 @@ async function execute() {
 
 // 执行一次
 async function runOnce() {
-    const { data: { code } } = await cronRunOnceTask({ ...form })
+    const { data: { code } } = cronRunOnceTask({ ...form })
     if (code !== 200) {
         return
     }

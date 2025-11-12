@@ -4,24 +4,16 @@ import { ElMessage } from 'element-plus'
 import qs from 'qs'
 import router from '@/router'
 
-/**
- * http请求
- *
- * 如果请求1个接口时，浏览器调试显示发起两次请求（OPTIONS、POST|GET），是触发了预检请求
- * https://blog.csdn.net/qq_27626333/article/details/77005911
- */
+// http请求
 const http = axios.create({
-    baseURL: import.meta.env.DEV ? import.meta.env.VITE_BASE_URL : (window as any).domain.url,
+    baseURL: (window as any).domain.url,
     timeout: 6000,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [function (data, headers) {
-        if (headers['Content-Type'] === 'application/json') {
-            return data
-        }
+        if (headers['Content-Type'] === 'application/json') return data
         return qs.stringify(data, { arrayFormat: 'repeat' })
     }],
 })
-
-http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 // 请求拦截器
 http.interceptors.request.use(function (config) {
@@ -31,40 +23,72 @@ http.interceptors.request.use(function (config) {
     }
 
     return config;
-}, function (error) {
-    return Promise.reject(error);
+}, function (err) {
+    return Promise.reject(err);
 })
 
 // 响应拦截器
-http.interceptors.response.use(
-    response => {
-        if (response.data.code === 401) {// 鉴权失败，跳转到登录页
-            // ElMessage.error(response.data.msg) // 不要提示，体验不好
-            console.info(`鉴权失败：${response.data.msg}`)
+let isRefreshing = false
+let refreshSubscribers: ((token: string) => void)[] = []
+function onAccessTokenFetched(accessToken: string) {
+    refreshSubscribers.forEach(callback => callback(accessToken))
+    refreshSubscribers = []
+}
+function addRefreshSubscriber(callback: (token: string) => void) {
+    refreshSubscribers.push(callback)
+}
+http.interceptors.response.use(response => {
+    if (response.data.code !== 200) {// 成功静默，失败反馈
+        ElMessage.error(`${response.data.msg}`)
+    }
+    return response
+}, async error => {
+    const originalRequest = error.config
+    if (error.response?.status === 401 && !originalRequest._retry) {
+        const userStore = useUserStore()
+        if (!userStore.refreshToken) {
+            userStore.reset()
             router.replace('/login')
-        } else if (response.data.code === 403) {// 禁止访问
-            ElMessage.error(response.data.msg)
-            console.info(`${response.data.msg}`)
-        } else if (response.data.code === 500) {// 接口错误，提示错误
-            ElMessage.error(response.data.msg)
-        } else if (response.headers.authorization) {// 携带刷新令牌，替代当前令牌
-            const userStore = useUserStore()
-            userStore.accessToken = response.headers.authorization
+            ElMessage.error('登录已过期，请重新登录..')
+            return Promise.reject(error)
         }
 
-        return response;
-    }, error => {
-        if (error.message.substring(0, 10) === 'timeout of') {// 请求超时，提示错误（timeout of 6000ms exceeded）
-            ElMessage.error(`请求超时：${error.config.timeout / 1000}秒`)
-            console.error(`请求超时：${error.config.timeout / 1000}秒 ${error.config.baseURL}${error.config.url}?${error.config.data}`)
-        } else if (error.message === 'Network Error') {// 网络不通，提示错误
-            ElMessage.error('连接服务器失败')
-            console.error(`连接服务器失败：${error.config.baseURL}${error.config.url}?${error.config.data}`)
-        } else {
-            ElMessage.error(error.message)// 其他错误，提示错误
-            console.error(`请求未知错误：${error.config.baseURL}${error.config.url}?${error.config.data}`)
+        if (isRefreshing) {
+            return new Promise(resolve => {
+                addRefreshSubscriber((accessToken: string) => {
+                    originalRequest.headers.Authorization = accessToken
+                    resolve(http(originalRequest))
+                })
+            })
         }
-        return Promise.reject(error);
-    })
+
+        originalRequest._retry = true
+        isRefreshing = true
+
+        try {
+            const response = await http.post(`/login/refresh`, { refreshToken: userStore.refreshToken })
+            if (response.data.code !== 200) throw new Error(response.data.msg)
+            userStore.accessToken = response.data.data.accessToken
+            onAccessTokenFetched(userStore.accessToken)
+            originalRequest.headers.Authorization = userStore.accessToken
+            return http(originalRequest)
+        } catch (err) {
+            userStore.reset()
+            router.replace('/login')
+            return Promise.reject(err)
+        } finally {
+            isRefreshing = false
+        }
+    }
+
+    if (error.code === 'ECONNABORTED') {
+        ElMessage.error(`请求服务器超时：${error.config.timeout / 1000}秒`)
+    } else if (error.code === 'ERR_NETWORK') {
+        ElMessage.error('连接服务器失败')
+    } else {
+        ElMessage.error(`未知错误：${error}`)
+    }
+    return Promise.reject(error);
+})
 
 export default http

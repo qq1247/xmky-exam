@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +26,7 @@ import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -37,19 +36,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/exer")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiExerController extends BaseController {
-
-	@Resource
-	private ExerService exerService;
-	@Resource
-	private QuestionBankService questionBankService;
-	@Resource
-	private BaseCacheService baseCacheService;
-	@Resource
-	private UserService userService;
-	@Resource
-	private OrgService orgService;
+	private final ExerService exerService;
+	private final QuestionBankService questionBankService;
+	private final BaseCacheService baseCacheService;
+	private final UserService userService;
+	private final OrgService orgService;
 
 	/**
 	 * 练习列表

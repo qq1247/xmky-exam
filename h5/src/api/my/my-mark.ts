@@ -1,29 +1,29 @@
 import request from '@/request'
 
 export function myMarkListpage(parm: object) {
-    return request.post('/myMark/listpage', parm);
+    return request.post('/my-mark/listpage', parm);
 }
 export function myMarkQuestionStatis(parm: object) {
-    return request.post('/myMark/questionStatis', parm);
+    return request.post('/my-mark/question-statis', parm);
 }
 export function myMarkMarkList(parm: object) {
-    return request.post('/myMark/markList', parm);
+    return request.post('/my-mark/mark-list', parm);
 }
 export function myMarkClaimInfo(parm: object) {
-    return request.post('/myMark/claimInfo', parm);
+    return request.post('/my-mark/claim-info', parm);
 }
 export function myMarkClaim(parm: object) {
-    return request.post('/myMark/claim', parm);
+    return request.post('/my-mark/claim', parm);
 }
 export function myMarkPaper(parm: object) {
-    return request.post('/myMark/paper', parm);
+    return request.post('/my-mark/paper', parm);
 }
 export function myMarkGet(parm: object) {
-    return request.post('/myMark/get', parm);
+    return request.post('/my-mark/get', parm);
 }
 export function myMarkScore(parm: object) {
-    return request.post('/myMark/score', parm);
+    return request.post('/my-mark/score', parm);
 }
 export function myMarkFinish(parm: object) {
-    return request.post('/myMark/finish', parm);
+    return request.post('/my-mark/finish', parm);
 }

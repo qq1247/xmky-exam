@@ -400,7 +400,7 @@ async function score(examQuestion: ExamQuestion) {
     }
 
     examQuestion.commit = true // 后台返回前，禁止再次更改分数
-    const { data: { code } } = await myMarkScore({
+    const { data: { code } } = myMarkScore({
         examId: route.params.examId,
         userId: markList.value[curMarkIndex.value]?.examUserId,
         questionId: examQuestion.questionId,
@@ -425,7 +425,7 @@ async function finish() {
     load.loading = true
 
     await delay(200)
-    const { data: { code } } = await myMarkFinish({
+    const { data: { code } } = myMarkFinish({
         examId: route.params.examId,
         userId: markList.value[curMarkIndex.value]?.examUserId,
     })

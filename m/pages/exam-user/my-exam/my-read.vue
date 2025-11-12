@@ -224,7 +224,7 @@ import { Exam } from '@/ts/exam.d';
 import { MyExam } from '@/ts/myExam.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
-import { myExamExamGet, myExamGet, myExamQuestionStatis, myExamRetake } from '@/api/myExam';
+import { myExamExamGet, myExamGet, myExamQuestionStatis, myExamRetake } from '@/@/api/my-exam';
 import { useDictStore } from '@/stores/dict';
 
 /************************变量定义相关***********************/

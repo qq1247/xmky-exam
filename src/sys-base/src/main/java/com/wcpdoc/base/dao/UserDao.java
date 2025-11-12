@@ -30,7 +30,7 @@ public interface UserDao extends RBaseDao<User> {
 								i -> i.like("USER.NAME", pageIn.getParm("name")).or().like("ORG.NAME",
 										pageIn.getParm("name")))//
 						.eq(pageIn.hasParm("state"), "USER.STATE", pageIn.getParm("state"))//
-						.eq(pageIn.hasParm("type"), "USER.TYPE", pageIn.getParm("type"))//
+						.eq(pageIn.hasParm("role"), "USER.ROLE", pageIn.getParm("role"))//
 						.in(pageIn.hasParm("ids"), "USER.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))// 页面过滤
 						.in(pageIn.hasParm("_ids") && !pageIn.hasParm("_orgIds"), "USER.ID",
 								pageIn.getParm("_ids", List.class))// 控制层控制子管理员只能过滤自己的考试用户

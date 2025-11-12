@@ -3,16 +3,14 @@ package com.wcpdoc.api.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
-import com.wcpdoc.base.service.OrgExService;
 import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.util.CurLoginUserUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
@@ -20,6 +18,7 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,15 +28,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/org")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiOrgController extends BaseController {
-
-	@Resource
-	private OrgService orgService;
-	@Resource
-	private OrgExService orgExService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final OrgService orgService;
+	private final BaseCacheService baseCacheService;
 
 	/**
 	 * 机构列表
@@ -50,9 +45,9 @@ public class ApiOrgController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			if (getCurUser().getType() == 0) {// 如果是管理员
+			if (CurLoginUserUtil.isAdmin()) {// 如果是管理员
 				// 看全部
-			} else if (getCurUser().getType() == 2) {// 如果是子管理
+			} else if (CurLoginUserUtil.isSubAdmin()) {// 如果是子管理
 				User user = baseCacheService.getUser(getCurUser().getId());
 				if (ValidateUtil.isValid(user.getOrgIds())) {
 					pageIn.addParm("_ids", user.getOrgIds());
@@ -61,9 +56,9 @@ public class ApiOrgController extends BaseController {
 					idList.add(-1);// 没有就不显示
 					pageIn.addParm("_ids", idList);
 				}
-			} else if (getCurUser().getType() == 3) {// 阅卷用户没有角色权限
+			} else if (CurLoginUserUtil.isMarkUser()) {// 阅卷用户没有角色权限
 
-			} else if (getCurUser().getType() == 1) {// 考试用户没有角色权限
+			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有角色权限
 
 			}
 			return PageResultEx.ok().data(orgService.getListpage(pageIn));

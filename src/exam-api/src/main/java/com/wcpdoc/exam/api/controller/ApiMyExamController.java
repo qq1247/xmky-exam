@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,11 +19,10 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.ExamCacheService;
-import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
-import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.util.MyExamUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,20 +31,13 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
 @RestController
-@RequestMapping("/api/myExam")
+@RequestMapping("/api/my-exam")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiMyExamController extends BaseController {
-
-	@Resource
-	private MyExamService myExamService;
-	@Resource
-	private MyQuestionService myQuestionService;
-	@Resource
-	private ExamService examService;
-	@Resource
-	private ExamCacheService examCacheService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final MyExamService myExamService;
+	private final ExamCacheService examCacheService;
+	private final BaseCacheService baseCacheService;
 
 	/**
 	 * 我的考试列表
@@ -132,7 +122,7 @@ public class ApiMyExamController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/examGet")
+	@RequestMapping("/exam-get")
 	public PageResult examGet(Integer examId) {
 		try {
 			MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
@@ -181,7 +171,7 @@ public class ApiMyExamController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/questionStatis")
+	@RequestMapping("/question-statis")
 	public PageResult questionStatis(Integer examId) {
 		try {
 			MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
@@ -267,7 +257,7 @@ public class ApiMyExamController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/generatePaper")
+	@RequestMapping("/generate-paper")
 	public PageResult generatePaper(Integer examId) {
 		try {
 			myExamService.generatePaper(examId, getCurUser().getId());

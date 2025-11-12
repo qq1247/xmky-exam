@@ -1,7 +1,5 @@
 package com.wcpdoc.api.controller;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +10,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,11 +19,11 @@ import lombok.extern.slf4j.Slf4j;
  * v1.0 zhanghc 2020年10月13日下午5:39:55
  */
 @RestController
-@RequestMapping("/api/progressBar")
+@RequestMapping("/api/progress-bar")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiProgressBarController extends BaseController {
-	@Resource
-	private ProgressBarService progressBarService;
+	private final ProgressBarService progressBarService;
 
 	/**
 	 * 进度条获取

@@ -80,7 +80,7 @@ const form = reactive<User>({
     orgId: 1,
     name: '',
     loginName: '',
-    type: 1,
+    role: 'EXAM_USER',
     state: 0,
 })
 const delConfirm = ref(false) // 删除确认

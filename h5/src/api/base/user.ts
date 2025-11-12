@@ -19,7 +19,7 @@ export function userFrozen(parm: object) {
     return request.post('/user/frozen', parm);
 }
 export function userPwdInit(parm: object) {
-    return request.post('/user/pwdInit', parm);
+    return request.post('/user/pwd-init', parm);
 }
 
 

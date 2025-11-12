@@ -64,7 +64,7 @@
                                 <div class="login-win__btn-group">
                                     <span @click="loginType = 1" class="login-win__switch‌-btn">账号登录</span>
                                     <el-button type="primary" class="login-win__login-btn"
-                                        @click="anonLogin">登录</el-button>
+                                        @click="tempIn">登录</el-button>
                                 </div>
                             </el-form-item>
                         </el-form>
@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { examExamGet } from '@/api/exam/exam'
-import { loginIn, loginNoLogin, loginParm, loginEncrypt, loginSysTime } from '@/api/login'
+import { loginIn, loginTempIn, loginParm, loginEncrypt, loginSysTime } from '@/api/login'
 import { myExamGeneratePaper } from '@/api/my/my-exam'
 import { dictIndexList } from '@/api/sys/dict'
 import http from '@/request'
@@ -129,14 +129,14 @@ const anonFormRules = reactive<FormRules>({// 表单规则
     ],
 })
 
-const loginType = ref(1)// 登录类型（1：账号登录；2：匿名登录）
+const loginType = ref(1)// 登录类型（1：账号登录；2：临时匿名登录）
 
 const keyDown = (e: KeyboardEvent) => {// 回车登录
     if (e.key === 'Enter') {
         if (loginType.value === 1) {
             login()
         } else {
-            anonLogin()
+            tempIn()
         }
     }
 }
@@ -200,8 +200,9 @@ async function login() {
     // 令牌缓存
     userStore.id = data.userId
     userStore.name = data.userName
-    userStore.type = data.type
+    userStore.role = data.role
     userStore.accessToken = data.accessToken
+    userStore.refreshToken = data.refreshToken
 
     // 字典缓存
     const { data: { data: dictData } } = await dictIndexList({})
@@ -212,8 +213,8 @@ async function login() {
 }
 
 
-// 匿名登录
-async function anonLogin() {
+// 临时登录
+async function tempIn() {
     // 数据校验
     try {
         await anonFormRef.value?.validate()
@@ -247,7 +248,7 @@ async function anonLogin() {
     }
 
     // 登录
-    const { data: { code: code1, data: userData } } = await loginNoLogin({
+    const { data: { code: code1, data: userData } } = await loginTempIn({
         name: anonForm.userName
     })
     if (code1 !== 200) {
@@ -257,8 +258,9 @@ async function anonLogin() {
     // 令牌缓存
     userStore.id = userData.userId
     userStore.name = userData.userName
-    userStore.type = userData.type
+    userStore.role = userData.role
     userStore.accessToken = userData.accessToken
+    userStore.refreshToken = userData.refreshToken
 
     // 字典缓存
     const { data: { data: dict } } = await dictIndexList({})

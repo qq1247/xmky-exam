@@ -6,13 +6,27 @@ package com.wcpdoc.base.constant;
  * v1.0 zhanghc 2024年3月22日下午6:55:32
  */
 public class BaseConstant {
+
+	public static final String LOGIN_ATTEMPT_CACHE = "LOGIN_ATTEMPT_CACHE";
+	public static final String ONLINE_USER_CACHE = "ONLINE_USER_CACHE";
+	public static final String TOKEN_BLACKLIST_CACHE = "TOKEN_BLACKLIST_CACHE";
+	
+	public static final String ADMIN = "ADMIN";
+	public static final String SUB_ADMIN = "SUB_ADMIN";
+	public static final String EXAM_USER = "EXAM_USER";
+	public static final String MARK_USER = "MARK_USER";
+	public static final String ANON_USER = "ANON_USER";
+	
+	
+	
+	
+
 	public static final String USER_CACHE = "USER_CACHE";
 	public static final String ORG_CACHE = "ORG_CACHE";
 	public static final String PARM_CACHE = "PARM_CACHE";
 	public static final String PROGRESS_BAR_CACHE = "PROGRESS_BAR_CACHE";
 	public static final String DICT_CACHE = "DICT_CACHE";
 	public static final String NONCE_CACHE = "NONCE_CACHE";
-	public static final String USER_LOCK_CACHE = "USER_LOCK_CACHE";
 
 	public static final String USER_KEY_PRE = "'USER:' + ";
 	public static final String ORG_KEY_PRE = "'ORG:' + ";

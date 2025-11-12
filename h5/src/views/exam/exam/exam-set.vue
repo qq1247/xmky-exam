@@ -15,7 +15,7 @@
                             <span class="iconfont icon-fabu-10 exam-info__tag-icon"></span>
                             <span class="exam-info__tag-txt">{{ dictStore.getValue('LOGIN_TYPE', form.loginType as
                                 number)
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="exam-info__tag">
                             <span class="iconfont icon-fabu-11 exam-info__tag-icon"></span>
@@ -214,10 +214,11 @@
                             </xmks-select>
                         </el-form-item>
                         <el-form-item label="" prop="userIds" style="width: 100%;">
-                            <xmks-select v-model="userForm.userIds" url="user/listpage" :params="{ state: 1, type: 1 }"
-                                search-parm-name="name" option-label="name" option-value="id" :options="users"
-                                :multiple="true" clearable :page-size="100" :disabled-values="disabledUserIds"
-                                search-placeholder="请输入机构名称或用户名称进行筛选" placeholder="请输入机构名称或用户名称进行筛选">
+                            <xmks-select v-model="userForm.userIds" url="user/listpage"
+                                :params="{ state: 1, role: 'EXAM_USER' }" search-parm-name="name" option-label="name"
+                                option-value="id" :options="users" :multiple="true" clearable :page-size="100"
+                                :disabled-values="disabledUserIds" search-placeholder="请输入机构名称或用户名称进行筛选"
+                                placeholder="请输入机构名称或用户名称进行筛选">
                                 <template #default="{ option }">
                                     {{ option.name }} - {{ option.orgName }} {{ disabledUserIds.includes(option.id) ?
                                         '（不可选）' : '' }}
@@ -503,7 +504,7 @@ async function load() {
 
 // 暂停
 async function pause() {
-    const { data: { code } } = await examPause({
+    const { data: { code } } = examPause({
         id: form.id,
     })
     if (code !== 200) {
@@ -524,7 +525,7 @@ async function time() {
 
     // 时间变更
     commit.value = true
-    const { data: { code } } = await examTime({
+    const { data: { code } } = examTime({
         id: timeForm.id,
         timeType: timeForm.timeType,
         minute: timeForm.add === 1 ? -timeForm.minute : timeForm.minute
@@ -547,7 +548,7 @@ async function score() {
     }
 
     // 时间变更
-    const { data: { code } } = await examScore({
+    const { data: { code } } = examScore({
         id: scoreForm.id,
         scoreState: scoreForm.scoreState,
     })
@@ -568,7 +569,7 @@ async function rank() {
     }
 
     // 时间变更
-    const { data: { code } } = await examRank({
+    const { data: { code } } = examRank({
         id: rankForm.id,
         rankState: rankForm.rankState,
     })
@@ -590,7 +591,7 @@ async function userAdd() {
 
     // 用户添加
     commit.value = true
-    const { data: { code } } = await examUserAdd({ ...userForm })
+    const { data: { code } } = examUserAdd({ ...userForm })
     commit.value = false
     if (code !== 200) {
         return
@@ -608,7 +609,7 @@ async function assist() {
     }
 
     // 时间变更
-    const { data: { code } } = await examAssist({ ...assistForm })
+    const { data: { code } } = examAssist({ ...assistForm })
     if (code !== 200) {
         return
     }
@@ -624,7 +625,7 @@ async function del() {
         return
     }
 
-    const { data: { code } } = await examDel({ id: form.id })
+    const { data: { code } } = examDel({ id: form.id })
     if (code !== 200) {
         return
     }

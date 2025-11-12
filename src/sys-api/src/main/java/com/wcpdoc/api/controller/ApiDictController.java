@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +17,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,13 +27,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/dict")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiDictController extends BaseController {
-
-	@Resource
-	private DictService dictService;
-	@Resource
-	private BaseCacheService baseCacheService;
+	private final DictService dictService;
+	private final BaseCacheService baseCacheService;
 
 	/**
 	 * 数据字典列表
@@ -154,7 +151,7 @@ public class ApiDictController extends BaseController {
 	 * 
 	 * @return PageResult
 	 */
-	@RequestMapping("/indexList")
+	@RequestMapping("/index-list")
 	public PageResult indexList() {
 		try {
 			List<Map<String, Object>> result = baseCacheService.getDictList().stream()//

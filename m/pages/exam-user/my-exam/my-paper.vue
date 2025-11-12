@@ -212,7 +212,7 @@ import { useDictStore } from '@/stores/dict';
 import { MyExam } from '@/ts/myExam.d';
 import { Exam } from '@/ts/exam.d';
 import { ExamQuestion } from '@/ts/paper.d';
-import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/api/myExam';
+import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/@/api/my-exam';
 import { loginSysTime } from '@/api/login';
 import { toChinaNum } from '@/util/numberUtil';
 import { useUserStore } from '@/stores/user';

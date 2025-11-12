@@ -2,12 +2,9 @@ package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
@@ -17,6 +14,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.service.BulletinService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,13 +24,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/bulletin")
+@RequiredArgsConstructor
 @Slf4j
 public class ApiBulletinController extends BaseController {
 
-	@Resource
-	private BulletinService bulletinService;
-	@Resource
-	private UserService userService;
+	private final BulletinService bulletinService;
 
 	/**
 	 * 公告列表
