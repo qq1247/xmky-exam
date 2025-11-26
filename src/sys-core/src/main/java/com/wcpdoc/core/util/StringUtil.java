@@ -1,18 +1,12 @@
 package com.wcpdoc.core.util;
 
-import java.io.File;
-import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.IOUtils;
 
 import com.wcpdoc.core.exception.MyException;
 
@@ -24,151 +18,6 @@ import com.wcpdoc.core.exception.MyException;
 public class StringUtil {
 	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	private static final SecureRandom RANDOM = new SecureRandom();
-
-	/**
-	 * 获取字符串
-	 * 
-	 * v1.0 zhanghc 2017年4月11日下午11:09:35
-	 * 
-	 * @param file      读取文件
-	 * @param startByte 起始字节
-	 * @param endByte   结束字节
-	 * @param charset   字符集
-	 * @return List<String>
-	 */
-	public static List<String> getString(File file, long startByte, long endByte, String charset) {
-		// 数据校验
-		if (!file.exists() || file.isDirectory() || !file.canRead()) {
-			throw new MyException("参数无效：file");
-		}
-		if (startByte < 0) {
-			throw new MyException("参数无效：startByte");
-		}
-		if (endByte < 0 || endByte < startByte) {
-			throw new MyException("参数无效：endByte");
-		}
-		if (!ValidateUtil.isValid(charset)) {
-			throw new MyException("参数无效：charset");
-		}
-		if (endByte - startByte > 100000) {
-			throw new MyException("不能大于10w个字节");
-		}
-
-		// 读取指定位置的字符串
-		RandomAccessFile fileRead = null;
-		List<String> result = new ArrayList<String>();
-		try {
-			fileRead = new RandomAccessFile(file, "r");// 只读模式
-			long fileByteLength = fileRead.length();
-			if (fileByteLength == 0L) {
-				return result;
-			}
-			if (startByte > fileByteLength) {
-				return result;
-			}
-
-			StringBuilder str = new StringBuilder();
-			for (long i = startByte; i < endByte; i++) {
-				fileRead.seek(i);
-				str.append((char) fileRead.read());
-			}
-
-			String[] strArr = new String(str.toString().getBytes("iso-8859-1"), charset).replaceAll("\r", "")
-					.split("\n");
-			return Arrays.asList(strArr);
-		} catch (Exception e) {
-			throw new MyException(e);
-		} finally {
-			IOUtils.closeQuietly(fileRead);
-		}
-	}
-
-	/**
-	 * 获取字符串
-	 * 
-	 * v1.0 zhanghc 2017年4月11日下午11:09:35
-	 * 
-	 * @param file      读取文件
-	 * @param startByte 起始字节
-	 * @param endByte   结束字节
-	 * @return List<String>
-	 */
-	public static List<String> getString(File file, long startByte, long endByte) {
-		return getString(file, startByte, endByte, "utf-8");
-	}
-
-	/**
-	 * 获取最后N行字符串
-	 * 
-	 * v1.0 zhanghc 2017年4月11日下午11:09:35
-	 * 
-	 * @param file    读取文件
-	 * @param readNum 读取行数
-	 * @param charset 字符集
-	 * @return List<String>
-	 */
-	public static List<String> getLastLine(File file, int readNum, String charset) {
-		// 数据校验
-		if (!file.exists() || file.isDirectory() || !file.canRead()) {
-			throw new MyException("参数无效：file");
-		}
-		if (readNum <= 0) {
-			throw new MyException("参数无效：readNum");
-		}
-		if (!ValidateUtil.isValid(charset)) {
-			throw new MyException("参数无效：charset");
-		}
-
-		// 读取最后N行记录
-		long currentReadNum = 0;
-		RandomAccessFile fileRead = null;
-		List<String> result = new ArrayList<String>();
-		try {
-			fileRead = new RandomAccessFile(file, "r");// 只读模式
-			long fileByteLength = fileRead.length();
-			if (fileByteLength == 0L) {
-				return result;
-			}
-
-			long pos = fileByteLength - 1;
-			while (pos > 0) {
-				pos--;
-				fileRead.seek(pos);
-				if (fileRead.readByte() == '\n') {
-					String line = new String(fileRead.readLine().getBytes("iso-8859-1"), charset);
-					result.add(line);
-					currentReadNum++;
-					if (currentReadNum == readNum) {
-						break;
-					}
-				}
-			}
-			if (pos == 0) {
-				fileRead.seek(0);
-				result.add(new String(fileRead.readLine().getBytes("iso-8859-1"), charset));
-			}
-
-			Collections.reverse(result);
-			return result;
-		} catch (Exception e) {
-			throw new MyException(e);
-		} finally {
-			IOUtils.closeQuietly(fileRead);
-		}
-	}
-
-	/**
-	 * 获取最后N行字符串
-	 * 
-	 * v1.0 zhanghc 2017年4月11日下午11:09:35
-	 * 
-	 * @param file    读取文件
-	 * @param readNum 读取行数
-	 * @return List<String>
-	 */
-	public static List<String> getLastLine(File file, int readNum) {
-		return getLastLine(file, readNum, "utf-8");
-	}
 
 	/**
 	 * 去除html标签
@@ -302,8 +151,8 @@ public class StringUtil {
 	 * @return String
 	 */
 	public static String getRandom(int length) {
-		StringBuilder sb = new StringBuilder(16);
-		for (int i = 0; i < 16; i++) {
+		StringBuilder sb = new StringBuilder(length);
+		for (int i = 0; i < length; i++) {
 			sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
 		}
 		return sb.toString();

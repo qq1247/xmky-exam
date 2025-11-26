@@ -62,7 +62,7 @@ const dictStore = useDictStore()// 字典缓存
 const queryForm = reactive({// 查询表单
     name: '',
     state: '',
-    type: 3,// 查询阅卷用户
+    role: 'MARK_USER'
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,

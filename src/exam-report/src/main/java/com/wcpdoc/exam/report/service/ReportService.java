@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.report.service;
 
-import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.entity.PageIn;
@@ -44,14 +43,6 @@ public interface ReportService {
 	 * @return Map<String,Object>
 	 */
 	Map<String, Object> markUserHome();
-	
-	/**
-	 * 慢接口日志
-	 * 
-	 * v1.0 chenyun 2021年12月10日上午10:14:11
-	 * @return Map<String,Object>
-	 */
-	List<String> serverLog() throws Exception ;
 	
 	/**
 	 * 试题统计

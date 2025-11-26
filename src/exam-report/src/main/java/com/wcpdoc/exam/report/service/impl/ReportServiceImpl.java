@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.report.service.impl;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,11 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,7 +27,6 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
-import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
@@ -189,34 +183,6 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("unMarkNum", myMarkOfUnMarkList.size());
 		result.put("examNum", myMakrList.size());
-		return result;
-	}
-
-	@Override
-	public List<String> serverLog() throws Exception {
-		if (getCurUser().getId().intValue() != 1) {
-			throw new MyException("登录用户角色错误");
-		}
-
-		List<String> result = new ArrayList<String>();
-		File log4j2File = new File(ResourceUtils.getURL("./config/log4j2.xml").getFile()); // 从log4j.xml解析日志文件目录
-		Document parse = Jsoup.parse(log4j2File, "UTF-8");
-		Elements elementsByTag = parse.getElementsByTag("RollingFile");
-		File logFile = new File(elementsByTag.attr("filename"));
-		Long fileLen = logFile.length();
-		Long curReadLen = fileLen - 10000;// 只读取最后10000字节的日志
-		curReadLen = curReadLen < 0 ? 0 : curReadLen;
-		List<String> strList = StringUtil.getString(logFile, curReadLen, fileLen);
-
-		for (int i = 0; i < strList.size(); i++) {
-			if (result.size() >= 10) {
-				return result;
-			}
-
-			if (strList.get(i).contains("请求耗时异常：链接：")) {
-				result.add(strList.get(i));
-			}
-		}
 		return result;
 	}
 

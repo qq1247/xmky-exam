@@ -54,18 +54,20 @@ public class AuthConf {
 		http.authorizeHttpRequests(authz -> authz // 权限规则配置
 				// ========== 匿名访问 ==========
 				.requestMatchers(//
+						"/plugin/**", //
 						"/api/login/**", //
 						"/api/file/download", //
-						"/api/exam/examGet" //
+						"/api/exam/exam-get" //
 				).permitAll()
 				// ========== 登录访问，不限角色 ==========
 				.requestMatchers(//
+						"/api/plugin/**", //
 						"/api/file/upload", //
-						"/api/dict/indexList", //
+						"/api/dict/index-list", //
 						"/api/bulletin/listpage", //
 						"/api/bulletin/get", //
 						"/api/user/get", //
-						"/api/progressBar/**"//
+						"/api/progress-bar/**"//
 				).authenticated()
 				// ========== 管理员、子管理员 ==========
 				.requestMatchers(//
@@ -74,29 +76,29 @@ public class AuthConf {
 						"/api/user/add", //
 						"/api/user/edit", //
 						"/api/user/del", //
-						"/api/user/pwdInit", //
+						"/api/user/pwd-init", //
 						"/api/user/frozen", //
 						"/api/parm/get", //
-						"/api/report/exam/rankListpage", //
+						"/api/report/exam/rank-listpage", //
 						"/api/report/exam/statis", //
-						"/api/report/paper/exportPDF", //
-						"/api/report/rank/exportPDF", //
-						"/api/report/exer/trackListpage", //
-						"/api/report/exer/wrongQuestionListpage", //
-						"/api/questionBank/**", //
+						"/api/report/paper/export-pdf", //
+						"/api/report/rank/export-pdf", //
+						"/api/report/exer/track-listpage", //
+						"/api/report/exer/wrong-question-listpage", //
+						"/api/question-bank/**", //
 						"/api/question/**", //
 						"/api/exam/**", //
 						"/api/exer/**"//
 				)//
 				.hasAnyRole("ADMIN", "SUB_ADMIN")//
 				// ========== 管理员、子管理员、阅卷用户 ==========
-				.requestMatchers("/api/myMark/**")//
+				.requestMatchers("/api/my-mark/**")//
 				.hasAnyRole("ADMIN", "SUB_ADMIN", "MARK_USER")//
 				// ========== 考试用户、临时用户 ==========
-				.requestMatchers("/api/myExam/**")//
+				.requestMatchers("/api/my-exam/**")//
 				.hasAnyRole("EXAM_USER", "TEMP_USER")//
 				// ========== 考试用户 ==========
-				.requestMatchers("/api/myExer/**")//
+				.requestMatchers("/api/my-exer/**")//
 				.hasAnyRole("EXAM_USER")//
 				// ========== 管理员 ==========
 				.requestMatchers("/api/**")//

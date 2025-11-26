@@ -29,10 +29,10 @@ public class DemoModeFilter extends OncePerRequestFilter {
 
 	private static final List<String> DEMO_PROTECTED_PATHS = Arrays.asList("/api/**/del", "/api/parm/ent",
 			"/api/parm/email", "/api/parm/file", "/api/parm/db", "/api/parm/pwd", "/api/parm/custom", "/api/parm/m",
-			"/api/cron/add", "/api/cron/edit", "/api/cron/startTask", "/api/cron/stopTask", "/api/cron/runOnceTask",
+			"/api/cron/add", "/api/cron/edit", "/api/cron/start-task", "/api/cron/stop-task", "/api/cron/run-once-task",
 			"/api/dict/add", "/api/dict/edit", "/api/org/add", "/api/org/edit", "/api/org/move", "/api/user/edit",
-			"/api/user/frozen", "/api/user/pwdInit", "/api/login/pwd", "/api/questionBank/edit",
-			"/api/questionBank/clear");
+			"/api/user/frozen", "/api/user/pwd-init", "/api/login/pwd", "/api/question-bank/edit",
+			"/api/question-bank/clear");
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

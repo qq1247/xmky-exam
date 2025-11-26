@@ -76,7 +76,7 @@ import type { Listpage } from '@/ts/common/listpage'
 import XmksCardData from '@/components/card/xmks-card-data.vue'
 import XmksCardEmpty from '@/components/card/xmks-card-empty.vue'
 import { useRouter } from 'vue-router'
-import { exerListpage } from '@/api/exam/exer'
+import { myExerExerListpage } from '@/api/my/my-exer'
 
 /************************变量定义相关***********************/
 const router = useRouter()
@@ -98,7 +98,7 @@ onMounted(() => {
 /************************事件相关*****************************/
 // 查询
 async function query() {
-    const { data: { code, data } } = await exerListpage({
+    const { data: { code, data } } = await myExerExerListpage({
         ...queryForm,
         state: 1,
         curPage: listpage.curPage,

@@ -408,6 +408,7 @@ import { diff } from '@/util/timeUtil'
 import xmksCountDown from '@/components/xmks-count-down.vue';
 import xmksCardEmpty from '@/components/card/xmks-card-empty.vue';
 import type { Bulletin } from '@/ts/sys/bulletin';
+import { myExerExerListpage } from '@/api/my/my-exer';
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore();// 字典缓存
@@ -432,7 +433,7 @@ onMounted(async () => {
         exerListQuery();
     } else if (userStore.isExamUser()) {
         myExamListQuery()
-        exerListQuery()
+        myExerListQuery()
     } else if (userStore.isMarkUser()) {
         myMarkListQuery()
     }
@@ -548,6 +549,23 @@ async function exerListQuery() {
     const pageSize = 100
     while (true) {
         const { data: { data } } = await exerListpage({
+            state: 1,
+            curPage: curPage++,
+            pageSize: pageSize,
+        })
+        exerList.value.push(...data.list)
+        if (exerList.value.length >= data.total) {
+            break
+        }
+    }
+}
+
+// 我的练习列表
+async function myExerListQuery() {
+    let curPage = 1
+    const pageSize = 100
+    while (true) {
+        const { data: { data } } = await myExerExerListpage({
             state: 1,
             curPage: curPage++,
             pageSize: pageSize,

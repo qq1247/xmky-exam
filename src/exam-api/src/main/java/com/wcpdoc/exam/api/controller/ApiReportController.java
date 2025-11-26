@@ -226,26 +226,6 @@ public class ApiReportController extends BaseController {
 //        }
 //    }
 
-//	/**
-//	 * 慢接口日志
-//	 * 
-//	 * v1.0 chenyun 2021-12-15 13:49:29
-//	 * 
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/server/log")
-//	public PageResult serverLog() {
-//		try {
-//			return PageResultEx.ok().data(reportService.serverLog());
-//		} catch (MyException e) {
-//			log.error("首页慢接口日志统计错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("首页慢接口日志统计错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-
 	/**
 	 * 试题统计
 	 * 

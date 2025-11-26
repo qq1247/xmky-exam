@@ -3,6 +3,9 @@ import request from '@/request'
 export function myExerListpage(parm: object) {
     return request.post('/my-exer/listpage', parm);
 }
+export function myExerExerListpage(parm: object) {
+    return request.post('/my-exer/exer-listpage', parm);
+}
 export function myExerAdd(parm: object) {
     return request.post('/my-exer/add', parm);
 }
