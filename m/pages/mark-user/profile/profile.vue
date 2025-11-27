@@ -6,8 +6,8 @@
 				<view class="avatar">
 					<image class="avatar__wrap" src="@/static/img/user-avatar.png"></image>
 					<view class="avatar__inner">
-						<view class="avatar__name">{{ userStore.user.name }}</view>
-						<view class="avatar__orgname">{{ userStore.user.type === 3 ? '阅卷用户' : '未知' }}</view>
+						<view class="avatar__name">{{ userStore.name }}</view>
+						<view class="avatar__orgname">{{ userStore.role === 'MARK_USER' ? '阅卷用户' : '未知' }}</view>
 					</view>
 				</view>
 			</view>
@@ -57,7 +57,7 @@ const scrollHeight = ref(0); // 下侧列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
 onShow(async () => {
-	if (!userStore.user.id) {
+	if (!userStore.id) {
 		uni.navigateTo({ url: '/pages/login/login' });
 		return;
 	}

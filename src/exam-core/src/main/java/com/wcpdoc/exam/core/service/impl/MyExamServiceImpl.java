@@ -13,8 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -415,7 +414,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		// 旧试卷存档
 		MyExamHis myExamHis = new MyExamHis();
 		try {
-			BeanUtils.copyProperties(myExamHis, myExam);
+			BeanUtils.copyProperties(myExam, myExamHis);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new MyException("拷贝属性错误");
@@ -427,7 +426,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		for (MyExamQuestion myQuestion : myQuestionList) {
 			MyExamQuestionHis myQuestionHis = new MyExamQuestionHis();
 			try {
-				BeanUtils.copyProperties(myQuestionHis, myQuestion);
+				BeanUtils.copyProperties(myQuestion, myQuestionHis);
 			} catch (Exception e) {
 				log.error(e.getMessage());
 				throw new MyException("拷贝属性错误");
@@ -649,7 +648,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			shuffleNums[i] = start + i;
 		}
 
-		ArrayUtils.shuffle(shuffleNums);
+		Collections.shuffle(CollectionUtil.toList(shuffleNums));
 		return Arrays.asList(shuffleNums);
 	}
 }

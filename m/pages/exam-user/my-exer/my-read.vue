@@ -227,7 +227,7 @@ import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
 import { myExerListpage, myExerGet, myExerTrackList, myExerAdd } from '@/api/my-exer';
 import { loginSysTime } from '@/api/login';
-import { exerListpage } from '@/api/exer';
+import { myExerExerListpage } from '@/api/my-exer';
 import { Page } from '@/ts/page.d';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
@@ -372,7 +372,7 @@ async function userQuery() {
 
 // 题库统计查询
 async function questionBankStatisQuery() {
-	let { data } = await exerListpage({
+	let { data } = await myExerExerListpage({
 		exerId: exerId.value,
 		curPage: 1,
 		pageSize: 1

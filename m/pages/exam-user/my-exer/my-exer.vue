@@ -77,7 +77,7 @@
 import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
-import { exerListpage } from '@/api/exer';
+import { myExerExerListpage } from '@/api/my-exer';
 import { Exer } from '@/ts/exer.d';
 import { useTabbarStore } from '@/stores/tabbar';
 
@@ -115,7 +115,7 @@ async function query(append: boolean) {
 	listpage.status = 'loading';
 	listpage.curPage = append ? listpage.curPage + 1 : 1;
 
-	let { data } = await exerListpage({
+	let { data } = await myExerExerListpage({
 		...queryForm,
 		state: 1,
 		curPage: listpage.curPage,

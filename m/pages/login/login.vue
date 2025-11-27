@@ -26,20 +26,20 @@
                     </view>
                 </uni-forms-item>
             </uni-forms>
-            <uni-forms v-if="loginType == 2" ref="anonFormRef" :model="anonForm" :rules="anonFormRules">
+            <uni-forms v-if="loginType == 2" ref="tempFormRef" :model="tempForm" :rules="tempFormRules">
                 <uni-forms-item name="userName">
-                    <uni-easyinput v-model="anonForm.userName" prefixIcon="person" :focus="true"
+                    <uni-easyinput v-model="tempForm.userName" prefixIcon="person" :focus="true"
                         :styles="{ backgroundColor: '#F3F6F9' }" placeholder="请输入姓名和手机号" class="login-main__input" />
                 </uni-forms-item>
                 <uni-forms-item name="examName">
-                    <uni-easyinput v-model="anonForm.examName" prefixIcon="locked"
+                    <uni-easyinput v-model="tempForm.examName" prefixIcon="locked"
                         :styles="{ backgroundColor: '#F3F6F9' }" clearable placeholder="请输入考试名称"
                         class="login-main__input" />
                 </uni-forms-item>
                 <uni-forms-item>
                     <view class="login-main__btn-group">
                         <text @click="loginType = 1" class="login-main__switc-btn">账号登录</text>
-                        <button class="login-main__login" type="primary" @click="anonLogin">登录</button>
+                        <button class="login-main__login" type="primary" @click="tempIn">登录</button>
                     </view>
                 </uni-forms-item>
             </uni-forms>
@@ -54,13 +54,13 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { loginIn, loginSysTime, loginNoLogin, loginParm, loginEncrypt } from '@/api/login';
-import { examExamGet } from '@/api/exam.js';
+import { loginIn, loginSysTime, loginTempIn, loginParm, loginEncrypt } from '@/api/login';
+import { examExamGet } from '@/api/exam';
 import { dictIndexList } from '@/api/dict';
 import { useUserStore } from '@/stores/user';
 import { useDictStore } from '@/stores/dict';
 import { useParmStore } from '@/stores/parm';
-import { myExamGeneratePaper } from '@/@/api/my-exam';
+import { myExamGeneratePaper } from '@/api/my-exam';
 import { escape2Html } from '@/util/htmlUtil';
 // #ifdef MP-WEIXIN
 import WxmpRsa from 'wxmp-rsa';
@@ -89,12 +89,12 @@ const formRules = {
     }
 };
 
-const anonForm = reactive({
+const tempForm = reactive({
     userName: '',
     examName: ''
 });
-const anonFormRef = ref();
-const anonFormRules = {
+const tempFormRef = ref();
+const tempFormRules = {
     userName: {
         rules: [
             { required: true, errorMessage: '请输入姓名和手机号' },
@@ -118,7 +118,7 @@ onLoad(async (option) => {
 
     let {
         data: { sysName, customTitle, customContent, icp }
-    } = await loginParm();
+    } = await loginParm({});
 
     parmStore.sysName = sysName;
     parmStore.customTitle = customTitle;
@@ -175,36 +175,30 @@ async function login() {
     }
 
     // 用户信息保存
-    userStore.user.id = data.userId;
-    userStore.user.name = data.userName;
-    userStore.user.type = data.type;
-    userStore.user.accessToken = data.accessToken;
+    userStore.id = data.userId;
+    userStore.name = data.userName;
+    userStore.role = data.role;
+    userStore.accessToken = data.accessToken;
+	userStore.refreshToken = data.refreshToken
 
     // 数据字典保存
-    let { data: dicts } = await dictIndexList();
+    let { data: dicts } = await dictIndexList({});
     dictStore.dicts = dicts;
 
     // 进入相关页面
-    if (userStore.user.type === 0 || userStore.user.type == 2) {
+    if (userStore.isAdmin() || userStore.isSubAdmin()) {
         uni.redirectTo({ url: '/pages/admin/question-bank/question-bank' });
-    } else if (userStore.user.type === 1) {
+    } else if (userStore.role === 'EXAM_USER') {
         uni.redirectTo({ url: '/pages/exam-user/home/home' });
-    } else if (userStore.user.type === 3) {
+    } else if (userStore.role === 'MARK_USER') {
         uni.redirectTo({ url: '/pages/mark-user/my-mark/my-mark' });
     }
-    // if (uni.getStorageSync('redirectPath')) {// 因为不同角色的底部菜单不一样，需要自定义
-    // 	let _redirectPath = uni.getStorageSync('redirectPath'); // 过期登录返回之前页面
-    // 	uni.removeStorageSync('redirectPath');
-    // 	uni.reLaunch({ url: _redirectPath });
-    // } else {
-    // 	uni.switchTab({ url: '/pages/exam-user/home/home' });
-    // }
 }
 
-// 登录
-async function anonLogin() {
+// 临时登录
+async function tempIn() {
     // 数据校验
-    let validate = await anonFormRef.value
+    let validate = await tempFormRef.value
         .validate()
         .then(() => true)
         .catch(() => false);
@@ -213,7 +207,7 @@ async function anonLogin() {
     }
 
     let { code: examCode, data: examData } = await examExamGet({
-        name: anonForm.examName
+        name: tempForm.examName
     });
     if (examCode !== 200) {
         return;
@@ -238,23 +232,20 @@ async function anonLogin() {
     }
 
     // 用户登录
-    let { code, data } = await loginNoLogin({ name: anonForm.userName });
+    let { code, data } = await loginTempIn({ name: tempForm.userName });
     if (code !== 200) {
-        return;
-    }
-    if (!(data.type === 1 || data.type === 4)) {
-        uni.showToast({ title: '暂不支持管理员登录', icon: 'error' });
         return;
     }
 
     // 用户信息缓存
-    userStore.user.id = data.userId;
-    userStore.user.name = data.userName;
-    userStore.user.type = data.type;
-    userStore.user.accessToken = data.accessToken;
+    userStore.id = data.userId;
+    userStore.name = data.userName;
+    userStore.role = data.role;
+    userStore.accessToken = data.accessToken;
+    userStore.refreshToken = data.refreshToken;
 
     // 数据字典缓存
-    let { data: dicts } = await dictIndexList();
+    let { data: dicts } = await dictIndexList({});
     dictStore.dicts = dicts;
 
     // 生成试卷

@@ -185,14 +185,14 @@
                                     <span class="my-exam__num">
                                         {{ myExam.totalScore || '-' }}<span class="my-exam__unit">/{{
                                             myExam.examTotalScore
-                                        }}</span>
+                                            }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的分数</span>
                                 </div>
                                 <div class="my-exam__inner">
                                     <span class="my-exam__num">
                                         {{ myExam.no || '-' }}<span class="my-exam__unit">/{{ myExam.userNum || '-'
-                                        }}</span>
+                                            }}</span>
                                     </span>
                                     <span class="my-exam__after-txt">我的排名</span>
                                 </div>

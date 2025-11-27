@@ -16,6 +16,3 @@ export function orgDel(parm: object) {
 export function orgGet(parm: object) {
     return request.post('/org/get', parm);
 }
-
-
-

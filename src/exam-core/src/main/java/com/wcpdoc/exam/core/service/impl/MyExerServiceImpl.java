@@ -72,7 +72,7 @@ public class MyExerServiceImpl extends BaseServiceImp<MyExer> implements MyExerS
 	private final MyExerTrackMonthlyService myExerTrackMonthlyService;
 	private final QuestionBankService questionBankService;
 	private final MyFavQuestionService myFavQuestionService;
-	private MyWrongQuestionService myWrongQuestionService;
+	private final MyWrongQuestionService myWrongQuestionService;
 
 	@Override
 	public RBaseDao<MyExer> getDao() {

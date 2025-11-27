@@ -15,7 +15,7 @@ public class BaseConstant {
 	public static final String SUB_ADMIN = "SUB_ADMIN";
 	public static final String EXAM_USER = "EXAM_USER";
 	public static final String MARK_USER = "MARK_USER";
-	public static final String ANON_USER = "ANON_USER";
+	public static final String TEMP_USER = "TEMP_USER";
 	
 	
 	

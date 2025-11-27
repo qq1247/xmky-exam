@@ -127,9 +127,9 @@
 import { ref } from 'vue';
 import { onShow, onLoad, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
-import { myExamListpage } from '@/@/api/my-exam';
+import { myExamListpage } from '@/api/my-exam';
 import { bulletinListpage } from '@/api/bulletin';
-import { exerListpage } from '@/api/exer';
+import { myExerExerListpage } from '@/api/my-exer';
 import { useParmStore } from '@/stores/parm';
 import { useTabbarStore } from '@/stores/tabbar';
 
@@ -152,7 +152,7 @@ const taskListHeight = ref(0); // 下侧列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
 onShow(async () => {
-	if (!userStore.user.id) {
+	if (!userStore.id) {
 		uni.navigateTo({ url: '/pages/login/login' });
 		return;
 	}
@@ -180,7 +180,7 @@ async function myExamQuery() {
 
 // 我的练习查询
 async function myExerQuery() {
-	let { data } = await exerListpage({ state: 1, todo: true, pageSize: 20 });
+	let { data } = await myExerExerListpage({ state: 1, todo: true, pageSize: 20 });
 	myExerList.value = data.list;
 }
 

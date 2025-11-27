@@ -11,13 +11,14 @@ const http = axios.create({
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [function (data, headers) {
         if (headers['Content-Type'] === 'application/json') return data
+        if (typeof data === 'string') return data;
         return qs.stringify(data, { arrayFormat: 'repeat' })
     }],
 })
 
 // 请求拦截器
-http.interceptors.request.use(function (config) {
-    const userStore = useUserStore()
+const userStore = useUserStore()
+http.interceptors.request.use(config => {
     if (userStore.accessToken) {
         config.headers.Authorization = userStore.accessToken
     }
@@ -38,6 +39,9 @@ function addRefreshSubscriber(callback: (token: string) => void) {
     refreshSubscribers.push(callback)
 }
 http.interceptors.response.use(response => {
+    if (response.config.responseType === 'blob') { // 下载附件不要提示
+        return response;
+    }
     if (response.data.code !== 200) {// 成功静默，失败反馈
         ElMessage.error(`${response.data.msg}`)
     }
@@ -45,7 +49,6 @@ http.interceptors.response.use(response => {
 }, async error => {
     const originalRequest = error.config
     if (error.response?.status === 401 && !originalRequest._retry) {
-        const userStore = useUserStore()
         if (!userStore.refreshToken) {
             userStore.reset()
             router.replace('/login')
@@ -67,7 +70,9 @@ http.interceptors.response.use(response => {
 
         try {
             const response = await http.post(`/login/refresh`, { refreshToken: userStore.refreshToken })
+
             if (response.data.code !== 200) throw new Error(response.data.msg)
+
             userStore.accessToken = response.data.data.accessToken
             onAccessTokenFetched(userStore.accessToken)
             originalRequest.headers.Authorization = userStore.accessToken
@@ -75,13 +80,16 @@ http.interceptors.response.use(response => {
         } catch (err) {
             userStore.reset()
             router.replace('/login')
+            ElMessage.error(`刷新令牌失败：${err || ''}`)
             return Promise.reject(err)
         } finally {
             isRefreshing = false
         }
     }
 
-    if (error.code === 'ECONNABORTED') {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+        ElMessage.error(error.response.data.msg)
+    } else if (error.code === 'ECONNABORTED') {
         ElMessage.error(`请求服务器超时：${error.config.timeout / 1000}秒`)
     } else if (error.code === 'ERR_NETWORK') {
         ElMessage.error('连接服务器失败')

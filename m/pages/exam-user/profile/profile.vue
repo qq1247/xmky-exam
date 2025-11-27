@@ -69,7 +69,7 @@ const scrollHeight = ref(0); // 下侧列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
 onShow(async () => {
-	if (!userStore.user.id) {
+	if (!userStore.id) {
 		uni.navigateTo({ url: '/pages/login/login' });
 		return;
 	}

@@ -477,7 +477,7 @@ public class ApiMyExerController extends BaseController {
 	 * @param questionId
 	 * @return PageResult
 	 */
-	@RequestMapping("/questionFav")
+	@RequestMapping("/question-fav")
 	public PageResult fav(Integer id, Integer questionId) {
 		try {
 			// 数据校验
@@ -595,7 +595,7 @@ public class ApiMyExerController extends BaseController {
 	 * @param questionId
 	 * @return PageResult
 	 */
-	@RequestMapping("/wrongQuestionReset")
+	@RequestMapping("/wrong-question-reset")
 	public PageResult wrongQuestionReset(Integer id, Integer questionId) {
 		try {
 			// 数据校验

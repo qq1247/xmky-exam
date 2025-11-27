@@ -1,9 +1,7 @@
 package com.wcpdoc.core.util;
 
 import java.security.MessageDigest;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
+import java.util.Base64;
 
 import com.wcpdoc.core.exception.MyException;
 
@@ -27,7 +25,7 @@ public class EncryptUtil {
 		try {
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
 			byte[] digest = md5.digest(key.getBytes(charset));
-			return Base64.encodeBase64String(digest);
+			return Base64.getEncoder().encodeToString(digest);
 		} catch (Exception e) {
 			throw new MyException(e);
 		}
@@ -58,7 +56,11 @@ public class EncryptUtil {
 		try {
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
 			byte[] digest = md5.digest(key.getBytes(charset));
-			return new String(Hex.encodeHex(digest));
+			StringBuilder sb = new StringBuilder();
+			for (byte b : digest) {
+				sb.append(String.format("%02x", b & 0xFF));
+			}
+			return sb.toString();
 		} catch (Exception e) {
 			throw new MyException(e);
 		}

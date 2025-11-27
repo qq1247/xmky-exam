@@ -21,7 +21,7 @@
                         <el-menu-item v-if="userStore.isExamUser() || userStore.isTempUser()"
                             index="/my-exam-list">考试</el-menu-item>
                         <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
-                            index="/base-nav/exam-user-list">用户</el-menu-item>
+                            index="/user-nav/exam-user-list">用户</el-menu-item>
                         <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/bulletin-list">系统</el-menu-item>
                     </el-menu>
                     <el-dropdown @command="dropdownCmd" :teleported="false" class="nav-user__wrap">
@@ -76,8 +76,8 @@ onMounted(async () => {
 
 /************************计算属性相关*************************/
 const curActiveMenu = computed(() => {
-    if (route.path.startsWith('/base-nav')) {// 子菜单在不同的路由，需要特殊处理一下
-        return '/base-nav/org-list'
+    if (route.path.startsWith('/user-nav')) {// 子菜单在不同的路由，需要特殊处理一下
+        return '/user-nav/org-list'
     }
     if (route.path.startsWith('/sys-nav')) {
         return '/sys-nav/bulletin-list'

@@ -382,7 +382,7 @@ public class ApiReportController extends BaseController {
 				Elements titles = doc.select(".question__title");
 
 				ScriptEngineManager manager = new ScriptEngineManager();
-				ScriptEngine engine = manager.getEngineByName("nashorn");
+				ScriptEngine engine = manager.getEngineByName("graal.js");
 				try (FileReader reader = new FileReader(prismJs)) {
 					engine.eval(reader);
 

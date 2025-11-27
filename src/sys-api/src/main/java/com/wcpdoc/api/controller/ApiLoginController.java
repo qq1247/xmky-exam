@@ -3,6 +3,7 @@ package com.wcpdoc.api.controller;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
 
@@ -161,8 +162,8 @@ public class ApiLoginController extends BaseController {
 			// 生成匿名用户
 			User user = new User();
 			user.setName(name);
-			user.setLoginName(null);// 无登录账号
-			user.setRole(BaseConstant.ANON_USER);
+			user.setLoginName(UUID.randomUUID().toString().replaceAll("-", ""));// 无登录账号
+			user.setRole(BaseConstant.TEMP_USER);
 			user.setRegistTime(new Date());
 			user.setOrgId(0);
 			user.setState(1);
@@ -186,6 +187,7 @@ public class ApiLoginController extends BaseController {
 			return PageResultEx.ok()//
 					.addAttr("userId", user.getId())//
 					.addAttr("userName", user.getName())//
+					.addAttr("role", user.getRole())//
 					.addAttr("accessToken", accessToken)//
 					.addAttr("refreshToken", refreshToken)//
 			;

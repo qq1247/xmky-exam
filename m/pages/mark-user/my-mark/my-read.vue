@@ -187,7 +187,7 @@ import { Exam } from '@/ts/exam.d';
 import { MyExam } from '@/ts/myExam.d';
 import { PaperStatis } from '@/ts/paper.d';
 import { userGet } from '@/api/user';
-import { examGet } from '@/api/exam';
+import { myMarkExamGet } from '@/api/my-mark';
 import { myMarkQuestionStatis, myMarkClaimInfo, myMarkClaim } from '@/api/my-mark';
 import { useDictStore } from '@/stores/dict';
 
@@ -331,7 +331,7 @@ function toMark() {
 
 // 用户查询
 async function userQuery() {
-	let { data } = await userGet();
+	let { data } = await userGet({});
 	user.id = data.id;
 	user.name = data.name;
 	user.loginName = data.loginName;
@@ -340,7 +340,7 @@ async function userQuery() {
 
 // 考试查询
 async function examQuery() {
-	let { data } = await examGet({ id: pageParm.examId });
+	let { data } = await myMarkExamGet({ id: pageParm.examId });
 	exam.id = data.id;
 	exam.name = data.name;
 	exam.paperName = data.paperName;

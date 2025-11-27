@@ -13,7 +13,7 @@ export function loginPwd(parm: object) {
     return request.post('/login/pwd', parm);
 }
 export function loginTempIn(parm: object) {
-    return request.post('/login/tempIn', parm);
+    return request.post('/login/temp-in', parm);
 }
 export function loginEncrypt(parm: object) {
     return request.post('/login/encrypt', parm);

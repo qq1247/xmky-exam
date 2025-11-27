@@ -212,7 +212,7 @@ import { useDictStore } from '@/stores/dict';
 import { MyExam } from '@/ts/myExam.d';
 import { Exam } from '@/ts/exam.d';
 import { ExamQuestion } from '@/ts/paper.d';
-import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/@/api/my-exam';
+import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/api/my-exam';
 import { loginSysTime } from '@/api/login';
 import { toChinaNum } from '@/util/numberUtil';
 import { useUserStore } from '@/stores/user';
@@ -545,7 +545,7 @@ function uploadImg(examQuestion: ExamQuestion) {
 				filePath: tempFilePaths[0],
 				name: 'files',
 				header: {
-					Authorization: userStore.user.accessToken
+					Authorization: userStore.accessToken
 				},
 				success: (uploadFileRes) => {
 					const jsonObj = JSON.parse(uploadFileRes.data);
@@ -585,7 +585,7 @@ function uploadVideo(examQuestion: ExamQuestion) {
 				filePath: chooseVideoRes.tempFilePath,
 				name: 'files',
 				header: {
-					Authorization: userStore.user.accessToken
+					Authorization: userStore.accessToken
 				},
 				success: (uploadFileRes) => {
 					const jsonObj = JSON.parse(uploadFileRes.data);

@@ -25,5 +25,17 @@
 			<artifactId>exam-report</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- ScriptEngine 支持 -->
+		<dependency>
+			<groupId>org.graalvm.js</groupId>
+			<artifactId>js</artifactId>
+			<version>24.2.2</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.graalvm.js</groupId>
+			<artifactId>js-scriptengine</artifactId>
+			<version>24.2.2</version>
+		</dependency>
 	</dependencies>
 </project>

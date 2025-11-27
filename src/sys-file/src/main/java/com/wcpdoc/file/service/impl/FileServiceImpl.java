@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -234,7 +234,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		// 保存记录
 		File fileNew = new File();
 		try {
-			BeanUtils.copyProperties(fileNew, fileOld);
+			BeanUtils.copyProperties(fileOld, fileNew);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new MyException("拷贝附件错误");

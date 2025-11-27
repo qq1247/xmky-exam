@@ -4,7 +4,7 @@
 			<view class="user__main">
 				<uv-tabs
 					:list="
-						userStore.user.type === 0
+						userStore.isAdmin()
 							? [{ name: '机构管理' }, { name: '考试用户' }, { name: '阅卷用户' }, { name: '子管理员' }]
 							: [{ name: '机构管理' }, { name: '考试用户' }, { name: '阅卷用户' }]
 					"
@@ -157,7 +157,7 @@ onLoad(async () => {
 	orgQuery(false);
 	examUserQuery(false);
 	markUserQuery(false);
-	if (userStore.user.type === 0) {
+	if (userStore.isAdmin()) {
 		subAdminQuery(false);
 	}
 });
@@ -197,7 +197,7 @@ async function examUserQuery(append: boolean) {
 	examUserListpage.curPage = append ? examUserListpage.curPage + 1 : 1;
 
 	let { data } = await _userListpage({
-		type: 1,
+		role: 'EXAM_USER',
 		curPage: examUserListpage.curPage,
 		pageSize: examUserListpage.pageSize
 	});
@@ -217,7 +217,7 @@ async function markUserQuery(append: boolean) {
 	markUserListpage.curPage = append ? markUserListpage.curPage + 1 : 1;
 
 	let { data } = await _userListpage({
-		type: 3,
+		role: 'MARK_USER',
 		curPage: markUserListpage.curPage,
 		pageSize: markUserListpage.pageSize
 	});
@@ -237,7 +237,7 @@ async function subAdminQuery(append: boolean) {
 	subAdminListpage.curPage = append ? subAdminListpage.curPage + 1 : 1;
 
 	let { data } = await _userListpage({
-		type: 2,
+		role: 'SUB_ADMIN',
 		curPage: subAdminListpage.curPage,
 		pageSize: subAdminListpage.pageSize
 	});

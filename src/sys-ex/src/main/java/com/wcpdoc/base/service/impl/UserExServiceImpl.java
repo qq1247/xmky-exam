@@ -35,8 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExService {
 	private final FileService fileService;
 	private final OrgService orgService;
-
-	private UserService userService;
+	private final UserService userService;
 
 	@Override
 	public RBaseDao<Object> getDao() {

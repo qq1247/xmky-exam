@@ -40,6 +40,12 @@
 			<artifactId>exam-ex</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成插件API -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>plugin-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<!--maven打包插件-->
 	<build>

@@ -60,7 +60,8 @@ public class DbBackJob implements Job {
 		Process process = null;
 		try {
 			process = new ProcessBuilder(bakCmd).redirectErrorStream(true).start();// 错误流重定向到标准输入流，不管正常错误处理一个流就可以了
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(),
+					System.getProperty("os.name").toLowerCase().startsWith("win") ? "GBK" : "UTF-8"));
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				log.info("数据库备份命令行日志：{}", line);

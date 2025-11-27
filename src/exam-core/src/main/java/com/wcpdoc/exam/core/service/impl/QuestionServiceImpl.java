@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -230,8 +230,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 试题复制
 		Question question = examCacheService.getQuestion(id);
 		Question questionNew = new Question();
-		BeanUtils.copyProperties(questionNew, question);
+		BeanUtils.copyProperties(question, questionNew);
 		// questionOfCopy.setState(2);
+		questionNew.setTitle(questionNew.getTitle() + "【复制】");
 		questionNew.setId(null);
 		questionNew.setUpdateTime(new Date());
 		questionNew.setUpdateUserId(getCurUser().getId());
@@ -247,7 +248,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		List<QuestionAnswer> questionAnswerList = examCacheService.getQuestionAnswerList(question.getId());
 		for (QuestionAnswer questionAnswer : questionAnswerList) {
 			QuestionAnswer questionAnswerNew = new QuestionAnswer();
-			BeanUtils.copyProperties(questionAnswerNew, questionAnswer);
+			BeanUtils.copyProperties(questionAnswer, questionAnswerNew);
 			questionAnswerNew.setId(null);
 			questionAnswerNew.setQuestionId(questionNew.getId());
 			questionAnswerService.save(questionAnswerNew);
@@ -258,7 +259,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			List<QuestionOption> questionOptionList = examCacheService.getQuestionOptionList(question.getId());
 			for (QuestionOption questionOption : questionOptionList) {
 				QuestionOption questionOptionNew = new QuestionOption();
-				BeanUtils.copyProperties(questionOptionNew, questionOption);
+				BeanUtils.copyProperties(questionOption, questionOptionNew);
 				questionOptionNew.setId(null);
 				questionOptionNew.setQuestionId(questionNew.getId());
 				questionOptionService.save(questionOptionNew);

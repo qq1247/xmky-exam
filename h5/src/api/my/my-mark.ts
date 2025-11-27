@@ -21,6 +21,9 @@ export function myMarkPaper(parm: object) {
 export function myMarkGet(parm: object) {
     return request.post('/my-mark/get', parm);
 }
+export function myMarkExamGet(parm: object) {
+    return request.post('/my-mark/exam-get', parm);
+}
 export function myMarkScore(parm: object) {
     return request.post('/my-mark/score', parm);
 }

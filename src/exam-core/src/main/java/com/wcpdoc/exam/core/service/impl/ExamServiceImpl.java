@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
@@ -1459,7 +1458,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			shuffleNums[i] = start + i;
 		}
 
-		ArrayUtils.shuffle(shuffleNums);
+		Collections.shuffle(CollectionUtil.toList(shuffleNums));
 		return Arrays.asList(shuffleNums);
 	}
 

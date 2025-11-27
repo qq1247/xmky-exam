@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankExService;
 import com.wcpdoc.exam.core.service.QuestionService;
 
-import cn.hutool.extra.spring.SpringUtil;
 import lombok.RequiredArgsConstructor;
 
 /**
