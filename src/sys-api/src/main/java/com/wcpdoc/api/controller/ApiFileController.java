@@ -75,8 +75,9 @@ public class ApiFileController extends BaseController {
 			String fileName = new String(
 					(fileEx.getEntity().getName() + "." + fileEx.getEntity().getExtName()).getBytes("UTF-8"),
 					"ISO-8859-1");
+			response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
-			response.setContentType("application/force-download");
+			response.setContentType("application/octet-stream");
 			try (OutputStream output = response.getOutputStream()) {
 				FileUtils.copyFile(fileEx.getFile(), output);
 			} catch (Exception e) {

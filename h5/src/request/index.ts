@@ -80,7 +80,6 @@ http.interceptors.response.use(response => {
         } catch (err) {
             userStore.reset()
             router.replace('/login')
-            ElMessage.error(`刷新令牌失败：${err || ''}`)
             return Promise.reject(err)
         } finally {
             isRefreshing = false

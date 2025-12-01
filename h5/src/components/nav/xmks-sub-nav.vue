@@ -60,6 +60,7 @@ onMounted(async () => {
 // 下拉菜单命令
 async function dropdownCmd(command: string) {
     if (command === 'out') {
+        userStore.reset()
         await http.post('login/out', {})
         router.push('/login')
         return

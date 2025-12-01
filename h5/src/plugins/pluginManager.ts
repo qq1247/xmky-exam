@@ -7,7 +7,7 @@
 // 插件开发者需确保其构建产物挂载到 window 并实现标准 API 接口。
 //
 //   使用方式：
-//   1. 构建插件为 IIFE/UMD 格式，挂载名格式为 camelCase（如 'myPlugin'）
+//   1. 构建插件为 IIFE/UMD 格式，挂载名格式为 kebab-case
 //   2. 实现 init(), mount(), unmount(), getInfo() 四个方法
 //   3. 在 plugins-config.json 中配置插件元信息与脚本路径
 //   4. 调用 initPlugins() 自动完成加载流程
@@ -15,8 +15,9 @@
 // ========== 核心依赖 ==========
 import * as Vue from 'vue'
 import router from '@/router'
-import ElementPlus from 'element-plus'
+import ElementPlus, { ElMessage } from 'element-plus'
 import { camelize } from '@vueuse/core'
+import { useUserStore } from '@/stores/user'
 
 // ========== 类型定义 ==========
 /**
@@ -28,12 +29,11 @@ export interface PluginOption {
 }
 
 /**
- * 插件配置结构，来源于 plugins-config.json 配置文件。
+ * 插件配置结构，来源于 plugins/config.json 配置文件。
  */
 export interface PluginConfig {
-    name: string        // 插件唯一标识（推荐使用 kebab-case）
+    id: string        // 插件唯一标识（推荐使用 kebab-case）
     url: string         // 插件脚本 URL（支持远程或本地）
-    enabled: boolean    // 是否启用
     option?: PluginOption // 初始化配置参数
 }
 
@@ -41,15 +41,16 @@ export interface PluginConfig {
  * 所有插件必须实现的标准接口。
  * 通过 window[camelCaseName] 暴露。
  */
-interface PluginAPI {
-    init(config: PluginOption): void    // 初始化插件
+export interface PluginAPI {
+    init(option: PluginOption): void    // 初始化插件
     mount(): void                       // 挂载资源
     unmount(): void                     // 清理资源
     getInfo(): {                        // 获取元信息
-        name: string
-        version: string
-        displayName: string
-        description: string
+        id: string                      // 插件ID
+        name: string                    // 插件名称
+        version: string                 // 插件版本
+        description: string             // 插件描述
+        roles: [string]                 // 插件角色 ['ADMIN', 'SUB_ADMIN', 'EXAM_USER', 'MARK_USER']
     }
 }
 
@@ -68,15 +69,10 @@ const pluginInfos: Array<ReturnType<PluginAPI['getInfo']>> = []
  * 1. 若未启用则跳过
  * 2. 加载脚本
  * 3. 从 window 获取插件实例
- * 4. 调用 init 和 mount
+ * 4. 调用 init 
  * 5. 缓存实例与元信息
  */
 export async function loadPlugin(config: PluginConfig): Promise<void> {
-    if (!config.enabled) {
-        //console.log(`插件已禁用，跳过加载: ${config.name}`)
-        return
-    }
-
     try {
         await new Promise<void>((resolve, reject) => {
             const script = document.createElement('script')
@@ -97,27 +93,25 @@ export async function loadPlugin(config: PluginConfig): Promise<void> {
             document.head.appendChild(script)
         })
 
-        const pluginName = camelize(config.name)
-        const plugin = window[pluginName] as PluginAPI
+        const pluginId = camelize(config.id)
+        const plugin = window[pluginId] as PluginAPI
         if (!plugin) {
-            throw new Error(`插件未注册到 window: ${pluginName}`)
+            throw new Error(`插件未注册到 window: ${pluginId}`)
         }
 
         plugin.init(config.option || {})
-        plugin.mount()
-        plugins.set(config.name, plugin)
+        plugins.set(config.id, plugin)
 
-        const info = plugin.getInfo()
-        const index = pluginInfos.findIndex(p => p.name === info.name)
+        const index = pluginInfos.findIndex(p => p.name === plugin.getInfo().id)
         if (index > -1) {
-            pluginInfos[index] = info
+            pluginInfos[index] = plugin.getInfo()
         } else {
-            pluginInfos.push(info)
+            pluginInfos.push(plugin.getInfo())
         }
 
         //console.log(`插件加载成功: ${info.displayName} (v${info.version})`)
     } catch (err) {
-        console.error(`插件加载失败: ${config.name}`, err)
+        console.error(`插件加载失败: ${config.id}`, err)
     }
 }
 
@@ -126,7 +120,11 @@ export async function loadPlugin(config: PluginConfig): Promise<void> {
  * 防止外部直接修改内部状态。
  */
 export function getAllPluginInfos(): Array<ReturnType<PluginAPI['getInfo']>> {
-    return [...pluginInfos]
+    const userStore = useUserStore()
+
+    return [...pluginInfos.filter(pluginInfo => {
+        return pluginInfo.roles.includes(userStore.role)
+    })]
 }
 
 // ========== 主入口函数 ==========
@@ -145,19 +143,25 @@ export async function initPlugins(): Promise<void> {
     window.vue = Vue
     window.router = router
     window.elementPlus = ElementPlus
-    import('@vueuse/core')
-        .then(module => {
-            window.vueUse = module
-        })
-        .catch(err => {
-            console.warn('无法加载 @vueuse/core，部分功能受限', err)
-        })
+    window.elMessage = ElMessage
+    window.userStore = useUserStore()
+    import('@vueuse/core').then(module => {
+        window.vueUse = module
+    }).catch(err => {
+        console.warn('无法加载 @vueuse/core，部分功能受限', err)
+    })
+    await import('@/request/index').then(http => {
+        window.http = http.default
+    }).catch(err => {
+        console.warn('无法加载 @request/index，部分功能受限', err)
+    })
+
 
     // 加载插件配置文件
     let pluginConfigs: PluginConfig[] = []
     try {
-        const res = await fetch('/plugins-config.json')
-        if (!res.ok) throw new Error(`加载plugins-config.json失败`)
+        const res = await fetch('/plugins/config.json')
+        if (!res.ok) throw new Error(`加载/plugins/config.json失败`)
         pluginConfigs = await res.json()
         //console.log('插件配置加载成功:', pluginConfigs)
     } catch (err) {

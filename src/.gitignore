@@ -7,5 +7,6 @@
 *.sql
 /.idea/
 /bak/
+/plugins/
 *.pid
 *.iml

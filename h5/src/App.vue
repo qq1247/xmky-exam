@@ -1,9 +1,11 @@
 <template>
-    <RouterView />
+    <router-view />
+    <xmky-plugin />
 </template>
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { checkBrowserCompatibility, getDownloadLinks } from '@/util/browserCheck';
+import XmkyPlugin from '@/components/xmky-plugin.vue'
 
 onMounted(() => {
     const { isSupported, browserName, currentVersion } = checkBrowserCompatibility();
