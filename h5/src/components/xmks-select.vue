@@ -129,6 +129,7 @@ function invertAll() {
 // 已经脱离dom内部，不要scoped。改完不生效需要刷新一下页面。
 .xmks-select {
     padding: 10px 20px 20px 20px;
+    max-width: 780px;
 
     .el-select-dropdown__wrap {
         max-height: 285px;
