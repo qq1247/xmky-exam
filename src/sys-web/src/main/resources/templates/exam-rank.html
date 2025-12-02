@@ -18,7 +18,7 @@
                 <th>分数</th>
                 <th>考试结果</th>
                 <th>答题用时</th>
-                <th>阅卷用时</th>
+                <!-- <th>阅卷用时</th> -->
             </tr>
         </thead>
         <tbody class="table__body">
@@ -26,11 +26,11 @@
             <tr class="${(rank?index == 0)?then('row1', (rank?index == 1)?then('row2', (rank?index == 2)?then('row3', '')))}">
                 <td>${rank.myExamNo}</td>
                 <td>${rank.userName}</td>
-                <td>${rank.orgName}</td>
+                <td>${rank.orgName!'-'}</td>
                 <td class="${(rank.myExamAnswerState == 1)?then('score-pass', 'score-fail')}">${rank.myExamTotalScore}</td>
                 <td>${rank.myExamAnswerStateName}</td>
                 <td>${rank.answerTime}分钟</td>
-                <td>${rank.markTime}分钟</td>
+                <!-- <td>${rank.markTime}分钟</td> -->
             </tr>
             </#list>
         </tbody>

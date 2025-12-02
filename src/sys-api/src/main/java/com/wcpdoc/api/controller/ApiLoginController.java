@@ -444,7 +444,7 @@ public class ApiLoginController extends BaseController {
 			registUserService.save(RegistUser.builder()//
 					.name(name)//
 					.loginName(loginName)//
-					.pwd(pwd)//
+					.pwd(userService.getEncryptPwd(loginName, pwd))//
 					.orgId(orgId)//
 					.registTime(new Date())//
 					.state(3)//

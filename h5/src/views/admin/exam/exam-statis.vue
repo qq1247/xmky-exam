@@ -99,7 +99,11 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="userName" label="姓名" align="center" />
-                                <el-table-column prop="orgName" label="机构" align="center" />
+                                <el-table-column prop="orgName" label="机构" align="center">
+                                    <template #default="scope">
+                                        {{ scope.row.orgName || '-' }}
+                                    </template>
+                                </el-table-column>
                                 <el-table-column prop="" label="分数" align="center">
                                     <template #default="scope">
                                         <span
@@ -107,6 +111,10 @@
                                             {{ scope.row.myExamTotalScore != null ? scope.row.myExamTotalScore : '-' }}
                                         </span>
                                     </template>
+                                </el-table-column>
+                                <el-table-column prop="" label="考试结果" align="center">
+                                    <template #default="scope">{{ dictStore.getValue('ANSWER_STATE',
+                                        scope.row.myExamAnswerState) }}</template>
                                 </el-table-column>
                                 <el-table-column prop="" label="考试状态" align="center">
                                     <template #default="scope">{{ dictStore.getValue('EXAM_STATE',
