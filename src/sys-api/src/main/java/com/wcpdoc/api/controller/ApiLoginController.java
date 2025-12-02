@@ -344,6 +344,7 @@ public class ApiLoginController extends BaseController {
 					.addAttr("customTitle", parm.getCustomTitle())//
 					.addAttr("customContent", parm.getCustomContent())//
 					.addAttr("icp", parm.getIcp())//
+					.addAttr("userRegist", parm.getUserRegist())//
 			;
 		} catch (Exception e) {
 			log.error("登录参数错误：", e);
@@ -400,15 +401,15 @@ public class ApiLoginController extends BaseController {
 	}
 
 	/**
-	 * 注册用户
+	 * 用户注册
 	 * 
 	 * v1.0 zhanghc 2025年12月1日下午7:06:04
 	 * 
 	 * @param registUser
 	 * @return PageResult
 	 */
-	@RequestMapping("/regist-user")
-	public PageResult registUser(String name, String loginName, String pwd, String orgCode) {
+	@RequestMapping("/user-regist")
+	public PageResult UserRegist(String name, String loginName, String pwd, String orgCode) {
 		try {
 			// 数据校验
 			if (!ValidateUtil.isValid(name)) {
@@ -433,7 +434,7 @@ public class ApiLoginController extends BaseController {
 			try {
 				orgId = InviteCodeUtil.extractIdFromCode(orgCode);
 			} catch (Exception e) {
-				throw new MyException("无效的机构码");
+				throw new MyException("无效的机构代码");
 			}
 			Org org = orgService.getById(orgId); // 不要用baseCacheService，比如id为0，org为null，但是log.debug获取了属性报错
 			if (org == null) {

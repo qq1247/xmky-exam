@@ -76,10 +76,10 @@
                                 </div>
                             </el-form-item>
                         </el-form>
-                        <el-form v-if="loginType == 3" ref="registUserFormRef" :model="registUserForm"
-                            :rules="registUserFormRules" class="login-win__main" size="large">
+                        <el-form v-if="loginType == 3" ref="userRegistFormRef" :model="userRegistForm"
+                            :rules="userRegistFormRules" class="login-win__main" size="large">
                             <el-form-item label="" prop="loginName">
-                                <el-input v-model.trim="registUserForm.loginName" placeholder="请输入登录账号"
+                                <el-input v-model.trim="userRegistForm.loginName" placeholder="请输入登录账号"
                                     class="login-win__input">
                                     <template #prefix>
                                         <span class="iconfont icon-zhanghaodenglu login-win__input-icon"></span>
@@ -87,7 +87,7 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="" prop="pwd">
-                                <el-input v-model.trim="registUserForm.pwd" type="password" show-password
+                                <el-input v-model.trim="userRegistForm.pwd" type="password" show-password
                                     placeholder="请输入登录密码" class="login-win__input">
                                     <template #prefix>
                                         <span class="iconfont icon-mima54 login-win__input-icon"></span>
@@ -95,14 +95,14 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="" prop="name">
-                                <el-input v-model.trim="registUserForm.name" placeholder="请输入姓名"
+                                <el-input v-model.trim="userRegistForm.name" placeholder="请输入姓名"
                                     class="login-win__input">
                                     <template #prefix>
                                         <span class="iconfont icon-fabu-11 login-win__input-icon"></span>
                                     </template>
                                 </el-input>
                             </el-form-item> <el-form-item label="" prop="orgCode">
-                                <el-input v-model.trim="registUserForm.orgCode" placeholder="请输入机构码"
+                                <el-input v-model.trim="userRegistForm.orgCode" placeholder="请输入机构代码"
                                     class="login-win__input">
                                     <template #prefix>
                                         <span class="iconfont icon-lianxi-64 login-win__input-icon"></span>
@@ -117,7 +117,7 @@
                                         <span @click="loginType = 1" class="login-win__switch‌-btn">账号登录</span>
                                     </div>
                                     <el-button type="primary" class="login-win__login-btn"
-                                        @click="registUser">注册</el-button>
+                                        @click="userRegist">注册</el-button>
                                 </div>
                             </el-form-item>
                         </el-form>
@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
 import { examExamGet } from '@/api/exam/exam'
-import { loginIn, loginTempIn, loginParm, loginEncrypt, loginSysTime, loginRegistUser } from '@/api/login'
+import { loginIn, loginTempIn, loginParm, loginEncrypt, loginSysTime, loginUserRegist } from '@/api/login'
 import { myExamGeneratePaper } from '@/api/my/my-exam'
 import { dictIndexList } from '@/api/sys/dict'
 import http from '@/request'
@@ -182,28 +182,28 @@ const anonFormRules = reactive<FormRules>({// 表单规则
     ],
 })
 
-const registUserForm = reactive({// 表单
+const userRegistForm = reactive({// 表单
     loginName: '',
     pwd: '',
     name: '',
     orgCode: '',
 })
-const registUserFormRef = ref<FormInstance>()// 表单引用
-const registUserFormRules = reactive<FormRules>({// 表单规则
+const userRegistFormRef = ref<FormInstance>()// 表单引用
+const userRegistFormRules = reactive<FormRules>({// 表单规则
     loginName: [
         { required: true, message: '请输入登录账号', trigger: 'blur' },
-        { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
+        { min: 2, max: 16, message: '长度介于2-16', trigger: 'blur' },
     ],
     pwd: [
         { required: true, message: '请输入登录密码', trigger: 'blur' },
-        { min: 1, max: 16, message: '长度介于4-16', trigger: 'blur' }
+        { min: 4, max: 16, message: '长度介于4-16', trigger: 'blur' }
     ],
     name: [
         { required: true, message: '请输入姓名', trigger: 'blur' },
-        { min: 1, max: 8, message: '长度介于1-8', trigger: 'blur' },
+        { min: 2, max: 8, message: '长度介于2-8', trigger: 'blur' },
     ],
     orgCode: [
-        { required: true, message: '请输入机构码', trigger: 'blur' },
+        { required: true, message: '请输入机构代码', trigger: 'blur' },
         { min: 8, max: 8, message: '长度等于8', trigger: 'blur' },
     ],
 })
@@ -355,27 +355,27 @@ async function tempIn() {
     router.push(`/my-exam/read/${examData.id}`)
 }
 
-// 注册用户
-async function registUser() {
+// 用户注册
+async function userRegist() {
     // 数据校验
     try {
-        await registUserFormRef.value?.validate()
+        await userRegistFormRef.value?.validate()
     } catch (e) {
         return
     }
 
-    const { data: { code } } = await loginRegistUser({
-        ...registUserForm
+    const { data: { code } } = await loginUserRegist({
+        ...userRegistForm
     })
     if (code !== 200) {
         return
     }
     ElMessage.success('注册成功，请等待管理员审核')
 
-    registUserForm.loginName = '' // 成功后清空，防止多次误点
-    registUserForm.name = ''
-    registUserForm.orgCode = ''
-    registUserForm.pwd = ''
+    userRegistForm.loginName = '' // 成功后清空，防止多次误点
+    userRegistForm.name = ''
+    userRegistForm.orgCode = ''
+    userRegistForm.pwd = ''
 }
 
 </script>

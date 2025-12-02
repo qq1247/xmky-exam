@@ -14,7 +14,7 @@
             <el-table :data="listpage.list" size="large" row-key="id" default-expand-all :indent="48"
                 height="calc(100vh - 428px)" class="table">
                 <el-table-column prop="name" label="名称" align="left" />
-                <el-table-column v-if="parmStore.userRegist === 1" prop="code" label="机构码" align="left" />
+                <el-table-column v-if="parmStore.userRegist === 1" prop="code" label="机构代码" align="left" />
                 <el-table-column prop="no" label="排序" align="center" />
                 <el-table-column v-if="userStore.isAdmin()" prop="" label="操作" align="center" width="300">
                     <template #default="scope">

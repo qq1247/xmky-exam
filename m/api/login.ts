@@ -21,4 +21,7 @@ export function loginOut(parm: object) {
 export function loginEncrypt(parm: object) {
 	return request.post('/login/encrypt', parm);
 }
+export function loginUserRegist(parm: object) {
+	return request.post('/login/user-regist', parm);
+}
 

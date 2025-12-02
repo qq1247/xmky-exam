@@ -56,7 +56,7 @@
             </template>
         </xmks-edit-card>
         <xmks-edit-card title="用户注册"
-            :desc="`考试用户在登录页自助注册（<a href=\'/user-nav/org-list\'>机构码查询</a>），管理员在“用户/注册用户”列表中审批后方可使用`">
+            :desc="`考试用户在登录页自助注册（<a href=\'/user-nav/org-list\'>机构代码查询</a>），管理员在“用户/注册用户”列表中审批后方可使用`">
             <template #card-main>
                 <el-form ref="userRegistFormRef" :model="userRegistForm" :rules="userRegistFormRules" label-width="100"
                     size="large" :inline="true" class="form">
