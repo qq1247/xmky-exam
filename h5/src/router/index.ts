@@ -83,6 +83,11 @@ const router = createRouter({
                             component: () => import('@/views/admin/user/mark-user/mark-user-list.vue'),
                             meta: { title: '阅卷用户管理' },
                         },
+                        {
+                            path: 'regist-user-list',
+                            component: () => import('@/views/admin/user/regist-user/regist-user-list.vue'),
+                            meta: { title: '注册用户管理' },
+                        },
                     ]
                 },
                 {
@@ -179,6 +184,18 @@ const router = createRouter({
                 {
                     path: 'set/:id',
                     component: () => import('@/views/admin/user/mark-user/mark-user-set.vue'),
+                    meta: { title: '阅卷用户设置' },
+                },
+            ]
+        },
+        {
+            path: '/regist-user-nav',
+            meta: { title: '注册用户导航' },
+            component: () => import('@/views/admin/user/regist-user/regist-user-nav.vue'),
+            children: [
+                {
+                    path: 'set/:id',
+                    component: () => import('@/views/admin/user/regist-user/regist-user-set.vue'),
                     meta: { title: '阅卷用户设置' },
                 },
             ]

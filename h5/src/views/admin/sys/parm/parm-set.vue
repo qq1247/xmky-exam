@@ -55,6 +55,22 @@
                 <el-button type="primary" class="form__btn" @click="mSave" style="margin-bottom: 40px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
+        <xmks-edit-card title="用户注册"
+            :desc="`考试用户在登录页自助注册（<a href=\'/user-nav/org-list\'>机构码查询</a>），管理员在“用户/注册用户”列表中审批后方可使用`">
+            <template #card-main>
+                <el-form ref="userRegistFormRef" :model="userRegistForm" :rules="userRegistFormRules" label-width="100"
+                    size="large" :inline="true" class="form">
+                    <el-radio-group v-model="userRegistForm.userRegist">
+                        <el-radio :value="1">开启</el-radio>
+                        <el-radio :value="2">关闭</el-radio>
+                    </el-radio-group>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-button type="primary" class="form__btn" @click="userRegistSave"
+                    style="margin-bottom: 30px;">保存设置</el-button>
+            </template>
+        </xmks-edit-card>
         <xmks-edit-card title="服务支持" desc="pc端：首页顶部欢迎图左侧显示；移动端：个人中心/服务支持 显示">
             <template #card-main>
                 <el-form ref="supportFormRef" :model="supportForm" :rules="supportFormRules" label-width="100"
@@ -101,7 +117,7 @@
 import type { ParmPwd } from '@/ts/sys/parm'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { parmSupport, parmSys, parmGet, parmIcp, parmM, parmPwd } from '@/api/sys/parm'
+import { parmSupport, parmSys, parmGet, parmIcp, parmM, parmPwd, parmuserRegist } from '@/api/sys/parm'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import http from '@/request'
 import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile } from 'element-plus'
@@ -184,6 +200,16 @@ const icpFormRules = reactive<FormRules>({// 表单校验规则
     ],
 })
 
+const userRegistForm = reactive({// 表单
+    userRegist: '',// 用户注册
+})
+const userRegistFormRef = ref<FormInstance>() // 表单引用
+const userRegistFormRules = reactive<FormRules>({// 表单校验规则
+    icp: [
+        { required: false, message: '请输入备案', trigger: 'blur' },
+        { min: 1, max: 512, message: '长度介于1-512', trigger: 'blur' },
+    ],
+})
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -198,6 +224,7 @@ onMounted(async () => {
         supportForm.title = data.customTitle
         supportForm.content = data.customContent
         icpForm.icp = escape2Html(data.icp)
+        userRegistForm.userRegist = data.userRegist
 
     }
 })
@@ -284,6 +311,23 @@ async function icpSave() {
     }
 
     parmStore.icp = icpForm.icp
+
+    router.push("/sys-nav/parm-list")
+}
+
+// 用户注册修改
+async function userRegistSave() {
+    // 数据校验
+    if (!userRegistFormRef.value || !await userRegistFormRef.value.validate()) {
+        return
+    }
+
+    const { data: { code } } = await parmuserRegist({ ...userRegistForm })
+    if (code !== 200) {
+        return
+    }
+
+    parmStore.userRegist = userRegistForm.userRegist
 
     router.push("/sys-nav/parm-list")
 }

@@ -266,4 +266,15 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			updateById(parm);
 		}
 	}
+
+	@Override
+	public void userRegist() {
+		Parm parm = baseCacheService.getParm();
+		if (parm.getUserRegist() == 1) {
+			parm.setUserRegist(2);
+		} else {
+			parm.setUserRegist(1);
+		}
+		updateById(parm);
+	}
 }

@@ -12,7 +12,7 @@
                     <img src="/img/login/login_illust.png" class="login-illust__img">
                 </div>
                 <div class="login-win-wrap">
-                    <div class="login-win">
+                    <div :class="['login-win', { 'login-win__big': loginType === 3 }]">
                         <div class="login-win__head">
                             <img :src="logoUrl" class="login-win__logo">
                             <span class="login-win__sysname">{{ parmStore.sysName }}</span>
@@ -37,7 +37,11 @@
                             </el-form-item>
                             <el-form-item>
                                 <div class="login-win__btn-group">
-                                    <span @click="loginType = 2" class="login-win__switch‌-btn">临时登录</span>
+                                    <div>
+                                        <span v-if="parmStore.userRegist === 1" @click="loginType = 3"
+                                            class="login-win__switch‌-btn">用户注册</span>
+                                        <span @click="loginType = 2" class="login-win__switch‌-btn">临时登录</span>
+                                    </div>
                                     <el-button type="primary" class="login-win__login-btn" @click="login">登录</el-button>
                                 </div>
                             </el-form-item>
@@ -62,9 +66,58 @@
                             </el-form-item>
                             <el-form-item>
                                 <div class="login-win__btn-group">
-                                    <span @click="loginType = 1" class="login-win__switch‌-btn">账号登录</span>
+                                    <div>
+                                        <span v-if="parmStore.userRegist === 1" @click="loginType = 3"
+                                            class="login-win__switch‌-btn">用户注册</span>
+                                        <span @click="loginType = 1" class="login-win__switch‌-btn">账号登录</span>
+                                    </div>
                                     <el-button type="primary" class="login-win__login-btn"
                                         @click="tempIn">登录</el-button>
+                                </div>
+                            </el-form-item>
+                        </el-form>
+                        <el-form v-if="loginType == 3" ref="registUserFormRef" :model="registUserForm"
+                            :rules="registUserFormRules" class="login-win__main" size="large">
+                            <el-form-item label="" prop="loginName">
+                                <el-input v-model.trim="registUserForm.loginName" placeholder="请输入登录账号"
+                                    class="login-win__input">
+                                    <template #prefix>
+                                        <span class="iconfont icon-zhanghaodenglu login-win__input-icon"></span>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="" prop="pwd">
+                                <el-input v-model.trim="registUserForm.pwd" type="password" show-password
+                                    placeholder="请输入登录密码" class="login-win__input">
+                                    <template #prefix>
+                                        <span class="iconfont icon-mima54 login-win__input-icon"></span>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="" prop="name">
+                                <el-input v-model.trim="registUserForm.name" placeholder="请输入姓名"
+                                    class="login-win__input">
+                                    <template #prefix>
+                                        <span class="iconfont icon-fabu-11 login-win__input-icon"></span>
+                                    </template>
+                                </el-input>
+                            </el-form-item> <el-form-item label="" prop="orgCode">
+                                <el-input v-model.trim="registUserForm.orgCode" placeholder="请输入机构码"
+                                    class="login-win__input">
+                                    <template #prefix>
+                                        <span class="iconfont icon-lianxi-64 login-win__input-icon"></span>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <div class="login-win__btn-group">
+                                    <div>
+                                        <span v-if="parmStore.userRegist === 1" @click="loginType = 3"
+                                            class="login-win__switch‌-btn">用户注册</span>
+                                        <span @click="loginType = 1" class="login-win__switch‌-btn">账号登录</span>
+                                    </div>
+                                    <el-button type="primary" class="login-win__login-btn"
+                                        @click="registUser">注册</el-button>
                                 </div>
                             </el-form-item>
                         </el-form>
@@ -80,7 +133,7 @@
 
 <script setup lang="ts">
 import { examExamGet } from '@/api/exam/exam'
-import { loginIn, loginTempIn, loginParm, loginEncrypt, loginSysTime } from '@/api/login'
+import { loginIn, loginTempIn, loginParm, loginEncrypt, loginSysTime, loginRegistUser } from '@/api/login'
 import { myExamGeneratePaper } from '@/api/my/my-exam'
 import { dictIndexList } from '@/api/sys/dict'
 import http from '@/request'
@@ -126,6 +179,32 @@ const anonFormRules = reactive<FormRules>({// 表单规则
     ],
     examName: [
         { required: true, message: '请输入考试名称', trigger: 'blur' },
+    ],
+})
+
+const registUserForm = reactive({// 表单
+    loginName: '',
+    pwd: '',
+    name: '',
+    orgCode: '',
+})
+const registUserFormRef = ref<FormInstance>()// 表单引用
+const registUserFormRules = reactive<FormRules>({// 表单规则
+    loginName: [
+        { required: true, message: '请输入登录账号', trigger: 'blur' },
+        { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
+    ],
+    pwd: [
+        { required: true, message: '请输入登录密码', trigger: 'blur' },
+        { min: 1, max: 16, message: '长度介于4-16', trigger: 'blur' }
+    ],
+    name: [
+        { required: true, message: '请输入姓名', trigger: 'blur' },
+        { min: 1, max: 8, message: '长度介于1-8', trigger: 'blur' },
+    ],
+    orgCode: [
+        { required: true, message: '请输入机构码', trigger: 'blur' },
+        { min: 8, max: 8, message: '长度等于8', trigger: 'blur' },
     ],
 })
 
@@ -276,6 +355,29 @@ async function tempIn() {
     router.push(`/my-exam/read/${examData.id}`)
 }
 
+// 注册用户
+async function registUser() {
+    // 数据校验
+    try {
+        await registUserFormRef.value?.validate()
+    } catch (e) {
+        return
+    }
+
+    const { data: { code } } = await loginRegistUser({
+        ...registUserForm
+    })
+    if (code !== 200) {
+        return
+    }
+    ElMessage.success('注册成功，请等待管理员审核')
+
+    registUserForm.loginName = '' // 成功后清空，防止多次误点
+    registUserForm.name = ''
+    registUserForm.orgCode = ''
+    registUserForm.pwd = ''
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -384,6 +486,10 @@ async function tempIn() {
                     border-radius: 10px 10px 10px 10px;
                     border: 1px solid #FFFFFF;
                     background: #D2ECFF;
+
+                    &.login-win__big {
+                        height: 680px;
+                    }
 
                     .login-win__head {
                         display: flex;

@@ -208,6 +208,28 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
+	 * 用户注册
+	 * 
+	 * v1.0 zhanghc 2025年12月1日上午10:40:15
+	 * 
+	 * @param state
+	 * @return PageResult
+	 */
+	@RequestMapping("/user-regist")
+	public PageResult userRegist() {
+		try {
+			parmService.userRegist();
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("用户注册错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("用户注册错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
 	 * 参数获取
 	 * 
 	 * v1.0 chenyun 2021年11月12日下午3:38:42
@@ -218,7 +240,6 @@ public class ApiParmController extends BaseController {
 	public PageResult get() {
 		try {
 			Parm parm = baseCacheService.getParm();
-			;
 			return PageResultEx.ok()//
 					.addAttr("sysName", parm.getSysName())//
 					.addAttr("fileUploadDir", parm.getFileUploadDir())//
@@ -230,6 +251,7 @@ public class ApiParmController extends BaseController {
 					.addAttr("customContent", parm.getCustomContent())//
 					.addAttr("icp", parm.getIcp())//
 					.addAttr("mHost", parm.getMHost())//
+					.addAttr("userRegist", parm.getUserRegist())//
 			;
 		} catch (MyException e) {
 			log.error("参数获取错误：{}", e.getMessage());

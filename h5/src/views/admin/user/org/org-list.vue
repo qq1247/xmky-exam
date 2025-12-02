@@ -14,6 +14,7 @@
             <el-table :data="listpage.list" size="large" row-key="id" default-expand-all :indent="48"
                 height="calc(100vh - 428px)" class="table">
                 <el-table-column prop="name" label="名称" align="left" />
+                <el-table-column v-if="parmStore.userRegist === 1" prop="code" label="机构码" align="left" />
                 <el-table-column prop="no" label="排序" align="center" />
                 <el-table-column v-if="userStore.isAdmin()" prop="" label="操作" align="center" width="300">
                     <template #default="scope">
@@ -36,9 +37,11 @@ import { reactive, onMounted, } from 'vue'
 import type { Listpage } from '@/ts/common/listpage'
 import { orgListpage } from '@/api/base/org'
 import { useUserStore } from '@/stores/user'
+import { useParmStore } from '@/stores/parm'
 
 /************************变量定义相关***********************/
 const userStore = useUserStore()// 用户缓存
+const parmStore = useParmStore()// 参数缓存
 const queryForm = reactive({// 查询表单
     name: '',
 })

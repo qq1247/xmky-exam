@@ -2,13 +2,15 @@
     <div class="user-nav">
         <div class="user-nav__head">
             <el-menu :default-active="$route.path" mode="horizontal" :router="true" class="user-nav__menu">
-                <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
+                <el-menu-item v-show="userStore.isAdmin() || userStore.isSubAdmin()"
                     index="/user-nav/org-list">机构管理</el-menu-item>
-                <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
+                <el-menu-item v-show="userStore.isAdmin() || userStore.isSubAdmin()"
                     index="/user-nav/exam-user-list">考试用户</el-menu-item>
-                <el-menu-item v-if="userStore.isAdmin()" index="/user-nav/sub-admin-list">子管理员</el-menu-item>
-                <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
+                <el-menu-item v-show="userStore.isAdmin()" index="/user-nav/sub-admin-list">子管理员</el-menu-item>
+                <el-menu-item v-show="userStore.isAdmin() || userStore.isSubAdmin()"
                     index="/user-nav/mark-user-list">阅卷用户</el-menu-item>
+                <el-menu-item v-show="userStore.isAdmin() && parmStore.userRegist === 1"
+                    index="/user-nav/regist-user-list">注册用户</el-menu-item>
             </el-menu>
         </div>
         <div class="user-nav__main">
@@ -18,10 +20,12 @@
 
 </template>
 <script lang="ts" setup>
+import { useParmStore } from '@/stores/parm';
 import { useUserStore } from '@/stores/user'
 
 /************************变量定义相关***********************/
 const userStore = useUserStore()// 用户缓存
+const parmStore = useParmStore()// 用户缓存
 
 </script>
 

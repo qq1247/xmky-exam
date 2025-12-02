@@ -133,7 +133,7 @@ public class ApiUserController extends BaseController {
 			// 用户修改
 			User entity = baseCacheService.getUser(user.getId());
 			String oldLoginName = entity.getLoginName();
-			userService.editEx(user);
+			userService.edit(user);
 			String newLoginName = entity.getLoginName();
 
 			// 更新密码

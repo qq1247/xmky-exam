@@ -11,8 +11,10 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.util.CurLoginUserUtil;
+import com.wcpdoc.base.util.InviteCodeUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -61,7 +63,12 @@ public class ApiOrgController extends BaseController {
 			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户没有角色权限
 
 			}
-			return PageResultEx.ok().data(orgService.getListpage(pageIn));
+
+			PageOut pageOut = orgService.getListpage(pageIn);
+			pageOut.getList().forEach(data -> {
+				data.put("code", InviteCodeUtil.generateInviteCode((Integer) data.get("id")));
+			});
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("机构列表错误：", e);
 			return PageResult.err();

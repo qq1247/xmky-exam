@@ -125,6 +125,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 						ValidateUtil.isValid(userRowData.getPwd()) ? userRowData.getPwd() : "111111"));// 初始化密码
 
 				user.setRegistTime(curTime);
+				user.setSource("excel导入");
 				user.setUpdateTime(curTime);
 				user.setUpdateUserId(getCurUser().getId());
 				user.setState(1);

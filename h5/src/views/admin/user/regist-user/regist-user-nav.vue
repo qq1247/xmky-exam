@@ -1,6 +1,6 @@
 <template>
-    <div class="parm-nav">
-        <xmks-sub-nav :nav-list="navList" @go="$router.push('/sys-nav/bulletin-list')"></xmks-sub-nav>
+    <div class="regist-user-nav">
+        <xmks-sub-nav :nav-list="navList" @go="$router.push('/user-nav/regist-user-list')"></xmks-sub-nav>
     </div>
 </template>
 <script lang="ts" setup>
@@ -15,14 +15,20 @@ const navList = ref<NavLink[]>([]);// 导航列表
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
-    navList.value.push(
-        { 'title': '设置', 'url': `/parm-nav/set/${route.params.id}` },
-    );
+    if (route.path.indexOf('/add') !== -1) {
+        navList.value.push(
+            { 'title': '审批', 'url': `/regist-user-nav/add` }
+        );
+    } else {
+        navList.value.push(
+            { 'title': '审批', 'url': `/regist-user-nav/set/${route.params.id}` },
+        );
+    }
 })
 
 </script>
 <style lang="scss" scoped>
-.parm-nav {
+.regist-user-nav {
     flex: 1;
     display: flex;
 }

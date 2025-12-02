@@ -46,6 +46,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		// 用户添加
 		Date curTime = new Date();
 		user.setRegistTime(curTime);
+		user.setSource("管理员添加");
 		user.setUpdateTime(curTime);
 		user.setUpdateUserId(getCurUser().getId());
 		user.setState(1);
@@ -67,7 +68,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 	@Override
 	@CacheEvict(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#user.id")
-	public void editEx(User user) {
+	public void edit(User user) {
 		// 数据校验
 		addValid(user);
 
@@ -307,5 +308,10 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 				throw new MyException("子管理员不能初始化子管理员密码");
 			}
 		}
+	}
+
+	@Override
+	public boolean existLoginName(String loginName, Integer excludeId) {
+		return userDao.existLoginName(loginName, excludeId);
 	}
 }

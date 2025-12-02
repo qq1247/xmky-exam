@@ -18,10 +18,15 @@ import com.wcpdoc.auth.service.LoginAttemptService;
 import com.wcpdoc.auth.service.NonceService;
 import com.wcpdoc.auth.service.OnlineUserService;
 import com.wcpdoc.base.constant.BaseConstant;
+import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.entity.RegistUser;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.RegistUserService;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.base.util.InviteCodeUtil;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
@@ -53,6 +58,8 @@ public class ApiLoginController extends BaseController {
 	private final OnlineUserService onlineUserService;
 	private final UserService userService;
 	private final NonceService nonceService;
+	private final RegistUserService registUserService;
+	private final OrgService orgService;
 
 	/**
 	 * 登录进入
@@ -167,6 +174,7 @@ public class ApiLoginController extends BaseController {
 			user.setRegistTime(new Date());
 			user.setOrgId(0);
 			user.setState(1);
+			user.setSource("临时登录");
 			user.setUpdateUserId(1);
 			user.setUpdateTime(new Date());
 			userService.save(user);
@@ -387,6 +395,66 @@ public class ApiLoginController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("登录密钥错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 注册用户
+	 * 
+	 * v1.0 zhanghc 2025年12月1日下午7:06:04
+	 * 
+	 * @param registUser
+	 * @return PageResult
+	 */
+	@RequestMapping("/regist-user")
+	public PageResult registUser(String name, String loginName, String pwd, String orgCode) {
+		try {
+			// 数据校验
+			if (!ValidateUtil.isValid(name)) {
+				throw new MyException("参数错误：name");
+			}
+			if (!ValidateUtil.isValid(loginName)) {
+				throw new MyException("参数错误：loginName");
+			}
+			if (!ValidateUtil.isValid(pwd)) {
+				throw new MyException("参数错误：pwd");
+			}
+			if (!ValidateUtil.isValid(orgCode)) {
+				throw new MyException("参数错误：orgCode");
+			}
+			if (registUserService.existLoginName(loginName)) {
+				throw new MyException("登录账号已注册");
+			}
+			if (userService.existLoginName(loginName, null)) {
+				throw new MyException("登录账号已存在");
+			}
+			int orgId;
+			try {
+				orgId = InviteCodeUtil.extractIdFromCode(orgCode);
+			} catch (Exception e) {
+				throw new MyException("无效的机构码");
+			}
+			Org org = orgService.getById(orgId); // 不要用baseCacheService，比如id为0，org为null，但是log.debug获取了属性报错
+			if (org == null) {
+				throw new MyException("机构不存在");
+			}
+
+			// 注册用户
+			registUserService.save(RegistUser.builder()//
+					.name(name)//
+					.loginName(loginName)//
+					.pwd(pwd)//
+					.orgId(orgId)//
+					.registTime(new Date())//
+					.state(3)//
+					.build());
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("注册用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("注册用户错误：", e);
 			return PageResult.err();
 		}
 	}

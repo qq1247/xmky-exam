@@ -27,7 +27,7 @@ public interface UserService extends BaseService<User> {
 	 * 
 	 * @param user void
 	 */
-	void editEx(User user);
+	void edit(User user);
 
 	/**
 	 * 用户删除
@@ -106,5 +106,16 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getMarkUserList(Integer parentId);
+
+	/**
+	 * 登录名是否存在
+	 * 
+	 * v1.0 zhanghc 2025年12月1日下午7:20:32
+	 * 
+	 * @param loginName
+	 * @param excludeId
+	 * @return boolean
+	 */
+	boolean existLoginName(String loginName, Integer excludeId);
 
 }

@@ -103,4 +103,11 @@ public interface ParmService extends BaseService<Parm> {
 	 * v1.0 zhanghc 2025年9月30日下午4:49:46 void
 	 */
 	void appId();
+
+	/**
+	 * 用户注册
+	 * 
+	 * v1.0 zhanghc 2025年12月1日上午10:43:10 void
+	 */
+	void userRegist();
 }

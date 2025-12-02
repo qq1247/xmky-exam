@@ -26,8 +26,6 @@ public class Parm {
 	private String emailPwd;
 	private String emailProtocol;
 	private String sysName;
-	private Integer updateUserId;
-	private Date updateTime;
 	private String fileUploadDir;
 	private String dbBakDir;
 	private Integer pwdType;
@@ -41,6 +39,9 @@ public class Parm {
 	private String appVer;
 	private String appRelVer;
 	private Date appRelTime;
+	private Integer userRegist;
+	private Integer updateUserId;
+	private Date updateTime;
 
 	public String getFileUploadDir() {
 		if (!ValidateUtil.isValid(fileUploadDir)) {

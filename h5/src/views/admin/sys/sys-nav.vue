@@ -3,16 +3,15 @@
         <div class="sys-nav__head">
             <el-menu :default-active="$route.path" mode="horizontal" :router="true" class="sys-nav__menu">
                 <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/bulletin-list">公告管理</el-menu-item>
-                <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/parm-list">系统配置</el-menu-item>
+                <el-menu-item v-if="userStore.isAdmin()" index="/parm-nav/set/1">系统配置</el-menu-item>
                 <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/cron-list">定时任务</el-menu-item>
-                <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/dict-list">字典</el-menu-item>
+                <el-menu-item v-if="userStore.isAdmin()" index="/sys-nav/dict-list">数据字典</el-menu-item>
             </el-menu>
         </div>
         <div class="sys-nav__main">
             <router-view></router-view>
         </div>
     </div>
-
 </template>
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/user'

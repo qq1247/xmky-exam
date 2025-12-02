@@ -18,4 +18,7 @@ export function parmSupport(parm: object) {
 export function parmIcp(parm: object) {
     return request.post('/parm/icp', parm);
 }
+export function parmuserRegist(parm: object) {
+    return request.post('/parm/user-regist', parm);
+}
 

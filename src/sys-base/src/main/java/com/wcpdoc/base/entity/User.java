@@ -12,7 +12,10 @@ import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.mybatis.IntTypeHandler;
 import com.wcpdoc.core.util.ValidateUtil;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户实体
@@ -21,6 +24,9 @@ import lombok.Data;
  */
 @Data
 @TableName(value = "SYS_USER", autoResultMap = true)
+@NoArgsConstructor
+@AllArgsConstructor 
+@Builder
 public class User implements LoginUser {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
@@ -31,8 +37,6 @@ public class User implements LoginUser {
 	private String pwd;
 	private Date registTime;
 	private Date lastLoginTime;
-	private Integer updateUserId;
-	private Date updateTime;
 	private Integer orgId;
 	private Integer state;
 	private Integer headFileId;
@@ -42,6 +46,9 @@ public class User implements LoginUser {
 	private List<Integer> userIds;
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> orgIds;
+	private String source;
+	private Integer updateUserId;
+	private Date updateTime;
 
 	public boolean hasAdmin() {
 		return ValidateUtil.isValid(role) && role.equals(BaseConstant.ADMIN);
