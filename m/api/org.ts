@@ -1,4 +1,4 @@
-import request from '@/request/request';
+import request from '@/request';
 
 export function orgListpage(parm: object) {
 	return request.post('/org/listpage', parm);

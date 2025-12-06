@@ -1,4 +1,4 @@
-import request from '@/request/request'
+import request from '@/request'
 
 export function bulletinListpage(parm: object) {
 	return request.post('/bulletin/listpage', parm);

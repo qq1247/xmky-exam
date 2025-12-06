@@ -39,3 +39,6 @@ export function myExerFavQuestionList(parm: object) {
 export function myExerWrongQuestionList(parm: object) {
     return request.post('/my-exer/wrong-question-list', parm);
 }
+export function myExerComment(parm: object) {
+    return request.post('/my-exer/comment', parm);
+}

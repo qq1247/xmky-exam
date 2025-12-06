@@ -4,13 +4,12 @@
             <el-button type="primary" class="my-exer-paper__btn"
                 @click="$router.push(`/my-exer/read/${route.params.exerId}`)">
                 <span class="iconfont icon-lianxi-61 my-exer-paper__btn-icon"></span>
-                <span class="editor-toolbar__btn-txt">完成练习</span>
+                <span class="editor-toolbar__btn-txt">退出练习</span>
             </el-button>
         </div>
         <div class="my-exer-paper__main">
             <div class="paper-toolbar">
-                <el-button type='' class="paper-toolbar__btn"
-                    :class="{ 'paper-toolbar__btn--active': toolbars.answerShow }"
+                <el-button class="paper-toolbar__btn" :class="{ 'paper-toolbar__btn--active': toolbars.answerShow }"
                     @click="toolbars.answerShow = !toolbars.answerShow; toolbars.analysisShow = !toolbars.analysisShow">
                     <span class="iconfont icon-icon_xiugaishijian paper-toolbar__btn-icon"></span>
                     <span class="paper-toolbar__btn-txt">{{ toolbars.answerShow ? '答题' : '背题' }}</span>
@@ -21,6 +20,11 @@
                     <span class="iconfont icon-a-icon_huaban1 paper-toolbar__btn-icon"></span>
                     <span class="paper-toolbar__btn-txt">{{ toolbars.randShow ? '顺序' : '随机' }}</span>
                 </el-button> -->
+                <el-button v-if="commentEnable" class="paper-toolbar__btn"
+                    :class="{ 'paper-toolbar__btn--active': toolbars.commentShow }" @click="commentOpen">
+                    <span class="iconfont icon-lianxi-69 paper-toolbar__btn-icon"></span>
+                    <span class="paper-toolbar__btn-txt">{{ toolbars.commentShow ? '收起思路' : '查看思路' }}</span>
+                </el-button>
             </div>
             <div class="paper__wrap">
                 <div class="answer-sheet">
@@ -30,8 +34,8 @@
                     <el-scrollbar height="calc(100vh - 300px)" class="answer-sheet__wrap">
                         <div class="answer-sheet">
                             <template v-for="(myExerQuestion, index) in _myExerQuestions" :key="index">
-                                <div @click="curQuestionIndex = index; questionView()" class="answer-sheet__question"
-                                    :class="{
+                                <div @click="curQuestionIndex = index; questionView(); commentQuery();"
+                                    class="answer-sheet__question" :class="{
                                         'answer-sheet__question--answered': answered(index),
                                         'answer-sheet__question--right': isRight(index),
                                         'answer-sheet__question--wrong': isWrong(index),
@@ -48,12 +52,12 @@
                         <el-form ref="formRef" :model="form" :rules="formRules" class="form">
                             <el-form-item prop="score" :rules="formRules.score">
                                 <el-button :disabled="curQuestionIndex <= 0" text class="paper__btn"
-                                    @click="curQuestionIndex--; questionView()">
+                                    @click="curQuestionIndex--; questionView(); commentQuery();">
                                     <span class="iconfont icon-zuo paper__btn-icon"></span>
                                     <span class="paper__btn-txt">上一题</span>
                                 </el-button>
                                 <el-button :disabled="curQuestionIndex >= _myExerQuestions.length - 1" text
-                                    class="paper__btn" @click="curQuestionIndex++; questionView()">
+                                    class="paper__btn" @click="curQuestionIndex++; questionView(); commentQuery();">
                                     <span class="paper__btn-txt paper__btn-txt-next">下一题</span>
                                     <span class="iconfont icon-right paper__btn-icon"></span>
                                 </el-button>
@@ -89,7 +93,7 @@
                             <el-button
                                 v-if="wrongQuestions.some(wq => wq.questionId === _myExerQuestions[curQuestionIndex]?.questionId)"
                                 type='' class="opt__btn opt__btn--active" @click="wrongQuestionReset">
-                                <span class="opt__btn-txt opt__btn-txt--wrong">答错{{
+                                <span class="opt__btn-txt opt__btn-txt--wrong">历史答错{{
                                     wrongQuestions.find(wq => wq.questionId ===
                                         _myExerQuestions[curQuestionIndex]?.questionId).wrongNum
                                 }}次&nbsp;&nbsp;</span>
@@ -112,6 +116,52 @@
                         @change="(userAnswers: string[]) => (curExamQuestion as ExamQuestion).userAnswers = userAnswers">
                         <template #title-pre>{{ curQuestionIndex + 1 }}、</template>
                     </xmks-question>
+                    <div v-if="toolbars.commentShow" class="comment">
+                        <div class="my-comment">
+                            <el-input type="textarea" v-model="commentForm.content" maxlength="128" style="width: 100%"
+                                placeholder="我是这样解题的..." show-word-limit resize="none"
+                                :autosize="{ minRows: 3, maxRows: 3 }" class="my-comment__textarea" />
+
+                            <div class="my-comment__inner">
+                                <el-button type="primary" class="my-comment__btn" @click="commentAdd()">分享思路</el-button>
+                                <!-- <el-checkbox v-model="commentForm.anon" :true-value="true" :false-value="false"
+                                    class="my-comment__checkbox">匿名</el-checkbox> -->
+                            </div>
+                        </div>
+                        <div class="user-comment">
+                            <span v-if="comments.length" class="user-comment__label">已分享思路：<span
+                                    class="user-comment__value">{{
+                                        commentNum }}条</span>
+                                <el-link :underline="false"
+                                    :class="['user-comment__btn', { 'user-comment__btn--active': !isHot }]"
+                                    @click="isHot = false">最新</el-link>
+                                <span class="user-comment__split">|</span>
+                                <el-link :underline="false"
+                                    :class="['user-comment__btn', { 'user-comment__btn--active': isHot }]"
+                                    @click="isHot = true">最热</el-link>
+                            </span>
+                            <template v-else>
+                                <!-- <p>暂无思路，<a href="#">分享你的想法吧</a>～</p> -->
+                                <el-link underline="never" class="user-comment__more">暂无思路，分享你的想法吧</el-link>
+                            </template>
+                            <xmky-comment v-for="(myComment, index) in _comments" :key="index"
+                                :name="myComment.userName || '匿名'" reply-name="" :content="myComment.content"
+                                :update-time="myComment.updateTime" :like-num="myComment.likeNum"
+                                :is-like="myComment.isLike" @like="commentLike(myComment)"
+                                @reply="(content) => commentReply(myComment, content)">
+                                <div v-if="myComment.children" class="user-comment__level2">
+                                    <xmky-comment v-for="(subMyComment, index) in myComment.children" :key="index"
+                                        :name="subMyComment.userName || '匿名'" :reply-name="subMyComment.replyUserName"
+                                        :content="subMyComment.content" :update-time="subMyComment.updateTime"
+                                        :like-num="subMyComment.likeNum" :is-like="subMyComment.isLike"
+                                        @like="commentLike(subMyComment)"
+                                        @reply="(content) => commentReply(subMyComment, content)">
+                                    </xmky-comment>
+                                </div>
+                            </xmky-comment>
+                            <!-- <el-link underline="never" class="user-comment__more">共10条回复，点击查看</el-link> -->
+                        </div>
+                    </div>
                 </el-scrollbar>
             </div>
         </div>
@@ -121,19 +171,23 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import XmksQuestion from '@/components/question/xmks-question.vue'
 import type { MyExerQuestion } from '@/ts/exam/my-exer-question';
-import { myExerAnswer, myExerQuestionFav, myExerQuestion, myExerTrack, myExerQuestionList, myExerFavQuestionList, myExerWrongQuestionList, myExerWrongQuestionReset } from '@/api/my/my-exer';
+import { myExerAnswer, myExerQuestionFav, myExerQuestion, myExerTrack, myExerQuestionList, myExerFavQuestionList, myExerWrongQuestionList, myExerWrongQuestionReset, myExerComment } from '@/api/my/my-exer';
 import { useRoute } from 'vue-router';
 import type { ExamQuestion } from '@/ts/exam/exam';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useIdleTrack } from '@/composables/xmky-idle-track';
+import XmkyComment from '@/components/xmky-comment.vue';
+import { myCommentAdd, myCommentLike, myCommentList, myCommentReply } from '@/api/my/my-comment';
+import type { MyCommon } from '@/ts/exam/my-comment';
 
 /************************变量定义相关***********************/
 const route = useRoute() // 路由
 const idleTrack = useIdleTrack()
 const toolbars = reactive({// 工具栏
     randShow: false,
-    answerShow: false,
-    analysisShow: false,
+    answerShow: false, // 答案显示
+    analysisShow: false, // 解析显示
+    commentShow: false, // 评论显示
 })
 const myExerQuestions = ref<MyExerQuestion[]>([])// 我的练习试题
 const questionCache = ref<Map<number, ExamQuestion>>(new Map()) // 试题缓存
@@ -165,6 +219,16 @@ const formRules = reactive<FormRules>({// 表单校验规则
 const favQuestionIds = ref<number[]>([])
 const wrongQuestions = ref<any[]>([])
 
+const commentEnable = ref(false)
+const commentForm = reactive({
+    content: '',
+    //anon: false,
+})
+
+const comments = ref<MyCommon[]>([]) // 评论列表（带二级列表）
+const commentNum = ref(0)
+const isHot = ref(false)
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     idleTrack.startTracking({
@@ -189,6 +253,7 @@ onMounted(async () => {
     // 显示第一题
     curQuestionIndex.value = 0
     questionView()
+    commentStateQuery()
 })
 
 /************************计算属性相关*************************/
@@ -241,6 +306,15 @@ const isWrong = computed(() => (index: number) => {
 
     return myExerQuestion.userScore === 0
 }); // 是否答错
+const _comments = computed(() => {
+    if (!isHot.value) {
+        return comments.value
+    }
+
+    return [...comments.value].sort((a, b) => {
+        return (b.likeNum as number) - (a.likeNum as number)
+    })
+})
 
 /************************事件相关*****************************/
 // 试题列表查询
@@ -352,6 +426,108 @@ async function wrongQuestionReset() {
         wq => wq.questionId !== currentId
     )
 }
+
+// 评论状态查询
+async function commentStateQuery() {
+    const { data: { code, data } } = await myExerComment({
+        exerId: route.params.exerId,
+    })
+
+    if (code !== 200) {
+        return
+    }
+
+    commentEnable.value = data === 1
+}
+
+// 评论打开
+function commentOpen() {
+    toolbars.commentShow = !toolbars.commentShow;
+    if (toolbars.commentShow) {
+        commentQuery()
+    }
+}
+
+// 评论查询
+async function commentQuery() {
+    const curQuestionId = _myExerQuestions.value[curQuestionIndex.value]?.questionId as number;
+    const { data: { code, data } } = await myCommentList({
+        questionId: curQuestionId,
+    })
+
+    if (code !== 200) {
+        return
+    }
+
+    const list = data
+    const treeList: object[] = []// 列表转树形列表
+    const treeMap: any = {}
+    const idFiled = 'id'
+    const parentField = 'rootId'
+    for (let i = 0; i < list.length; i++) {
+        list[i]['id'] = list[i][idFiled]
+        treeMap[list[i]['id']] = list[i]
+    }
+
+    for (let i = 0; i < list.length; i++) {
+        if (treeMap[list[i][parentField]] && list[i]['id'] !== list[i][parentField]) {
+            if (!treeMap[list[i][parentField]]['children']) {
+                treeMap[list[i][parentField]]['children'] = []
+            }
+            treeMap[list[i][parentField]]['children'].push(list[i])
+        } else {
+            treeList.push(list[i])
+        }
+    }
+
+    comments.value = treeList as any[]
+    commentNum.value = data.length
+}
+
+// 评论添加
+async function commentAdd() {
+    const curQuestionId = _myExerQuestions.value[curQuestionIndex.value]?.questionId as number;
+
+    const { data: { code } } = await myCommentAdd({
+        questionId: curQuestionId,
+        content: commentForm.content
+    })
+    if (code !== 200) {
+        return
+    }
+
+    commentForm.content = ''
+    commentQuery()
+}
+
+// 评论点赞
+async function commentLike(myComment: MyCommon) {
+    const { data: { code } } = await myCommentLike({
+        id: myComment.id
+    })
+    if (code !== 200) {
+        return
+    }
+
+    commentQuery()
+}
+
+// 评论回复
+async function commentReply(parentMyComment: MyCommon, content: string) {
+    const curQuestionId = _myExerQuestions.value[curQuestionIndex.value]?.questionId as number;
+
+    const { data: { code } } = await myCommentReply({
+        questionId: curQuestionId,
+        content: content,
+        parentId: parentMyComment.id
+    })
+    if (code !== 200) {
+        return
+    }
+
+    commentQuery()
+}
+
 </script>
 <style scoped lang="scss">
 .my-exer-paper {
@@ -726,6 +902,90 @@ async function wrongQuestionReset() {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                .paper-question {
+                    .question {
+                        // border-bottom: 1px solid #E5E5E5;
+                        padding-bottom: 20px;
+                    }
+                }
+
+                .comment {
+                    margin-top: 20px;
+
+                    .my-comment {
+                        .my-comment__textarea {
+                            .el-textarea__inner {
+                                padding: 15px;
+                                border-radius: 6px;
+                            }
+
+                            .el-input__count {
+                                font-size: 13px;
+                            }
+                        }
+
+                        .my-comment__inner {
+                            display: flex;
+                            margin-top: 15px;
+
+                            .my-comment__btn {
+                                width: 85px;
+                                height: 32px;
+                                border-radius: 6px;
+                                border: 0px;
+                                color: #FFFFFF;
+                                font-size: 14px;
+                                background-image: linear-gradient(to right, #04C7F2, #259FF8);
+                            }
+
+                            .my-comment__checkbox {
+                                margin-left: 20px;
+                            }
+                        }
+                    }
+
+                    .user-comment {
+                        // border: 1px solid red;
+                        margin-top: 30px;
+
+                        .user-comment__label {
+                            font-size: 14px;
+                            color: #333333;
+                            line-height: 20px;
+                        }
+
+                        .user-comment__value {
+                            color: #999999;
+                            margin-right: 10px;
+                        }
+
+                        .user-comment__split {
+                            color: #999999;
+                        }
+
+                        .user-comment__btn {
+                            margin: 0px 10px;
+                            color: #333333;
+
+                            &.user-comment__btn--active {
+                                color: #1EA1EE;
+                            }
+                        }
+
+                        .user-comment__more {
+                            margin-top: 20px;
+                            font-size: 14px;
+                            color: #999999;
+                        }
+
+                        .user-comment__level2 {
+                            background-color: #F2F6F9;
+                            padding: 0px 20px 20px 20px;
+                            border-radius: 6px;
                         }
                     }
                 }

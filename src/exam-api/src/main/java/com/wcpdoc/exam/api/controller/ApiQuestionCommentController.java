@@ -13,26 +13,26 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.ExerRmk;
-import com.wcpdoc.exam.core.service.ExerRmkService;
+import com.wcpdoc.exam.core.entity.MyComment;
+import com.wcpdoc.exam.core.service.MyCommentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 练习评论控制层
+ * 试题评论控制层
  * 
  * v1.0 chenyun 2021年8月31日上午9:54:28
  */
 @RestController
-@RequestMapping("/api/exer-rmk")
+@RequestMapping("/api/question-comment")
 @RequiredArgsConstructor
 @Slf4j
-public class ApiExerRmkController extends BaseController {
-	private final ExerRmkService exerRmkService;
+public class ApiQuestionCommentController extends BaseController {
+	private final MyCommentService questionCommentService;
 
 	/**
-	 * 练习评论列表
+	 * 试题评论列表
 	 * 
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
@@ -42,7 +42,7 @@ public class ApiExerRmkController extends BaseController {
 	@RequestMapping("/listpage")
 	public PageResult listpage(PageIn pageIn) {
 		try {
-			PageOut pageOut = exerRmkService.getListpage(pageIn);
+			PageOut pageOut = questionCommentService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (!ValidateUtil.isValid(map.get("likeUserIds").toString())) {
 					map.put("likeUserIds", new Integer[0]);
@@ -59,13 +59,13 @@ public class ApiExerRmkController extends BaseController {
 			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
-			log.error("练习评论列表错误：", e);
+			log.error("试题评论列表错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 练习评论删除
+	 * 试题评论删除
 	 * 
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
@@ -75,18 +75,18 @@ public class ApiExerRmkController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			// 练习评论删除
-			ExerRmk exerRmk = exerRmkService.getById(id);
+			// 试题评论删除
+			MyComment exerRmk = questionCommentService.getById(id);
 			exerRmk.setState(0);
 			exerRmk.setUpdateTime(new Date());
 			exerRmk.setUpdateUserId(getCurUser().getId());
-			exerRmkService.updateById(exerRmk);
+			questionCommentService.updateById(exerRmk);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("练习评论删除错误：{}", e.getMessage());
+			log.error("试题评论删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("练习评论删除错误：", e);
+			log.error("试题评论删除错误：", e);
 			return PageResult.err();
 		}
 	}

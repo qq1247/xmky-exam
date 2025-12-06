@@ -98,7 +98,7 @@ public class AuthConf {
 				.requestMatchers("/api/my-exam/**")//
 				.hasAnyRole("EXAM_USER", "TEMP_USER")//
 				// ========== 考试用户 ==========
-				.requestMatchers("/api/my-exer/**")//
+				.requestMatchers("/api/my-exer/**", "/api/my-comment/**")//
 				.hasAnyRole("EXAM_USER")//
 				// ========== 管理员 ==========
 				.requestMatchers("/api/**")//

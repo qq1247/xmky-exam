@@ -75,12 +75,14 @@ public class CacheConf {
 				caffeineCache("EXER_TIME_CACHE", Duration.ofSeconds(600), true),
 
 				// 用户锁定缓存：空闲60秒后失效
-				caffeineCache("USER_LOCK_CACHE", Duration.ofSeconds(60), false)
+				caffeineCache("USER_LOCK_CACHE", Duration.ofSeconds(60), false),
+				
+				// 我的评论缓存：空闲2小时后失效
+				caffeineCache("MYCOMMENT_CACHE", Duration.ofHours(2), false)
 
 		));
 
 		return cacheManager;
-
 	}
 
 	private CaffeineCache caffeineCache(String name, Duration ttl, boolean useWrite) {

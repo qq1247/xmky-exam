@@ -18,6 +18,6 @@ export function exerGet(parm: object) {
 export function exerState(parm: object) {
     return request.post('/exer/state', parm);
 }
-export function exerRmk(parm: object) {
-    return request.post('/exer/rmk', parm);
+export function exerCommentState(parm: object) {
+    return request.post('/exer/commentState', parm);
 }

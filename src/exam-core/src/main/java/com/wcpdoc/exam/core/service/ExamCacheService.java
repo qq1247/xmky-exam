@@ -8,6 +8,7 @@ import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.MyComment;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 
 /**
@@ -107,5 +108,15 @@ public interface ExamCacheService extends BaseService<Object> {
 	 * @return List<MyQuestion>
 	 */
 	List<MyExamQuestion> getMyQuestionList(Integer examId, Integer userId);
+
+	/**
+	 * 我的评论列表
+	 * 
+	 * v1.0 zhanghc 2025年12月3日上午9:44:19
+	 * 
+	 * @param questionId
+	 * @return List<QuestionComment>
+	 */
+	List<MyComment> getQuestionCommentList(Integer questionId);
 
 }

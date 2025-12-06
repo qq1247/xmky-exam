@@ -10,7 +10,7 @@
                         <xmks-select v-model="form.questionBankIds" url="question-bank/listpage" :params="{}"
                             search-parm-name="name" option-value="id" option-label="name" :multiple="true"
                             :page-size="100" search-placeholder="请输入题库名称进行筛选" :options="questionBanks"
-                            :disabled="form.id" placeholder="请选择题库">
+                            :disabled="!!form.id" placeholder="请选择题库">
                             <template #default="{ option }">
                                 {{ option.name }} （单选{{ option.singleNum }} / 多选{{ option.multipleNum }} /
                                 客观填空{{ option.multipleNum }} / 判断{{ option.judgeNum }} / 客观问答{{
@@ -60,16 +60,10 @@
                 <el-button type="primary" class="form__btn" @click="state" style="margin-bottom: 30px;">保存设置</el-button>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="form.id" title="删除练习" desc="删除练习">
-            <template #card-side>
-                <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': delConfirm }" @click="del"
-                    style="margin-bottom: 14px;">删除练习</el-button>
-            </template>
-        </xmks-edit-card>
-        <!-- <xmks-edit-card v-if="form.id" title="允许评论" desc="解题技巧互评，用同伴视角发现解题盲点">
+        <xmks-edit-card v-if="form.id" title="允许评论" desc="解题技巧互评，用同伴视角发现解题盲点">
             <template #card-main>
                 <el-form size="large" class="form">
-                    <el-radio-group v-model="form.rmkState">
+                    <el-radio-group v-model="form.commentState">
                         <el-radio v-for="(dict, index) in dictStore.getList('STATE_YN')" :key="index"
                             :value="parseInt(dict.dictKey)">
                             {{ dict.dictValue }}
@@ -78,14 +72,21 @@
                 </el-form>
             </template>
             <template #card-side>
-                <el-button type="primary" class="form__btn" @click="rmk" style="margin-bottom: 30px;">保存设置</el-button>
+                <el-button type="primary" class="form__btn" @click="commentState"
+                    style="margin-bottom: 30px;">保存设置</el-button>
             </template>
-        </xmks-edit-card> -->
+        </xmks-edit-card>
+        <xmks-edit-card v-if="form.id" title="删除练习" desc="删除练习">
+            <template #card-side>
+                <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': delConfirm }" @click="del"
+                    style="margin-bottom: 14px;">删除练习</el-button>
+            </template>
+        </xmks-edit-card>
     </el-scrollbar>
 </template>
 
 <script lang="ts" setup>
-import { exerAdd, exerDel, exerEdit, exerGet, exerState } from '@/api/exam/exer'
+import { exerAdd, exerCommentState, exerDel, exerEdit, exerGet, exerState } from '@/api/exam/exer'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import xmksSelect from '@/components/xmks-select.vue'
 import { useDictStore } from '@/stores/dict'
@@ -99,13 +100,14 @@ const route = useRoute()// 路由
 const router = useRouter()// 路由
 const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
-const form = reactive<Exer>({// 表单
+const form = reactive<Exer>({
     id: null,
     name: '',
     questionBankIds: [],
     userIds: [],
     orgIds: [],
-    state: 1,
+    state: null,
+    commentState: null
 })
 const formRules = reactive<FormRules>({// 表单规则
     name: [
@@ -146,6 +148,7 @@ onMounted(async () => {
         form.userIds = data.users.map((user: any) => user.id)
         form.orgIds = data.orgs.map((org: any) => org.id)
         form.state = data.state
+        form.commentState = data.commentState
 
         questionBanks.value = data.questionBanks
         users.value = data.users
@@ -193,6 +196,16 @@ async function edit() {
 // 发布
 async function state() {
     const { data: { code } } = await exerState({ id: form.id })
+    if (code !== 200) {
+        return
+    }
+
+    router.push("/exer-list")
+}
+
+// 评论
+async function commentState() {
+    const { data: { code } } = await exerCommentState({ id: form.id })
     if (code !== 200) {
         return
     }

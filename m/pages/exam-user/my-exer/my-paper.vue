@@ -9,10 +9,23 @@
 			<progress :percent="timePercent" activeColor="#10AEFF" class="progress" stroke-width="2" />
 			<view class="exer-model">
 				<view class="exer-model__inner">
-					<button :class="['exer-model__option', { 'exer-model__option--answer': !toolbars.answerShow }]" @click="toolbars.answerShow = !toolbars.answerShow">
+					<button
+						:class="['exer-model__option', { 'exer-model__option--answer': toolbars.answerShow }]"
+						@click="
+							toolbars.answerShow = true;
+							commentEnable = false;
+						"
+					>
 						答题
 					</button>
-					<button :class="['exer-model__option', { 'exer-model__option--remember': toolbars.answerShow }]" @click="toolbars.answerShow = !toolbars.answerShow">
+					<button
+						:class="['exer-model__option', { 'exer-model__option--remember': !toolbars.answerShow }]"
+						@click="
+							toolbars.answerShow = false;
+							commentEnable = true;
+							commentQuery();
+						"
+					>
 						背题
 					</button>
 				</view>
@@ -75,10 +88,10 @@
 						:score="curExamQuestion.score"
 						:analysis="curExamQuestion.analysis"
 						:user-score="curExamQuestion?.userScore"
-						:answer-show="toolbars.answerShow"
-						:user-answer-show="!toolbars.answerShow"
-						:analysis-show="toolbars.answerShow || curExamQuestion?.userScore != null"
-						:editable="!toolbars.answerShow && curExamQuestion?.userScore == null"
+						:answer-show="!toolbars.answerShow"
+						:user-answer-show="toolbars.answerShow"
+						:analysis-show="!toolbars.answerShow || curExamQuestion?.userScore != null"
+						:editable="toolbars.answerShow && curExamQuestion?.userScore == null"
 					>
 						<template #title-pre>
 							<text>{{ curQuestionIndex + 1 }}、</text>
@@ -87,6 +100,51 @@
 							<text>（{{ curExamQuestion.score }}分）</text>
 						</template>
 					</xmky-question>
+					<view v-if="commentEnable && !toolbars.answerShow">
+						<view v-if="comments.length" class="comment">
+							<!-- <text class="comment__txt">
+								已分享思路：
+								<text class="comment__value">{{ commentNum }}条</text>
+							</text> -->
+							<text class="comment__txt" style="color: #04c7f2" @click="popup.open()">点击这里分享思路</text>
+							<view v-if="isHot" class="comment__txt" @click="isHot = false">
+								<uni-icons customPrefix="iconfont" type="icon-liebiao" color="#8f939c" size="36rpx"></uni-icons>
+								<text>按时间</text>
+							</view>
+							<view v-else class="comment__txt" @click="isHot = true">
+								<uni-icons customPrefix="iconfont" type="icon-liebiao" color="#8f939c" size="36rpx"></uni-icons>
+								<text>按热度</text>
+							</view>
+						</view>
+						<text v-else class="comment">
+							<text v-if="!toolbars.answerShow" class="comment__txt" @click="popup.open()">暂无思路，点击这里分享你的想法吧</text>
+						</text>
+						<xmky-comment
+							v-for="(myComment, index) in _comments"
+							:key="index"
+							:name="myComment.userName || '匿名'"
+							reply-name=""
+							:content="myComment.content"
+							:update-time="myComment.updateTime"
+							:like-num="myComment.likeNum"
+							:is-like="myComment.isLike"
+							@like="commentLike(myComment)"
+							@reply="(content: string) => commentReply(myComment, content)"
+						>
+							<xmky-comment
+								v-for="(subMyComment, index) in myComment.children"
+								:key="index"
+								:name="subMyComment.userName || '匿名'"
+								:reply-name="subMyComment.replyUserName"
+								:content="subMyComment.content"
+								:update-time="subMyComment.updateTime"
+								:like-num="subMyComment.likeNum"
+								:is-like="subMyComment.isLike"
+								@like="commentLike(subMyComment)"
+								@reply="(content: string) => commentReply(subMyComment, content)"
+							></xmky-comment>
+						</xmky-comment>
+					</view>
 				</scroll-view>
 			</view>
 		</view>
@@ -107,6 +165,7 @@
 				@click="
 					curQuestionIndex--;
 					questionView();
+					if (commentEnable) commentQuery();
 				"
 			>
 				上一题
@@ -118,11 +177,12 @@
 				@click="
 					curQuestionIndex++;
 					questionView();
+					if (commentEnable) commentQuery();
 				"
 			>
 				下一题
 			</button>
-			<button v-show="!toolbars.answerShow && curExamQuestion?.userScore == null" class="question-confirm" type="primary" @click="answer">确认作答</button>
+			<button v-show="toolbars.answerShow && curExamQuestion?.userScore == null" class="question-confirm" type="primary" @click="answer">确认作答</button>
 
 			<xmky-popup ref="answerSheet" name="答题卡" class="answer-sheet">
 				<view class="answer-sheet__head">
@@ -145,6 +205,7 @@
 								curQuestionIndex = index;
 								questionView();
 								answerSheet.close();
+								if (commentEnable) commentQuery();
 							"
 							:class="[
 								'answer-sheet__question-no',
@@ -165,6 +226,20 @@
 	<uni-popup ref="inputDialog" type="dialog">
 		<uni-popup-dialog ref="inputClose" mode="input" title="自评分数" value="1.0" placeholder="主观题需要自评" @confirm="answerOfObjective"></uni-popup-dialog>
 	</uni-popup>
+	<xmky-popup ref="popup" name="分享思路" class="popup">
+		<view class="popup__txt"></view>
+		<uni-easyinput
+			type="textarea"
+			v-model="commentForm.content"
+			:maxlength="128"
+			autoHeight
+			placeholder="我是这样解题的..."
+			:styles="{ borderColor: '#04C7F2' }"
+			primaryColor="#04C7F2"
+			class="popup__input"
+		></uni-easyinput>
+		<button type="primary" class="popup__btn" @click="commentAdd">发送</button>
+	</xmky-popup>
 </template>
 
 <script lang="ts" setup>
@@ -172,6 +247,7 @@ import { ref, reactive, computed } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import { useDictStore } from '@/stores/dict';
 import { Exer } from '@/ts/exer.d';
+import { MyCommon } from '@/ts/my-comment.d';
 import {
 	myExerQuestion,
 	myExerAnswer,
@@ -180,11 +256,13 @@ import {
 	myExerFavQuestionList,
 	myExerWrongQuestionList,
 	myExerTrack,
-	myExerQuestionList
+	myExerQuestionList,
+	myExerComment
 } from '@/api/my-exer';
 import { MyExerQuestion } from '@/ts/my-exer-question.d';
 import { ExamQuestion } from '@/ts/paper.d';
 import { useIdleTrack } from '@/composables/xmky-idle-track';
+import { myCommentAdd, myCommentLike, myCommentList, myCommentReply } from '@/api/my-comment';
 
 /************************变量定义相关***********************/
 defineProps({
@@ -199,7 +277,7 @@ const pageParm = reactive({
 }); // 页面参数
 const toolbars = reactive({
 	randShow: false,
-	answerShow: false
+	answerShow: true
 }); // 工具栏
 const myExerQuestions = ref<MyExerQuestion[]>([]); // 我的练习试题
 const questionCache = ref<Map<number, ExamQuestion>>(new Map()); // 试题缓存
@@ -226,6 +304,17 @@ const inputDialog = ref();
 const idleTracker = useIdleTrack();
 const favQuestionIds = ref<number[]>([]);
 const wrongQuestions = ref<any[]>([]);
+
+const commentEnable = ref(false);
+const commentForm = reactive({
+	content: ''
+	//anon: false,
+});
+
+const comments = ref<MyCommon[]>([]); // 评论列表（带二级列表）
+const commentNum = ref(0);
+const isHot = ref(false);
+const popup = ref();
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
@@ -259,6 +348,7 @@ onLoad(async (options) => {
 	// 显示第一题
 	curQuestionIndex.value = 0;
 	questionView();
+	commentStateQuery();
 });
 
 onReady(() => {
@@ -330,6 +420,15 @@ const isMark = computed(() => (questionId: number) => {
 	return marks.value.includes(questionId);
 }); // 是否标记
 
+const _comments = computed(() => {
+	if (!isHot.value) {
+		return comments.value;
+	}
+
+	return [...comments.value].sort((a, b) => {
+		return (b.likeNum as number) - (a.likeNum as number);
+	});
+});
 /************************事件相关*****************************/
 // 练习查询
 async function exerQuery() {
@@ -484,6 +583,100 @@ async function wrongQuestionReset() {
 
 	wrongQuestions.value = wrongQuestions.value.filter((wq) => wq.questionId !== currentId);
 }
+
+// 评论状态查询
+async function commentStateQuery() {
+	const { code, data } = await myExerComment({
+		exerId: pageParm.exerId
+	});
+
+	if (code !== 200) {
+		return;
+	}
+
+	commentEnable.value = data === 1;
+}
+
+// 评论查询
+async function commentQuery() {
+	const curQuestionId = _myExerQuestions.value[curQuestionIndex.value]?.questionId as number;
+	const { code, data } = await myCommentList({
+		questionId: curQuestionId
+	});
+
+	if (code !== 200) {
+		return;
+	}
+
+	const list = data;
+	const treeList: object[] = []; // 列表转树形列表
+	const treeMap: any = {};
+	const idFiled = 'id';
+	const parentField = 'rootId';
+	for (let i = 0; i < list.length; i++) {
+		list[i]['id'] = list[i][idFiled];
+		treeMap[list[i]['id']] = list[i];
+	}
+
+	for (let i = 0; i < list.length; i++) {
+		if (treeMap[list[i][parentField]] && list[i]['id'] !== list[i][parentField]) {
+			if (!treeMap[list[i][parentField]]['children']) {
+				treeMap[list[i][parentField]]['children'] = [];
+			}
+			treeMap[list[i][parentField]]['children'].push(list[i]);
+		} else {
+			treeList.push(list[i]);
+		}
+	}
+
+	comments.value = treeList as any[];
+	commentNum.value = data.length;
+}
+
+// 评论添加
+async function commentAdd() {
+	const curQuestionId = _myExerQuestions.value[curQuestionIndex.value]?.questionId as number;
+
+	const { code } = await myCommentAdd({
+		questionId: curQuestionId,
+		content: commentForm.content
+	});
+	if (code !== 200) {
+		return;
+	}
+
+	commentForm.content = '';
+	popup.value.close();
+	commentQuery();
+}
+
+// 评论点赞
+async function commentLike(myComment: MyCommon) {
+	const { code } = await myCommentLike({
+		id: myComment.id
+	});
+	if (code !== 200) {
+		return;
+	}
+
+	commentQuery();
+}
+
+// 评论回复
+async function commentReply(parentMyComment: MyCommon, content: string) {
+	const curQuestionId = _myExerQuestions.value[curQuestionIndex.value]?.questionId as number;
+
+	const { code } = await myCommentReply({
+		questionId: curQuestionId,
+		content: content,
+		parentId: parentMyComment.id
+	});
+	if (code !== 200) {
+		return;
+	}
+
+	commentQuery();
+}
 </script>
 
 <style lang="scss" scoped>
@@ -590,6 +783,22 @@ async function wrongQuestionReset() {
 			.question__no {
 				font-size: 34rpx;
 				color: #0d9df6;
+			}
+			.comment {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-top: 30rpx;
+				margin-bottom: 30rpx;
+				padding-top: 30rpx;
+				border-top: 1px solid #e5e5e5;
+				.comment__txt {
+					font-size: 34rpx;
+					color: #8f939c;
+					.comment__value {
+						color: #303133;
+					}
+				}
 			}
 		}
 	}
@@ -761,6 +970,27 @@ async function wrongQuestionReset() {
 				}
 			}
 		}
+	}
+}
+.popup {
+	display: flex;
+	.popup__txt {
+		margin-bottom: 20rpx;
+		font-size: 30rpx;
+		color: #303133;
+	}
+	.popup__name {
+		color: #8f939c;
+	}
+	.popup__input {
+	}
+	.popup__btn {
+		margin-top: 20rpx;
+		// width: 628rpx;
+		height: 100rpx;
+		line-height: 100rpx;
+		border-radius: 50px;
+		background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 	}
 }
 </style>

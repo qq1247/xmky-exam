@@ -29,7 +29,7 @@ public class Exer {
 	@TableField(typeHandler = IntTypeHandler.class)
 	private List<Integer> orgIds;
 	private Integer state;
-	private Integer rmkState;
+	private Integer commentState;
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;

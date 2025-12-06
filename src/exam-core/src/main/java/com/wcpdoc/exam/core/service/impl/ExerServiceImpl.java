@@ -45,6 +45,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		exer.setCreateUserId(getCurUser().getId());
 		exer.setUpdateUserId(getCurUser().getId());
 		exer.setUpdateTime(new Date());
+		exer.setCommentState(1); // 默认允许评论
 		exer.setState(1);
 		save(exer);
 	}
@@ -61,6 +62,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		entity.setUserIds(exer.getUserIds());
 		entity.setOrgIds(exer.getOrgIds());
 		// entity.setState(exer.getState());// 单独接口控制
+		// entity.setCommentState(exer.gsetCommentState());// 单独接口控制
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setUpdateTime(new Date());
 		updateById(entity);

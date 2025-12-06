@@ -32,8 +32,10 @@
 					<xmky-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
 						<template #content>
 							<view class="exer__row">
-								<text>练习已</text>
+								<text>发布练习：</text>
 								<text class="exer__value">{{ dictStore.getValue('STATE_PS', exer.state) }}</text>
+								<text>允许评论：</text>
+								<text class="exer__value">{{ dictStore.getValue('STATE_YN', exer.state) }}</text>
 							</view>
 							<view>
 								<text>题库选</text>

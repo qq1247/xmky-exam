@@ -1,4 +1,4 @@
-import request from '@/request/request';
+import request from '@/request';
 
 export function examListpage(parm: object) {
 	return request.post('/exam/listpage', parm);

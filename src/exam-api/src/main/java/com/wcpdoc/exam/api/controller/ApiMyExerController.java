@@ -651,78 +651,6 @@ public class ApiMyExerController extends BaseController {
 		}
 	}
 
-//	/**
-//	 * 评论列表
-//	 * 
-//	 * v1.0 chenyun 2021年8月31日上午9:54:28
-//	 * 
-//	 * @param pageIn
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/rmkListpage")
-//	public PageResult rmkListpage(PageIn pageIn) {
-//		try {
-//			PageOut pageOut = exerRmkService.getListpage(pageIn);
-//			for (Map<String, Object> map : pageOut.getList()) {
-//				if (map.get("likeUserIds") != null
-//						&& map.get("likeUserIds").toString().contains(String.format(",%s,", getCurUser().getId()))) {
-//					map.put("hasLike", true);
-//				} else {
-//					map.put("hasLike", false);
-//				}
-//			}
-//			return PageResultEx.ok().data(pageOut);
-//		} catch (Exception e) {
-//			log.error("评论列表错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-//
-//	/**
-//	 * 评论
-//	 * 
-//	 * v1.0 chenyun 2021年8月31日上午9:54:28
-//	 * 
-//	 * @param exerRmk 评论
-//	 * @param anon    是否匿名（true：是；false：否）
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/rmk")
-//	public PageResult rmk(ExerRmk exerRmk, Boolean anon) {
-//		try {
-//			exerRmkService.rmk(exerRmk, anon);
-//			return PageResultEx.ok().addAttr("id", exerRmk.getId());
-//		} catch (MyException e) {
-//			log.error("评论错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("评论错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-//
-//	/**
-//	 * 评论点赞
-//	 * 
-//	 * v1.0 zhanghc 2023年4月17日下午7:52:03
-//	 * 
-//	 * @param exerRmkId 评论ID
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/rmkLike")
-//	public PageResult rmkLike(Integer exerRmkId) {
-//		try {
-//			exerRmkService.like(exerRmkId);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("评论点赞错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("评论点赞错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-
 	/**
 	 * 我的练习跟踪
 	 * 
@@ -804,6 +732,28 @@ public class ApiMyExerController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("我的练习跟踪月度列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 我的练习评论
+	 * 
+	 * v1.0 zhanghc 2025年12月4日上午12:25:12
+	 * 
+	 * @param exerId
+	 * @return PageResult
+	 */
+	@RequestMapping("/comment")
+	public PageResult comment(Integer exerId) {
+		try {
+			Exer exer = exerService.getById(exerId);
+			return PageResultEx.ok().data(exer.getCommentState());
+		} catch (MyException e) {
+			log.error("我的练习评论错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习评论错误：", e);
 			return PageResult.err();
 		}
 	}

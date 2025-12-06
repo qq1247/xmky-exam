@@ -25,9 +25,9 @@
                     <span class="exer__pre-txt">
                         发布练习：<span class="exer__num">{{ dictStore.getValue('STATE_PS', exer.state) }}</span>
                     </span>
-                    <!-- <span class="exer__pre-txt">
-                        允许评论：<span class="exer__num">{{ dictStore.getValue('STATE_YN', exer.rmkState) }}</span>
-                    </span> -->
+                    <span class="exer__pre-txt">
+                        允许评论：<span class="exer__num">{{ dictStore.getValue('STATE_YN', exer.commentState) }}</span>
+                    </span>
                 </div>
                 <div class="exer__outer">
                     <div class="exer__inner">

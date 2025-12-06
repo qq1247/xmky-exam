@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4963279 */
-  src: url('iconfont.woff2?t=1753344329990') format('woff2'),
-       url('iconfont.woff?t=1753344329990') format('woff'),
-       url('iconfont.ttf?t=1753344329990') format('truetype');
+  src: url('iconfont.woff2?t=1764758463919') format('woff2'),
+       url('iconfont.woff?t=1764758463919') format('woff'),
+       url('iconfont.ttf?t=1764758463919') format('truetype');
 }
 
 .iconfont {
@@ -273,10 +273,6 @@
   content: "\e630";
 }
 
-.icon-lianxi-68:before {
-  content: "\e631";
-}
-
 .icon-lianxi-69:before {
   content: "\e632";
 }
@@ -311,5 +307,9 @@
 
 .icon-bandui:before {
   content: "\e642";
+}
+
+.icon-lianxi-68:before {
+  content: "\e794";
 }
 

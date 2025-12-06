@@ -40,15 +40,22 @@ public class ExamConstant {
 	 */
 	public static final String MYQUESTION_CACHE = "MYQUESTION_CACHE";
 	public static final String MYQUESTION_LIST_KEY_PRE = "'MYQUESTION_LIST:' + ";
-	
+
 	/**
 	 * 防作弊缓存
 	 */
 	public static final String SXE_CACHE = "SXE_CACHE";
 	public static final String SXE_KEY_PRE = "'SXE_:' + ";
-	
+
 	/**
 	 * 练习时间缓存
 	 */
 	public static final String EXER_TIME_CACHE = "EXER_TIME_CACHE";
+
+	/**
+	 * 我的评论缓存<br/>
+	 * 一次性加载所有评论，防止练习的时候重复加载（一个试题下的评论正常情况下不超100条）
+	 */
+	public static final String MYCOMMENT_CACHE = "MYCOMMENT_CACHE";
+	public static final String MYCOMMENT_LIST_KEY_PRE = "'MYCOMMENT_LIST:' + ";
 }

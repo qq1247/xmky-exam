@@ -76,7 +76,7 @@
                             </div>
                             <div class="history__row">
                                 <span class="history__progress">进度：{{ myExer.answerNum }}/{{ myExer.questionNum
-                                }}</span>
+                                    }}</span>
                                 <span class="history__correct-rate">正确率：
                                     {{ new
                                         Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber()
@@ -243,13 +243,14 @@ const user = reactive<User>({ // 用户
     state: null,
     orgName: ''
 })
-const exer = reactive<Exer>({// 练习
+const exer = reactive<Exer>({
     id: null,
     name: '',
     questionBankIds: [],
     userIds: [],
     orgIds: [],
     state: null,
+    commentState: null
 })
 
 const markTypeStatis = reactive({ // 阅卷类型统计

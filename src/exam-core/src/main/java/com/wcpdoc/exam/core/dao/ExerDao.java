@@ -21,7 +21,8 @@ public interface ExerDao extends RBaseDao<Exer> {
 		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<Exer>().setAlias("EXER")//
 						.select("EXER.ID", "EXER.NAME", "EXER.QUESTION_BANK_IDS", "EXER.ORG_IDS", "EXER.USER_IDS",
-								"EXER.STATE", "EXER.UPDATE_TIME", "CREATE_USER.NAME AS CREATE_USER_NAME")
+								"EXER.STATE", "EXER.COMMENT_STATE", "EXER.UPDATE_TIME",
+								"CREATE_USER.NAME AS CREATE_USER_NAME")
 						.leftJoin("SYS_USER CREATE_USER ON EXER.CREATE_USER_ID = CREATE_USER.ID")//
 						.like(pageIn.hasParm("name"), "EXER.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("id"), "EXER.ID", pageIn.getParm("id")) // 练习用户试题数量饼图使用

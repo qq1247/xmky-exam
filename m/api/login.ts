@@ -1,4 +1,4 @@
-import request from '@/request/request'
+import request from '@/request'
 
 export function loginIn(parm: object) {
 	return request.post('/login/in', parm);

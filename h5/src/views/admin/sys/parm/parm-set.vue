@@ -201,7 +201,7 @@ const icpFormRules = reactive<FormRules>({// 表单校验规则
 })
 
 const userRegistForm = reactive({// 表单
-    userRegist: '',// 用户注册
+    userRegist: 2,// 用户注册
 })
 const userRegistFormRef = ref<FormInstance>() // 表单引用
 const userRegistFormRules = reactive<FormRules>({// 表单校验规则
@@ -335,7 +335,7 @@ async function userRegistSave() {
 // 刷新缓存
 async function refresh() {
     const { data: { code } } = await cacheRefresh({
-        cacheNames: ['USER_CACHE', 'ORG_CACHE', 'PARM_CACHE', 'PROGRESS_BAR_CACHE', 'QUESTION_CACHE', 'EXAM_CACHE', 'MYEXAM_CACHE', 'MYQUESTION_CACHE']
+        cacheNames: ['USER_CACHE', 'ORG_CACHE', 'PARM_CACHE', 'PROGRESS_BAR_CACHE', 'QUESTION_CACHE', 'EXAM_CACHE', 'MYEXAM_CACHE', 'MYQUESTION_CACHE', 'MYCOMMENT_CACHE']
     })
     if (code !== 200) {
         return

@@ -239,6 +239,7 @@ async function init() {
     parmStore.customTitle = data.customTitle
     parmStore.customContent = data.customContent.replaceAll('\n', '<br/>')
     parmStore.icp = escape2Html(data.icp || '')
+    parmStore.userRegist = data.userRegist
 
     // 更新浏览器标题和图标
     document.title = parmStore.sysName

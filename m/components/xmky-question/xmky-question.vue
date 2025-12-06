@@ -595,7 +595,7 @@ function preview(index: number) {
 		.question-qa-answer__content {
 			display: inline-block;
 			margin-top: 20rpx;
-			line-height: 60rpx;
+			line-height: 48rpx;
 		}
 	}
 	.question-analysis {

@@ -220,6 +220,7 @@ public class ApiExerController extends BaseController {
 								return data;
 							}).collect(Collectors.toList()))//
 					.addAttr("state", exer.getState())//
+					.addAttr("commentState", exer.getCommentState())
 			;
 		} catch (MyException e) {
 			log.error("练习获取错误：{}", e.getMessage());
@@ -231,7 +232,7 @@ public class ApiExerController extends BaseController {
 	}
 
 	/**
-	 * 练习发布
+	 * 练习发布状态
 	 * 
 	 * v1.0 zhanghc 2025年6月7日下午4:38:01
 	 * 
@@ -252,40 +253,41 @@ public class ApiExerController extends BaseController {
 			exerService.updateById(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("练习发布错误：{}", e.getMessage());
+			log.error("练习发布状态错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("练习发布错误：", e);
+			log.error("练习发布状态错误：", e);
 			return PageResult.err();
 		}
 	}
 
-//	/**
-//	 * 练习评论
-//	 * 
-//	 * v1.0 zhanghc 2025年6月7日下午4:38:01
-//	 * 
-//	 * @param id
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/rmk")
-//	public PageResult rmk(Integer id) {
-//		try {
-//			Exer exer = exerService.getById(id);
-//			QuestionBank questionBank = questionBankService.getById(exer.getQuestionBankId());
-//			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
-//				throw new MyException("无操作权限");
-//			}
-//
-//			exer.setRmkState(exer.getRmkState() == 1 ? 2 : 1);
-//			exerService.updateById(exer);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("练习发布错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("练习发布错误：", e);
-//			return PageResult.err();
-//		}
-//	}
+	/**
+	 * 练习评论状态
+	 * 
+	 * v1.0 zhanghc 2025年6月7日下午4:38:01
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/commentState")
+	public PageResult comment(Integer id) {
+		try {
+			Exer exer = exerService.getById(id);
+			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+
+			exer.setCommentState(exer.getCommentState() == 1 ? 2 : 1);
+			exer.setUpdateTime(new Date());
+			exer.setUpdateUserId(getCurUser().getId());
+			exerService.updateById(exer);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("练习评论状态错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("练习评论状态错误：", e);
+			return PageResult.err();
+		}
+	}
 }

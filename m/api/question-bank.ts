@@ -1,4 +1,4 @@
-import request from '@/request/request';
+import request from '@/request';
 
 export function questionBankListpage(parm: object) {
 	return request.post('/question-bank/listpage', parm);

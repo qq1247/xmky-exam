@@ -1,4 +1,4 @@
-import request from '@/request/request'
+import request from '@/request'
 
 export function myExerListpage(parm: object) {
 	return request.post('/my-exer/listpage', parm);
@@ -38,4 +38,7 @@ export function myExerTrackList(parm: object) {
 }
 export function myExerTrack(parm: object) {
 	return request.post('/my-exer/track', parm);
+}
+export function myExerComment(parm: object) {
+	return request.post('/my-exer/comment', parm);
 }

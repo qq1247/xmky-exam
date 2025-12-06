@@ -15,6 +15,7 @@ import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.dao.MyQuestionDao;
 import com.wcpdoc.exam.core.dao.QuestionAnswerDao;
+import com.wcpdoc.exam.core.dao.MyCommentDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.dao.QuestionOptionDao;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -22,6 +23,7 @@ import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.MyComment;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.service.ExamCacheService;
 
@@ -43,6 +45,7 @@ public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements Exam
 	private final ExamDao examDao;
 	private final MyExamDao myExamDao;
 	private final MyQuestionDao myQuestionDao;
+	private final MyCommentDao questionCommentDao;
 
 	@Override
 	public RBaseDao<Object> getDao() {
@@ -152,6 +155,16 @@ public class ExamCacheServiceImpl extends BaseServiceImp<Object> implements Exam
 					.collect(Collectors.toList()));
 		}
 		return myQuestionList;
+	}
+
+	@Override
+	@Cacheable(value = ExamConstant.MYCOMMENT_CACHE, key = ExamConstant.MYCOMMENT_LIST_KEY_PRE + "#questionId", sync = true)
+	public List<MyComment> getQuestionCommentList(Integer questionId) {
+		List<MyComment> questionCommentList = questionCommentDao.getList(questionId);
+		if (log.isDebugEnabled()) {
+			log.debug("缓存我的评论列表：{}-{}条", questionId, questionCommentList.size());
+		}
+		return questionCommentList;
 	}
 
 }
