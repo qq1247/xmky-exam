@@ -25,7 +25,7 @@ public interface UserDao extends RBaseDao<User> {
 				new MPJQueryWrapper<User>().setAlias("USER")//
 						.leftJoin("SYS_ORG ORG ON USER.ORG_ID = ORG.ID")
 						.select("USER.ID", "USER.NAME", "USER.LOGIN_NAME", "USER.ORG_ID", "ORG.NAME AS ORG_NAME",
-								"USER.STATE")//
+								"USER.AVATAR_FILE_ID", "USER.STATE")//
 						.and(pageIn.hasParm("name"),
 								i -> i.like("USER.NAME", pageIn.getParm("name")).or().like("ORG.NAME",
 										pageIn.getParm("name")))//

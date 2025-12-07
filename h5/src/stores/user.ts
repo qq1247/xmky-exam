@@ -5,7 +5,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 export const useUserStore = defineStore('user', () => {
     const id = ref<number | null>(null) // ID
     const name = ref('') // 姓名
-    const headFileId = ref<number | null>(0)
+    const avatarFileId = ref<number | null>(null) // 头像
     const role = ref('')  // 角色（ADMIN：管理员；EXAM_USER：考试用户；SUB_ADMIN：子管理员；MARK_USER：阅卷用户；TEMP_USER：临时用户）
     const accessToken = ref('') // 访问令牌
     const refreshToken = ref('') // 刷新令牌
@@ -29,12 +29,12 @@ export const useUserStore = defineStore('user', () => {
     function reset() {
         id.value = null
         name.value = ''
-        headFileId.value = null
+        avatarFileId.value = null
         role.value = ''
         accessToken.value = ''
         refreshToken.value = ''
     }
-    return { id, name, headFileId, role, accessToken, refreshToken, isAdmin, isExamUser, isSubAdmin, isMarkUser, isTempUser, reset }
+    return { id, name, avatarFileId, role, accessToken, refreshToken, isAdmin, isExamUser, isSubAdmin, isMarkUser, isTempUser, reset }
 }, {
     persist: true
 })

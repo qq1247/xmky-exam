@@ -4,7 +4,28 @@
 			<view class="profile__head">
 				<image class="profile__bg" src="@/static/img/home-bg.png"></image>
 				<view class="avatar">
-					<image class="avatar__wrap" src="@/static/img/user-avatar.png"></image>
+					<!-- <image class="avatar__wrap" src="@/static/img/user-avatar.png"></image> -->
+					<uni-file-picker
+						v-model="avatarUrl"
+						limit="1"
+						:del-icon="false"
+						disable-preview
+						:auto-upload="false"
+						:imageStyles="{
+							height: 72,
+							width: 72,
+							border: {
+								color: '#fff',
+								width: 2,
+								style: 'solid',
+								radius: '50%'
+							}
+						}"
+						file-mediatype="image"
+						@select="upload"
+					>
+						<uni-icons v-if="!avatarUrl.length" custom-prefix="iconfont" type="icon-rentouxiang" color="#77a2db" size="88rpx"></uni-icons>
+					</uni-file-picker>
 					<view class="avatar__inner">
 						<view class="avatar__name">{{ userStore.name }}</view>
 						<view class="avatar__orgname">{{ userStore.role === 'MARK_USER' ? '阅卷用户' : '未知' }}</view>
@@ -47,19 +68,26 @@
 import { ref, reactive } from 'vue';
 import { onShow, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
-import { loginOut } from '@/api/login';
+import { loginAvatar, loginOut } from '@/api/login';
 import { useTabbarStore } from '@/stores/tabbar';
 
 /************************变量定义相关***********************/
 const tabbarStore = useTabbarStore();
 const userStore = useUserStore(); // 用户存储
 const scrollHeight = ref(0); // 下侧列表沾满剩余空间
+const avatarUrl = ref([]);
+const host = ref(uni.getStorageSync('BASE_URL'));
 
 /************************组件生命周期相关*********************/
 onShow(async () => {
 	if (!userStore.id) {
 		uni.navigateTo({ url: '/pages/login/login' });
 		return;
+	}
+	if (userStore.avatarFileId) {
+		avatarUrl.value[0] = {
+			url: `${host.value}/file/download?id=${userStore.avatarFileId}`
+		};
 	}
 });
 
@@ -72,10 +100,39 @@ onReady(() => {
 		.exec();
 });
 
+// 上传头像
+async function upload(e) {
+	const file = e.tempFiles[0];
+	if (!file) return;
+	uni.uploadFile({
+		url: `${host.value}/file/upload`,
+		filePath: file.path,
+		name: 'files',
+		header: {
+			Authorization: userStore.accessToken
+		},
+		success: async (uploadFileRes) => {
+			const jsonObj = JSON.parse(uploadFileRes.data);
+			if (jsonObj.code !== 200) {
+				uni.showToast({ title: jsonObj.msg, icon: 'error' });
+				return;
+			}
+
+			const { code } = await loginAvatar({ avatarFileId: jsonObj.data.fileIds });
+			if (code !== 200) {
+				return;
+			}
+
+			userStore.avatarFileId = jsonObj.data.fileIds;
+		}
+	});
+}
+
 /************************事件相关*****************************/
 // 退出登录
 async function out() {
-	await loginOut();
+	await loginOut({});
+	userStore.reset();
 	uni.redirectTo({ url: '/pages/login/login' });
 }
 </script>
@@ -91,6 +148,9 @@ async function out() {
 		.avatar {
 			display: flex;
 			padding: 30rpx;
+			:deep(.file-picker__box-content) {
+				background-color: #c5dbff;
+			}
 			.avatar__wrap {
 				margin: 0rpx 20rpx;
 				height: 130rpx;
@@ -102,6 +162,7 @@ async function out() {
 				flex-direction: column;
 				justify-content: profile;
 				z-index: 0;
+				margin-left: 20rpx;
 				.avatar__name {
 					font-weight: bold;
 					font-size: 36rpx;

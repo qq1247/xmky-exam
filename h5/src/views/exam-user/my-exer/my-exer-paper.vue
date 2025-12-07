@@ -145,13 +145,18 @@
                                 <el-link underline="never" class="user-comment__more">暂无思路，分享你的想法吧</el-link>
                             </template>
                             <xmky-comment v-for="(myComment, index) in _comments" :key="index"
-                                :name="myComment.userName || '匿名'" reply-name="" :content="myComment.content"
-                                :update-time="myComment.updateTime" :like-num="myComment.likeNum"
-                                :is-like="myComment.isLike" @like="commentLike(myComment)"
+                                :userName="myComment.userName" :user-avatar-file-id="myComment.userAvatarFileId"
+                                :reply-user-name="myComment.replyUserName"
+                                :reply-user-avatar-file-id="myComment.replyUserAvatarFileId"
+                                :content="myComment.content" :update-time="myComment.updateTime"
+                                :like-num="myComment.likeNum" :is-like="myComment.isLike" @like="commentLike(myComment)"
                                 @reply="(content) => commentReply(myComment, content)">
                                 <div v-if="myComment.children" class="user-comment__level2">
                                     <xmky-comment v-for="(subMyComment, index) in myComment.children" :key="index"
-                                        :name="subMyComment.userName || '匿名'" :reply-name="subMyComment.replyUserName"
+                                        :userName="subMyComment.userName"
+                                        :user-avatar-file-id="subMyComment.userAvatarFileId"
+                                        :reply-user-name="subMyComment.replyUserName"
+                                        :reply-user-avatar-file-id="subMyComment.replyUserAvatarFileId"
                                         :content="subMyComment.content" :update-time="subMyComment.updateTime"
                                         :like-num="subMyComment.likeNum" :is-like="subMyComment.isLike"
                                         @like="commentLike(subMyComment)"

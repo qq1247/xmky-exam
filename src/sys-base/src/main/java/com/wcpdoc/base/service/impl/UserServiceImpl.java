@@ -131,6 +131,8 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		Parm parm = baseCacheService.getParm();
 		String newPwd = parm.getPwdType() == 1 ? StringUtil.getRandom(8) : parm.getPwdValue();
 		user.setPwd(getEncryptPwd(user.getLoginName(), newPwd));
+		user.setUpdateUserId(getCurUser().getId());
+		user.setUpdateTime(new Date());
 		updateById(user);
 		return newPwd;
 	}
@@ -144,6 +146,22 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		// 用户冻结
 		User user = baseCacheService.getUser(id);
 		user.setState(state);
+		user.setUpdateUserId(getCurUser().getId());
+		user.setUpdateTime(new Date());
+		updateById(user);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id")
+	public void avatar(Integer avatarFileId) {
+		// 数据校验
+		avatarValid(avatarFileId);
+
+		// 头像更新
+		User user = baseCacheService.getUser(getCurUser().getId());
+		user.setAvatarFileId(avatarFileId);
+		user.setUpdateUserId(getCurUser().getId());
+		user.setUpdateTime(new Date());
 		updateById(user);
 	}
 
@@ -281,6 +299,12 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		}
 	}
 
+	private void avatarValid(Integer avatarFileId) {
+		if (!ValidateUtil.isValid(avatarFileId)) {
+			throw new MyException("参数错误：avatarFileId");
+		}
+	}
+
 	private void pwdValid(Integer id) {
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
@@ -314,4 +338,5 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	public boolean existLoginName(String loginName, Integer excludeId) {
 		return userDao.existLoginName(loginName, excludeId);
 	}
+
 }

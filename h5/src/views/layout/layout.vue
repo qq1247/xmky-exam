@@ -26,14 +26,16 @@
                     </el-menu>
                     <el-dropdown @command="dropdownCmd" :teleported="false" class="nav-user__wrap">
                         <div class="nav-user">
-                            <span class="iconfont icon-rentouxiang nav-user__img"></span>
+                            <el-avatar v-if="userStore.avatarFileId" :size="38"
+                                :src="`${downloadUrl}?id=${userStore.avatarFileId}`"></el-avatar>
+                            <span v-else class="iconfont icon-rentouxiang nav-user__img"></span>
                             <span class="nav-user__user-name">{{ userStore.name }}</span>
                             <span class="iconfont icon-xiala nav-user__icon"></span>
                         </div>
                         <template #dropdown>
                             <el-dropdown-menu>
-                                <el-dropdown-item command="pwd"><span
-                                        class="iconfont icon-edit"></span>修改密码</el-dropdown-item>
+                                <el-dropdown-item command="profile"><span
+                                        class="iconfont icon-edit"></span>个人中心</el-dropdown-item>
                                 <el-dropdown-item command="out"><span
                                         class="iconfont icon-login-out"></span>退出</el-dropdown-item>
                             </el-dropdown-menu>
@@ -68,6 +70,7 @@ const route = useRoute() // 路由
 const userStore = useUserStore() // 用户缓存
 const parmStore = useParmStore() // 参数缓存
 const logoUrl = `${http.defaults.baseURL}login/logo` // logo地址
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -89,8 +92,8 @@ const curActiveMenu = computed(() => {
 /************************事件相关*****************************/
 // 下拉菜单命令
 async function dropdownCmd(command: string) {
-    if (command === 'pwd') {
-        router.push('/pwd')
+    if (command === 'profile') {
+        router.push('/profile')
         return
     }
 

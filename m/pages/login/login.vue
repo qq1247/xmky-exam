@@ -308,6 +308,7 @@ async function login() {
 	userStore.role = data.role;
 	userStore.accessToken = data.accessToken;
 	userStore.refreshToken = data.refreshToken;
+	userStore.avatarFileId = data.avatarFileId;
 
 	// 数据字典保存
 	let { data: dicts } = await dictIndexList({});

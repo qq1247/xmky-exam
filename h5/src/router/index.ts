@@ -19,9 +19,9 @@ const router = createRouter({
                     meta: { title: '首页' },
                 },
                 {
-                    path: 'pwd',
-                    component: () => import('@/views/home/home/pwd.vue'),
-                    meta: { title: '密码修改' },
+                    path: 'profile',
+                    component: () => import('@/views/home/home/profile.vue'),
+                    meta: { title: '个人中心' },
                 },
                 {
                     path: 'bulletin/:id',

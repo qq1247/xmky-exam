@@ -13,4 +13,12 @@ public interface UserExService {
 	 * v1.0 chenyun 2021年3月4日下午5:29:49 void
 	 */
 	void xlsImport(Integer fileId);
+
+	/**
+	 * 头像
+	 * 
+	 * v1.0 zhanghc 2025年12月6日下午10:34:04
+	 * @param avatarFileId void
+	 */
+	void avatar(Integer avatarFileId);
 }

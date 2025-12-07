@@ -54,6 +54,7 @@ public class ApiMyCommentController extends BaseController {
 						data.put("id", myComment.getId());
 						data.put("userId", myComment.getUserId());
 						data.put("userName", baseCacheService.getUser(myComment.getUserId()).getName());
+						data.put("userAvatarFileId", baseCacheService.getUser(myComment.getUserId()).getAvatarFileId());
 						data.put("content", myComment.getContent());
 						data.put("updateTime", myComment.getUpdateTime());
 						data.put("likeNum", myComment.getLikeNum());
@@ -63,6 +64,7 @@ public class ApiMyCommentController extends BaseController {
 							User replyUser = baseCacheService.getUser(myComment.getReplyUserId());
 							data.put("replyUserId", replyUser.getId());
 							data.put("replyUserName", replyUser.getName());
+							data.put("replyUserAvatarFileId", replyUser.getAvatarFileId());
 						} else {
 							data.put("replyUserId", null);
 							data.put("replyUserName", null);

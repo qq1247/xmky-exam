@@ -1,9 +1,9 @@
 <template>
 	<view class="xmky-comment">
-		<uv-avatar src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></uv-avatar>
+		<uv-avatar :src="`${host}/file/download?id=${userAvatarFileId}`"></uv-avatar>
 		<view class="xmky-comment__outer">
 			<view class="xmky-comment__inner">
-				<view class="xmky-comment__name">{{ props.name }}</view>
+				<view class="xmky-comment__name">{{ props.userName }}</view>
 				<view class="xmky-comment__like" @click="emit('like')">
 					<uni-icons v-if="isLike" custom-prefix="iconfont" type="icon-lianxi-68" color="#04C7F2" size="38rpx"></uni-icons>
 					<uni-icons v-else custom-prefix="iconfont" type="icon-lianxi-67" color="#303133" size="38rpx"></uni-icons>
@@ -11,9 +11,9 @@
 				</view>
 			</view>
 			<view class="xmky-comment__comment">
-				<text v-if="props.replyName">
+				<text v-if="props.replyUserName">
 					回复@
-					<text class="xmky-comment__name">{{ props.replyName }}：</text>
+					<text class="xmky-comment__name">{{ props.replyUserName }}：</text>
 				</text>
 				<text>{{ props.content }}</text>
 			</view>
@@ -29,7 +29,7 @@
 		<xmky-popup ref="popup" name="分享思路" class="popup">
 			<view class="popup__txt">
 				@回复
-				<text class="popup__name">{{ props.name }}</text>
+				<text class="popup__name">{{ props.userName }}</text>
 			</view>
 			<uni-easyinput
 				type="textarea"
@@ -56,9 +56,10 @@ const emit = defineEmits<{
 	(e: 'reply', content: string): void;
 }>();
 const props = defineProps({
-	avatarFileId: { type: [Number], required: false, default: null }, // 头像附件ID
-	name: { type: [String], required: false, default: '' }, // 姓名
-	replyName: { type: [String, null], required: false, default: '' }, // 回复姓名
+	userName: { type: [String], required: false, default: '' }, // 评论用户姓名
+	userAvatarFileId: { type: [Number, null], required: false, default: null }, // 评论用户头像附件ID
+	replyUserName: { type: [String, null], required: false, default: '' }, // 回复用户姓名
+	replyUserAvatarFileId: { type: [Number, null], required: false, default: null }, // 回复用户头像附件ID
 	content: { type: [String], required: false, default: '' }, // 评论
 	updateTime: { type: [String], required: false, default: '' }, // 更新时间
 	likeNum: { type: [Number, null], required: false, default: 0 }, // 点赞数量
@@ -67,8 +68,8 @@ const props = defineProps({
 
 const reply = ref(false);
 const replyContent = ref('');
-
 const popup = ref();
+const host = ref(uni.getStorageSync('BASE_URL'));
 
 function send() {
 	if (!replyContent.value) {

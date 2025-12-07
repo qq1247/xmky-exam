@@ -89,6 +89,16 @@ public interface UserService extends BaseService<User> {
 	void frozen(Integer id, Integer state);
 
 	/**
+	 * 用户头像
+	 * 
+	 * v1.0 zhanghc 2025年12月6日下午10:19:29
+	 * 
+	 * @param avatarFileId
+	 * @return PageResult
+	 */
+	void avatar(Integer avatarFileId);
+
+	/**
 	 * 获取用户列表
 	 * 
 	 * v1.0 zhanghc 2022年5月10日下午4:54:44

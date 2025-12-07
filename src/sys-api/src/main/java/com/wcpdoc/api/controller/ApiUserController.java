@@ -60,7 +60,8 @@ public class ApiUserController extends BaseController {
 					pageIn.addParm("parentId", getCurUser().getId());
 				}
 			} else if (CurLoginUserUtil.isSubAdmin()) {// 如果是子管理
-				if (!ValidateUtil.isValid(pageIn.getParm("role", String.class)) || pageIn.getParm("role").equals(BaseConstant.EXAM_USER)) {// 默认查询考试用户
+				if (!ValidateUtil.isValid(pageIn.getParm("role", String.class))
+						|| pageIn.getParm("role").equals(BaseConstant.EXAM_USER)) {// 默认查询考试用户
 					User user = baseCacheService.getUser(getCurUser().getId());
 					if (!ValidateUtil.isValid(user.getUserIds()) && !ValidateUtil.isValid(user.getOrgIds())) {
 						List<Integer> orgIds = new ArrayList<>();

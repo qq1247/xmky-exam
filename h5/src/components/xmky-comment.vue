@@ -1,12 +1,12 @@
 <template>
     <div class="xmky-comment">
-        <el-avatar :size="48" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-            class="xmky-comment__avatar" />
+        <el-avatar v-if="userAvatarFileId" :size="38" :src="`${downloadUrl}?id=${userAvatarFileId}`"></el-avatar>
+        <span v-else class="iconfont icon-rentouxiang xmky-comment__avatar"></span>
         <div class="xmky-comment__outer">
-            <div class="xmky-comment__name">{{ props.name }}</div>
+            <div class="xmky-comment__name">{{ props.userName }}</div>
             <div class="xmky-comment__comment">
                 <span>
-                    <template v-if="props.replyName">回复@<span class="xmky-comment__name">{{ props.replyName
+                    <template v-if="props.replyUserName">回复@<span class="xmky-comment__name">{{ props.replyUserName
                             }}：</span></template>
                     {{ props.content }}
                 </span>
@@ -40,6 +40,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import http from '@/request';
 import { ref } from 'vue';
 
 /************************变量定义相关***********************/
@@ -48,15 +49,17 @@ const emit = defineEmits<{// 定义事件
     (e: 'reply', content: string): void
 }>()
 const props = defineProps({
-    avatarFileId: { type: [Number], required: false, default: null }, // 头像附件ID
-    name: { type: [String], required: false, default: '' }, // 姓名
-    replyName: { type: [String, null], required: false, default: '' }, // 回复姓名
+    userName: { type: [String], required: false, default: '' }, // 评论用户姓名
+    userAvatarFileId: { type: [Number, null], required: false, default: null }, // 评论用户头像附件ID
+    replyUserName: { type: [String, null], required: false, default: '' }, // 回复用户姓名
+    replyUserAvatarFileId: { type: [Number, null], required: false, default: null }, // 回复用户头像附件ID
     content: { type: [String], required: false, default: '' }, // 评论
     updateTime: { type: [String], required: false, default: '' }, // 更新时间
     likeNum: { type: [Number, null], required: false, default: 0 }, // 点赞数量
     isLike: { type: [Boolean], required: false, default: false }, // 点赞数量
 })
 
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 const reply = ref(false)
 const replyContent = ref('')
 </script>
@@ -64,6 +67,22 @@ const replyContent = ref('')
 .xmky-comment {
     display: flex;
     margin-top: 20px;
+
+    .xmky-comment__avatar {
+        color: #77A2DB;
+        font-size: 27px;
+        width: 36px;
+        height: 36px;
+        background-color: #C5DBFF;
+        border-radius: 50%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        &:focus {
+            outline: none;
+        }
+    }
 
     .xmky-comment__outer {
         flex: 1;

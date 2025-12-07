@@ -136,4 +136,10 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 		})).sheet().doRead();
 	}
 
+	@Override
+	public void avatar(Integer avatarFileId) {
+		userService.avatar(avatarFileId);
+		fileService.upload(avatarFileId);
+	}
+
 }

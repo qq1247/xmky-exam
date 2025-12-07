@@ -25,6 +25,7 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.RegistUserService;
+import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.InviteCodeUtil;
 import com.wcpdoc.core.controller.BaseController;
@@ -57,6 +58,7 @@ public class ApiLoginController extends BaseController {
 	private final JwtTokenService jwtTokenService;
 	private final OnlineUserService onlineUserService;
 	private final UserService userService;
+	private final UserExService userExService;
 	private final NonceService nonceService;
 	private final RegistUserService registUserService;
 	private final OrgService orgService;
@@ -130,6 +132,7 @@ public class ApiLoginController extends BaseController {
 					.addAttr("role", user.getRole())//
 					.addAttr("accessToken", accessToken)//
 					.addAttr("refreshToken", refreshToken)//
+					.addAttr("avatarFileId", user.getAvatarFileId())//
 			;
 		} catch (MyException e) {
 			log.error("登录错误：{}", e.getMessage());
@@ -300,6 +303,8 @@ public class ApiLoginController extends BaseController {
 
 			// 修改密码
 			user.setPwd(userService.getEncryptPwd(user.getLoginName(), newPwd));
+			user.setUpdateUserId(getCurUser().getId());
+			user.setUpdateTime(new Date());
 			userService.updateById(user);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -307,6 +312,28 @@ public class ApiLoginController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("密码修改错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 登录头像
+	 * 
+	 * v1.0 zhanghc 2025年12月6日下午10:19:29
+	 * 
+	 * @param avatarFileId
+	 * @return PageResult
+	 */
+	@RequestMapping("/avatar")
+	public PageResult avatar(Integer avatarFileId) {
+		try {
+			userExService.avatar(avatarFileId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("登录头像错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("登录头像错误：", e);
 			return PageResult.err();
 		}
 	}

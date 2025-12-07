@@ -40,6 +40,13 @@
         <div class="exam-user__main">
             <el-table :data="listpage.list" size="large" row-key="id" height="calc(100vh - 460px)" class="table">
                 <el-table-column prop="name" label="姓名" align="center" />
+                <el-table-column prop="name" label="头像" align="center">
+                    <template #default="scope">
+                        <el-avatar v-if="scope.row.avatarFileId" :size="38"
+                            :src="`${downloadUrl}?id=${scope.row.avatarFileId}`"></el-avatar>
+                        <span v-else class="iconfont icon-rentouxiang exam-user__avatar"></span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="loginName" label="登录账号" align="center" />
                 <el-table-column prop="orgName" label="所属机构" align="center" />
                 <el-table-column prop="state" label="状态" align="center">
@@ -89,6 +96,7 @@ const listpage = reactive<Listpage>({// 分页列表
     total: 0,
     list: [],
 })
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 
 /************************组件生命周期相关*********************/
 onMounted(() => {
@@ -220,6 +228,22 @@ async function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles:
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
+
+        .exam-user__avatar {
+            color: #77A2DB;
+            font-size: 27px;
+            width: 36px;
+            height: 36px;
+            background-color: #C5DBFF;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+
+            &:focus {
+                outline: none;
+            }
+        }
 
         .table {
 

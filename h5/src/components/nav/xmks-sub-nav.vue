@@ -15,7 +15,10 @@
                 </el-menu>
                 <el-dropdown @command="dropdownCmd" :teleported="false" class="user">
                     <div class="user__inner">
-                        <span class="iconfont icon-rentouxiang user__img"></span>
+                        <el-avatar v-if="userStore.avatarFileId" :size="38"
+                            :src="`${downloadUrl}?id=${userStore.avatarFileId}`"></el-avatar>
+                        <span v-else class="iconfont icon-rentouxiang user__img"></span>
+                        <!-- <span class="iconfont icon-rentouxiang user__img"></span> -->
                         <span class="user__name">{{ userStore.name }}</span>
                         <span class="iconfont icon-xiala user__icon"></span>
                     </div>
@@ -51,6 +54,7 @@ const emit = defineEmits<{
 
 const router = useRouter()// 路由
 const userStore = useUserStore() // 用户缓存
+const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {

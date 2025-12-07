@@ -39,7 +39,7 @@ public class User implements LoginUser {
 	private Date lastLoginTime;
 	private Integer orgId;
 	private Integer state;
-	private Integer headFileId;
+	private Integer avatarFileId;
 	private String role;
 	private Integer parentId;
 	@TableField(typeHandler = IntTypeHandler.class)
