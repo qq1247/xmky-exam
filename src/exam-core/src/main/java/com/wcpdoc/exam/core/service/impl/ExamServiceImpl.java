@@ -826,8 +826,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		myQuestionService.clear(examInfo.getId());
 
 		// 生成考试用户试卷
-		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
-		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
+//		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
+//		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
 		int curProgressNum = 1;// 当前保存进度
 
 		Double processLen = (examInfo.getUserIds().size() + 5) * 1.0;// 说明参考控制层
@@ -881,12 +881,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					if (ExamUtil.hasOptionRand(examInfo)) {// 如果是选项乱序
 						Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
 						if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
-							if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
-								questionOptionCache.put(myQuestion.getQuestionId(),
-										examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
-							}
-							List<QuestionOption> questionOptionList = questionOptionCache
-									.get(myQuestion.getQuestionId());// A,B,C,D
+//							if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
+//								questionOptionCache.put(myQuestion.getQuestionId(),
+//										examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
+//							}
+//							List<QuestionOption> questionOptionList = questionOptionCache
+//									.get(myQuestion.getQuestionId());// A,B,C,D
+
+							List<QuestionOption> questionOptionList = examCacheService
+									.getQuestionOptionList(myQuestion.getQuestionId());// A,B,C,D
 							myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
 							myQuestionService.updateById(myQuestion);
 						}
@@ -938,12 +941,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								myQuestion.setScores(Stream.of(examRule.getScores()).collect(Collectors.toList()));
 							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
 									&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
-								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
-									questionAnswerCache.put(myQuestion.getQuestionId(),
-											examCacheService.getQuestionAnswerList(myQuestion.getQuestionId()));
-								}
-								List<QuestionAnswer> questionAnswerList = questionAnswerCache
-										.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
+//								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
+//									questionAnswerCache.put(myQuestion.getQuestionId(),
+//											examCacheService.getQuestionAnswerList(myQuestion.getQuestionId()));
+//								}
+//								List<QuestionAnswer> questionAnswerList = questionAnswerCache
+//										.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
+								List<QuestionAnswer> questionAnswerList = examCacheService
+										.getQuestionAnswerList(myQuestion.getQuestionId());
 								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
 							}
 
@@ -953,12 +958,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							if (ExamUtil.hasOptionRand(examInfo)) {// 如果是选项乱序
 								if (QuestionUtil.hasSingleChoice(question)
 										|| QuestionUtil.hasMultipleChoice(question)) {
-									if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
-										questionOptionCache.put(myQuestion.getQuestionId(),
-												examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
-									}
-									List<QuestionOption> questionOptionList = questionOptionCache
-											.get(myQuestion.getQuestionId());// A,B,C,D
+//									if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
+//										questionOptionCache.put(myQuestion.getQuestionId(),
+//												examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
+//									}
+//									List<QuestionOption> questionOptionList = questionOptionCache
+//											.get(myQuestion.getQuestionId());// A,B,C,D
+									List<QuestionOption> questionOptionList = examCacheService
+											.getQuestionOptionList(myQuestion.getQuestionId());
 									myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
 								}
 							}

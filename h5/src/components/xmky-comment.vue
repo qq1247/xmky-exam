@@ -7,7 +7,7 @@
             <div class="xmky-comment__comment">
                 <span>
                     <template v-if="props.replyUserName">回复@<span class="xmky-comment__name">{{ props.replyUserName
-                            }}：</span></template>
+                    }}：</span></template>
                     {{ props.content }}
                 </span>
             </div>
@@ -63,7 +63,7 @@ const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 const reply = ref(false)
 const replyContent = ref('')
 </script>
-<style lang="scss">
+<style scoped lang="scss">
 .xmky-comment {
     display: flex;
     margin-top: 20px;

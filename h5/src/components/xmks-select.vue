@@ -127,9 +127,17 @@ function invertAll() {
 
 <style lang="scss">
 // 已经脱离dom内部，不要scoped。改完不生效需要刷新一下页面。
+.el-select {
+    .el-select__tags-text {
+        max-width: 100px;
+    }
+}
+
 .xmks-select {
     padding: 10px 20px 20px 20px;
+    min-width: 780px;
     max-width: 780px;
+
 
     .el-select-dropdown__wrap {
         max-height: 285px;

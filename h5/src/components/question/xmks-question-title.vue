@@ -157,7 +157,7 @@ watch(titles, () => {
 
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .xmks-question-title {
     display: flex-line;
     width: 100%;

@@ -389,27 +389,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 					+ "#examId + ':' + #userId") })
 	public void retake(Integer examId, Integer userId) {
 		// 数据校验
-		Exam exam = examCacheService.getExam(examId);
-		if (exam.getMarkType() == 2) {
-			throw new MyException("主观题试卷");
-		}
-		if (exam.getMarkState() != 1) {
-			throw new MyException("考试已结束");
-		}
-		if (exam.getRetakeNum() == 0) {
-			throw new MyException("不允许重考");
-		}
-
-		MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
-		if (myExam.getAnswerState() == null) {// 相当于判断了state和markState
-			throw new MyException("请继续参考");
-		}
-		if (myExam.getAnswerState() == 1) {
-			throw new MyException("已及格，无须重考");
-		}
-		if (myExam.getVer().intValue() > exam.getRetakeNum().intValue()) {
-			throw new MyException(String.format("只能重考%s次", exam.getRetakeNum()));
-		}
+		MyExam myExam = retakeValid0(examId);
+		List<ExamRule> examRuleList = examRuleService.getList(examId);
+		Map<Integer, List<Question>> questionListCache = retakeValid(examRuleList);
 
 		// 旧试卷存档
 		MyExamHis myExamHis = new MyExamHis();
@@ -434,6 +416,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 			myQuestionHis.setId(null);
 			myQuestionHisService.save(myQuestionHis);
+			myQuestionService.removeById(myQuestion.getId());
 		}
 
 		// 生成新试卷
@@ -453,19 +436,202 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExam.setUpdateTime(new Date());
 		updateById(myExam);
 
-		for (MyExamQuestion myQuestion : myQuestionList) {
-			myQuestion.setAnswerTime(null);
-			myQuestion.setUserAnswer(null);
-			myQuestion.setUserScore(null);
-			myQuestion.setMarkUserId(null);
-			myQuestion.setMarkTime(null);
-			myQuestion.setVer(myQuestion.getVer() + 1);
-			myQuestion.setImgFileIds(null);
-			myQuestion.setVideoFileIds(null);
-			myQuestion.setUpdateUserId(getCurUser().getId());
-			myQuestion.setUpdateTime(new Date());
-			myQuestionService.updateById(myQuestion);
+//		for (MyExamQuestion myQuestion : myQuestionList) { // bug：随机试卷重考应该生成不一样的试卷
+//			myQuestion.setAnswerTime(null);
+//			myQuestion.setUserAnswer(null);
+//			myQuestion.setUserScore(null);
+//			myQuestion.setMarkUserId(null);
+//			myQuestion.setMarkTime(null);
+//			myQuestion.setVer(myQuestion.getVer() + 1);
+//			myQuestion.setImgFileIds(null);
+//			myQuestion.setVideoFileIds(null);
+//			myQuestion.setUpdateUserId(getCurUser().getId());
+//			myQuestion.setUpdateTime(new Date());
+//			myQuestionService.updateById(myQuestion);
+//		}
+
+		Exam exam = examCacheService.getExam(examId);
+		if (exam.getGenType() == 1) {// 如果是人工组卷，直接生成我的试卷
+			List<ExamQuestion> examQuestionList = examQuestionService.getList(examId);
+			List<MyExamQuestion> shuffleCacheList = new ArrayList<>();// 乱序缓存列表，用于乱序
+			for (int i = 0; i < examQuestionList.size(); i++) {
+				ExamQuestion examQuestion = examQuestionList.get(i);
+				MyExamQuestion myQuestion = new MyExamQuestion();
+				myQuestion.setChapterName(examQuestion.getChapterName());
+				myQuestion.setChapterTxt(examQuestion.getChapterTxt());
+				myQuestion.setType(examQuestion.getType());
+				myQuestion.setScore(examQuestion.getScore());
+				myQuestion.setScores(examQuestion.getScores());
+				myQuestion.setMarkOptions(examQuestion.getMarkOptions());
+				myQuestion.setExamId(examQuestion.getExamId());
+				myQuestion.setQuestionId(examQuestion.getQuestionId());
+				myQuestion.setUserId(userId);
+				myQuestion.setNo(i + 1);
+				myQuestion.setVer(myExam.getVer()); // 版本记录递增
+				myQuestion.setUpdateUserId(getCurUser().getId());
+				myQuestion.setUpdateTime(new Date());
+				myQuestionService.save(myQuestion);
+
+				if (ExamUtil.hasQuestionRand(exam)) {// 如果是试题乱序（章节不能乱序；试题不能跨章节乱序）
+					if (ExamUtil.hasQuestion(myQuestion)) {// 1章节；2试题；3试题；4试题；5章节；6试题；7试题；8：试题
+						shuffleCacheList.add(myQuestion); // 2试题；3试题；4试题；
+					}
+					if (ExamUtil.hasChapter(myQuestion) || i >= examQuestionList.size() - 1) {// 5章节；（如果是章节或最后一道题，乱序已经缓存的试题，前面不要加else，最后一道题的情况不处理）
+						Collections.shuffle(shuffleCacheList);// 3试题；2试题；4试题；
+						Integer maxNo = ExamUtil.hasChapter(myQuestion) ? myQuestion.getNo() - 1 : myQuestion.getNo();// 5章节
+						for (MyExamQuestion shuffleCache : shuffleCacheList) {
+							shuffleCache.setNo(maxNo--);
+							myQuestionService.updateById(myQuestion);// 1章节；4试题；2试题；3试题；
+						}
+						shuffleCacheList.clear();
+					}
+				}
+				if (ExamUtil.hasOptionRand(exam)) {// 如果是选项乱序
+					Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
+					if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
+						List<QuestionOption> questionOptionList = examCacheService
+								.getQuestionOptionList(myQuestion.getQuestionId());// A,B,C,D
+						myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
+						myQuestionService.updateById(myQuestion);
+					}
+				}
+			}
+		} else if (exam.getGenType() == 2) {// 如果是随机组卷，按抽题规则生成我的试卷（校验里判断过规则是否满足，不用在判断）
+			Set<Question> questionOfUsed = new HashSet<>();
+			int no = 1;
+			for (int i = 0; i < examRuleList.size(); i++) {
+				ExamRule examRule = examRuleList.get(i);
+				if (examRule.getType() == 1) {// 如果是章节
+					MyExamQuestion myQuestion = new MyExamQuestion();
+					myQuestion.setType(examRule.getType());
+					myQuestion.setChapterName(examRule.getChapterName());
+					myQuestion.setChapterTxt(examRule.getChapterTxt());
+					myQuestion.setUserId(userId);
+					myQuestion.setExamId(exam.getId());
+					myQuestion.setNo(no++);
+					myQuestion.setVer(myExam.getVer());
+					myQuestion.setUpdateTime(new Date());
+					myQuestion.setUpdateUserId(getCurUser().getId());
+					myQuestionService.save(myQuestion);
+				} else {// 如果是规则
+					List<Question> questionList = questionListCache.get(examRule.getQuestionBankId());
+					Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
+					Integer ruleRemainNum = examRule.getNum();// 该规则试题数量，找到一个数量减一
+					for (Question question : questionList) {
+						if (ruleRemainNum <= 0) {// 满足规则，处理下一个规则
+							break;
+						}
+						if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+							continue;
+						}
+						if (examRule.getQuestionType() != question.getType() // 当前试题不符合当前抽题规则，继续找下一个
+								|| examRule.getMarkType() != question.getMarkType()) {
+							continue;
+						}
+
+						MyExamQuestion myQuestion = new MyExamQuestion();
+						myQuestion.setType(examRule.getType());
+						myQuestion.setScore(examRule.getScore());
+						myQuestion.setMarkOptions(examRule.getMarkOptions());
+						myQuestion.setQuestionId(question.getId());
+						myQuestion.setUserId(userId);
+						myQuestion.setExamId(exam.getId());
+						myQuestion.setNo(no++); // 试题乱序无效，因为本身就是随机的
+
+						if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
+							myQuestion.setScores(Stream.of(examRule.getScores()).collect(Collectors.toList()));
+						} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
+								&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
+							List<QuestionAnswer> questionAnswerList = examCacheService
+									.getQuestionAnswerList(myQuestion.getQuestionId());
+							myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
+						}
+
+						if (ExamUtil.hasOptionRand(exam)) {// 如果是选项乱序
+							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
+								List<QuestionOption> questionOptionList = examCacheService
+										.getQuestionOptionList(myQuestion.getQuestionId());
+								myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
+							}
+						}
+
+						myQuestion.setVer(myExam.getVer());
+						myQuestion.setUpdateTime(new Date());
+						myQuestion.setUpdateUserId(getCurUser().getId());
+						myQuestionService.save(myQuestion);
+
+						questionOfUsed.add(question);
+						ruleRemainNum--;
+					}
+				}
+			}
 		}
+	}
+
+	private Map<Integer, List<Question>> retakeValid(List<ExamRule> examRuleList) {
+		Map<Integer, List<Question>> questionListCache = new HashMap<>();
+		examRuleList.stream()//
+				.map(ExamRule::getQuestionBankId)// 提取需要的题库
+				.collect(Collectors.toSet()).stream()// 去重
+				.forEach(questionBankId -> questionListCache.put(questionBankId,
+						questionService.getList(questionBankId)));// 把题库缓存起来，用于模拟随机抽题
+
+		Set<Question> questionOfUsed = new HashSet<>();// 已使用过的试题
+		for (int i = 0; i < examRuleList.size(); i++) {
+			ExamRule examRule = examRuleList.get(i);
+			if (examRule.getType() == 2) {// 如果是规则
+				int validQuestionNum = 0;// 符合当前抽题规则的有效题数
+				for (Question question : questionListCache.get(examRule.getQuestionBankId())) {
+//					if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+//						throw new MyException(String.format("试题无权限，编号：%s", question.getId()));
+//					}
+
+					if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+						continue;
+					}
+					if (validQuestionNum >= examRule.getNum()) {// 当前题库已满足当前抽题规则，不在继续验证
+						break;
+					}
+
+					if (examRule.getQuestionType() == question.getType() // 当前试题满足抽题规则
+							&& examRule.getMarkType() == question.getMarkType()) {
+						questionOfUsed.add(question);// 加入已使用过的试题
+						validQuestionNum++; // 有效题数加一
+					}
+				}
+
+				if (validQuestionNum < examRule.getNum()) {
+					throw new MyException(String.format("题库试题不足，无法生成试卷"));
+				}
+			}
+		}
+
+		return questionListCache;
+	}
+
+	private MyExam retakeValid0(Integer examId) {
+		Exam exam = examCacheService.getExam(examId);
+		if (exam.getMarkType() == 2) {
+			throw new MyException("主观题试卷");
+		}
+		if (exam.getMarkState() != 1) {
+			throw new MyException("考试已结束");
+		}
+		if (exam.getRetakeNum() == 0) {
+			throw new MyException("不允许重考");
+		}
+
+		MyExam myExam = examCacheService.getMyExam(examId, getCurUser().getId());
+		if (myExam.getAnswerState() == null) {// 相当于判断了state和markState
+			throw new MyException("请继续参考");
+		}
+		if (myExam.getAnswerState() == 1) {
+			throw new MyException("已及格，无须重考");
+		}
+		if (myExam.getVer().intValue() > exam.getRetakeNum().intValue()) {
+			throw new MyException(String.format("只能重考%s次", exam.getRetakeNum()));
+		}
+		return myExam;
 	}
 
 	private void paperValid(Integer examId, Integer userId) {
