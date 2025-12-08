@@ -165,6 +165,39 @@ public class ApiMyExerController extends BaseController {
 	}
 
 	/**
+	 * 我的练习删除
+	 * 
+	 * v1.0 zhanghc 2025年12月8日上午11:57:08
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/del")
+	public PageResult del(Integer id) {
+		try {
+			if (!ValidateUtil.isValid(id)) {
+				throw new MyException("参数错误：id");
+			}
+			MyExer myExer = myExerService.getById(id);
+			if (myExer == null) {
+				throw new MyException("参数错误：id");
+			}
+			if (myExer.getUserId().intValue() != getCurUser().getId().intValue()) {
+				throw new MyException("无操作权限");
+			}
+
+			myExerService.removeById(id);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("我的练习删除错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("我的练习删除错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
 	 * 我的练习获取
 	 * 
 	 * v1.0 zhanghc 2025年9月26日上午10:54:21

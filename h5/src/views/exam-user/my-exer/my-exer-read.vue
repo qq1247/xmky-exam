@@ -72,15 +72,19 @@
                             <div class="history__row">
                                 <span class="history__title">{{ myExer.name }}</span>
                                 <span class="history__btn"
-                                    @click="$router.push(`/my-exer/paper/${form.exerId}/${myExer.id}`)">>>继续训练</span>
+                                    @click="$router.push(`/my-exer/paper/${form.exerId}/${myExer.id}`)">>>继续练习</span>
                             </div>
                             <div class="history__row">
-                                <span class="history__progress">进度：{{ myExer.answerNum }}/{{ myExer.questionNum
+                                <div>
+                                    <span class="history__txt">进度：{{ myExer.answerNum }}/{{ myExer.questionNum
                                     }}</span>
-                                <span class="history__correct-rate">正确率：
-                                    {{ new
+                                    <span class="history__txt">正确率：{{ new
                                         Decimal(myExer.correctAnswerNum).dividedBy(myExer.answerNum).times(100).toDecimalPlaces(0).toNumber()
                                     }}%</span>
+                                </div>
+                                <div class="history__del" @click="del(myExer.id)">
+                                    <span class="iconfont icon-shanchu"></span>删除
+                                </div>
                             </div>
                         </div>
                         <xmks-card-empty v-if="listpage.list.length === 0" name="暂无最近练习"
@@ -185,7 +189,7 @@ import { userGet } from '@/api/base/user'
 import { useUserStore } from '@/stores/user'
 import { useRoute, useRouter } from 'vue-router'
 import { dayjs, type FormRules } from 'element-plus'
-import { myExerAdd, myExerExerListpage, myExerGet, myExerListpage, myExerTrackList } from '@/api/my/my-exer'
+import { myExerAdd, myExerDel, myExerExerListpage, myExerGet, myExerListpage, myExerTrackList } from '@/api/my/my-exer'
 import type { Exer } from '@/ts/exam/exer'
 import type { Listpage } from '@/ts/common/listpage'
 import Decimal from 'decimal.js-light'
@@ -422,6 +426,19 @@ async function myExerQuery() {
 
     listpage.list = data.list
     listpage.total = data.total
+}
+
+// 我的练习删除
+async function del(id: number) {
+    const { data: { code } } = await myExerDel({
+        id
+    })
+
+    if (code !== 200) {
+        return
+    }
+
+    myExerQuery()
 }
 
 // 切换练习
@@ -742,17 +759,19 @@ async function exerTimeStatisQuery() {
                     .history__list {
                         display: flex;
                         flex-direction: column;
+                        justify-content: space-between;
+                        height: 65px;
                         border-radius: 15px 15px 15px 15px;
                         margin-top: 10px;
-                        padding: 10px;
+                        padding: 10px 15px;
                         background-color: #efefef;
                         font-size: 14px;
                         color: #888;
 
                         .history__row {
-                            height: 20px;
                             display: flex;
                             justify-content: space-between;
+                            margin-top: 2px;
 
                             .history__title {
                                 font-size: 14px;
@@ -764,6 +783,14 @@ async function exerTimeStatisQuery() {
                                 cursor: pointer;
                                 color: #04C7F2;
 
+                            }
+
+                            .history__txt {
+                                margin-right: 20px;
+                            }
+
+                            .history__del {
+                                cursor: pointer;
                             }
                         }
 

@@ -9,6 +9,9 @@ export function myExerExerListpage(parm: object) {
 export function myExerAdd(parm: object) {
     return request.post('/my-exer/add', parm);
 }
+export function myExerDel(parm: object) {
+    return request.post('/my-exer/del', parm);
+}
 export function myExerGet(parm: object) {
     return request.post('/my-exer/get', parm);
 }
