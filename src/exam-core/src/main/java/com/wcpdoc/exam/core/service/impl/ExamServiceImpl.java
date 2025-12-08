@@ -1498,11 +1498,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //		if (exam.getState() == 2) {// bug修复：删除考试，提示已暂停；发布考试，提示考试已结束。
 //			throw new MyException("已暂停");
 //		}
-		if (exam.getMarkState() == 1) {
-			throw new MyException("未阅卷");
-		}
-		if (exam.getMarkState() == 2) {
-			throw new MyException("阅卷中");
+		if (exam.getStartTime().getTime() > System.currentTimeMillis()) {// bug修复：考试开始前允许删除。比如考试信息有误，需要重改。
+			if (exam.getMarkState() == 1) {
+				throw new MyException("未阅卷");
+			}
+			if (exam.getMarkState() == 2) {
+				throw new MyException("阅卷中");
+			}
 		}
 		return exam;
 	}
