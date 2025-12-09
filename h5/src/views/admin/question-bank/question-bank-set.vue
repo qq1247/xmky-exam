@@ -6,6 +6,14 @@
                     <el-form-item label="名称" prop="name">
                         <el-input v-model="form.name" placeholder="请输入名称" />
                     </el-form-item>
+                    <el-form-item v-if="$route.path.indexOf('add') !== -1" label="共享权限" prop="shareAuth">
+                        <el-radio-group v-model="form.shareAuth">
+                            <el-radio-button v-for="dict in dictStore.getList('SHARE_AUTH')" :key="dict.dictKey"
+                                :value="parseInt(dict.dictKey)" class="form__radio">
+                                {{ dict.dictValue }}
+                            </el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
                     <el-form-item>
                         <el-button v-if="$route.path.indexOf('add') !== -1" type="primary" class="form__btn"
                             @click="add">添加</el-button>
@@ -69,14 +77,17 @@ import type { QuestionBank } from '@/ts/exam/question-bank'
 import { questionBankAdd, questionBankDel, questionBankEdit, questionBankGet, questionBankClear } from '@/api/exam/question-bank'
 import XmksSelect from '@/components/xmks-select.vue'
 import { questionMove } from '@/api/exam/question'
+import { useDictStore } from '@/stores/dict'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
 const router = useRouter()// 路由
+const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
 const form = reactive<QuestionBank>({
     id: null,
     name: '',
+    shareAuth: 1,
 })
 const formRules = reactive<FormRules>({// 表单规则
     name: [
@@ -213,6 +224,14 @@ async function clear() {
 
     .form {
         margin-top: 20px;
+
+        :deep(.form__radio) {
+            &.is-active {
+                .el-radio-button__inner {
+                    background-color: #259FF8;
+                }
+            }
+        }
     }
 
     .form__btn {

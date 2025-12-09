@@ -164,7 +164,7 @@ import { useDictStore } from '@/stores/dict';
 import { MyExam } from '@/ts/myExam.d';
 import { Exam } from '@/ts/exam.d';
 import { ExamQuestion } from '@/ts/paper.d';
-import { myMarkMarkList, myMarkPaper, myMarkScore, myMarkFinish } from '@/api/my-mark';
+import { myMarkMarkList, myMarkPaper, myMarkScore, myMarkFinish, myMarkExamGet } from '@/api/my-mark';
 import { examGet } from '@/api/exam';
 import { loginSysTime } from '@/api/login';
 import { toChinaNum } from '@/util/numberUtil';
@@ -247,7 +247,7 @@ const examQuestion = computed(() => {
 /************************事件相关*****************************/
 // 考试查询
 async function examQuery() {
-	const { data } = await examGet({ id: pageParm.examId });
+	const { data } = await myMarkExamGet({ id: pageParm.examId });
 	exam.id = data.id;
 	exam.name = data.name;
 	exam.paperName = data.paperName;

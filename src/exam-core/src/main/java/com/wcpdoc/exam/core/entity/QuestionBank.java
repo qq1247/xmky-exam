@@ -29,6 +29,7 @@ public class QuestionBank {
 	private Integer qaSubNum;
 	private Integer qaObjNum;
 	private Integer questionNum;
+	private Integer shareAuth;
 	private Integer state;
 	private Integer createUserId;
 	private Integer updateUserId;

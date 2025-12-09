@@ -389,6 +389,11 @@ async function claimInfoQuery() {
 
 // 分配试卷
 async function claim() {
+	if (!form.num) {
+		uni.showToast({ title: '无可领取试卷', icon: 'error' });
+		return
+	}
+
 	await myMarkClaim({
 		examId: pageParm.examId,
 		num: form.num

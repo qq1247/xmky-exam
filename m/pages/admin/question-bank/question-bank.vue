@@ -59,7 +59,7 @@
 						<template #opt>
 							<view class="question-bank__opt">
 								<view>
-									<view class="question-bank__state">{{ questionBank.createUserName }}</view>
+									<view class="question-bank__state">{{ questionBank.createUserName }} / {{ dictStore.getValue('SHARE_AUTH', questionBank.shareAuth) }}权限</view>
 									<view class="question-bank__state">{{ questionBank.updateTime }}</view>
 								</view>
 								<button type="primary" @click="toQuestion(questionBank.id)" class="question-bank__btn">进入题库</button>
@@ -85,8 +85,10 @@ import { onShow, onReady } from '@dcloudio/uni-app';
 import { Page } from '@/ts/page.d';
 import { questionBankListpage } from '@/api/question-bank';
 import { useTabbarStore } from '@/stores/tabbar';
+import { useDictStore } from '@/stores/dict';
 
 /************************变量定义相关***********************/
+const dictStore = useDictStore();
 const tabbarStore = useTabbarStore();
 const queryForm = reactive({
 	name: '' // 题库名称

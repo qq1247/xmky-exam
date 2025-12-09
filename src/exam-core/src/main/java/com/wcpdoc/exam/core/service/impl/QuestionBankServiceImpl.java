@@ -13,6 +13,7 @@ import com.wcpdoc.exam.core.dao.QuestionBankDao;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankExService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
+import com.wcpdoc.exam.core.util.QuestionBankUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +37,8 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 	public void del(Integer id) {
 		// 数据校验
 		QuestionBank entity = getById(id);
-		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(entity))) {
 			throw new MyException("无操作权限");
 		}
 
@@ -67,7 +69,8 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 			throw new MyException("参数错误：id");
 		}
 		QuestionBank entity = getById(id);
-		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(entity))) {
 			throw new MyException("无操作权限");
 		}
 		// 题库清理

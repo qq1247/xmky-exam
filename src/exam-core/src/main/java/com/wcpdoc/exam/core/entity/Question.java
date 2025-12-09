@@ -32,8 +32,8 @@ public class Question {
 	private Integer videoFileId;
 	private String analysis;
 	private BigDecimal score;
-	private Integer state;
 	private Integer questionBankId;
+	private Integer state;
 	private Integer createUserId;
 	private Integer updateUserId;
 	private Date updateTime;

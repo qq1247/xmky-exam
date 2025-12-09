@@ -25,10 +25,12 @@ public interface QuestionBankDao extends RBaseDao<QuestionBank> {
 								"QUESTION_BANK.SUBJECTIVE_NUM", "QUESTION_BANK.SINGLE_NUM",
 								"QUESTION_BANK.MULTIPLE_NUM", "QUESTION_BANK.JUDGE_NUM",
 								"QUESTION_BANK.FILL_BLANK_OBJ_NUM", "QUESTION_BANK.FILL_BLANK_SUB_NUM",
-								"QUESTION_BANK.QA_OBJ_NUM", "QUESTION_BANK.QA_SUB_NUM", "QUESTION_BANK.UPDATE_TIME")//
+								"QUESTION_BANK.QA_OBJ_NUM", "QUESTION_BANK.QA_SUB_NUM", "QUESTION_BANK.UPDATE_TIME", "QUESTION_BANK.SHARE_AUTH")//
 						.like(pageIn.hasParm("name"), "QUESTION_BANK.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("id"), "QUESTION_BANK.ID", pageIn.getParm("id"))//
-						.eq(pageIn.hasParm("curUserId"), "QUESTION_BANK.CREATE_USER_ID", pageIn.getParm("curUserId"))//
+						.apply(pageIn.hasParm("curUserId"),
+								" (QUESTION_BANK.CREATE_USER_ID = {0} OR QUESTION_BANK.SHARE_AUTH IN (2, 3)) ",
+								pageIn.getParm("curUserId"))//
 						.eq("QUESTION_BANK.STATE", 1)//
 						.orderByDesc("QUESTION_BANK.ID"));
 		return new PageOut(page.getRecords(), page.getTotal());

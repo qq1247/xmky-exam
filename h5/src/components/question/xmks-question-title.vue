@@ -166,7 +166,7 @@ watch(titles, () => {
     line-height: 28px;
     word-break: break-all;
 
-    .fillblank {
+    :deep(.fillblank) {
         .el-input__wrapper {
             position: relative;
             height: 38px;

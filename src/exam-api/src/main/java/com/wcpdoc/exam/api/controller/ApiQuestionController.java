@@ -20,9 +20,12 @@ import com.wcpdoc.core.util.CollectionUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.service.ExamCacheService;
+import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.QuestionBankUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ApiQuestionController extends BaseController {
 	private final QuestionService questionService;
 	private final ExamCacheService examCacheService;
+	private final QuestionBankService questionBankService;
 
 	/**
 	 * 试题列表
@@ -193,7 +197,8 @@ public class ApiQuestionController extends BaseController {
 		try {
 			// 数据校验
 			Question question = examCacheService.getQuestion(id);
-			if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
+			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin() || QuestionBankUtil.hasRead(questionBank))) {
 				throw new MyException("无操作权限");
 			}
 

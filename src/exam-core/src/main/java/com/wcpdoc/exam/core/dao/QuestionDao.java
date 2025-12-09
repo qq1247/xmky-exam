@@ -43,13 +43,15 @@ public interface QuestionDao extends RBaseDao<Question> {
 						.eq(pageIn.hasParm("markType"), "QUESTION.MARK_TYPE", pageIn.getParm("markType"))//
 						.notIn(pageIn.hasParm("exIds"), "QUESTION.ID",
 								StringUtil.toIntList(pageIn.getParm("exIds", String.class)))//
-						.eq(!pageIn.hasParm("state"), "QUESTION.STATE", 1)// 默认查询发布和草稿状态
+						.eq(!pageIn.hasParm("state"), "QUESTION.STATE", 1)// 默认查询发布
 						.and(pageIn.hasParm("state") && "0".equals(pageIn.getParm("state")),
 								i -> i.eq("QUESTION.STATE", 0).gt("QUESTION.UPDATE_TIME",
 										DateUtil.getNextDay(new Date(), -7)))// 查询已删除并且最近7天的试题（回收站使用）
 						.eq(pageIn.hasParm("state") && !"0".equals(pageIn.getParm("state")), "QUESTION.STATE",
 								pageIn.getParm("state"))//
-						.eq(pageIn.hasParm("curUserId"), "QUESTION.CREATE_USER_ID", pageIn.getParm("curUserId"))//
+						.apply(pageIn.hasParm("curUserId"),
+								" (QUESTION_BANK.CREATE_USER_ID = {0} OR QUESTION_BANK.SHARE_AUTH IN (2, 3)) ",
+								pageIn.getParm("curUserId"))//
 						.orderByDesc("QUESTION.ID"));
 		return new PageOut(page.getRecords(), page.getTotal());
 	}

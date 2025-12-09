@@ -15,6 +15,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankService;
+import com.wcpdoc.exam.core.util.QuestionBankUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,12 @@ public class ApiQuestionBankController extends BaseController {
 			if (!ValidateUtil.isValid(questionBank.getName())) {
 				throw new MyException("参数错误：name");
 			}
+			if (!ValidateUtil.isValid(questionBank.getShareAuth())) {
+				throw new MyException("参数错误：shareAuth");
+			}
+			if (!(questionBank.getShareAuth() >= 1 && questionBank.getShareAuth() <= 3)) {
+				throw new MyException("参数错误：shareAuth");
+			}
 			// if (existName(questionBank)) {
 			// throw new MyException("名称已存在");
 			// } // 不同的子管理员添加可以重复
@@ -115,12 +122,14 @@ public class ApiQuestionBankController extends BaseController {
 				throw new MyException("参数错误：name");
 			}
 			QuestionBank entity = questionBankService.getById(questionBank.getId());
-			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+					|| QuestionBankUtil.hasWrite(entity))) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 				throw new MyException("无操作权限");
 			}
 
 			// 保存题库
 			entity.setName(questionBank.getName());
+			// entity.setShareAuth(questionBank.getShareAuth()) // 单独功能控制
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			questionBankService.updateById(entity);
@@ -169,7 +178,8 @@ public class ApiQuestionBankController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			QuestionBank entity = questionBankService.getById(id);
-			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+					|| QuestionBankUtil.hasRead(entity))) {
 				throw new MyException("无操作权限");
 			}
 			return PageResultEx.ok()//
@@ -183,6 +193,31 @@ public class ApiQuestionBankController extends BaseController {
 			return PageResult.err();
 		}
 	}
+
+//	@RequestMapping("/share")
+//	public PageResult share(Integer id, Integer shareAuth) {
+//		try {
+//			// 数据校验
+//			if () {
+//				
+//			}
+//
+//			// 保存题库
+//			entity.setName(questionBank.getName());
+//			// entity.setShareAuth(questionBank.getShareAuth()) // 单独功能控制
+//			entity.setUpdateTime(new Date());
+//			entity.setUpdateUserId(getCurUser().getId());
+//			questionBankService.updateById(entity);
+//
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("题库修改错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("题库修改错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 
 	/**
 	 * 题库清空

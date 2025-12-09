@@ -16,6 +16,7 @@ import com.wcpdoc.exam.core.entity.Exer;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
+import com.wcpdoc.exam.core.util.QuestionBankUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -80,7 +81,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		}
 		for (Integer questionBankId : exer.getQuestionBankIds()) {
 			QuestionBank questionBank = questionBankService.getById(questionBankId);// 只能练习自己的题库
-			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin() || QuestionBankUtil.hasRead(questionBank))) {
 				throw new MyException("无操作权限");
 			}
 		}

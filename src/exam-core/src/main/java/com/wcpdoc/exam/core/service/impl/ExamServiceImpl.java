@@ -54,6 +54,7 @@ import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ExamUtil;
+import com.wcpdoc.exam.core.util.QuestionBankUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -1118,7 +1119,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						questionIdCache.add(examQuestion.getQuestionId());
 
 						Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
-						if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+						QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
+						if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin() || QuestionBankUtil.hasRead(questionBank))) {
 							throw new MyException(String.format("试题无权限，编号：%s", examQuestion.getQuestionId()));
 						}
 					}
@@ -1232,7 +1234,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					ruleNo++;
 					int validQuestionNum = 0;// 符合当前抽题规则的有效题数
 					for (Question question : questionListCache.get(examRule.getQuestionBankId())) {
-						if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+						QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
+						if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin() || QuestionBankUtil.hasRead(questionBank))) {
 							throw new MyException(String.format("试题无权限，编号：%s", question.getId()));
 						}
 

@@ -30,6 +30,7 @@ import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionExService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.QuestionBankUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.file.service.FileService;
 
@@ -64,7 +65,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		addValid(question, options, answers, scores, questionBank);
 
 		// 试题添加
-		question.setCreateUserId(questionBank.getCreateUserId());// 如果是管理员添加子管理的题库，创建人还是子管理员（比如需要根据创建人查询自己的试题）
+		question.setCreateUserId(questionBank.getCreateUserId());// 如果是管理员添加子管理的题库，创建人还是子管理员（比如需要根据创建人查询自己的试题）；有读写权限可以给别的题库添加（多人维护一个题库）
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setState(1);
@@ -300,13 +301,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	})
 	public synchronized void move(Integer id, Integer questionBankId) {
 		// 数据校验
-		moveValid(id, questionBankId);
+		QuestionBank sourceQuestionBank = moveValid0(id, questionBankId);
+		QuestionBank destQuestionBank = moveValid(id, questionBankId);
 
 		// 移动
-		QuestionBank destQuestionBank = questionBankService.getById(questionBankId);
-
 		Question question = examCacheService.getQuestion(id);
-		QuestionBank sourceQuestionBank = questionBankService.getById(question.getQuestionBankId());
 
 		question.setQuestionBankId(destQuestionBank.getId());
 		question.setCreateUserId(destQuestionBank.getCreateUserId());// 不要用当前用户ID，可能是管理员操作
@@ -464,7 +463,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	private void addValid(Question question, List<String> options, List<String> answers, List<BigDecimal> scores,
 			QuestionBank questionBank) {
-		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
+		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(questionBank))) {// 子管理可以改自己创建的题库，管理员可以改所有子管理的题库
 			throw new MyException("无操作权限");
 		}
 
@@ -674,7 +674,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：id");
 		}
 		Question question = examCacheService.getQuestion(id);
-		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+		QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
+		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(questionBank))) {
 			throw new MyException("无操作权限");
 		}
 		return questionBankService.getById(question.getQuestionBankId());
@@ -682,13 +684,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	private QuestionBank copyValid(Integer id) {
 		Question question = examCacheService.getQuestion(id);
-		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+		QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
+		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(questionBank))) {
 			throw new MyException("无操作权限");
 		}
 		return questionBankService.getById(question.getQuestionBankId());
 	}
 
-	private void moveValid(Integer id, Integer questionBankId) {
+	private QuestionBank moveValid0(Integer id, Integer questionBankId) {
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
@@ -697,13 +701,25 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		Question question = examCacheService.getQuestion(id);
-		if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+		// if (!(CurLoginUserUtil.isSelf(question.getCreateUserId()) ||
+		// CurLoginUserUtil.isAdmin())) {
+		// throw new MyException("无操作权限");
+		// }
+		QuestionBank sourceQuestionBank = questionBankService.getById(question.getQuestionBankId());
+		if (!(CurLoginUserUtil.isSelf(sourceQuestionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(sourceQuestionBank))) {
 			throw new MyException("无操作权限");
 		}
+		return sourceQuestionBank;
 
-		QuestionBank questionBank = questionBankService.getById(questionBankId);
-		if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+	}
+
+	private QuestionBank moveValid(Integer id, Integer questionBankId) {
+		QuestionBank targetQuestionBank = questionBankService.getById(questionBankId);
+		if (!(CurLoginUserUtil.isSelf(targetQuestionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(targetQuestionBank))) {
 			throw new MyException("无操作权限");
 		}
+		return targetQuestionBank;
 	}
 }

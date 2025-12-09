@@ -72,7 +72,10 @@
                     </div>
                     <div class="question-bank__other">
                         <span class="question-bank__time">{{ questionBank.updateTime }}</span>
-                        <span class="question-bank__username">{{ questionBank.createUserName }}</span>
+                        <span class="question-bank__username">
+                            {{ questionBank.createUserName }} /
+                            {{ dictStore.getValue('SHARE_AUTH', questionBank.shareAuth) }}权限
+                        </span>
                     </div>
                 </xmks-card-data>
             </el-scrollbar>
@@ -91,8 +94,10 @@ import type { Listpage } from '@/ts/common/listpage'
 import xmksCardData from '@/components/card/xmks-card-data.vue'
 import xmksCardAdd from '@/components/card/xmks-card-add.vue'
 import { questionBankListpage } from '@/api/exam/question-bank'
+import { useDictStore } from '@/stores/dict'
 
 /************************变量定义相关***********************/
+const dictStore = useDictStore() // 字典缓存
 const queryForm = reactive({// 查询表单
     name: '',
 })
