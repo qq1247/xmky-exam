@@ -23,6 +23,27 @@
                 </el-form>
             </template>
         </xmks-edit-card>
+        <xmks-edit-card v-if="form.id" title="删除用户" desc="批量删除考试用户">
+            <template #card-main>
+                <el-form ref="userDelFormRef" :model="userDelForm" :rules="userDelFormRules" inline label-width="100"
+                    size="large" class="form">
+                    <el-form-item label="选择用户" prop="questionIds" style="width: 100%;">
+                        <xmks-select v-model="userDelForm.userIds" url="user/listpage"
+                            :params="{ state: 1, role: 'EXAM_USER', orgId: route.params.id }" search-parm-name="name"
+                            option-label="name" option-value="id" :options="[]" :multiple="true" clearable
+                            :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选" placeholder="请输入机构名称或用户名称进行筛选">
+                            <template #default="{ option }">
+                                {{ option.name }} - {{ option.orgName }}
+                            </template>
+                        </xmks-select>
+                    </el-form-item>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-button type="primary" class="form__btn" @click="userBatchDel"
+                    style="margin-bottom: 40px;">删除用户</el-button>
+            </template>
+        </xmks-edit-card>
         <xmks-edit-card v-if="form.id" title="删除机构" desc="如果存在子机构，则不能删除">
             <template #card-side>
                 <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': delConfirm }" @click="del"
@@ -39,6 +60,8 @@ import { useRouter, useRoute } from 'vue-router'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import type { Org } from '@/ts/base/org'
 import { orgAdd, orgDel, orgEdit, orgGet } from '@/api/base/org'
+import XmksSelect from '@/components/xmks-select.vue'
+import { userDel } from '@/api/base/user'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -61,6 +84,16 @@ const formRules = reactive<FormRules>({// 表单规则
     ],
 })
 const delConfirm = ref(false) // 删除确认
+
+const userDelFormRef = ref<FormInstance>()// 表单引用
+const userDelForm = reactive({// 表单
+    userIds: [],// 用户IDS
+})
+const userDelFormRules = reactive<FormRules>({// 表单校验规则
+    userIds: [
+        { required: true, message: '请选择考试用户', trigger: 'blur' },
+    ],
+})
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -108,6 +141,24 @@ async function edit() {
 
     // 修改
     const { data: { code } } = await orgEdit({ ...form })
+    if (code !== 200) {
+        return
+    }
+
+    router.push("/user-nav/org-list")
+}
+
+// 用户删除
+async function userBatchDel() {
+    // 数据校验
+    try {
+        await userDelFormRef.value?.validate()
+    } catch (e) {
+        return
+    }
+
+    // 修改
+    const { data: { code } } = await userDel({ ids: userDelForm.userIds })
     if (code !== 200) {
         return
     }

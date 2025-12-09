@@ -163,9 +163,11 @@ public class ApiUserController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/del")
-	public PageResult del(Integer id) {
+	public PageResult del(Integer[] ids) {
 		try {
-			userService.del(id);
+			for (Integer id : ids) {
+				userService.del(id);
+			}
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("用户删除错误：{}", e.getMessage());

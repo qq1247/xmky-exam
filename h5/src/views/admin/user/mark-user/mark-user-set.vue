@@ -160,7 +160,7 @@ async function del() {
     }
 
     const { data: { code } } = await userDel({
-        id: form.id,
+        ids: form.id,
     })
     if (code !== 200) {
         return

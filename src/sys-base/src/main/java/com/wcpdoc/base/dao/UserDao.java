@@ -29,6 +29,7 @@ public interface UserDao extends RBaseDao<User> {
 						.and(pageIn.hasParm("name"),
 								i -> i.like("USER.NAME", pageIn.getParm("name")).or().like("ORG.NAME",
 										pageIn.getParm("name")))//
+						.eq(pageIn.hasParm("orgId"), "USER.ORG_ID", pageIn.getParm("orgId"))// 用于机构页面，批量选中用户删除
 						.eq(pageIn.hasParm("state"), "USER.STATE", pageIn.getParm("state"))//
 						.eq(pageIn.hasParm("role"), "USER.ROLE", pageIn.getParm("role"))//
 						.in(pageIn.hasParm("ids"), "USER.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))// 页面过滤

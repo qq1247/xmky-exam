@@ -23,7 +23,8 @@ public interface OrgDao extends RBaseDao<Org> {
 	default PageOut getListpage(PageIn pageIn) {
 		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
 				new MPJQueryWrapper<Org>().setAlias("ORG")//
-						.select("ORG.ID", "ORG.NAME", "ORG.PARENT_ID", "PARENT_ORG.NAME AS PARENT_NAME", "ORG.NO")//
+						.select("ORG.ID", "ORG.NAME", "ORG.PARENT_ID", "PARENT_ORG.NAME AS PARENT_NAME", "ORG.NO",
+								"(SELECT COUNT(*) FROM SYS_USER Z WHERE ORG.ID = Z.ORG_ID AND Z.STATE IN (1,2)) AS USER_COUNT")//
 						.leftJoin("SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID")
 						.eq(pageIn.hasParm("parentId"), "ORG.PARENT_ID", pageIn.getParm("parentId"))//
 						.in(pageIn.hasParm("ids"), "ORG.ID", StringUtil.toIntList(pageIn.getParm("ids", String.class)))// 页面过滤
