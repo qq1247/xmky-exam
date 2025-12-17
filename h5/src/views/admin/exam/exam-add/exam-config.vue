@@ -97,11 +97,13 @@
                 </el-form-item>
             </el-form>
         </el-scrollbar>
-        <div class="exam-config-side">
-            <span class="exam-config-side__tip">配置说明：</span>
-            <span class="exam-config-side__title" v-html="tip.title"></span>
-            <span class="exam-config-side__desc" v-html="tip.desc"></span>
-        </div>
+        <el-scrollbar height="calc(100vh - 280px)">
+            <div class="exam-config-side">
+                <span class="exam-config-side__tip">配置说明：</span>
+                <span class="exam-config-side__title" v-html="tip.title"></span>
+                <span class="exam-config-side__desc" v-html="tip.desc"></span>
+            </div>
+        </el-scrollbar>
     </div>
 </template>
 
