@@ -18,3 +18,6 @@ export function questionBankGet(parm: object) {
 export function questionBankClear(parm: object) {
     return request.post('/question-bank/clear', parm);
 }
+export function questionBankShare(parm: object) {
+    return request.post('/question-bank/share', parm);
+}

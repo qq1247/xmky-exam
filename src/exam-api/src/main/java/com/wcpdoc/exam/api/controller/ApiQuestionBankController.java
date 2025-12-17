@@ -184,7 +184,10 @@ public class ApiQuestionBankController extends BaseController {
 			}
 			return PageResultEx.ok()//
 					.addAttr("id", entity.getId())//
-					.addAttr("name", entity.getName());
+					.addAttr("name", entity.getName()) //
+					.addAttr("shareAuth", entity.getShareAuth()) //
+					.addAttr("createUserId", entity.getCreateUserId()) // 只能对自己的题库进行权限设置
+			;
 		} catch (MyException e) {
 			log.error("题库获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -194,30 +197,41 @@ public class ApiQuestionBankController extends BaseController {
 		}
 	}
 
-//	@RequestMapping("/share")
-//	public PageResult share(Integer id, Integer shareAuth) {
-//		try {
-//			// 数据校验
-//			if () {
-//				
-//			}
-//
-//			// 保存题库
-//			entity.setName(questionBank.getName());
-//			// entity.setShareAuth(questionBank.getShareAuth()) // 单独功能控制
-//			entity.setUpdateTime(new Date());
-//			entity.setUpdateUserId(getCurUser().getId());
-//			questionBankService.updateById(entity);
-//
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("题库修改错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("题库修改错误：", e);
-//			return PageResult.err();
-//		}
-//	}
+	/**
+	 * 题库共享权限
+	 * 
+	 * v1.0 zhanghc 2025年12月17日上午10:47:53
+	 * 
+	 * @param id
+	 * @param shareAuth
+	 * @return PageResult
+	 */
+	@RequestMapping("/share")
+	public PageResult share(Integer id, Integer shareAuth) {
+		try {
+			// 数据校验
+			QuestionBank entity = questionBankService.getById(id);
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+				throw new MyException("无操作权限");
+			}
+			if (!(shareAuth >= 1 && shareAuth <= 3)) {
+				throw new MyException("参数错误：shareAuth");
+			}
+
+			// 保存题库
+			entity.setShareAuth(shareAuth);
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
+			questionBankService.updateById(entity);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("题库共享权限错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("题库共享权限错误：", e);
+			return PageResult.err();
+		}
+	}
 
 	/**
 	 * 题库清空
