@@ -179,7 +179,7 @@ const tempFormRules = {
 			{ required: true, errorMessage: '请输入姓名和手机号' },
 			{
 				minLength: 2,
-				maxLength: 16,
+				maxLength: 18,
 				errorMessage: '长度介于{minLength}-{maxLength}'
 			}
 		]
@@ -203,7 +203,7 @@ const userRegistFormRules = {
 			{ required: true, errorMessage: '请输入登录账号' },
 			{
 				minLength: 2,
-				maxLength: 16,
+				maxLength: 18,
 				errorMessage: '长度介于{minLength}-{maxLength}'
 			}
 		]

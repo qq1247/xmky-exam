@@ -77,7 +77,7 @@ const form = reactive<Org>({// 表单
 const formRules = reactive<FormRules>({// 表单规则
     name: [
         { required: true, message: '请输入名称', trigger: 'blur' },
-        { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
+        { min: 1, max: 18, message: '长度介于1-18', trigger: 'blur' },
     ],
     no: [
         { required: true, message: '请输入排序', trigger: 'blur' },

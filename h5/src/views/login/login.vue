@@ -192,7 +192,7 @@ const userRegistFormRef = ref<FormInstance>()// 表单引用
 const userRegistFormRules = reactive<FormRules>({// 表单规则
     loginName: [
         { required: true, message: '请输入登录账号', trigger: 'blur' },
-        { min: 2, max: 16, message: '长度介于2-16', trigger: 'blur' },
+        { min: 2, max: 18, message: '长度介于2-18', trigger: 'blur' },
     ],
     pwd: [
         { required: true, message: '请输入登录密码', trigger: 'blur' },
