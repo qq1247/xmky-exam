@@ -1,25 +1,23 @@
 package com.wcpdoc.base.job;
 
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.BaseCacheService;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.SpringUtil;
+
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 版本任务
@@ -27,7 +25,11 @@ import com.wcpdoc.core.util.SpringUtil;
  * v1.0 zhanghc 2025年4月8日下午7:21:38
  */
 @Component
+@RequiredArgsConstructor
 public class VerCheckJob {
+	private final WebClient webClient;
+	private final ParmService parmService;
+	private final BaseCacheService baseCacheService;
 
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void execute() {
@@ -36,39 +38,37 @@ public class VerCheckJob {
 			Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
 
 			// 获取最新版本
-			SpringUtil.getBean(ParmService.class).appId();
+			Parm parm = baseCacheService.getParm();
+
 			MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
 			requestParams.add("appSeries", "小猫开源");
 			requestParams.add("appName", "在线考试");
-			requestParams.add("appId", SpringUtil.getBean(BaseCacheService.class).getParm().getAppId());
-			requestParams.add("appVer", SpringUtil.getBean(BaseCacheService.class).getParm().getAppVer());
+			requestParams.add("appId", parm.getAppId());
+			requestParams.add("appVer", parm.getAppVer());
 			requestParams.add("osName", System.getProperty("os.name"));
 			requestParams.add("osVer", System.getProperty("os.version"));
 			requestParams.add("osArch", System.getProperty("os.arch"));
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestParams, headers);
-			Parm parm = SpringUtil.getBean(BaseCacheService.class).getParm();
-			ResponseEntity<String> response = SpringUtil.getBean(RestTemplate.class).postForEntity(parm.getVerhubUrl(),
-					requestEntity, String.class);
-			String responseBody = response.getBody();
-			ObjectMapper objectMapper = new ObjectMapper();
-			Map<String, Object> responseMap = objectMapper.readValue(responseBody,
-					new TypeReference<Map<String, Object>>() {
-					});
 
-			Integer code = (Integer) responseMap.get("code");
-			if (code != 200) {
+			String responseBody = webClient //
+					.post() //
+					.uri(parm.getVerhubUrl()) //
+					.contentType(MediaType.APPLICATION_FORM_URLENCODED) //
+					.body(BodyInserters.fromFormData(requestParams)) //
+					.retrieve() //
+					.bodyToMono(String.class) //
+					.block();
+
+			JSONObject responseJson = JSONUtil.parseObj(responseBody);
+			Integer code = responseJson.getInt("code");
+			if (code == null || code != 200) {
 				return;
 			}
 
 			// 更新版本号、版本中心地址等
-			@SuppressWarnings("unchecked")
-			Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
-			SpringUtil.getBean(ParmService.class).app((String) data.get("relVer"),
-					DateUtil.getDate((String) data.get("relTime")), (String) data.get("verHubUrl"));
+			JSONObject data = responseJson.getJSONObject("data");
+			parmService.app(data.getStr("relVer"), DateUtil.getDate(data.getStr("relTime")), data.getStr("verHubUrl"));
 		} catch (Exception e) {
-			// 失败也没关系，无须处理
+			// 失败也没关系，不要影响程序正常业务
 		}
 	}
 }

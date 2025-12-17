@@ -261,7 +261,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 	@CacheEvict(value = BaseConstant.PARM_CACHE, key = BaseConstant.PARM_KEY)
 	public void appId() {
 		Parm parm = baseCacheService.getParm();
-		if (!ValidateUtil.isValid(parm.getAppId())) {
+		if (!ValidateUtil.isValid(parm.getAppId())) {// 遗留代码，用于给历史版本重置appid（5.2版本为固定appid）
 			parm.setAppId(UUID.randomUUID().toString().replaceAll("-", ""));
 			updateById(parm);
 		}
