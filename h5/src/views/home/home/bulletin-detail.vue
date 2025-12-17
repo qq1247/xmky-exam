@@ -70,6 +70,7 @@ onMounted(async () => {
         }
 
         .bulletin__content {
+            white-space: pre-line;
             margin-top: 15px;
             font-size: 14px;
             color: #8F939C;
