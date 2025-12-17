@@ -409,7 +409,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 						.leftJoin("SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID")// 阅卷用户
 						.leftJoin("SYS_ORG ORG ON USER.ORG_ID = ORG.ID")// 机构名称
 						.select("MY_EXAM.EXAM_ID, MY_EXAM.NO AS MY_EXAM_NO", // 排名
-								"USER.ID AS USER_ID", "USER.NAME AS USER_NAME", "ORG.NAME AS ORG_NAME", // 用户机构信息
+								"USER.ID AS USER_ID", "USER.LOGIN_NAME AS LOGIN_NAME", "USER.NAME AS USER_NAME",
+								"ORG.NAME AS ORG_NAME", // 用户机构信息
 								"MY_EXAM.STATE AS MY_EXAM_STATE", "MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE",
 								"MY_EXAM.ANSWER_STATE AS MY_EXAM_ANSWER_STATE", // 考试状态信息
 								"MY_EXAM.ANSWER_START_TIME AS MY_EXAM_ANSWER_START_TIME",

@@ -36,7 +36,7 @@ public class RsaUtil {
 		try {
 			return rsa.decryptStr(encryptedBase64, KeyType.PrivateKey);
 		} catch (Exception e) {
-			throw new MyException(e);
+			throw new MyException("解密失败");
 		}
 	}
 }

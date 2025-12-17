@@ -99,6 +99,7 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="userName" label="姓名" align="center" />
+                                <el-table-column prop="loginName" label="登录名" align="center" />
                                 <el-table-column prop="orgName" label="机构" align="center">
                                     <template #default="scope">
                                         {{ scope.row.orgName || '-' }}
@@ -129,12 +130,7 @@
                                         {{ diff(scope.row.myExamAnswerStartTime, scope.row.myExamAnswerEndTime) }}分钟
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="no" label="阅卷用时" align="center">
-                                    <template #default="scope">
-                                        {{ diff(scope.row.myExamStartMarkime, scope.row.myExamMarkEndTTime) }}分钟
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="" label="操作" align="center" width="300">
+                                <el-table-column prop="" label="操作" align="center" width="160">
                                     <template #default="scope">
                                         <el-button v-if="scope.row.myExamMarkState === 3" type="" link
                                             @click="toPaper(scope.row.examId, scope.row.userId)"
