@@ -25,5 +25,11 @@
 			<artifactId>pf4j</artifactId>
 			<version>3.12.1</version>
 		</dependency>
+		<!-- 集成OSHI -->
+		<dependency>
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>6.8.3</version>
+		</dependency>
 	</dependencies>
 </project>

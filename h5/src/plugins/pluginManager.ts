@@ -50,7 +50,7 @@ export interface PluginAPI {
         name: string                    // 插件名称
         version: string                 // 插件版本
         description: string             // 插件描述
-        roles: [string]                 // 插件角色 ['ADMIN', 'SUB_ADMIN', 'EXAM_USER', 'MARK_USER']
+        roles: string[]                 // 插件角色 ['ADMIN', 'SUB_ADMIN', 'EXAM_USER', 'MARK_USER']
     }
 }
 

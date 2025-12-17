@@ -88,7 +88,7 @@ const orgs = ref([] as Org[])
 const formRules = reactive<FormRules>({// 表单规则
     loginName: [
         { required: true, message: '请输入登录账号', trigger: 'blur' },
-        { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
+        { min: 1, max: 18, message: '长度介于1-18', trigger: 'blur' },
     ],
     name: [
         { required: true, message: '请输入姓名', trigger: 'blur' },

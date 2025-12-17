@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.pf4j.ExtensionPoint;
 
+import reactor.core.publisher.Flux;
+
 /**
  * 插件业务层接口
  * 
@@ -55,4 +57,14 @@ public interface PluginService extends ExtensionPoint {
 	 * @return Object
 	 */
 	Object execute(Map<String, Object> requestParm);
+
+	/**
+	 * 插件执行
+	 * 
+	 * v1.0 zhanghc 2025年11月14日下午4:15:57
+	 * 
+	 * @param requestParm
+	 * @return Mono<Void>
+	 */
+	Flux<String> run(Map<String, Object> requestParm);
 }

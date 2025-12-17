@@ -54,7 +54,6 @@ public class AuthConf {
 		http.authorizeHttpRequests(authz -> authz // 权限规则配置
 				// ========== 匿名访问 ==========
 				.requestMatchers(//
-						"/plugin/**", //
 						"/api/login/**", //
 						"/api/file/download", //
 						"/api/exam/exam-get" //

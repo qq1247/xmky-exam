@@ -19,12 +19,5 @@
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- 集成服务器参数 -->
-		<dependency>
-			<groupId>com.github.oshi</groupId>
-			<artifactId>oshi-core</artifactId>
-			<version>6.3.2</version>
-		</dependency>
 	</dependencies>
 </project>
