@@ -60,7 +60,7 @@
 							<view class="question-bank__opt">
 								<view>
 									<view class="question-bank__state">{{ questionBank.createUserName }} / {{ dictStore.getValue('SHARE_AUTH', questionBank.shareAuth) }}权限</view>
-									<view class="question-bank__state">{{ questionBank.updateTime }}</view>
+									<!-- <view class="question-bank__state">{{ questionBank.updateTime }}</view> -->
 								</view>
 								<button type="primary" @click="toQuestion(questionBank.id)" class="question-bank__btn">进入题库</button>
 							</view>
@@ -187,12 +187,12 @@ async function toQuestion(id: number) {
 					}
 				}
 				.question-bank__btn {
-					width: 180rpx;
+					width: 190rpx;
 					height: 66rpx;
 					margin: initial;
 					border-radius: 33rpx 33rpx 33rpx 33rpx;
 					line-height: 66rpx;
-					font-size: 30rpx;
+					font-size: 29rpx; // 30在鸿蒙下概率性不显最后一个字
 					color: #fefeff;
 					background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 				}

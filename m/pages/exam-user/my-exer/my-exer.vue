@@ -32,9 +32,9 @@
 					<xmky-card v-for="(exer, index) in listpage.list" :key="index" :preTxt="(index + 1).toString().padStart(2, '0')" :name="exer.name" tag-name="练习">
 						<template #content>
 							<view class="myexer-main__head">
-								<text>主观：</text>
-								<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
 								<text>客观：</text>
+								<text class="myexer-main__value">{{ exer.objectiveNum }}</text>
+								<text>主观：</text>
 								<text class="myexer-main__value">{{ exer.subjectiveNum }}</text>
 							</view>
 							<view>
@@ -160,6 +160,7 @@ async function toExer(exer: Exer) {
 		overflow: hidden;
 		border-radius: 30rpx;
 		.myexer-main__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 			.myexer-main__opt {
 				flex: 1;
 				display: flex;

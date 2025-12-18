@@ -188,6 +188,7 @@ async function toMark(id: number) {
 	}
 	.my-mark__main {
 		.my-mark__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 			.my-mark__opt {
 				flex: 1;
 				display: flex;

@@ -409,6 +409,7 @@ async function toPaper(examId: number, userId: number) {
 			overflow: hidden;
 			border-radius: 30rpx 30rpx 30rpx 30rpx;
 			margin-top: 20rpx;
+			margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 			.list {
 				display: flex;
 				border-bottom: 1px solid #dfdfdf;

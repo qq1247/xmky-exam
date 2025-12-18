@@ -309,6 +309,7 @@ async function toExam(myExam: MyExam) {
 
         //#endif
         .myexam-main__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
             .myexam-main__opt {
                 flex: 1;
                 display: flex;

@@ -286,7 +286,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.mypaper-main__scroll')
 		.boundingClientRect((data: any) => {
-			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 70;
 		})
 		.exec();
 });
@@ -647,6 +647,7 @@ function pre() {}
 		}
 		.mypaper-main__scroll {
 			padding: 0rpx 30rpx;
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 			.mypaper-main__question-cur-no {
 				font-size: 34rpx;
 				color: #0d9df6;
@@ -779,6 +780,7 @@ function pre() {}
 	.mypaper-foot {
 		display: flex;
 		margin: 20rpx 30rpx;
+		padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 		.answer-nav {
 			flex: 1;
 			display: flex;

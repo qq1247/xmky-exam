@@ -362,7 +362,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.mypaper-main__scroll')
 		.boundingClientRect((data: any) => {
-			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 70;
 		})
 		.exec();
 });
@@ -786,6 +786,7 @@ async function commentReply(parentMyComment: MyCommon, content: string) {
 			}
 		}
 		.mypaper-main__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 			padding: 0rpx 30rpx;
 			.question__no {
 				font-size: 34rpx;
@@ -812,6 +813,7 @@ async function commentReply(parentMyComment: MyCommon, content: string) {
 	.mypaper-foot {
 		display: flex;
 		margin: 20rpx 30rpx;
+		padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 		.answer-nav {
 			flex: 1;
 			display: flex;

@@ -1,20 +1,24 @@
 <template>
-	<view class="bulletin-detail">
-		<view class="bulletin-detail__main-title">
-			<text :decode="true">{{ bulletin.title }}</text>
-		</view>
-		<view class="bulletin-detail__sub-title">
-			<text :decode="true">{{ bulletin.startTime }}</text>
-		</view>
-		<view class="bulletin-detail__content">
-			<text :decode="true">{{ bulletin.content }}</text>
-		</view>
+	<view :style="{ height: scrollHeight + 'px' }" class="bulletin-detail__scroll">
+		<scroll-view scroll-y="true" style="height: 100%">
+			<view class="bulletin-detail">
+				<view class="bulletin-detail__main-title">
+					<text :decode="true">{{ bulletin.title }}</text>
+				</view>
+				<view class="bulletin-detail__sub-title">
+					<text :decode="true">{{ bulletin.startTime }}</text>
+				</view>
+				<view class="bulletin-detail__content">
+					<text :decode="true">{{ bulletin.content }}</text>
+				</view>
+			</view>
+		</scroll-view>
 	</view>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onReady } from '@dcloudio/uni-app';
 import { Bulletin } from '@/ts/bulletin.d';
 import { bulletinGet } from '@/api/bulletin';
 
@@ -26,11 +30,21 @@ const bulletin = reactive<Bulletin>({
 	startTime: '',
 	endTime: ''
 });
+const scrollHeight = ref(0); // 滚动高度
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	bulletin.id = options.id;
 	await bulletinQuery();
+});
+
+onReady(() => {
+	uni.createSelectorQuery()
+		.select('.bulletin-detail__scroll')
+		.boundingClientRect((data: any) => {
+			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 20;
+		})
+		.exec();
 });
 
 /************************事件相关*****************************/
@@ -50,6 +64,7 @@ async function bulletinQuery() {
 	height: inherit;
 	background-color: #fff;
 	padding: 30rpx;
+
 	.bulletin-detail__main-title {
 		font-size: 32rpx;
 		color: #333333;

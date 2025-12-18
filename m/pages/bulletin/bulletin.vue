@@ -94,7 +94,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.bulletin-main__scroll')
 		.boundingClientRect((data: any) => {
-			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 20;
 		})
 		.exec();
 });
@@ -130,9 +130,11 @@ async function toBulletin(bulletin: any) {
 </script>
 <style lang="scss" scoped>
 .bulletin {
+	height: inherit;
 	display: flex;
 	flex-direction: column;
 	padding: 20rpx;
+	
 	.bulletin-head {
 	}
 	.bulletin-main {

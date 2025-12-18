@@ -226,7 +226,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.my-paper__scroll')
 		.boundingClientRect((data: any) => {
-			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 60;
 		})
 		.exec();
 });
@@ -376,6 +376,9 @@ async function finish() {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
+		.question__scroll {
+			margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+		}
 		.my-paper__nav {
 			display: flex;
 			justify-content: space-between;
@@ -532,6 +535,7 @@ async function finish() {
 	.my-paper__foot {
 		display: flex;
 		margin: 20rpx 30rpx;
+		margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 		.answer-nav {
 			flex: 1;
 			display: flex;

@@ -16,37 +16,39 @@
 			<view class="toolbar">
 				<button class="toolbar__type" type="primary">{{ dictStore.getValue('QUESTION_TYPE', question?.type) }}题</button>
 			</view>
-			<xmky-question
-				v-if="question"
-				v-model="question.userAnswers"
-				:type="question?.type"
-				:title="question.title"
-				:img-ids="question.imgFileIds"
-				:video-id="question.videoFileId"
-				:options="question.options"
-				:answers="question.answers"
-				:mark-type="question.markType"
-				:score="question.score"
-				:analysis="question.analysis"
-				:user-score="question?.userScore"
-				:answer-show="toolbars.answerShow"
-				:user-answer-show="false"
-				:analysis-show="toolbars.answerShow"
-				:editable="false"
-			>
-				<template #title-pre>
-					<text>{{ 1 }}、</text>
-				</template>
-				<template #title-post>
-					<text>（{{ question.score }}分）</text>
-				</template>
-			</xmky-question>
+			<scroll-view scroll-y="true" class="question__scroll" :style="{ height: scrollHeight + 'px' }">
+				<xmky-question
+					v-if="question"
+					v-model="question.userAnswers"
+					:type="question?.type"
+					:title="question.title"
+					:img-ids="question.imgFileIds"
+					:video-id="question.videoFileId"
+					:options="question.options"
+					:answers="question.answers"
+					:mark-type="question.markType"
+					:score="question.score"
+					:analysis="question.analysis"
+					:user-score="question?.userScore"
+					:answer-show="toolbars.answerShow"
+					:user-answer-show="false"
+					:analysis-show="toolbars.answerShow"
+					:editable="false"
+				>
+					<template #title-pre>
+						<text>{{ 1 }}、</text>
+					</template>
+					<template #title-post>
+						<text>（{{ question.score }}分）</text>
+					</template>
+				</xmky-question>
+			</scroll-view>
 		</view>
 	</view>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onReady } from '@dcloudio/uni-app';
 import { Question } from '@/ts/question.d';
 import { questionGet } from '@/api/question';
 import { useDictStore } from '@/stores/dict';
@@ -57,11 +59,20 @@ const question = ref<Question>();
 const toolbars = reactive({
 	answerShow: false
 });
+const scrollHeight = ref(0); // 列表沾满剩余空间
 
 /************************组件生命周期相关*********************/
 onLoad(async (options) => {
 	let { data } = await questionGet({ id: options.id });
 	question.value = data;
+});
+onReady(() => {
+	uni.createSelectorQuery()
+		.select('.question__scroll')
+		.boundingClientRect((data: any) => {
+			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top;
+		})
+		.exec();
 });
 </script>
 <style lang="scss" scoped>
@@ -114,6 +125,9 @@ onLoad(async (options) => {
 	.question-view__main {
 		display: flex;
 		flex-direction: column;
+		.question__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+		}
 		.toolbar {
 			display: flex;
 			justify-content: space-between;

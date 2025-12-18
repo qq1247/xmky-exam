@@ -49,7 +49,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.my-user__scroll')
 		.boundingClientRect((data: any) => {
-			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top;
+			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 20;
 		})
 		.exec();
 });
@@ -97,6 +97,9 @@ function toPaper(examId: number, userId: number) {
 		margin-top: 10rpx;
 		overflow: hidden;
 		border-radius: 30rpx 30rpx 30rpx 30rpx;
+		.question__scroll {
+			margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+		}
 		.list {
 			display: flex;
 			border-bottom: 1px solid #dfdfdf;

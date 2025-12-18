@@ -150,6 +150,9 @@ function toView(id: number) {
 		margin-top: 10rpx;
 		overflow: hidden;
 		border-radius: 30rpx 30rpx 30rpx 30rpx;
+		.question__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+		}
 		.list {
 			display: flex;
 			border-bottom: 1px solid #dfdfdf;

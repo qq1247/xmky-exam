@@ -294,7 +294,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.my-read__scroll')
 		.boundingClientRect((data: any) => {
-			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top;
+			scrollHeight.value = uni.getWindowInfo().windowHeight - data.top - 20;
 		})
 		.exec();
 });
@@ -496,11 +496,11 @@ async function claim() {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-
 		margin: 0rpx 20rpx 0rpx 20rpx;
 		box-shadow: 0rpx 10rpx 20rpx 0rpx rgba(0, 0, 0, 0.2);
 		overflow: hidden;
 		border-radius: 30rpx 30rpx 30rpx 30rpx;
+		margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 		.my-read__scroll {
 			.warn {
 				display: flex;

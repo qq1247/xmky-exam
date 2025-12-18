@@ -494,6 +494,7 @@ async function userRegist() {
 		justify-content: center;
 		align-items: flex-end;
 		padding: 20rpx 0rpx;
+		padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 		font-size: 22rpx;
 		color: #888;
 

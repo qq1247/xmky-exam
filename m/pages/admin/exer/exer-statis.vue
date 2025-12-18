@@ -138,7 +138,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.exer-statis__scroll')
 		.boundingClientRect((data: any) => {
-			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 20;
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top;
 		})
 		.exec();
 });
@@ -215,6 +215,9 @@ async function toWrongQuestionChart(tracks: []) {
 	.exer-statis__head {
 	}
 	.exer-statis__main {
+		.exer-statis__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+		}
 		// 小程序没有uni-scroll-view-content
 		// #ifdef H5
 		:deep(.uni-scroll-view-content) {

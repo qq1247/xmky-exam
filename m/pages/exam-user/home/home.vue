@@ -166,7 +166,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.home-foot__scroll')
 		.boundingClientRect((data: any) => {
-			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 60;
 		})
 		.exec();
 });
@@ -407,6 +407,7 @@ function quickNav({ detail: { index } }) {
 		//#endif
 
 		.home-foot__scroll {
+			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
 			.home-foot__opt {
 				flex: 1;
 				display: flex;

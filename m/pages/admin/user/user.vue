@@ -166,7 +166,7 @@ onReady(() => {
 	uni.createSelectorQuery()
 		.select('.user__scroll')
 		.boundingClientRect((data: any) => {
-			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 50;
+			taskListHeight.value = uni.getWindowInfo().windowHeight - data.top - 80;
 		})
 		.exec();
 });
@@ -256,17 +256,15 @@ async function subAdminQuery(append: boolean) {
 	display: flex;
 	flex-direction: column;
 	padding: 20rpx;
-	// #ifdef H5
-	height: calc(100vh - 44px);
-	// #endif
-	// #ifdef MP-WEIXIN
-	height: calc(100vh - 0px);
-	// #endif
+	height: inherit;
 	.user__head {
 	}
 	.user__main {
 		overflow: hidden;
 		border-radius: 30rpx 30rpx 30rpx 30rpx;
+		.user__scroll {
+			margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+		}
 		// 小程序没有uni-scroll-view-content
 		// #ifdef H5
 		:deep(.uni-scroll-view-content) {
