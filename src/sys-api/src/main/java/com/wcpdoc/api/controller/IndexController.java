@@ -2,6 +2,7 @@ package com.wcpdoc.api.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.wcpdoc.core.controller.BaseController;
 
@@ -26,8 +27,18 @@ public class IndexController extends BaseController {
 	 */
 	@GetMapping("/")
 	public String serveIndex(HttpServletRequest request) {
-		boolean isMobile = isMobileDevice(request);
-		return isMobile ? "forward:/m/index.html" : "forward:/h5/index.html";
+		return isMobileDevice(request) ? "forward:/m/index.html" : "forward:/h5/index.html";
+	}
+
+	/**
+	 * 静态资源路由
+	 * 
+	 */
+	@RequestMapping({ "/assets/**", "/img/**", "/static/**", "/uni_modules/**", "/plugins/**", "/config.js",
+			"/favicon.ico" })
+	public String serveStatic(HttpServletRequest request) {
+		String path = request.getRequestURI();
+		return isMobileDevice(request) ? "forward:/m" + path : "forward:/h5" + path;
 	}
 
 	private boolean isMobileDevice(HttpServletRequest request) {

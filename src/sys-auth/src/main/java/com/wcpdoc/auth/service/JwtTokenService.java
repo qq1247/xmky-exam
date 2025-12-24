@@ -3,6 +3,7 @@ package com.wcpdoc.auth.service;
 import java.util.List;
 
 import com.wcpdoc.auth.entity.JwtToken;
+import com.wcpdoc.auth.filter.TokenInvalidException;
 
 /**
  * Jwt令牌服务层接口
@@ -44,16 +45,6 @@ public interface JwtTokenService {
 	String createRefreshToken(String loginName);
 
 	/**
-	 * 校验
-	 * 
-	 * v1.0 zhanghc 2025年11月3日下午11:03:55
-	 * 
-	 * @param token
-	 * @return boolean
-	 */
-	boolean isValid(String token);
-
-	/**
 	 * jwt令牌解析
 	 * 
 	 * v1.0 zhanghc 2025年11月3日下午11:06:59
@@ -61,16 +52,38 @@ public interface JwtTokenService {
 	 * @param token
 	 * @return String
 	 */
-	JwtToken parse(String token);
+	JwtToken parse(String token) throws TokenInvalidException;
 
 	/**
-	 * 加入黑名单（用于登出后不能在访问、强制下线等）
+	 * 加入白名单（用于单设备登录、强制下线等）
 	 * 
 	 * v1.0 zhanghc 2025年11月3日下午11:03:39
 	 * 
 	 * @param loginName
+	 * @param accessToken
+	 * @param refreshToken
 	 * @return String
 	 */
-	void blacklist(String token);
+	void whitelistAdd(String loginName, String accessToken, String refreshToken);
+
+	/**
+	 * 移除白名单
+	 * 
+	 * v1.0 zhanghc 2025年12月23日下午7:34:45
+	 * 
+	 * @param loginName void
+	 */
+	void whitelistDel(String loginName);
+
+	/**
+	 * 是否白名单
+	 * 
+	 * v1.0 zhanghc 2025年12月23日下午4:19:04
+	 * 
+	 * @param loginName
+	 * @param token
+	 * @return boolean
+	 */
+	boolean hasWhitelist(String loginName, String token);
 
 }

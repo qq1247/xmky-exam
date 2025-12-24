@@ -98,8 +98,8 @@ async function dropdownCmd(command: string) {
     }
 
     if (command === 'out') {
-        userStore.reset()
         await http.post('login/out', {})
+        userStore.reset()
         router.push('/login')
         return
     }

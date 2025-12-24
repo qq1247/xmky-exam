@@ -36,7 +36,7 @@ export const useUserStore = defineStore('user', () => {
     }
     return { id, name, avatarFileId, role, accessToken, refreshToken, isAdmin, isExamUser, isSubAdmin, isMarkUser, isTempUser, reset }
 }, {
-    persist: true
+    persist: [{ storage: sessionStorage }]
 })
 
 if (import.meta.hot) {

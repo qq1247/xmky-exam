@@ -3,6 +3,7 @@ package com.wcpdoc.auth.filter;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import com.wcpdoc.auth.entity.UserDetailsImpl;
 import com.wcpdoc.auth.service.JwtTokenService;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.BaseCacheService;
+import com.wcpdoc.core.util.ValidateUtil;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -42,10 +44,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		String token = request.getHeader("Authorization");
-		if (jwtTokenService.isValid(token)) {
+		try {
+			String token = request.getHeader("Authorization");
+			if (!ValidateUtil.isValid(token)) {
+				chain.doFilter(request, response);
+				return;
+			}
+
 			JwtToken jwtToken = jwtTokenService.parse(token);
+			if (!jwtTokenService.hasWhitelist(jwtToken.getLoginName(), token)) {
+				throw new TokenInvalidException("已在其他设备登录，请重新登录");
+			}
+
 			User user = baseCacheService.getUser(jwtToken.getUserId());
+			if (user == null || user.getState() != 1) {
+				throw new TokenInvalidException("账号异常");
+			}
 
 			List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole()));
 			UserDetails userDetails = new UserDetailsImpl(user);
@@ -53,8 +67,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 					authorities);
 			auth.setDetails(new WebAuthenticationDetails(request));
 			SecurityContextHolder.getContext().setAuthentication(auth);
-		}
 
-		chain.doFilter(request, response);
+			chain.doFilter(request, response);
+		} catch (TokenInvalidException e) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			response.setContentType("application/json;charset=UTF-8");
+			response.getWriter().write(String.format("{\"code\":401,\"msg\":\"%s\"}", e.getMessage()));
+		} catch (Exception e) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			response.setContentType("application/json;charset=UTF-8");
+			response.getWriter().write(String.format("{\"code\":401,\"msg\":\"%s\"}", "未知异常"));
+		}
 	}
 }

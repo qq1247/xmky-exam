@@ -85,6 +85,8 @@ instance.interceptors.response.use(
 			uni.showToast({ title: `请求服务器超时：${error.config.timeout / 1000}秒`, icon: 'error' });
 		} else if (error.code === 'ERR_NETWORK') {
 			uni.showToast({ title: `连接服务器失败`, icon: 'error' });
+		} else if (error.errMsg === 'request:fail timeout') {
+			uni.showToast({ title: `连接服务器失败.`, icon: 'error' });
 		} else {
 			uni.showToast({ title: `未知错误：${error}`, icon: 'error' });
 		}

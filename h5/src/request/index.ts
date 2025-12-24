@@ -15,6 +15,16 @@ const http = axios.create({
         return qs.stringify(data, { arrayFormat: 'repeat' })
     }],
 })
+const refreshHttp = axios.create({
+    baseURL: (window as any).domain.url,
+    timeout: 6000,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    transformRequest: [function (data, headers) {
+        if (headers['Content-Type'] === 'application/json') return data
+        if (typeof data === 'string') return data;
+        return qs.stringify(data, { arrayFormat: 'repeat' })
+    }],
+})
 
 // 请求拦截器
 const userStore = useUserStore()
@@ -52,7 +62,7 @@ http.interceptors.response.use(response => {
         if (!userStore.refreshToken) {
             userStore.reset()
             router.replace('/login')
-            ElMessage.error('登录已过期，请重新登录..')
+            // ElMessage.error(`${error.response.data.msg}`)
             return Promise.reject(error)
         }
 
@@ -69,15 +79,15 @@ http.interceptors.response.use(response => {
         isRefreshing = true
 
         try {
-            const response = await http.post(`/login/refresh`, { refreshToken: userStore.refreshToken })
-
-            if (response.data.code !== 200) throw new Error(response.data.msg)
+            const response = await refreshHttp.post(`/login/refresh`, { refreshToken: userStore.refreshToken })
+            if (response.data.code !== 200) throw response.data.msg
 
             userStore.accessToken = response.data.data.accessToken
             onAccessTokenFetched(userStore.accessToken)
             originalRequest.headers.Authorization = userStore.accessToken
             return http(originalRequest)
         } catch (err) {
+            ElMessage.error(`${err}`)
             userStore.reset()
             router.replace('/login')
             return Promise.reject(err)

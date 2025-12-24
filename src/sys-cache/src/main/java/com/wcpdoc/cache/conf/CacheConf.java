@@ -35,8 +35,8 @@ public class CacheConf {
 				caffeineCache("LOGIN_ATTEMPT_CACHE", Duration.ofMinutes(1), true),
 				// 在线用户缓存，用于获取在线用户信息
 				caffeineCache("ONLINE_USER_CACHE", Duration.ofMinutes(15), false),
-				// 令牌黑名单缓存，用于登出和强制下线（保持和刷新令牌的时长一样，比如过期是10分钟，则第11分钟就不在黑名单了，可以再次换取令牌）
-				caffeineCache("TOKEN_BLACKLIST_CACHE", Duration.ofHours(12), true),
+				// 令牌白名单缓存，用于单设备和强制下线（保持和刷新令牌的时长一样，比如过期是10分钟，则第11分钟就不在黑名单了，可以再次换取令牌）
+				caffeineCache("TOKEN_WHITELIST_CACHE", Duration.ofHours(12), true),
 
 				// 防重放缓存：写入后3秒过期
 				caffeineCache("NONCE_CACHE", Duration.ofSeconds(3), true),

@@ -138,7 +138,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 
 	@Override
 	public void avatar(Integer avatarFileId) {
-		userService.avatar(avatarFileId);
+		userService.avatar(getCurUser().getId(), avatarFileId);
 		fileService.upload(avatarFileId);
 	}
 

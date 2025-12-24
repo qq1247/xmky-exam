@@ -153,12 +153,35 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 	@Override
 	@CacheEvict(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id")
-	public void avatar(Integer avatarFileId) {
+	public void pwd(Integer id, String oldPwd, String newPwd) {
+		// 数据校验
+		if (!ValidateUtil.isValid(oldPwd)) {
+			throw new MyException("参数错误：oldPwd");
+		}
+		if (!ValidateUtil.isValid(newPwd)) {
+			throw new MyException("参数错误：newPwd");
+		}
+		User user = baseCacheService.getUser(getCurUser().getId());
+		String oldEncryptPwd = getEncryptPwd(user.getLoginName(), oldPwd);
+		if (!user.getPwd().equals(oldEncryptPwd)) {
+			throw new MyException("原始密码错误");
+		}
+
+		// 修改密码
+		user.setPwd(getEncryptPwd(user.getLoginName(), newPwd));
+		user.setUpdateUserId(getCurUser().getId());
+		user.setUpdateTime(new Date());
+		updateById(user);
+	}
+
+	@Override
+	@CacheEvict(value = BaseConstant.USER_CACHE, key = BaseConstant.USER_KEY_PRE + "#id")
+	public void avatar(Integer id, Integer avatarFileId) {
 		// 数据校验
 		avatarValid(avatarFileId);
 
 		// 头像更新
-		User user = baseCacheService.getUser(getCurUser().getId());
+		User user = baseCacheService.getUser(id);
 		user.setAvatarFileId(avatarFileId);
 		user.setUpdateUserId(getCurUser().getId());
 		user.setUpdateTime(new Date());
@@ -338,5 +361,4 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	public boolean existLoginName(String loginName, Integer excludeId) {
 		return userDao.existLoginName(loginName, excludeId);
 	}
-
 }

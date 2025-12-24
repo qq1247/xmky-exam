@@ -93,10 +93,11 @@ public interface UserService extends BaseService<User> {
 	 * 
 	 * v1.0 zhanghc 2025年12月6日下午10:19:29
 	 * 
+	 * @param id
 	 * @param avatarFileId
 	 * @return PageResult
 	 */
-	void avatar(Integer avatarFileId);
+	void avatar(Integer id, Integer avatarFileId);
 
 	/**
 	 * 获取用户列表
@@ -127,5 +128,7 @@ public interface UserService extends BaseService<User> {
 	 * @return boolean
 	 */
 	boolean existLoginName(String loginName, Integer excludeId);
+
+	void pwd(Integer id, String oldPwd, String newPwd);
 
 }

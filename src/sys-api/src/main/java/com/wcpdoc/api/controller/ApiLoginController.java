@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wcpdoc.auth.entity.JwtToken;
 import com.wcpdoc.auth.entity.OnlineUser;
+import com.wcpdoc.auth.filter.TokenInvalidException;
 import com.wcpdoc.auth.service.JwtTokenService;
 import com.wcpdoc.auth.service.LoginAttemptService;
 import com.wcpdoc.auth.service.NonceService;
@@ -29,6 +30,7 @@ import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.util.InviteCodeUtil;
 import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -121,6 +123,7 @@ public class ApiLoginController extends BaseController {
 					.updateTime(new Date())//
 					.build();
 			onlineUserService.login(onlineUser);
+			jwtTokenService.whitelistAdd(user.getLoginName(), accessToken, refreshToken); // 用于单设备登录
 
 			// 更新用户登录时间
 			user.setLastLoginTime(new Date());
@@ -194,6 +197,7 @@ public class ApiLoginController extends BaseController {
 					.updateTime(new Date())//
 					.build();
 			onlineUserService.login(onlineUser);
+			jwtTokenService.whitelistAdd(user.getLoginName(), accessToken, refreshToken); // 用于单设备登录
 
 			return PageResultEx.ok()//
 					.addAttr("userId", user.getId())//
@@ -221,11 +225,10 @@ public class ApiLoginController extends BaseController {
 	@RequestMapping("/out")
 	public PageResult out() {
 		try {
-			String token = request.getHeader("Authorization");
-			if (jwtTokenService.isValid(token)) {
-				JwtToken jwtToken = jwtTokenService.parse(token);
-				jwtTokenService.blacklist(token);
-				onlineUserService.logout(jwtToken.getLoginName());
+			LoginUser curUser = getCurUser();
+			if (curUser != null) {
+				jwtTokenService.whitelistDel(curUser.getLoginName());
+				onlineUserService.logout(curUser.getLoginName());
 			}
 			return PageResult.ok();
 		} catch (Exception e) {
@@ -246,28 +249,32 @@ public class ApiLoginController extends BaseController {
 	@RequestMapping("/refresh")
 	public PageResult refresh(String refreshToken) {
 		try {
-			if (!jwtTokenService.isValid(refreshToken)) {
-				throw new LoginException("登录已过期，请重新登录.");
+			if (!ValidateUtil.isValid(refreshToken)) {
+				throw new LoginException("刷新令牌为空");
+			}
+			JwtToken jwtToken = jwtTokenService.parse(refreshToken);
+			if (!jwtTokenService.hasWhitelist(jwtToken.getLoginName(), refreshToken)) {
+				throw new TokenInvalidException("已在其他设备登录，请重新登录");
+			}
+			if (ValidateUtil.isValid(jwtToken.getUserId())) {// 刷新令牌没有userId
+				throw new LoginException("刷新令牌无效");
 			}
 
-			JwtToken jwtToken = jwtTokenService.parse(refreshToken);
 			User user = userService.getUser(jwtToken.getLoginName());
-			if (user == null) {
-				throw new LoginException("登录账号不存在");
-			}
-			if (user.getState() == 0) {
-				throw new LoginException("账号已被删除");
-			}
-			if (user.getState() == 2) {
-				throw new LoginException("账号已被冻结");
+			if (user == null || user.getState() != 1) {
+				throw new LoginException("账号异常");
 			}
 
 			String accessToken = jwtTokenService.createAccessToken(user.getLoginName(), List.of(user.getRole()),
 					user.getId(), user.getName());
+			jwtTokenService.whitelistAdd(user.getLoginName(), accessToken, refreshToken);
 			return PageResultEx.ok()//
 					.addAttr("accessToken", accessToken)//
 			;
 		} catch (LoginException e) {
+			log.error("刷新令牌错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (TokenInvalidException e) {
 			log.error("刷新令牌错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
@@ -288,24 +295,7 @@ public class ApiLoginController extends BaseController {
 	@RequestMapping("/pwd")
 	public PageResult pwd(String oldPwd, String newPwd) {
 		try {
-			// 数据校验
-			if (!ValidateUtil.isValid(oldPwd)) {
-				throw new MyException("参数错误：oldPwd");
-			}
-			if (!ValidateUtil.isValid(newPwd)) {
-				throw new MyException("参数错误：newPwd");
-			}
-			User user = baseCacheService.getUser(getCurUser().getId());
-			String oldEncryptPwd = userService.getEncryptPwd(user.getLoginName(), oldPwd);
-			if (!user.getPwd().equals(oldEncryptPwd)) {
-				throw new MyException("原始密码错误");
-			}
-
-			// 修改密码
-			user.setPwd(userService.getEncryptPwd(user.getLoginName(), newPwd));
-			user.setUpdateUserId(getCurUser().getId());
-			user.setUpdateTime(new Date());
-			userService.updateById(user);
+			userService.pwd(getCurUser().getId(), oldPwd, newPwd);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("密码修改错误：{}", e.getMessage());
@@ -315,7 +305,7 @@ public class ApiLoginController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 登录头像
 	 * 

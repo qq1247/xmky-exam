@@ -13,12 +13,14 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import com.wcpdoc.auth.entity.JwtToken;
+import com.wcpdoc.auth.filter.TokenInvalidException;
 import com.wcpdoc.auth.service.JwtTokenService;
 import com.wcpdoc.base.constant.BaseConstant;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 	private static final File SECRET_FILE = new File(
 			String.format(".%sconfig%sjwtSecret.txt", File.separator, File.separator));
 	private static SecretKey SECRET_KEY = null;
-	private static final long ACCESS_TOKEN_EXPIRE = 10 * 60 * 1000; // 访问令牌10分钟过期
+	private static final long ACCESS_TOKEN_EXPIRE = 10 * 1000; // 访问令牌10分钟过期
 	private static final long REFRESH_TOKEN_EXPIRE = 12 * 60 * 60 * 1000; // 刷新令牌12小时过期
 	private final CacheManager cacheManager;
 
@@ -85,40 +87,37 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 		return refreshToken;
 	}
 
-	@Override
-	public boolean isValid(String token) {
-		try {
-			if (!ValidateUtil.isValid(token)) {
-				return false;
-			}
-
-			Cache cache = cacheManager.getCache(BaseConstant.TOKEN_BLACKLIST_CACHE);
-			Long timestamp = cache.get(token, Long.class);
-			if (ValidateUtil.isValid(timestamp)) {
-				return false;
-			}
-
-			Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public JwtToken parse(String token) {
-		Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+	public JwtToken parse(String token) throws TokenInvalidException {
+		Claims claims = null;
+		try {
+			claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+		} catch (ExpiredJwtException e) {
+			throw new TokenInvalidException("登录已过期，请重新登录.");
+		} catch (Exception e) {
+			throw new TokenInvalidException("登录信息无效，请重新登录");
+		}
 		return JwtToken.builder().userId(claims.get("userId", Integer.class)).LoginName(claims.getSubject())
 				.roles(claims.get("roles", List.class)).build();
 	}
 
 	@Override
-	public void blacklist(String token) {
-		if (!isValid(token)) {
-			return;
-		}
-		Cache cache = cacheManager.getCache(BaseConstant.TOKEN_BLACKLIST_CACHE);
-		cache.put(token, System.currentTimeMillis());
+	public void whitelistAdd(String loginName, String accessToken, String refreshToken) {
+		Cache cache = cacheManager.getCache(BaseConstant.TOKEN_WHITELIST_CACHE);
+		cache.put(loginName, String.format("%s|%s", accessToken, refreshToken));
+	}
+
+	@Override
+	public boolean hasWhitelist(String loginName, String token) {// api/refresh接口会调用whitelistAdd使缓存重新计时，但是没关系，token本身也有失效时间
+		Cache cache = cacheManager.getCache(BaseConstant.TOKEN_WHITELIST_CACHE);
+		String cacheToken = cache.get(loginName, String.class);
+		return ValidateUtil.isValid(cacheToken) && cacheToken.contains(token);
+	}
+
+	@Override
+	public void whitelistDel(String loginName) {
+		Cache cache = cacheManager.getCache(BaseConstant.TOKEN_WHITELIST_CACHE);
+		cache.evict(loginName);
 	}
 }

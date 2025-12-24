@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -52,15 +53,16 @@ public class AuthConf {
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 禁用httpSession
 
 		http.authorizeHttpRequests(authz -> authz // 权限规则配置
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				// ========== 匿名访问 ==========
 				.requestMatchers(//
 						"/api/login/**", //
 						"/api/file/download", //
-						"/api/exam/exam-get" //
+						"/api/exam/exam-get", //
+						"/api/plugin/**" //
 				).permitAll()
 				// ========== 登录访问，不限角色 ==========
 				.requestMatchers(//
-						"/api/plugin/**", //
 						"/api/file/upload", //
 						"/api/dict/index-list", //
 						"/api/bulletin/listpage", //
@@ -102,7 +104,8 @@ public class AuthConf {
 				// ========== 管理员 ==========
 				.requestMatchers("/api/**")//
 				.hasRole("ADMIN")//
-				.anyRequest().authenticated());
+				.anyRequest()//
+				.permitAll());
 
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // 提前通过jwt完成用户认证
 		http.addFilterBefore(onlineUserFilter, UsernamePasswordAuthenticationFilter.class); // 记录在线用户

@@ -10,7 +10,7 @@ export const useParmStore = defineStore('parm', () => {
     const userRegist = ref(2) // 用户注册
     return { sysName, customTitle, customContent, icp, userRegist }
 }, {
-    persist: true
+    persist: [{ storage: sessionStorage }]
 })
 
 if (import.meta.hot) {

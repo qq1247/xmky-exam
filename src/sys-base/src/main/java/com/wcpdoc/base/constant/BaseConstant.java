@@ -9,7 +9,7 @@ public class BaseConstant {
 
 	public static final String LOGIN_ATTEMPT_CACHE = "LOGIN_ATTEMPT_CACHE";
 	public static final String ONLINE_USER_CACHE = "ONLINE_USER_CACHE";
-	public static final String TOKEN_BLACKLIST_CACHE = "TOKEN_BLACKLIST_CACHE";
+	public static final String TOKEN_WHITELIST_CACHE = "TOKEN_WHITELIST_CACHE";
 	
 	public static final String ADMIN = "ADMIN";
 	public static final String SUB_ADMIN = "SUB_ADMIN";
@@ -17,10 +17,6 @@ public class BaseConstant {
 	public static final String MARK_USER = "MARK_USER";
 	public static final String TEMP_USER = "TEMP_USER";
 	
-	
-	
-	
-
 	public static final String USER_CACHE = "USER_CACHE";
 	public static final String ORG_CACHE = "ORG_CACHE";
 	public static final String PARM_CACHE = "PARM_CACHE";

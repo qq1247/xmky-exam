@@ -36,5 +36,5 @@
 		<appender-ref ref="FILE" />
 	</root>
 
-	<logger name="p6spy" level="INFO" />
+	<logger name="p6spy" level="ERROR" />
 </configuration>

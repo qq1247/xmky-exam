@@ -15,11 +15,9 @@ export const useDictStore = defineStore('dict', () => {
     return { dicts, getValue, getList }
 },
     {
-        persist: true,
+        persist: [{ storage: sessionStorage }]
     },
 )
-
-
 
 if (import.meta.hot) {
     import.meta.hot.accept(acceptHMRUpdate(useDictStore, import.meta.hot))
