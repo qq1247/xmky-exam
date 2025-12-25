@@ -279,14 +279,14 @@ async function login() {
 		const pemKey = `-----BEGIN PUBLIC KEY-----\n${lines.join('\n')}\n-----END PUBLIC KEY-----`;
 		const publicKey = forge.pki.publicKeyFromPem(pemKey);
 
-		const encryptedBytes = publicKey.encrypt(forge.util.encodeUtf8(`${_encrypt.nonce}:${form.pwd}`), 'RSAES-PKCS1-V1_5');
+		const encryptedBytes = publicKey.encrypt(forge.util.encodeUtf8(`${_encrypt.nonce}\n${form.pwd}`), 'RSAES-PKCS1-V1_5');
 		encryptedPwd = forge.util.encode64(encryptedBytes);
 		// #endif
 
 		// #ifdef MP-WEIXIN
 		const rsa = new WxmpRsa();
 		rsa.setPublicKey(_encrypt.publicKey);
-		encryptedPwd = rsa.encryptLong(`${_encrypt.nonce}:${form.pwd}`);
+		encryptedPwd = rsa.encryptLong(`${_encrypt.nonce}\n${form.pwd}`);
 		// #endif
 	} catch (error) {
 		uni.showToast({ title: '生成秘钥失败', icon: 'error' });

@@ -262,7 +262,7 @@ async function login() {
     }
     const encrypt = new JSEncrypt();
     encrypt.setPublicKey(_encrypt.publicKey);
-    const encryptedPwd = encrypt.encrypt(`${_encrypt.nonce}:${form.pwd}`);
+    const encryptedPwd = encrypt.encrypt(`${_encrypt.nonce}\n${form.pwd}`);
     if (!encryptedPwd) {
         ElMessage.warning('生成秘钥失败')
         return

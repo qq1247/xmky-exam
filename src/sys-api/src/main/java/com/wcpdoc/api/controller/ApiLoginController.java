@@ -88,7 +88,7 @@ public class ApiLoginController extends BaseController {
 				throw new MyException("账号已被锁定，请1分钟后重试");
 			}
 			String decryptText = RsaUtil.decrypt(pwd);
-			String[] plainTexts = decryptText.split(":"); // loginName:nonce:pwd
+			String[] plainTexts = decryptText.split("\n"); // loginName:nonce:pwd
 			if (plainTexts.length != 3) {
 				throw new MyException("数据格式错误");
 			}
@@ -96,7 +96,7 @@ public class ApiLoginController extends BaseController {
 				throw new MyException("数据格式错误");
 			}
 
-			nonceService.consumeNonce(String.format("%s:%s", plainTexts[0], plainTexts[1]));
+			nonceService.consumeNonce(String.format("%s\n%s", plainTexts[0], plainTexts[1]));
 
 			User user = userService.getUser(loginName);
 			if (user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, plainTexts[2]))) {

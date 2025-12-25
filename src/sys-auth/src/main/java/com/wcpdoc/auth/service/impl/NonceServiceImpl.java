@@ -24,7 +24,7 @@ public class NonceServiceImpl implements NonceService {
 
 	@Override
 	public String generateNonce(String loginName) {
-		String nonce = String.format("%s:%s", loginName, UUID.randomUUID().toString());
+		String nonce = String.format("%s\n%s", loginName, UUID.randomUUID().toString());
 		Cache cache = cacheManager.getCache(BaseConstant.NONCE_CACHE);
 		cache.put(nonce, System.currentTimeMillis());
 		return nonce;
