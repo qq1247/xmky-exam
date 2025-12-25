@@ -234,7 +234,7 @@ function quickNav({ detail: { index } }) {
 	}
 	if (index === 2) {
 		uni.navigateTo({
-			url: '/pages/center/center'
+			url: '/pages/exam-user/profile/profile'
 		});
 		return;
 	}

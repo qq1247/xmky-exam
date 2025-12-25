@@ -604,6 +604,10 @@ async function toExer() {
 								font-size: 26rpx;
 								color: #333333;
 								line-height: 48rpx;
+								max-width: 160rpx; /* 最大宽度 100rpx */
+								white-space: nowrap; /* 禁止换行 */
+								overflow: hidden; /* 隐藏溢出 */
+								text-overflow: ellipsis; /* 溢出显示省略号 */
 							}
 						}
 					}

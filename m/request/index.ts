@@ -7,12 +7,26 @@ const instance = ajax.create({
 	timeout: 6000
 });
 
+const refreshInstance = ajax.create({
+	baseURL: uni.getStorageSync('BASE_URL'),
+	timeout: 6000
+});
+
 // 添加请求拦截器
 instance.interceptors.request.use(
 	(config) => {
 		if (userStore.accessToken) {
 			config.header['Authorization'] = userStore.accessToken;
 		}
+		config.header['content-type'] = 'application/x-www-form-urlencoded';
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
+refreshInstance.interceptors.request.use(
+	(config) => {
 		config.header['content-type'] = 'application/x-www-form-urlencoded';
 		return config;
 	},
@@ -44,11 +58,12 @@ instance.interceptors.response.use(
 			if (!userStore.refreshToken) {
 				userStore.reset();
 				uni.redirectTo({ url: '/pages/login/login' });
-				uni.showToast({ title: '登录已过期，请重新登录..', icon: 'error' });
+				// uni.showToast({ title: '登录已过期，请重新登录..', icon: 'error' });
 				return Promise.reject(error);
 			}
 
 			if (isRefreshing) {
+				console.log('正在调用刷新接口，缓存当前请求', originalRequest)
 				return new Promise((resolve) => {
 					addRefreshSubscriber((accessToken: string) => {
 						originalRequest.header['Authorization'] = accessToken;
@@ -61,18 +76,20 @@ instance.interceptors.response.use(
 			isRefreshing = true;
 
 			try {
-				const response = await instance.post(`/login/refresh`, { refreshToken: userStore.refreshToken });
-
-				if (response.code !== 200) throw new Error(response.msg);
-
-				userStore.accessToken = response.data.accessToken;
+				const response = await refreshInstance.post(`/login/refresh`, { refreshToken: userStore.refreshToken });
+				console.log('调用刷新接口，', response)
+				if (response.data.code !== 200) throw response.data.msg;
+				
+				console.log('令牌已更新，回调缓存请求', response)
+				userStore.accessToken = response.data.data.accessToken;
 				onAccessTokenFetched(userStore.accessToken);
 				originalRequest.header['Authorization'] = userStore.accessToken;
 				return instance(originalRequest);
 			} catch (err) {
+				console.log('未知异常', err)
+				uni.showToast({ title: `${err}`, icon: 'error' });
 				userStore.reset();
 				uni.redirectTo({ url: '/pages/login/login' });
-				uni.showToast({ title: `刷新令牌失败：${err || ''}`, icon: 'error' });
 				return Promise.reject(err);
 			} finally {
 				isRefreshing = false;

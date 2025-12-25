@@ -25,7 +25,7 @@
 							</view>
 							<view class="myread-user-content__inner">
 								<text class="myread-exam__label">机构：</text>
-								<text class="myread-exam__value">{{ user.orgName || '-' }}</text>
+								<text class="myread-exam__value myread-exam__value--ellipsis">{{ user.orgName || '-' }}</text>
 							</view>
 						</view>
 					</view>
@@ -503,6 +503,12 @@ async function toRetake() {
 								font-size: 26rpx;
 								color: #333333;
 								line-height: 48rpx;
+							}
+							.myread-exam__value--ellipsis {
+								max-width: 160rpx; /* 最大宽度 100rpx */
+								white-space: nowrap; /* 禁止换行 */
+								overflow: hidden; /* 隐藏溢出 */
+								text-overflow: ellipsis; /* 溢出显示省略号 */
 							}
 						}
 					}

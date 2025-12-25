@@ -136,6 +136,8 @@ async function out() {
 async function upload(e) {
 	const file = e.tempFiles[0];
 	if (!file) return;
+	
+	await loginSysTime(); // bug修复，上传时访问令牌正好过期，调用不了刷新令牌
 	uni.uploadFile({
 		url: `${host.value}/file/upload`,
 		filePath: file.path,

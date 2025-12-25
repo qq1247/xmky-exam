@@ -22,7 +22,8 @@
                 </el-form>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="userStore.isAdmin() || userStore.id == shareForm.createUserId" title="共享权限" desc="共享权限">
+        <xmks-edit-card v-if="shareForm.id && (userStore.isAdmin() || userStore.id == shareForm.createUserId)"
+            title="共享权限" desc="共享权限">
             <template #card-main>
                 <el-form ref="shareFormRef" :model="shareForm" :rules="shareFormRules" label-width="100" size="large"
                     class="form">

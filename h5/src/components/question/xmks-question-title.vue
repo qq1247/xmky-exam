@@ -88,7 +88,7 @@ const answers = computed(() => { // 标准答案
 })
 
 const titles = computed(() => {// 题干
-    const titile = props.title.replaceAll('\n', '<br/>')
+    const titile = props.title
     const titleWithHeight = titile.replace(/```([a-z]*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
         const highlighted = Prism.highlight(
             escape2Html(code.trim()),// 没有注入风险，插件把特殊符号拆分了。如alert(1) 变为 <span class="token function">alert</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
@@ -165,6 +165,7 @@ watch(titles, () => {
     color: #303133;
     line-height: 28px;
     word-break: break-all;
+    white-space: pre-wrap; // 题干允许换行显示
 
     :deep(.fillblank) {
         .el-input__wrapper {

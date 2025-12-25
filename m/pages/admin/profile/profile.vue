@@ -70,6 +70,7 @@ import { onShow, onReady } from '@dcloudio/uni-app';
 import { useUserStore } from '@/stores/user';
 import { loginAvatar, loginOut } from '@/api/login';
 import { useTabbarStore } from '@/stores/tabbar';
+import { loginSysTime } from '@/api/login';
 
 /************************变量定义相关***********************/
 const tabbarStore = useTabbarStore();
@@ -105,6 +106,8 @@ onReady(() => {
 async function upload(e) {
 	const file = e.tempFiles[0];
 	if (!file) return;
+
+	await loginSysTime(); // bug修复，上传时访问令牌正好过期，调用不了刷新令牌
 	uni.uploadFile({
 		url: `${host.value}/file/upload`,
 		filePath: file.path,
