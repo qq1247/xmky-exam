@@ -42,6 +42,7 @@ import { onMounted, } from 'vue'
 import type { NavLink } from '@/ts/nav/nav'
 import { useRouter } from 'vue-router'
 import http from '@/request'
+import { loginOut } from '@/api/login'
 
 /************************变量定义相关***********************/
 
@@ -65,7 +66,7 @@ onMounted(async () => {
 async function dropdownCmd(command: string) {
     if (command === 'out') {
         userStore.reset()
-        await http.post('login/out', {})
+        await loginOut({})
         router.push('/login')
         return
     }

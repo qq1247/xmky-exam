@@ -1,4 +1,5 @@
 import request from '@/request'
+import type { AxiosRequestConfig } from 'axios';
 
 export function examListpage(parm: object) {
     return request.post('/exam/listpage', parm);
@@ -18,8 +19,8 @@ export function examGet(parm: object) {
 export function examCopy(parm: object) {
     return request.post('/exam/copy', parm);
 }
-export function examPublish(parm: object) {
-    return request.post('/exam/publish', parm);
+export function examPublish(data?: object | undefined, config?: AxiosRequestConfig<object> | undefined) {
+    return request.post('/exam/publish', data, config);
 }
 export function examPause(parm: object) {
     return request.post('/exam/pause', parm);

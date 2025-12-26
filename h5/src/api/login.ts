@@ -24,3 +24,6 @@ export function loginUserRegist(parm: object) {
 export function loginAvatar(parm: object) {
     return request.post('/login/avatar', parm);
 }
+export function loginOut(parm: object) {
+    return request.post('/login/out', parm);
+}

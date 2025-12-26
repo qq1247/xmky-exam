@@ -1,4 +1,5 @@
 import request from '@/request'
+import type { AxiosRequestConfig } from 'axios';
 
 export function userListpage(parm: object) {
     return request.post('/user/listpage', parm);
@@ -20,6 +21,12 @@ export function userFrozen(parm: object) {
 }
 export function userPwdInit(parm: object) {
     return request.post('/user/pwd-init', parm);
+}
+export function userImport(parm: object) {
+    return request.post('user/import', parm);
+}
+export function userTemplate(data?: any, config?: AxiosRequestConfig<any> | undefined) {
+    return request.post('user/template', data, config);
 }
 
 

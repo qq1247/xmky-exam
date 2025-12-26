@@ -63,6 +63,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useParmStore } from '@/stores/parm'
 import { computed, onMounted } from 'vue'
+import { loginOut } from '@/api/login'
 
 /************************变量定义相关***********************/
 const router = useRouter() // 路由
@@ -98,7 +99,7 @@ async function dropdownCmd(command: string) {
     }
 
     if (command === 'out') {
-        await http.post('login/out', {})
+        await loginOut({})
         userStore.reset()
         router.push('/login')
         return

@@ -12,8 +12,7 @@
                     <span class="iconfont icon-xiazaimoban opt__btn-icon"></span>
                     <span class="opt__btn-txt">模板下载</span>
                 </el-button>
-                <el-upload v-if="userStore.isAdmin()" :action="`${http.defaults.baseURL}file/upload`"
-                    :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
+                <el-upload v-if="userStore.isAdmin()" :http-request="customUpload" :show-file-list="false"
                     :before-upload="uploadBefore" :on-success="uploadSuccess">
                     <el-button type="success" class="opt__btn opt__btn--secondary">
                         <span class="iconfont icon-daoru opt__btn-icon"></span>
@@ -76,11 +75,12 @@
 <script setup lang="ts">
 import { reactive, onMounted, } from 'vue'
 import type { Listpage } from '@/ts/common/listpage'
-import { userListpage } from '@/api/base/user'
+import { userImport, userListpage, userTemplate } from '@/api/base/user'
 import http from "@/request"
 import { useDictStore } from '@/stores/dict'
 import { useUserStore } from '@/stores/user'
-import { ElMessage, type UploadFile, type UploadFiles, type UploadRawFile } from 'element-plus'
+import { ElMessage, type UploadFile, type UploadFiles, type UploadRawFile, type UploadRequestOptions } from 'element-plus'
+import { fileUpload } from '@/api/sys/file'
 
 /************************变量定义相关***********************/
 const userStore = useUserStore()// 用户缓存
@@ -122,7 +122,7 @@ async function query() {
 
 // 下载模板
 async function download() {
-    const data = await http.post('user/template', {}, { responseType: 'blob' })
+    const data = await userTemplate({}, { responseType: 'blob' })
     const blob = new Blob([data.data]);
     const aEle = document.createElement('a');
     aEle.download = '用户模板.xlsx'
@@ -130,6 +130,20 @@ async function download() {
     aEle.href = URL.createObjectURL(blob);
     aEle.click();
     URL.revokeObjectURL(aEle.href);
+}
+
+// 上传
+async function customUpload(options: UploadRequestOptions) {
+    const { file } = options
+    const formData = new FormData()
+    formData.append('files', file)
+    const response = await fileUpload(formData)
+
+    if (response.data.code === 200) {
+        return response.data
+    }
+
+    throw new Error(response.data.msg);
 }
 
 // 上传之前处理
@@ -147,8 +161,8 @@ function uploadBefore(rawFile: UploadRawFile) {
 }
 
 // 上传成功处理
-async function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) {
-    await http.post('user/import', { fileId: response.data.fileIds })
+async function uploadSuccess(response: any) {
+    await userImport({ fileId: response.data.fileIds })
 
     query()
 }

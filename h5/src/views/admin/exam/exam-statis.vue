@@ -167,10 +167,9 @@ import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { BarChart } from 'echarts/charts';
 import { GridComponent } from 'echarts/components';
-import { reportExamRankListpage, reportExamStatis } from '@/api/report/report'
+import { reportExamRankListpage, reportExamStatis, reportPaperExportPdf, reportRankExportPdf } from '@/api/report/report'
 import { diff } from '@/util/timeUtil'
 import type { Listpage } from '@/ts/common/listpage'
-import http from "@/request"
 import { ElMessage } from 'element-plus'
 
 /************************变量定义相关***********************/
@@ -388,7 +387,7 @@ async function examRankExport() {
     let objectUrl = null;
     try {
         ElMessage.info('正在生成PDF，请稍后...')
-        const data = await http.post('report/rank/export-pdf', { examId: examRankForm.examId, userName: examRankForm.userName, orgName: examRankForm.orgName }, { responseType: 'blob' })
+        const data = await reportRankExportPdf({ examId: examRankForm.examId, userName: examRankForm.userName, orgName: examRankForm.orgName }, { responseType: 'blob' })
         objectUrl = URL.createObjectURL(data.data)
 
         const downloadLink = document.createElement('a');
@@ -422,7 +421,7 @@ async function toPDF(examId: number, userId: number) {
     let objectUrl = null;
     try {
         ElMessage.info('正在生成PDF，请稍后...')
-        const data = await http.post('report/paper/export-pdf', { examId, userId }, { responseType: 'blob' })
+        const data = await reportPaperExportPdf({ examId, userId }, { responseType: 'blob' })
         objectUrl = URL.createObjectURL(data.data)
 
         const downloadLink = document.createElement('a');

@@ -20,9 +20,9 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { progressBarGet } from '@/api/sys/progress-bar'
-import http from '@/request'
 import { useExamStore } from '@/stores/exam'
 import { useRouter } from 'vue-router'
+import { examPublish } from '@/api/exam/exam'
 
 /************************变量定义相关***********************/
 const router = useRouter()// 路由
@@ -46,7 +46,7 @@ async function publish() {
     progressBar.title = '正在发布考试...'
     progressBar.msg = ''
 
-    const { data: { code, data: processBarId } } = await http.post("exam/publish", JSON.stringify({
+    const { data: { code, data: processBarId } } = await examPublish({
         id: form.id,
         name: form.name,
         paperName: form.paperName,
@@ -72,7 +72,7 @@ async function publish() {
         markStartTime: form.markType === 2 ? form?.markTimes[0] : '',
         markEndTime: form.markType === 2 ? form?.markTimes[1] : '',
         retakeNum: form.markType === 1 ? form.retakeNum : 0, // 主观题试卷没有补考
-    }),
+    },
         { headers: { 'Content-Type': 'application/json' } }
     )
 

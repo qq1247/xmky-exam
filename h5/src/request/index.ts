@@ -10,8 +10,17 @@ const http = axios.create({
     timeout: 6000,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [function (data, headers) {
-        if (headers['Content-Type'] === 'application/json') return data
-        if (typeof data === 'string') return data;
+        if (data instanceof FormData) {
+            delete headers['Content-Type']
+            return data
+        }
+
+        if (headers['Content-Type'] === 'application/json') {
+            return data
+        }
+        if (typeof data === 'string') {
+            return data;
+        }
         return qs.stringify(data, { arrayFormat: 'repeat' })
     }],
 })
@@ -19,9 +28,7 @@ const refreshHttp = axios.create({
     baseURL: (window as any).domain.url,
     timeout: 6000,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    transformRequest: [function (data, headers) {
-        if (headers['Content-Type'] === 'application/json') return data
-        if (typeof data === 'string') return data;
+    transformRequest: [function (data) {
         return qs.stringify(data, { arrayFormat: 'repeat' })
     }],
 })
