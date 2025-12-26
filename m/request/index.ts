@@ -63,7 +63,6 @@ instance.interceptors.response.use(
 			}
 
 			if (isRefreshing) {
-				console.log('正在调用刷新接口，缓存当前请求', originalRequest)
 				return new Promise((resolve) => {
 					addRefreshSubscriber((accessToken: string) => {
 						originalRequest.header['Authorization'] = accessToken;
@@ -77,10 +76,8 @@ instance.interceptors.response.use(
 
 			try {
 				const response = await refreshInstance.post(`/login/refresh`, { refreshToken: userStore.refreshToken });
-				console.log('调用刷新接口，', response)
 				if (response.data.code !== 200) throw response.data.msg;
 				
-				console.log('令牌已更新，回调缓存请求', response)
 				userStore.accessToken = response.data.data.accessToken;
 				onAccessTokenFetched(userStore.accessToken);
 				originalRequest.header['Authorization'] = userStore.accessToken;

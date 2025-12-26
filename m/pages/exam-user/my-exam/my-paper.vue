@@ -207,17 +207,23 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed } from 'vue';
-import { onLoad, onReady } from '@dcloudio/uni-app';
+import { onLoad, onReady, onHide, onBackPress } from '@dcloudio/uni-app';
 import { useDictStore } from '@/stores/dict';
 import { MyExam } from '@/ts/myExam.d';
 import { Exam } from '@/ts/exam.d';
 import { ExamQuestion } from '@/ts/paper.d';
-import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish } from '@/api/my-exam';
+import { myExamGet, myExamExamGet, myExamPaper, myExamAnswer, myExamFinish, myExamSxe } from '@/api/my-exam';
 import { loginSysTime } from '@/api/login';
 import { toChinaNum } from '@/util/numberUtil';
 import { useUserStore } from '@/stores/user';
 
 /************************变量定义相关***********************/
+const props = defineProps({
+	examId: {
+		type: [String, Number]
+	}
+});
+
 const dictStore = useDictStore();
 const userStore = useUserStore();
 const questionHeight = ref(0); // 试题滚动高度
@@ -289,6 +295,12 @@ onReady(() => {
 			questionHeight.value = uni.getWindowInfo().windowHeight - data.top - 70;
 		})
 		.exec();
+});
+
+onHide(() => {
+	if (myExam.state === 2 && exam.sxes.includes(3)) {
+		sxes('移动端切屏离开');
+	}
 });
 
 /************************计算属性相关*************************/
@@ -597,7 +609,16 @@ function uploadVideo(examQuestion: ExamQuestion) {
 	});
 }
 
-function pre() {}
+// 防作弊
+async function sxes(content: string) {
+	uni.showToast({ title: '禁止考试中切屏，请继续答题', icon: 'error' });
+
+	const { data } = await myExamSxe({ examId: exam.id, type: 3, content });
+	if (data) {
+		uni.showToast({ title: '多次检测到作弊，强制交卷', icon: 'error' });
+		toHome();
+	}
+}
 </script>
 
 <style lang="scss" scoped>
@@ -606,14 +627,17 @@ function pre() {}
 	background-color: white;
 	display: flex;
 	flex-direction: column;
+
 	.mypaper-head {
 		.mypaper-head__time {
 			padding: 40rpx 20rpx 15rpx 20rpx;
+
 			.mypaper-head__time-count-down {
 				font-size: 30rpx;
 				color: #8f939c;
 			}
 		}
+
 		:deep(.mypaper-head__time-progress) {
 			.uni-progress-inner-bar {
 				height: 4rpx;
@@ -621,15 +645,18 @@ function pre() {}
 			}
 		}
 	}
+
 	.mypaper-main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
+
 		.mypaper-main__nav {
 			display: flex;
 			justify-content: space-between;
 			margin: 40rpx 30rpx 20rpx 30rpx;
 			align-items: center;
+
 			.mypaper-main__nav-type {
 				width: 154rpx;
 				height: 54rpx;
@@ -639,44 +666,54 @@ function pre() {}
 				border-radius: 50px;
 				background: linear-gradient(to right, rgba(4, 183, 242, 0.15) 0%, rgba(0, 125, 252, 0.15) 100%);
 				margin: initial;
+
 				&::after {
 					border-radius: initial;
 					border: initial;
 				}
 			}
 		}
+
 		.mypaper-main__scroll {
 			padding: 0rpx 30rpx;
 			padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+
 			.mypaper-main__question-cur-no {
 				font-size: 34rpx;
 				color: #0d9df6;
 			}
+
 			// #ifdef MP-WEIXIN
 			:deep(swiper) {
 				height: 100%;
+
 				swiper-item {
 					& > view {
 						height: 100%;
 					}
 				}
 			}
+
 			// #endif
 			.user-files {
 				display: flex;
 				justify-content: left;
 				align-items: flex-end;
 				margin-top: 10rpx;
+
 				.img-group {
 					display: flex;
 					flex-direction: column;
+
 					.img-group__inner {
 						display: flex;
 					}
+
 					.img {
 						display: flex;
 						flex-direction: column;
 						align-items: center;
+
 						.img__inner {
 							display: inline-block;
 							height: 180rpx;
@@ -686,18 +723,22 @@ function pre() {}
 							border-radius: 6rpx;
 							margin-left: 10rpx;
 						}
+
 						.img__txt {
 							font-size: 24rpx;
 							color: #000000;
 						}
+
 						.img__icon {
 							margin-left: 10rpx;
 						}
 					}
+
 					.upload-btn {
 						display: flex;
 						flex-direction: column;
 						margin-top: 10rpx;
+
 						.upload-btn__icon {
 							width: 48rpx;
 							height: 48rpx;
@@ -708,38 +749,47 @@ function pre() {}
 							text-align: center;
 							// #endif
 						}
+
 						.upload-btn__txt {
 							font-size: 22rpx;
 							color: #000000;
 						}
 					}
 				}
+
 				.video-group {
 					display: flex;
 					flex-direction: column;
 					margin-left: 20rpx;
+
 					.video-group__inner {
 					}
+
 					.video {
 						display: flex;
 						flex-direction: column;
 						align-items: center;
+
 						.video__inner {
 							width: 240rpx;
 							height: 180rpx;
 						}
+
 						.video__txt {
 							font-size: 24rpx;
 							color: #000000;
 						}
+
 						.video__icon {
 							margin-left: 10rpx;
 						}
 					}
+
 					.upload-btn {
 						display: flex;
 						flex-direction: column;
 						margin-top: 10rpx;
+
 						.upload-btn__icon {
 							width: 48rpx;
 							height: 48rpx;
@@ -750,6 +800,7 @@ function pre() {}
 							text-align: center;
 							// #endif
 						}
+
 						.upload-btn__txt {
 							font-size: 22rpx;
 							color: #000000;
@@ -758,17 +809,20 @@ function pre() {}
 					}
 				}
 			}
+
 			.question-qa-answer {
 				margin-top: 20rpx;
 				padding: 20rpx;
 				background: #f6f7fc;
 				border-radius: 10rpx;
+
 				.question-qa-answer__label {
 					margin-top: 20rpx;
 					font-weight: bold;
 					font-size: 30rpx;
 					color: #999999;
 				}
+
 				.question-qa-answer__content {
 					display: inline-block;
 					margin-top: 20rpx;
@@ -777,42 +831,51 @@ function pre() {}
 			}
 		}
 	}
+
 	.mypaper-foot {
 		display: flex;
 		margin: 20rpx 30rpx;
 		padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+
 		.answer-nav {
 			flex: 1;
 			display: flex;
 			align-items: center;
+
 			.answer-nav__icon {
 				background-clip: text;
 				color: transparent;
 				background-image: linear-gradient(0deg, #259ff8, #04c7f2);
 			}
+
 			.answer-nav__outer {
 				display: flex;
 				flex-direction: column;
 				margin-left: 10rpx;
+
 				.answer-nav__inner {
 					display: flex;
 					justify-content: center;
 					line-height: 20rpx;
+
 					.answer-nav__cur {
 						font-size: 24rpx;
 						color: #0d9df6;
 					}
+
 					.answer-nav__total {
 						font-size: 24rpx;
 						color: #303133;
 					}
 				}
+
 				.answer-nav__text {
 					font-size: 24rpx;
 					color: #8f939c;
 				}
 			}
 		}
+
 		.mypaper-foot__pre-question {
 			width: 160rpx;
 			height: 66rpx;
@@ -823,10 +886,12 @@ function pre() {}
 			margin: 0rpx 0rpx 0rpx 20rpx;
 			background-color: white;
 			border: 1rpx solid #04c7f2;
+
 			&::after {
 				border: 0rpx;
 			}
 		}
+
 		.mypaper-foot__next-question {
 			width: 160rpx;
 			height: 66rpx;
@@ -837,10 +902,12 @@ function pre() {}
 			margin: 0rpx 0rpx 0rpx 20rpx;
 			background-color: white;
 			border: 1rpx solid #04c7f2;
+
 			&::after {
 				border: 0rpx;
 			}
 		}
+
 		.mypaper-foot__finish {
 			width: 160rpx;
 			height: 66rpx;
@@ -850,16 +917,19 @@ function pre() {}
 			border-radius: 33rpx;
 			background: linear-gradient(to right, #04c7f2 0%, #259ff8 100%);
 			margin: 0rpx 0rpx 0rpx 20rpx;
+
 			&::after {
 				border: 0rpx;
 			}
 		}
+
 		.answer-sheet {
 			.answer-sheet-head {
 				display: flex;
 				justify-content: end;
 				align-items: center;
 				margin-bottom: 30rpx;
+
 				.answer-sheet-head__state {
 					width: 22rpx;
 					height: 22rpx;
@@ -868,35 +938,42 @@ function pre() {}
 					background: #000;
 					border: 1rpx solid #000;
 				}
+
 				.answer-sheet-head__state--default {
 					background: #e9e9eb;
 					border: 1rpx solid #8f939c;
 				}
+
 				.answer-sheet-head__state--answer {
 					background: #d4e4ff;
 					border: 1rpx solid #2979ff;
 				}
+
 				.answer-sheet-head__state--mark {
 					background: #fdedd9;
 					border: 1rpx solid #f3a73f;
 				}
+
 				.answer-sheet-head__name {
 					margin-left: 10rpx;
 					font-size: 30rpx;
 					color: #8f939c;
 				}
 			}
+
 			.answer-sheet-main {
 				flex: 1;
 				display: grid;
 				grid-template-columns: repeat(10, 1fr);
 				gap: 5px 5px;
+
 				.answer-sheet_chapter-name {
 					grid-column: 1 / -1;
 					margin-top: 10px;
 					font-size: 36rpx;
 					color: #303133;
 				}
+
 				.answer-sheet__question-no {
 					display: flex;
 					justify-content: center;
@@ -909,11 +986,13 @@ function pre() {}
 					border: 1px solid #8f939c;
 					background-color: #e9e9eb;
 				}
+
 				.answer-sheet__question-no--answer {
 					color: #2979ff;
 					border: 1px solid #2979ff;
 					background-color: #d4e4ff;
 				}
+
 				.answer-sheet__question-no--mark {
 					color: #f3a73f;
 					border: 1px solid #f3a73f;
