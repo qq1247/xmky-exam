@@ -19,7 +19,7 @@ export function examGet(parm: object) {
 export function examCopy(parm: object) {
     return request.post('/exam/copy', parm);
 }
-export function examPublish(data?: object | undefined, config?: AxiosRequestConfig<object> | undefined) {
+export function examPublish(data?: object | string, config?: AxiosRequestConfig<object> | undefined) {
     return request.post('/exam/publish', data, config);
 }
 export function examPause(parm: object) {

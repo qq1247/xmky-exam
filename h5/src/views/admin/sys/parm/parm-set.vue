@@ -28,8 +28,7 @@
                         <el-input v-model="sysForm.name" placeholder="请输入系统名称" />
                     </el-form-item>
                     <el-form-item label="Logo" prop="logoFileId">
-                        <el-upload :action="`${uploadUrl}`" :headers="{ Authorization: userStore.accessToken }"
-                            name="files" :show-file-list="false" :before-upload="uploadBefore"
+                        <el-upload :http-request="customUpload" :show-file-list="false" :before-upload="uploadBefore"
                             :on-success="uploadSuccess">
                             <img :src="logoUrl" class="form__logo" />
                         </el-upload>
@@ -120,11 +119,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { parmSupport, parmSys, parmGet, parmIcp, parmM, parmPwd, parmuserRegist } from '@/api/sys/parm'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import http from '@/request'
-import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile, type UploadRequestOptions } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { useParmStore } from '@/stores/parm'
 import { cacheRefresh } from '@/api/sys/cache'
 import { escape2Html } from '@/util/htmlUtil'
+import { fileUpload } from '@/api/sys/file'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -356,6 +356,20 @@ function uploadBefore(rawFile: UploadRawFile) {
     }
 
     return true
+}
+
+// 自定义上传
+async function customUpload(options: UploadRequestOptions) {
+    const { file } = options
+    const formData = new FormData()
+    formData.append('files', file)
+    const response = await fileUpload(formData)
+
+    if (response.data.code === 200) {
+        return response.data
+    }
+
+    throw new Error(response.data.msg);
 }
 
 // 上传成功处理

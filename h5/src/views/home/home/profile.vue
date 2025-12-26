@@ -23,8 +23,7 @@
                 <el-form ref="avatarFormRef" :model="avatarForm" :rules="avatarFormRules" label-width="100" size="large"
                     class="form">
                     <el-form-item label="" prop="logoFileId">
-                        <el-upload :action="`${uploadUrl}`" :headers="{ Authorization: userStore.accessToken }"
-                            name="files" :show-file-list="false" :before-upload="uploadBefore"
+                        <el-upload :http-request="customUpload" :show-file-list="false" :before-upload="uploadBefore"
                             :on-success="uploadSuccess">
                             <img v-if="avatarForm.avatarFileId" :src="`${downloadUrl}?id=${avatarForm.avatarFileId}`"
                                 class="form__avatar" />
@@ -42,10 +41,11 @@
 
 <script lang="ts" setup>
 import { loginAvatar, loginPwd } from '@/api/login'
+import { fileUpload } from '@/api/sys/file'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import http from '@/request'
 import { useUserStore } from '@/stores/user'
-import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile, type UploadRequestOptions } from 'element-plus'
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -80,7 +80,6 @@ const formRules = reactive<FormRules>({// 表单规则
     }],
 })
 
-const uploadUrl = `${http.defaults.baseURL}file/upload`// 上传地址
 const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 const avatarForm = reactive({// 系统表单
     avatarFileId: userStore.avatarFileId, // 头像附件ID
@@ -119,6 +118,19 @@ async function pwd() {
     router.push('/home')
 }
 
+// 上传
+async function customUpload(options: UploadRequestOptions) {
+    const { file } = options
+    const formData = new FormData()
+    formData.append('files', file)
+    const response = await fileUpload(formData)
+
+    if (response.data.code === 200) {
+        return response.data
+    }
+
+    throw new Error(response.data.msg);
+}
 
 // 上传之前处理
 function uploadBefore(rawFile: UploadRawFile) {

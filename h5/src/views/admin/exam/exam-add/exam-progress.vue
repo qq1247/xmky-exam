@@ -46,7 +46,7 @@ async function publish() {
     progressBar.title = '正在发布考试...'
     progressBar.msg = ''
 
-    const { data: { code, data: processBarId } } = await examPublish({
+    const { data: { code, data: processBarId } } = await examPublish(JSON.stringify({
         id: form.id,
         name: form.name,
         paperName: form.paperName,
@@ -72,7 +72,7 @@ async function publish() {
         markStartTime: form.markType === 2 ? form?.markTimes[0] : '',
         markEndTime: form.markType === 2 ? form?.markTimes[1] : '',
         retakeNum: form.markType === 1 ? form.retakeNum : 0, // 主观题试卷没有补考
-    },
+    }),
         { headers: { 'Content-Type': 'application/json' } }
     )
 

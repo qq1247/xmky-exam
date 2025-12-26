@@ -79,7 +79,7 @@ import { userImport, userListpage, userTemplate } from '@/api/base/user'
 import http from "@/request"
 import { useDictStore } from '@/stores/dict'
 import { useUserStore } from '@/stores/user'
-import { ElMessage, type UploadFile, type UploadFiles, type UploadRawFile, type UploadRequestOptions } from 'element-plus'
+import { ElMessage, type UploadRawFile, type UploadRequestOptions } from 'element-plus'
 import { fileUpload } from '@/api/sys/file'
 
 /************************变量定义相关***********************/
@@ -92,7 +92,7 @@ const queryForm = reactive({// 查询表单
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,
-    pageSize: 8,
+    pageSize: 5,
     total: 0,
     list: [],
 })

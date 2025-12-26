@@ -103,29 +103,32 @@
                                     <div class="upload__btn">
                                         <vue-draggable v-model="examQuestion.imgFiles">
                                             <photo-provider :default-backdrop-opacity="0.6">
-                                                <photo-consumer v-for="(file, index) in examQuestion.imgFiles"
-                                                    :key="index" :src="`${downloadUrl}?id=${file.uid}`">
-                                                    <div class="img">
-                                                        <el-image :src="`${downloadUrl}?id=${file.uid}`"
-                                                            fit="contain" />
-                                                        <div class="img__inner">
-                                                            <span class="img__txt">
-                                                                图{{ toChinaNum(index + 1) }}
-                                                            </span>
-                                                            <span v-if="myExam.state === 2" @click.stop="() => {
-                                                                examQuestion.imgFiles.splice(index, 1);
-                                                                examQuestion.answerImgFileIds = examQuestion.imgFiles.map((file: UploadUserFile) => file.uid)
-                                                                answer(examQuestion);
-                                                            }" class="iconfont icon-shanchu img__btn"></span>
+                                                <template v-for="(file, index) in examQuestion.imgFiles" :key="index">
+                                                    <!-- el-upload会自动生成一个uid（时间戳），实际只需要上传到数据库的附件ID -->
+                                                    <photo-consumer v-if="file.uid < 100000"
+                                                        :src="`${downloadUrl}?id=${file.uid}`">
+                                                        <div class="img">
+                                                            <el-image :src="`${downloadUrl}?id=${file.uid}`"
+                                                                fit="contain" />
+                                                            <div class="img__inner">
+                                                                <span class="img__txt">
+                                                                    图{{ toChinaNum(index + 1) }}
+                                                                </span>
+                                                                <span v-if="myExam.state === 2" @click.stop="() => {
+                                                                    examQuestion.imgFiles.splice(index, 1);
+                                                                    examQuestion.answerImgFileIds = examQuestion.imgFiles.map((file: UploadUserFile) => file.uid)
+                                                                    answer(examQuestion);
+                                                                }" class="iconfont icon-shanchu img__btn"></span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </photo-consumer>
+                                                    </photo-consumer>
+                                                </template>
                                             </photo-provider>
                                         </vue-draggable>
                                         <el-upload v-if="myExam.state === 2" v-model:file-list="examQuestion.imgFiles"
-                                            :action="uploadUrl" :headers="{ Authorization: userStore.accessToken }"
-                                            name="files" :show-file-list="false" accept=".jpg,.png,.jpeg,JPG,PNG,JPEG"
-                                            :limit="2" :before-upload="uploadBefore" :multiple="true"
+                                            :http-request="customUpload" :show-file-list="false"
+                                            accept=".jpg,.png,.jpeg,JPG,PNG,JPEG" :limit="2"
+                                            :before-upload="uploadBefore" :multiple="true"
                                             :on-success="(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) => uploadSuccess(response, uploadFile, uploadFiles, examQuestion)">
                                             <span
                                                 class="iconfont icon-zhaopian upload__btn-icon upload__btn-icon--img"></span>
@@ -146,9 +149,8 @@
                                             </div>
                                         </div>
                                         <el-upload v-if="myExam.state === 2" v-model:file-list="examQuestion.videoFiles"
-                                            :action="uploadUrl" :headers="{ Authorization: userStore.accessToken }"
-                                            name="files" :show-file-list="false" accept=".mp4,.MP4" :limit="1"
-                                            :before-upload="uploadBeforeOfVideo" :multiple="false"
+                                            :http-request="customUpload" :show-file-list="false" accept=".mp4,.MP4"
+                                            :limit="1" :before-upload="uploadBeforeOfVideo" :multiple="false"
                                             :on-success="(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) => uploadSuccessOfVideo(response, uploadFile, uploadFiles, examQuestion)">
                                             <span
                                                 class="iconfont icon-shipin upload__btn-icon upload__btn-icon--video"></span>
@@ -179,7 +181,7 @@ import http from '@/request'
 import type { Exam, ExamQuestion } from '@/ts/exam/exam'
 import type { MyExam } from '@/ts/exam/my-exam'
 import { delay } from '@/util/timeUtil'
-import { ElMessage, type UploadFile, type UploadFiles, type UploadRawFile, type UploadUserFile } from 'element-plus'
+import { ElMessage, type UploadFile, type UploadFiles, type UploadRawFile, type UploadRequestOptions, type UploadUserFile } from 'element-plus'
 import _ from 'lodash'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -187,6 +189,7 @@ import { toChinaNum } from '@/util/numberUtil'
 import { useUserStore } from '@/stores/user'
 import { VueDraggable } from 'vue-draggable-plus'
 import { longzeVideoPlay } from "longze-vue3-video-player";
+import { fileUpload } from '@/api/sys/file'
 
 /************************变量定义相关***********************/
 const route = useRoute() // 路由
@@ -506,11 +509,25 @@ function uploadBeforeOfVideo(rawFile: UploadRawFile) {
     return true
 }
 
+// 自定义上传
+async function customUpload(options: UploadRequestOptions) {
+    const { file } = options
+    const formData = new FormData()
+    formData.append('files', file)
+    const response = await fileUpload(formData)
+
+    if (response.data.code === 200) {
+        return response.data
+    }
+
+    throw new Error(response.data.msg);
+}
+
 // 上传成功处理
 function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles, examQuestion: ExamQuestion) {
     if (response.code === 200) {
         uploadFile.uid = response.data.fileIds
-        uploadFile.url = `${downloadUrl}?id=${response.data.fileIds}`
+        //uploadFile.url = `${downloadUrl}?id=${response.data.fileIds}`
 
         examQuestion.imgFiles = uploadFiles
         examQuestion.answerImgFileIds = examQuestion.imgFiles.map((file: UploadUserFile) => file.uid)
@@ -522,7 +539,7 @@ function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: Uploa
 function uploadSuccessOfVideo(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles, examQuestion: ExamQuestion) {
     if (response.code === 200) {
         uploadFile.uid = response.data.fileIds
-        uploadFile.url = `${downloadUrl}?id=${response.data.fileIds}`
+        //uploadFile.url = `${downloadUrl}?id=${response.data.fileIds}`
 
 
         examQuestion.videoFiles = [{

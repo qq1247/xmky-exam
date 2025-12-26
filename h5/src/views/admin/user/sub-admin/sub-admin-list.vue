@@ -74,7 +74,7 @@ const queryForm = reactive({// 查询表单
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,
-    pageSize: 8,
+    pageSize: 5,
     total: 0,
     list: [],
 })

@@ -21,24 +21,24 @@
                         <div class="img-group">
                             <vue-draggable v-model="imgFileList">
                                 <photo-provider :default-backdrop-opacity="0.6">
-                                    <photo-consumer v-for="(file, index) in imgFileList" :key="index"
-                                        :src="`${downloadUrl}?id=${file.uid}`">
-                                        <div class="img">
-                                            <el-image :src="`${downloadUrl}?id=${file.uid}`" fit="contain" />
-                                            <div class="img__inner">
-                                                <span class="img__txt">图{{ toChinaNum(index + 1) }}</span>
-                                                <span @click.stop="imgFileList.splice(index, 1)"
-                                                    class="iconfont icon-shanchu img__btn"></span>
+                                    <template v-for="(file, index) in imgFileList" :key="index">
+                                        <photo-consumer v-if="file.uid < 100000" :src="`${downloadUrl}?id=${file.uid}`">
+                                            <div class="img">
+                                                <el-image :src="`${downloadUrl}?id=${file.uid}`" fit="contain" />
+                                                <div class="img__inner">
+                                                    <span class="img__txt">图{{ toChinaNum(index + 1) }}</span>
+                                                    <span @click.stop="imgFileList.splice(index, 1)"
+                                                        class="iconfont icon-shanchu img__btn"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </photo-consumer>
+                                        </photo-consumer>
+                                    </template>
                                 </photo-provider>
                             </vue-draggable>
 
-                            <el-upload v-model:file-list="imgFileList" :action="uploadUrl"
-                                :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
-                                accept=".jpg,.png,.jpeg,JPG,PNG,JPEG" :limit="4" :before-upload="uploadBefore"
-                                :multiple="true" :on-success="uploadSuccess">
+                            <el-upload v-model:file-list="imgFileList" :http-request="customUpload"
+                                :show-file-list="false" accept=".jpg,.png,.jpeg,JPG,PNG,JPEG" :limit="4"
+                                :before-upload="uploadBefore" :multiple="true" :on-success="uploadSuccess">
                                 <span class="iconfont icon-tubiaoziti2-02"></span>
                             </el-upload>
                         </div>
@@ -54,9 +54,9 @@
                                         class="iconfont icon-shanchu img__btn"></span>
                                 </div>
                             </div>
-                            <el-upload ref="videoUploadRef" v-model:file-list="videoFileList" :action="uploadUrl"
-                                :headers="{ Authorization: userStore.accessToken }" name="files" :show-file-list="false"
-                                accept=".mp4,.MP4" :limit="1" :before-upload="uploadBeforeOfVideo" :multiple="false"
+                            <el-upload ref="videoUploadRef" v-model:file-list="videoFileList"
+                                :http-request="customUpload" :show-file-list="false" accept=".mp4,.MP4" :limit="1"
+                                :before-upload="uploadBeforeOfVideo" :multiple="false"
                                 :on-success="uploadSuccessOfVideo" :on-exceed="uploadExceedOfVideo"
                                 :on-remove="uploadRemoveOfVideo">
                                 <span class="iconfont icon-tubiaoziti2-02"></span>
@@ -245,13 +245,14 @@ import { escape2Html } from '@/util/htmlUtil'
 import { toChinaNum, toLetter } from '@/util/numberUtil'
 import { hasFillBlank, hasJudge, hasMultipleChoice, hasObjective, hasQA, hasSingleChoice, hasSubjective } from '@/util/questionUtil'
 import { Decimal } from 'decimal.js-light'
-import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadInstance, type UploadProps, type UploadRawFile, type UploadUserFile } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadInstance, type UploadProps, type UploadRawFile, type UploadRequestOptions, type UploadUserFile } from 'element-plus'
 import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { VueDraggable } from 'vue-draggable-plus'
 import XmksSelect from '@/components/xmks-select.vue'
 import { genFileId } from 'element-plus'
 import { longzeVideoPlay } from "longze-vue3-video-player";
+import { fileUpload } from '@/api/sys/file'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -710,6 +711,20 @@ function uploadBeforeOfVideo(rawFile: UploadRawFile) {
     }
 
     return true
+}
+
+// 自定义上传
+async function customUpload(options: UploadRequestOptions) {
+    const { file } = options
+    const formData = new FormData()
+    formData.append('files', file)
+    const response = await fileUpload(formData)
+
+    if (response.data.code === 200) {
+        return response.data
+    }
+
+    throw new Error(response.data.msg);
 }
 
 // 上传成功处理
