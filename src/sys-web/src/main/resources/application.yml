@@ -20,4 +20,4 @@ spring:
 demo:
   mode: false  
 sys:
-  ver: 5.7.0
+  ver: 6.0.0
