@@ -23,14 +23,14 @@
                 </el-form>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="form.id" title="删除用户" desc="批量删除考试用户">
+        <xmks-edit-card v-if="form.id" title="删除用户" desc="批量删除考试用户 ">
             <template #card-main>
                 <el-form ref="userDelFormRef" :model="userDelForm" :rules="userDelFormRules" inline label-width="100"
                     size="large" class="form">
                     <el-form-item label="选择用户" prop="questionIds" style="width: 100%;">
                         <xmks-select v-model="userDelForm.userIds" url="user/listpage"
                             :params="{ state: 1, role: 'EXAM_USER', orgId: route.params.id }" search-parm-name="name"
-                            option-label="name" option-value="id" :options="[]" :multiple="true" clearable
+                            option-label="name" option-value="id" :options="users" :multiple="true" clearable
                             :page-size="100" search-placeholder="请输入机构名称或用户名称进行筛选" placeholder="请输入机构名称或用户名称进行筛选">
                             <template #default="{ option }">
                                 {{ option.name }} - {{ option.orgName }}
@@ -95,6 +95,7 @@ const userDelFormRules = reactive<FormRules>({// 表单校验规则
     ],
 })
 
+const users = ref<any[]>([])// 考试用户
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加

@@ -75,7 +75,6 @@ onMounted(async () => {
             font-size: 14px;
             color: #8F939C;
             line-height: 20px;
-            text-indent: 2em;
         }
     }
 }

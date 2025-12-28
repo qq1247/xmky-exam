@@ -38,7 +38,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 	private static final File SECRET_FILE = new File(
 			String.format(".%sconfig%sjwtSecret.txt", File.separator, File.separator));
 	private static SecretKey SECRET_KEY = null;
-	private static final long ACCESS_TOKEN_EXPIRE = 10 * 1000; // 访问令牌10分钟过期
+	private static final long ACCESS_TOKEN_EXPIRE = 1 * 60 * 60 * 1000; // 访问令牌1小时过期
 	private static final long REFRESH_TOKEN_EXPIRE = 12 * 60 * 60 * 1000; // 刷新令牌12小时过期
 	private final CacheManager cacheManager;
 

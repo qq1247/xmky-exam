@@ -38,6 +38,7 @@ public class VerCheckJob {
 			Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 60000));
 
 			// 获取最新版本
+			parmService.appId();
 			Parm parm = baseCacheService.getParm();
 
 			MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();

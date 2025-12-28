@@ -14,6 +14,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "demo")
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class DemoModeFilter extends OncePerRequestFilter {
 	private boolean mode;
 

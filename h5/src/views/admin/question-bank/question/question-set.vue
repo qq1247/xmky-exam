@@ -22,7 +22,8 @@
                             <vue-draggable v-model="imgFileList">
                                 <photo-provider :default-backdrop-opacity="0.6">
                                     <template v-for="(file, index) in imgFileList" :key="index">
-                                        <photo-consumer v-if="file.uid < 100000" :src="`${downloadUrl}?id=${file.uid}`">
+                                        <photo-consumer v-if="file.uid && file.uid < 100000"
+                                            :src="`${downloadUrl}?id=${file.uid}`">
                                             <div class="img">
                                                 <el-image :src="`${downloadUrl}?id=${file.uid}`" fit="contain" />
                                                 <div class="img__inner">
