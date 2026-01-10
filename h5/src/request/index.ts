@@ -7,7 +7,7 @@ import router from '@/router'
 // http请求
 const http = axios.create({
     baseURL: (window as any).domain.url,
-    timeout: 6000,
+    timeout: 10000,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [function (data, headers) {
         if (data instanceof FormData) {

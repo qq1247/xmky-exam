@@ -45,7 +45,7 @@ public class ApiFileController extends BaseController {
 	@RequestMapping("/upload")
 	public PageResult upload(@RequestParam("files") MultipartFile[] files, String uuid) {
 		try {
-			String[] allowTypes = { "jpg", "jpeg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
+			String[] allowTypes = { "jpg", "jpeg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4", "pdf" };
 			String fileIds = fileService.tempUpload(files, allowTypes, uuid);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("fileIds", fileIds);

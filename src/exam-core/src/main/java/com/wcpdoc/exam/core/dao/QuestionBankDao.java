@@ -1,7 +1,9 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.wcpdoc.core.dao.RBaseDao;
@@ -25,7 +27,8 @@ public interface QuestionBankDao extends RBaseDao<QuestionBank> {
 								"QUESTION_BANK.SUBJECTIVE_NUM", "QUESTION_BANK.SINGLE_NUM",
 								"QUESTION_BANK.MULTIPLE_NUM", "QUESTION_BANK.JUDGE_NUM",
 								"QUESTION_BANK.FILL_BLANK_OBJ_NUM", "QUESTION_BANK.FILL_BLANK_SUB_NUM",
-								"QUESTION_BANK.QA_OBJ_NUM", "QUESTION_BANK.QA_SUB_NUM", "QUESTION_BANK.UPDATE_TIME", "QUESTION_BANK.SHARE_AUTH")//
+								"QUESTION_BANK.QA_OBJ_NUM", "QUESTION_BANK.QA_SUB_NUM", "QUESTION_BANK.UPDATE_TIME",
+								"QUESTION_BANK.SHARE_AUTH")//
 						.like(pageIn.hasParm("name"), "QUESTION_BANK.NAME", pageIn.getParm("name"))//
 						.eq(pageIn.hasParm("id"), "QUESTION_BANK.ID", pageIn.getParm("id"))//
 						.apply(pageIn.hasParm("curUserId"),
@@ -34,5 +37,16 @@ public interface QuestionBankDao extends RBaseDao<QuestionBank> {
 						.eq("QUESTION_BANK.STATE", 1)//
 						.orderByDesc("QUESTION_BANK.ID"));
 		return new PageOut(page.getRecords(), page.getTotal());
+	}
+
+	/**
+	 * 获取题库列表
+	 * 
+	 * v1.0 zhanghc 2026年1月10日上午9:47:56
+	 * 
+	 * @return List<QuestionBank>
+	 */
+	default List<QuestionBank> getList() {
+		return selectList(new LambdaQueryWrapper<QuestionBank>().eq(QuestionBank::getState, 1));
 	}
 }

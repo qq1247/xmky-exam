@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankExService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.QuestionBankUtil;
+import com.wcpdoc.file.service.FileService;
+import com.wcpdoc.search.service.DocIndexService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implements QuestionBankService {
 	private final QuestionBankDao questionBankDao;
 	private final QuestionBankExService questionBankExService;
+	private final FileService fileService;
+	private final DocIndexService searchService;
 
 	@Override
 	public RBaseDao<QuestionBank> getDao() {
@@ -91,4 +96,59 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 		questionBankExService.clear(id);
 	}
 
+	@Override
+	public void docAdd(Integer id, Integer fileId) {
+		// 数据校验
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误：id");
+		}
+		if (!ValidateUtil.isValid(fileId)) {
+			throw new MyException("参数错误：fileId");
+		}
+		QuestionBank entity = getById(id);
+		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(entity))) {
+			throw new MyException("无操作权限");
+		}
+
+		// 附件保存
+		fileService.upload(fileId);
+
+		// 题库关联附件
+		QuestionBank questionBank = getById(id);
+		questionBank.getFileIds().add(fileId);
+		updateById(questionBank);
+
+		// 添加索引支持检索
+		searchService.add(questionBank.getId(), fileId);
+	}
+
+	@Override
+	public void docDel(Integer id, Integer fileId) {
+		// 数据校验
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误：id");
+		}
+		if (!ValidateUtil.isValid(fileId)) {
+			throw new MyException("参数错误：fileId");
+		}
+		QuestionBank entity = getById(id);
+		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| QuestionBankUtil.hasWrite(entity))) {
+			throw new MyException("无操作权限");
+		}
+
+		// 题库关联附件删除
+		QuestionBank questionBank = getById(id);
+		questionBank.getFileIds().remove(fileId);
+		updateById(questionBank);
+
+		// 删除相关索引
+		searchService.del(entity.getId(), fileId);
+	}
+
+	@Override
+	public List<QuestionBank> getList() {
+		return questionBankDao.getList();
+	}
 }

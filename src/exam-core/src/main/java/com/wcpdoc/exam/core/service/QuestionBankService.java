@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
+import java.util.List;
+
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 
@@ -28,5 +30,35 @@ public interface QuestionBankService extends BaseService<QuestionBank> {
 	 * @return PageResult
 	 */
 	void clear(Integer id);
+
+	/**
+	 * 题库资料添加
+	 * 
+	 * v1.0 zhanghc 2026年1月9日上午10:23:24
+	 * 
+	 * @param id
+	 * @param docFileId
+	 * @return PageResult
+	 */
+	void docAdd(Integer id, Integer docFileId);
+
+	/**
+	 * 题库资料删除
+	 * 
+	 * v1.0 zhanghc 2026年1月9日上午11:21:31
+	 * 
+	 * @param id
+	 * @param fileId void
+	 */
+	void docDel(Integer id, Integer fileId);
+
+	/**
+	 * 获取题库列表
+	 * 
+	 * v1.0 zhanghc 2026年1月10日上午9:46:18
+	 * 
+	 * @return List<QuestionBank>
+	 */
+	List<QuestionBank> getList();
 
 }

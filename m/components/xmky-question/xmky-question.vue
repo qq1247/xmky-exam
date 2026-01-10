@@ -6,8 +6,7 @@
 			<template v-for="(title, index) in titles as Title[]" :key="index">
 				// #ifdef H5
 				<text v-if="title.type === 'txt'" class="question-title__text" v-html="title.value"></text>
-				// #endif 
-				// #ifdef MP-WEIXIN
+				// #endif // #ifdef MP-WEIXIN
 				<text v-if="title.type === 'txt'" class="question-title__text" decode="true">
 					{{
 						title.value
@@ -201,6 +200,8 @@
 			</view>
 			<text class="question-analysis__content">{{ analysis || '无' }}</text>
 		</view>
+		<!-- 底部插槽 -->
+		<slot name="foot"></slot>
 	</view>
 </template>
 
@@ -434,12 +435,14 @@ function preview(index: number) {
 .question {
 	.question-title {
 		margin-bottom: 20rpx;
+
 		.question-title__text {
 			display: inline;
 			font-size: 34rpx;
 			color: #303133;
 			line-height: 60rpx;
 		}
+
 		:deep(.question-title__fill-blank) {
 			display: inline-block;
 			padding-right: 50rpx;
@@ -450,10 +453,12 @@ function preview(index: number) {
 			.uni-input-input {
 				text-align: center;
 			}
+
 			// #ifdef MP-WEIXIN
 			input {
 				text-align: center;
 			}
+
 			// #endif
 			.question-title__score {
 				position: absolute;
@@ -464,14 +469,17 @@ function preview(index: number) {
 				font-size: 24rpx;
 				color: #0d9df6;
 			}
+
 			.question-title__score--succ {
 				color: #18bc38;
 			}
+
 			.question-title__score--err {
 				color: #e43d33;
 			}
 		}
 	}
+
 	.question__img-group {
 		display: flex;
 
@@ -479,6 +487,7 @@ function preview(index: number) {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+
 			.question__img {
 				display: inline-block;
 				height: 140rpx;
@@ -490,20 +499,24 @@ function preview(index: number) {
 			}
 		}
 	}
+
 	.question__video {
 		width: 100%;
 		padding-top: 75%;
 	}
+
 	:deep(.question-user-answer) {
 		background-color: #f6f7fc;
 		width: 100%;
 		padding: 20rpx;
 		min-height: 600rpx;
 		line-height: 50rpx;
+
 		.uni-textarea-wrap {
 			min-height: 600rpx;
 		}
 	}
+
 	.question-score {
 		display: flex;
 		justify-content: space-between;
@@ -513,29 +526,35 @@ function preview(index: number) {
 		height: 96rpx;
 		background: #f6f7fc;
 		border-radius: 10rpx 10rpx 10rpx 10rpx;
+
 		.question-score__label {
 			margin-left: 5rpx;
 			font-weight: bold;
 			font-size: 34rpx;
 			color: #303133;
 		}
+
 		.question-score__user {
 			font-weight: bold;
 			font-size: 34rpx;
 			color: #0d9df6;
 		}
+
 		.question-score__user--succ {
 			color: #18bc38;
 		}
+
 		.question-score__user--err {
 			color: #e43d33;
 		}
+
 		.question-score__standard {
 			font-weight: bold;
 			font-size: 34rpx;
 			color: #999999;
 		}
 	}
+
 	.question-select-answer {
 		display: flex;
 		justify-content: center;
@@ -544,35 +563,42 @@ function preview(index: number) {
 		padding: 20rpx 0rpx 10rpx 0rpx;
 		background: #f6f7fc;
 		border-radius: 10rpx;
+
 		.question-select-answer__diff {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+
 			.question-select-answer__label {
 				font-weight: bold;
 				font-size: 30rpx;
 				color: #999999;
 			}
+
 			.question-select-answer__value {
 				margin-top: 10rpx;
 				font-weight: bold;
 				font-size: 30rpx;
 				color: #0d9df6;
 			}
+
 			.question-select-answer__value--succ {
 				color: #18bc38;
 			}
+
 			.question-select-answer__value--err {
 				color: #e43d33;
 			}
 		}
 	}
+
 	.question-fill-blank-answer {
 		margin-top: 20rpx;
 		padding: 20rpx;
 		background: #f6f7fc;
 		border-radius: 10rpx;
+
 		.question-fill-blank-answer__label {
 			display: inline-block;
 			margin-bottom: 20rpx;
@@ -581,27 +607,33 @@ function preview(index: number) {
 			color: #999999;
 		}
 	}
+
 	.question-qa-answer {
 		margin-top: 20rpx;
 		padding: 20rpx;
 		background: #f6f7fc;
 		border-radius: 10rpx;
+
 		.question-qa-answer__label {
 			margin-top: 20rpx;
 			font-weight: bold;
 			font-size: 30rpx;
 			color: #999999;
 		}
+
 		.question-qa-answer__content {
 			display: inline-block;
 			margin-top: 20rpx;
 			line-height: 48rpx;
 		}
 	}
+
 	.question-analysis {
 		margin-top: 20rpx;
+
 		.question-analysis__title-wrap {
 			position: relative;
+
 			.question-analysis__title-icon {
 				position: absolute;
 				left: 0rpx;
@@ -611,6 +643,7 @@ function preview(index: number) {
 				border-radius: 50%;
 				background: #2979ff;
 			}
+
 			.question-analysis__title-icon1 {
 				position: absolute;
 				left: 12rpx;
@@ -621,6 +654,7 @@ function preview(index: number) {
 				background: #2979ff;
 				opacity: 0.6;
 			}
+
 			.question-analysis__title {
 				margin-left: 50rpx;
 				font-weight: bold;
@@ -637,6 +671,7 @@ function preview(index: number) {
 			color: #303133;
 		}
 	}
+
 	.question-option__radio-wrap,
 	.question-option__checkbox-wrap {
 		/* #ifndef APP-NVUE */
@@ -645,6 +680,7 @@ function preview(index: number) {
 		flex-direction: column;
 		position: relative;
 		margin: 10rpx 0rpx 20rpx 0rpx;
+
 		.question-option {
 			/* #ifndef APP-NVUE */
 			display: flex;
@@ -655,15 +691,18 @@ function preview(index: number) {
 			position: relative;
 			margin: 0rpx 0rpx 25rpx 0rpx;
 			padding: 20rpx 0rpx 20rpx 20rpx;
+
 			.question-option__radio-hover {
 				// 隐藏默认单选按钮
 				position: absolute;
 				opacity: 0;
 			}
+
 			.question-option__checkbox-hover {
 				position: absolute;
 				opacity: 0;
 			}
+
 			.question-option__radio {
 				// 重新实现单选按钮
 				/* #ifndef APP-NVUE */
@@ -680,6 +719,7 @@ function preview(index: number) {
 				border-radius: 30rpx;
 				background-color: #fff;
 				z-index: 1;
+
 				.question-option__radio-inner {
 					width: 20rpx;
 					height: 20rpx;
@@ -687,12 +727,14 @@ function preview(index: number) {
 					opacity: 0;
 				}
 			}
+
 			.question-option__content {
 				font-size: 34rpx;
 				color: #303133;
 				margin: 0rpx 20rpx;
 				line-height: 46rpx;
 			}
+
 			.question-option__checkbox {
 				/* #ifndef APP-NVUE */
 				flex-shrink: 0;
@@ -705,6 +747,7 @@ function preview(index: number) {
 				border-radius: 8rpx;
 				background-color: #fff;
 				z-index: 1;
+
 				.question-option__checkbox-inner {
 					position: absolute;
 					/* #ifndef APP-NVUE */
@@ -724,8 +767,10 @@ function preview(index: number) {
 					transform: rotate(40deg);
 				}
 			}
+
 			&.is-checked {
 				background-color: #e0f9ff;
+
 				// 选中样式
 				.question-option__radio {
 					.question-option__radio-inner {
@@ -733,6 +778,7 @@ function preview(index: number) {
 						background: linear-gradient(to right, #04b7f2 0%, #007dfc 100%);
 					}
 				}
+
 				.question-option__checkbox {
 					border-width: 0;
 					background: linear-gradient(to right, #04b7f2 0%, #007dfc 100%);
@@ -742,40 +788,49 @@ function preview(index: number) {
 						transform: rotate(45deg);
 					}
 				}
+
 				.question-option__content {
 					font-size: 34rpx;
 					color: #303133;
 				}
 			}
+
 			&.is-succ {
 				background-color: #d1f2d7;
+
 				.question-option__radio {
 					.question-option__radio-inner {
 						opacity: 1;
 					}
 				}
+
 				.question-option__checkbox {
 					.question-option__checkbox-inner {
 						opacity: 1;
 						transform: rotate(45deg);
 					}
 				}
+
 				.question-option__content {
 				}
 			}
+
 			&.is-err {
 				background-color: #fad8d6;
+
 				.question-option__radio {
 					.question-option__radio-inner {
 						opacity: 1;
 					}
 				}
+
 				.question-option__checkbox {
 					.question-option__checkbox-inner {
 						opacity: 1;
 						transform: rotate(45deg);
 					}
 				}
+
 				.question-option__content {
 				}
 			}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.wcpdoc.exam</groupId>
+		<artifactId>sys-parent</artifactId>
+		<version>6.0.0</version>
+	</parent>
+	<artifactId>sys-search</artifactId>
+	<name>sys-search</name>
+	<description>系统检索</description>
+
+	<dependencies>
+		<!-- 集成附件核心 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-file</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- 集成全文检索 -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>10.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analysis-common</artifactId>
+			<version>10.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>10.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-highlighter</artifactId>
+			<version>10.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hankcs</groupId>
+			<artifactId>hanlp</artifactId>
+			<version>portable-1.8.6</version>
+		</dependency>
+		<!-- 集成文档解析 -->
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>3.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers-standard-package</artifactId>
+			<version>3.2.3</version>
+		</dependency>
+	</dependencies>
+</project>

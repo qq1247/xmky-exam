@@ -27,6 +27,7 @@
 		<module>sys-ex</module>
 		<module>sys-cache</module>
 		<module>sys-file</module>
+		<module>sys-search</module>
 		<module>sys-quartz</module>
 		<module>sys-auth</module>
 		<module>sys-notify</module>

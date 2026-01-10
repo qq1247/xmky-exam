@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wcpdoc.search.entity.DocSummary;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,4 +33,5 @@ public class QuestionPart extends PaperPart {
 	private String remark;
 	private BigDecimal userScore;
 	private List<String> userAnswers = new ArrayList<>();
+	private List<DocSummary> docSummaryList = new ArrayList<>();
 }

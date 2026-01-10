@@ -115,6 +115,22 @@
                         :editable="!toolbars.answerShow && curExamQuestion.userScore == null" class="paper-question"
                         @change="(userAnswers: string[]) => (curExamQuestion as ExamQuestion).userAnswers = userAnswers">
                         <template #title-pre>{{ curQuestionIndex + 1 }}、</template>
+                        <template #foot>
+                            <div v-if="toolbars.analysisShow || curExamQuestion?.userScore != null"
+                                class="question__doc">
+                                <div class="question__doc-title">参考资料</div>
+                                <!-- <span v-if="curExamQuestion.docSummaryList.length === 0"
+                                    class="question__analysis-content">暂无参考资料</span> -->
+                                <ul v-for="(docSummary, index) in curExamQuestion.docSummaryList" :key="index">
+                                    <li>
+                                        {{ docSummary.title }}
+                                    </li>
+                                    <li v-for="(summary, index) in docSummary.summaryList" :key="index"
+                                        v-html="summary">
+                                    </li>
+                                </ul>
+                            </div>
+                        </template>
                     </xmks-question>
                     <div v-if="toolbars.commentShow" class="comment">
                         <div class="my-comment">
@@ -915,6 +931,46 @@ async function commentReply(parentMyComment: MyCommon, content: string) {
                     .question {
                         // border-bottom: 1px solid #E5E5E5;
                         padding-bottom: 20px;
+
+                        .question__doc {
+                            display: flex;
+                            flex-direction: column;
+                            min-height: 50px;
+                            margin-top: 20px;
+                            padding: 10px 20px 5px 20px;
+                            position: relative;
+                            border: 1px solid #E5E5E5;
+
+                            .question__doc-title {
+                                position: absolute;
+                                left: 15px;
+                                top: -8px;
+                                padding: 0px 10px;
+                                background-color: #FFFFFF;
+                                font-size: 14px;
+                                color: #999999;
+                            }
+                        }
+
+                        ul {
+                            display: block;
+                            padding-left: 20px;
+                            font-size: 14px;
+                            line-height: 20px;
+                            color: #999999;
+
+                            li:first-child {
+                                // font-weight: bold;
+                                color: #303133;
+                                list-style: none;
+                                margin-bottom: 4px;
+                            }
+
+                            mark {
+                                color: #E43D33;
+                                background-color: initial;
+                            }
+                        }
                     }
                 }
 

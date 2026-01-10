@@ -42,6 +42,25 @@
                     style="margin-bottom: 14px;" @click="share">保存设置</el-button>
             </template>
         </xmks-edit-card>
+        <xmks-edit-card v-if="shareForm.id && (userStore.isAdmin() || userStore.id == shareForm.createUserId)"
+            title="参考资料" desc="基于企业内部权威资料，在用户练题时提供相关参考，帮助其理解相关背景与依据。资料须与题库高度相关，以保障体验。">
+            <template #card-main>
+                <el-form ref="shareFormRef" :model="shareForm" :rules="shareFormRules" label-width="100" size="large"
+                    class="form">
+                    <el-tag v-for="file in files" :key="file.id" closable class="form__tag"
+                        @close="() => docDel(file.id as number)">
+                        {{ file.name }}
+                    </el-tag>
+                </el-form>
+            </template>
+            <template #card-side>
+                <el-upload :http-request="customUpload" :show-file-list="false" accept=".doc,.docx,.pdf,DOC,DOCX,PDF"
+                    :limit="4" :before-upload="uploadBefore" :multiple="true" :on-success="uploadSuccess">
+                    <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': clearConfirm }"
+                        style="margin-bottom: 14px;">上传资料</el-button>
+                </el-upload>
+            </template>
+        </xmks-edit-card>
         <xmks-edit-card v-if="form.id" title="移动试题" desc="移动试题">
             <template #card-main>
                 <el-form ref="moveFormRef" :model="moveForm" :rules="moveFormRules" inline label-width="100"
@@ -90,15 +109,16 @@
 
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from 'vue'
-import { type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadRawFile, type UploadRequestOptions } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import type { QuestionBank } from '@/ts/exam/question-bank'
-import { questionBankAdd, questionBankDel, questionBankEdit, questionBankGet, questionBankClear, questionBankShare } from '@/api/exam/question-bank'
+import { questionBankAdd, questionBankDel, questionBankEdit, questionBankGet, questionBankClear, questionBankShare, questionBankDocAdd, questionBankDocDel } from '@/api/exam/question-bank'
 import XmksSelect from '@/components/xmks-select.vue'
 import { questionMove } from '@/api/exam/question'
 import { useDictStore } from '@/stores/dict'
 import { useUserStore } from '@/stores/user'
+import { fileUpload } from '@/api/sys/file'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
@@ -111,6 +131,7 @@ const form = reactive<QuestionBank>({
     name: '',
     shareAuth: 1,
 })
+
 const formRules = reactive<FormRules>({// 表单规则
     name: [
         { required: true, message: '请输入名称', trigger: 'blur' },
@@ -147,6 +168,8 @@ const moveFormRules = reactive<FormRules>({// 表单校验规则
     ],
 })
 
+const files = ref<{ id: string | number; name: string }[]>([])
+
 /************************组件生命周期相关*********************/
 onMounted(async () => {
     if (route.path.indexOf('add') !== -1) {// 添加
@@ -161,6 +184,8 @@ onMounted(async () => {
         shareForm.id = data.id
         shareForm.shareAuth = data.shareAuth
         shareForm.createUserId = data.createUserId
+
+        files.value = data.files
     }
 })
 
@@ -266,6 +291,57 @@ async function clear() {
 
     router.push("/question-bank-list")
 }
+
+// 上传之前处理
+function uploadBefore(rawFile: UploadRawFile) {
+    const allowedTypes = [
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/pdf' // .pdf
+
+    ]
+
+    if (!allowedTypes.includes(rawFile.type)) {
+        ElMessage.error('只允许上传 doc、docx 和 pdf')
+        return false
+    }
+    if (rawFile.size / 1024 > 10240) {
+        ElMessage.error('最大支持10兆')
+        return false
+    }
+
+    return true
+}
+
+// 自定义上传
+async function customUpload(options: UploadRequestOptions) {
+    const { file } = options
+    const formData = new FormData()
+    formData.append('files', file)
+    const response = await fileUpload(formData)
+
+    if (response.data.code === 200) {
+        return response.data
+    }
+
+    throw new Error(response.data.msg);
+}
+
+// 上传成功处理
+async function uploadSuccess(response: any, uploadFile: UploadFile, uploadFiles: UploadFiles) {
+    await questionBankDocAdd({ id: route.params.id, fileId: response.data.fileIds })
+
+    const { data: { data } } = await questionBankGet({ id: route.params.id })
+    files.value = data.files
+}
+
+// 附件删除
+async function docDel(fileId: number) {
+    await questionBankDocDel({ id: route.params.id, fileId })
+
+    const { data: { data } } = await questionBankGet({ id: route.params.id })
+    files.value = data.files
+}
 </script>
 
 <style lang="scss" scoped>
@@ -288,6 +364,17 @@ async function clear() {
                 }
             }
         }
+    }
+
+    .form__tag {
+        height: 22px;
+        padding: 0px 10px;
+        font-size: 12px;
+        margin: 10px 10px 0px 0px;
+
+        color: #1EA1EE;
+        background-color: #E4F6FF;
+        border: 1px solid #C0EAFF;
     }
 
     .form__btn {

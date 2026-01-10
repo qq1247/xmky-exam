@@ -31,6 +31,12 @@
 			<artifactId>sys-notify</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成系统检索 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-search</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- 集成html解析 -->
 		<dependency>
 			<groupId>org.jsoup</groupId>

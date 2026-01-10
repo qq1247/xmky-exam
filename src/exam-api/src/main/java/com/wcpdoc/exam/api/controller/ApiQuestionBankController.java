@@ -1,6 +1,9 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +19,8 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionBank;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.util.QuestionBankUtil;
+import com.wcpdoc.file.entity.FileEx;
+import com.wcpdoc.file.service.FileService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ApiQuestionBankController extends BaseController {
 	private final QuestionBankService questionBankService;
+	private final FileService fileService;
 
 	/**
 	 * 题库列表
@@ -182,12 +188,21 @@ public class ApiQuestionBankController extends BaseController {
 					|| QuestionBankUtil.hasRead(entity))) {
 				throw new MyException("无操作权限");
 			}
+
+			List<Map<String, Object>> fileList = entity.getFileIds().stream().map(fileId -> {
+				FileEx fileEx = fileService.getFileEx(fileId);
+				Map<String, Object> data = new HashMap<>();
+				data.put("id", fileEx.getEntity().getId());
+				data.put("name", String.format("%s.%s", fileEx.getEntity().getName(), fileEx.getEntity().getExtName()));
+				return data;
+			}).toList();
+
 			return PageResultEx.ok()//
 					.addAttr("id", entity.getId())//
 					.addAttr("name", entity.getName()) //
 					.addAttr("shareAuth", entity.getShareAuth()) //
 					.addAttr("createUserId", entity.getCreateUserId()) // 只能对自己的题库进行权限设置
-			;
+					.addAttr("files", fileList);
 		} catch (MyException e) {
 			log.error("题库获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -251,6 +266,52 @@ public class ApiQuestionBankController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("题库清空错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 题库资料添加
+	 * 
+	 * v1.0 zhanghc 2026年1月9日上午10:23:24
+	 * 
+	 * @param id
+	 * @param fileId
+	 * @return PageResult
+	 */
+	@RequestMapping("/docAdd")
+	public PageResult docAdd(Integer id, Integer fileId) {
+		try {
+			questionBankService.docAdd(id, fileId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("题库资料添加错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("题库资料添加空错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	/**
+	 * 题库资料删除
+	 * 
+	 * v1.0 zhanghc 2026年1月9日上午10:23:24
+	 * 
+	 * @param id
+	 * @param fileId
+	 * @return PageResult
+	 */
+	@RequestMapping("/docDel")
+	public PageResult docDel(Integer id, Integer fileId) {
+		try {
+			questionBankService.docDel(id, fileId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("题库资料删除错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("题库资料删除空错误：", e);
 			return PageResult.err();
 		}
 	}

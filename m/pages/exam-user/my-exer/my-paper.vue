@@ -99,6 +99,21 @@
 						<template #title-post>
 							<text>（{{ curExamQuestion.score }}分）</text>
 						</template>
+						<template #foot>
+							<view v-if="!toolbars.answerShow || curExamQuestion?.userScore != null" class="question-doc">
+								<view class="question-doc__title-wrap">
+									<view class="question-doc__title-icon"></view>
+									<view class="question-doc__title-icon1"></view>
+									<text class="question-doc__title">参考资料</text>
+								</view>
+								<view v-for="(docSummary, index) in curExamQuestion.docSummaryList" :key="index">
+									<view class="question-doc__name">
+										{{ docSummary.title }}
+									</view>
+									<view v-for="(summary, index) in docSummary.summaryList" :key="index" v-html="summary" class="question-doc__content"></view>
+								</view>
+							</view>
+						</template>
 					</xmky-question>
 					<view v-if="commentEnable && !toolbars.answerShow">
 						<view v-if="comments.length" class="comment">
@@ -791,6 +806,61 @@ async function commentReply(parentMyComment: MyCommon, content: string) {
 			.question__no {
 				font-size: 34rpx;
 				color: #0d9df6;
+			}
+			.question-doc {
+				margin-top: 20rpx;
+				.question-doc__title-wrap {
+					position: relative;
+					.question-doc__title-icon {
+						position: absolute;
+						left: 0rpx;
+						top: 10rpx;
+						width: 20rpx;
+						height: 20rpx;
+						border-radius: 50%;
+						background: #2979ff;
+					}
+					.question-doc__title-icon1 {
+						position: absolute;
+						left: 12rpx;
+						top: 10rpx;
+						width: 20rpx;
+						height: 20rpx;
+						border-radius: 50%;
+						background: #2979ff;
+						opacity: 0.6;
+					}
+					.question-doc__title {
+						margin-left: 50rpx;
+						font-weight: bold;
+						font-size: 36rpx;
+						color: #303133;
+					}
+				}
+
+				.question-doc__name {
+					display: inline-block;
+					margin-top: 20rpx;
+					line-height: 60rpx;
+					font-size: 34rpx;
+					color: #303133;
+				}
+				.question-doc__content {
+					display: inline-block;
+					font-size: 30rpx;
+					line-height: 40rpx;
+					color: #999999;
+					:deep(rich-text) {
+						mark {
+							background-color: initial;
+							color: red;
+						}
+					}
+					:deep(mark) {
+						background-color: initial;
+						color: red;
+					}
+				}
 			}
 			.comment {
 				display: flex;

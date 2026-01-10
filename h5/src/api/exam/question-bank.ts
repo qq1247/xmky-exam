@@ -21,3 +21,9 @@ export function questionBankClear(parm: object) {
 export function questionBankShare(parm: object) {
     return request.post('/question-bank/share', parm);
 }
+export function questionBankDocAdd(parm: object) {
+    return request.post('/question-bank/docAdd', parm);
+}
+export function questionBankDocDel(parm: object) {
+    return request.post('/question-bank/docDel', parm);
+}

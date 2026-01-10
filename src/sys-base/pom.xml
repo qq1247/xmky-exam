@@ -41,6 +41,11 @@
 					<artifactId>ehcache</artifactId>
 					<groupId>org.ehcache</groupId>
 				</exclusion>
+				<exclusion><!-- 和tika冲突 -->
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-compress</artifactId>
+				</exclusion>
+
 			</exclusions>
 		</dependency>
 	</dependencies>

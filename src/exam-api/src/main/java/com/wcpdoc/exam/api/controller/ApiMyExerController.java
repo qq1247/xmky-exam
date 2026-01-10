@@ -43,6 +43,7 @@ import com.wcpdoc.exam.core.service.MyWrongQuestionService;
 import com.wcpdoc.exam.core.service.QuestionBankService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
+import com.wcpdoc.search.service.DocIndexService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +67,7 @@ public class ApiMyExerController extends BaseController {
 	private final MyWrongQuestionService myWrongQuestionService;
 	private final MyFavQuestionService myFavQuestionService;
 	private final QuestionBankService questionBankService;
+	private final DocIndexService docIndexService;
 
 	/**
 	 * 我的练习列表
@@ -430,7 +432,6 @@ public class ApiMyExerController extends BaseController {
 				for (QuestionOption questionOption : questionOptionList) {
 					questionPart.getOptions().add(questionOption.getOptions());
 				}
-
 			}
 
 			{// 组装标准答案
@@ -467,6 +468,24 @@ public class ApiMyExerController extends BaseController {
 					}
 				}
 			}
+
+			{ // 如果题库有相关资料则进行检索
+				StringBuilder content = new StringBuilder();
+				content.append(questionPart.getTitle());
+
+				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 单选多选，不用答案ABCD，用对应的选项内容
+					for (Object answer : questionPart.getAnswers()) {
+						String option = questionPart.getOptions().get(((String) answer).charAt(0) - 'A');
+						content.append(option);
+					}
+				} else if (QuestionUtil.hasQA(question) || QuestionUtil.hasFillBlank(question)) {// 填空问答用答案；判断不用（因为只有对错）
+					content.append(StringUtil.join(questionPart.getAnswers(), ""));
+				}
+
+				questionPart
+						.setDocSummaryList(docIndexService.search(question.getQuestionBankId(), content.toString(), 3));
+			}
+
 			return PageResultEx.ok().data(questionPart);
 		} catch (MyException e) {
 			log.error("我的练习试题错误：{}", e.getMessage());
