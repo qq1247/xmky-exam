@@ -32,7 +32,7 @@ public interface ExerDao extends RBaseDao<Exer> {
 										.like("EXER.ORG_IDS", String.format(",%s,", pageIn.getParm("examOrgId"))))// 考试用户看（管理或子管理）分配给自己的
 						.eq(pageIn.hasParm("state"), "EXER.STATE", pageIn.getParm("state"))//
 						.ne("EXER.STATE", 0)//
-						.orderByDesc("EXER.UPDATE_TIME"));
+						.orderByDesc("EXER.ID"));
 		return new PageOut(page.getRecords(), page.getTotal());
 	}
 }

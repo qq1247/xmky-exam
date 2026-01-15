@@ -60,8 +60,8 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		Exer entity = getById(exer.getId());
 		entity.setName(exer.getName());
 		// entity.setQuestionBankIds(exer.getQuestionBankIds());// 不允许修改
-		entity.setUserIds(exer.getUserIds());
 		entity.setOrgIds(exer.getOrgIds());
+		entity.setUserIds(exer.getUserIds());
 		// entity.setState(exer.getState());// 单独接口控制
 		// entity.setCommentState(exer.gsetCommentState());// 单独接口控制
 		entity.setUpdateUserId(getCurUser().getId());

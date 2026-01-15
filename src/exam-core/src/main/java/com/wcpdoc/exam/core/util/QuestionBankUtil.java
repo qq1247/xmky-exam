@@ -25,7 +25,7 @@ public class QuestionBankUtil {
 	 * 
 	 * v1.0 zhanghc 2025年12月9日上午11:48:45
 	 * 
-	 * @param question
+	 * @param questionBank
 	 * @return boolean
 	 */
 	public static boolean hasRead(QuestionBank questionBank) {

@@ -45,7 +45,7 @@
                         </div>
                     </el-form-item>
                     <!-- 视频 -->
-                    <el-form-item label="视频" prop="rideoFileIds">
+                    <el-form-item label="视频" prop="videoFileIds">
                         <div class="img-group">
                             <div v-if="videoOptions.src" class="img">
                                 <longze-video-play ref="videoPlayerRef" v-bind="videoOptions"></longze-video-play>

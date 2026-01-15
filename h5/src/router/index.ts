@@ -39,6 +39,11 @@ const router = createRouter({
                     meta: { title: '考试列表' },
                 },
                 {
+                    path: 'course-list',
+                    component: () => import('@/views/admin/course/course-list.vue'),
+                    meta: { title: '课程列表' },
+                },
+                {
                     path: 'exer-list',
                     component: () => import('@/views/admin/exer/exer-list.vue'),
                     meta: { title: '练习列表' },
@@ -348,6 +353,50 @@ const router = createRouter({
                     path: 'statis/:id',
                     component: () => import('@/views/admin/exer/exer-statis.vue'),
                     meta: { title: '练习统计' },
+                },
+            ]
+        },
+        {
+            path: '/course',
+            meta: { title: '课程导航' },
+            component: () => import('@/views/admin/course/course-nav.vue'),
+            children: [
+                {
+                    path: 'add',
+                    component: () => import('@/views/admin/course/course-set.vue'),
+                    meta: { title: '课程设置' },
+                },
+                {
+                    path: 'set/:id',
+                    component: () => import('@/views/admin/course/course-set.vue'),
+                    meta: { title: '课程设置' },
+                },
+                {
+                    path: 'statis/:id',
+                    component: () => import('@/views/admin/course/course-statis.vue'),
+                    meta: { title: '课程统计' },
+                },
+                {
+                    path: 'course-nav',
+                    component: () => import('@/views/admin/course/course-material/course-material-nav.vue'),
+                    meta: { title: '课程资料' },
+                    children: [
+                        {
+                            path: 'list/:courseId',
+                            component: () => import('@/views/admin/course/course-material/course-material-list.vue'),
+                            meta: { title: '课程资料列表' },
+                        },
+                        {
+                            path: 'add/:courseId',
+                            component: () => import('@/views/admin/course/course-material/course-material-set.vue'),
+                            meta: { title: '课程资料添加' },
+                        },
+                        {
+                            path: 'set/:id',
+                            component: () => import('@/views/admin/course/course-material/course-material-set.vue'),
+                            meta: { title: '课程资料设置' },
+                        },
+                    ]
                 },
             ]
         },

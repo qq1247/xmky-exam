@@ -1,6 +1,6 @@
 <template>
-    <div class="exer-list">
-        <div class="exer-list__head">
+    <div class="course-list">
+        <div class="course-list__head">
             <el-form :model="queryForm" :inline="true" size="large" class="query">
                 <el-form-item label="">
                     <el-input v-model="queryForm.name" placeholder="请输入名称" />
@@ -10,58 +10,64 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-scrollbar max-height="calc(100vh - 360px)" class="exer-list__main">
-            <xmks-card-add name="添加练习" @click="$router.push('/exer/add')"></xmks-card-add>
-            <xmks-card-data v-for="exer in listpage.list" :key="exer.id" :title="exer.name" tag-name="练习" :btns="[{
+        <el-scrollbar max-height="calc(100vh - 360px)" class="course-list__main">
+            <xmks-card-add name="添加课程" @click="$router.push('/course/add')"></xmks-card-add>
+            <xmks-card-data v-for="course in listpage.list" :key="course.id" :title="course.name" tag-name="课程" :btns="[{
                 name: '设置',
                 icon: 'icon-liebiao-01',
-                event: () => $router.push(`/exer/set/${exer.id}`)
+                event: () => $router.push(`/course/set/${course.id}`)
+            }, {
+                name: '资料列表',
+                icon: 'icon-a-16ri-05',
+                event: () => $router.push(`/course/course-nav/list/${course.id}`)
             }, {
                 name: '统计',
                 icon: 'icon-liebiao-02',
-                event: () => $router.push(`/exer/statis/${exer.id}`)
-            }]" class="exer">
-                <div class="exer__state">
-                    <span class="exer__pre-txt">
-                        发布练习：<span class="exer__num">{{ dictStore.getValue('STATE_PS', exer.state) }}</span>
+                event: () => $router.push(`/course/statis/${course.id}`)
+            }]" class="course">
+                <div class="course__state">
+                    <span class="course__pre-txt">
+                        发布课程：<span class="course__num">{{ dictStore.getValue('STATE_PS', course.state) }}</span>
                     </span>
-                    <span class="exer__pre-txt">
-                        允许评论：<span class="exer__num">{{ dictStore.getValue('STATE_YN', exer.commentState) }}</span>
-                    </span>
+                    <!-- <span class="course__pre-txt">
+                        允许评论：<span class="course__num">{{ dictStore.getValue('STATE_YN', course.commentState) }}</span>
+                    </span> -->
                 </div>
-                <div class="exer__outer">
-                    <div class="exer__inner">
-                        <span class="exer__num">
-                            {{ exer.questionBankIds.length }}<span class="exer__unit">个</span>
+                <div class="course__outer">
+                    <!-- <div class="course__inner">
+                        <span class="course__num">
+                            {{ course.questionBankIds.length }}<span class="course__unit">个</span>
                         </span>
-                        <span class="exer__after-txt">题库已选</span>
+                        <span class="course__after-txt">题库已选</span>
+                    </div> -->
+                    <div class="course__inner">
+                        <span class="course__num">
+                            {{ course.objectiveNum + course.subjectiveNum }}<span class="course__unit">题</span>
+                        </span>
+                        <span class="course__after-txt">资料合计</span>
                     </div>
-                    <div class="exer__inner">
-                        <span class="exer__num">
-                            {{ exer.objectiveNum + exer.subjectiveNum }}<span class="exer__unit">题</span>
+                    <div class="course__inner">
+                        <span class="course__num">
+                            {{ course.orgIds.length }}<span class="course__unit">个</span>
                         </span>
-                        <span class="exer__after-txt">试题合计</span>
+                        <span class="course__after-txt">机构已选</span>
                     </div>
-                    <div class="exer__inner">
-                        <span class="exer__num">
-                            {{ exer.orgIds.length }}<span class="exer__unit">个</span>
+                    <div class="course__inner">
+                        <span class="course__num">
+                            {{ course.userIds.length }}<span class="course__unit">人</span>
                         </span>
-                        <span class="exer__after-txt">机构已选</span>
-                    </div>
-                    <div class="exer__inner">
-                        <span class="exer__num">
-                            {{ exer.userIds.length }}<span class="exer__unit">人</span>
-                        </span>
-                        <span class="exer__after-txt">用户已选</span>
+                        <span class="course__after-txt">用户已选</span>
                     </div>
                 </div>
-                <div class="exer__other">
-                    <span class="exer__time">{{ exer.updateTime }}</span>
-                    <span class="exer__username">{{ exer.createUserName }}</span>
+                <div class="course__other">
+                    <span class="course__time">{{ course.updateTime }}</span>
+                    <span class="course__username">
+                        {{ course.createUserName }} /
+                        {{ dictStore.getValue('SHARE_AUTH', course.shareAuth) }}权限</span>
                 </div>
             </xmks-card-data>
         </el-scrollbar>
-        <div class="exer-list__foot">
+        <div class="course-list__foot">
             <el-pagination v-model:current-page="listpage.curPage" v-model:page-size="listpage.pageSize"
                 :total="listpage.total" background layout="prev, pager, next" :hide-on-single-page="true" size="large"
                 class="pagination" @size-change="query" @current-change="query" @prev-click="query"
@@ -75,7 +81,7 @@ import type { Listpage } from '@/ts/common/listpage'
 import XmksCardData from '@/components/card/xmks-card-data.vue'
 import XmksCardAdd from '@/components/card/xmks-card-add.vue'
 import { useDictStore } from '@/stores/dict'
-import { exerListpage } from '@/api/exam/exer'
+import { courseListpage } from '@/api/course/course'
 
 /************************变量定义相关***********************/
 const dictStore = useDictStore() // 字典缓存
@@ -97,7 +103,7 @@ onMounted(() => {
 /************************事件相关*****************************/
 // 查询
 async function query() {
-    const { data: { code, data } } = await exerListpage({
+    const { data: { code, data } } = await courseListpage({
         ...queryForm,
         curPage: listpage.curPage,
         pageSize: listpage.pageSize,
@@ -113,13 +119,13 @@ async function query() {
 
 </script>
 <style lang="scss" scoped>
-.exer-list {
+.course-list {
     display: flex;
     flex-direction: column;
     width: 1200px;
     margin: 20px 0px;
 
-    .exer-list__head {
+    .course-list__head {
         .query {
             .el-form-item {
                 width: 260px;
@@ -142,7 +148,7 @@ async function query() {
         }
     }
 
-    :deep(.exer-list__main) {
+    :deep(.course-list__main) {
         flex: 1;
 
         .el-scrollbar__view {
@@ -150,32 +156,32 @@ async function query() {
             grid-template-columns: repeat(3, 1fr);
             gap: 20px 20px;
 
-            .exer {
+            .course {
                 display: flex;
                 flex-direction: column;
                 height: 220px;
 
-                .exer__state {
+                .course__state {
                     display: flex;
                     justify-content: center;
                     align-items: baseline;
                     margin-top: 15px;
 
-                    .exer__pre-txt {
+                    .course__pre-txt {
                         font-size: 12px;
                         color: #8F939C;
                         margin-right: 20px;
 
-                        .exer__num {
+                        .course__num {
                             font-size: 12px;
                             color: #333333;
                         }
                     }
                 }
 
-                .exer__outer {
+                .course__outer {
                     display: grid;
-                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-columns: repeat(3, 1fr);
                     height: 74px;
                     justify-content: center;
                     align-items: center;
@@ -183,7 +189,7 @@ async function query() {
                     background: #EFF5FA;
                     border-radius: 6px 6px 6px 6px;
 
-                    .exer__inner {
+                    .course__inner {
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
@@ -206,18 +212,18 @@ async function query() {
                             }
                         }
 
-                        .exer__num {
+                        .course__num {
                             font-size: 16px;
                             color: #333333;
 
-                            .exer__unit {
+                            .course__unit {
                                 font-size: 10px;
                                 color: #8F939C;
                             }
                         }
 
 
-                        .exer__after-txt {
+                        .course__after-txt {
                             font-size: 12px;
                             color: #8F939C;
                             flex: 1 0 100%;
@@ -227,7 +233,7 @@ async function query() {
                     }
                 }
 
-                .exer__other {
+                .course__other {
                     display: flex;
                     justify-content: space-between;
                     margin-top: 20px;
@@ -238,7 +244,7 @@ async function query() {
         }
     }
 
-    .exer-list__foot {
+    .course-list__foot {
         display: flex;
         justify-content: center;
 

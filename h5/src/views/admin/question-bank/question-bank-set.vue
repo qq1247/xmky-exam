@@ -6,14 +6,6 @@
                     <el-form-item label="名称" prop="name">
                         <el-input v-model="form.name" placeholder="请输入名称" />
                     </el-form-item>
-                    <el-form-item v-if="$route.path.indexOf('add') !== -1" label="共享权限" prop="shareAuth">
-                        <el-radio-group v-model="form.shareAuth">
-                            <el-radio-button v-for="dict in dictStore.getList('SHARE_AUTH')" :key="dict.dictKey"
-                                :value="parseInt(dict.dictKey)" class="form__radio">
-                                {{ dict.dictValue }}
-                            </el-radio-button>
-                        </el-radio-group>
-                    </el-form-item>
                     <el-form-item>
                         <el-button v-if="$route.path.indexOf('add') !== -1" type="primary" class="form__btn"
                             @click="add">添加</el-button>
@@ -22,8 +14,7 @@
                 </el-form>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="shareForm.id && (userStore.isAdmin() || userStore.id == shareForm.createUserId)"
-            title="共享权限" desc="共享权限">
+        <xmks-edit-card v-if="shareForm.id" title="共享权限" desc="私有：仅自己管理；只读：多子管理员可使用；读写：多子管理员可编辑。">
             <template #card-main>
                 <el-form ref="shareFormRef" :model="shareForm" :rules="shareFormRules" label-width="100" size="large"
                     class="form">
@@ -38,12 +29,10 @@
                 </el-form>
             </template>
             <template #card-side>
-                <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': clearConfirm }"
-                    style="margin-bottom: 14px;" @click="share">保存设置</el-button>
+                <el-button type="primary" class="form__btn" style="margin-bottom: 14px;" @click="share">保存设置</el-button>
             </template>
         </xmks-edit-card>
-        <xmks-edit-card v-if="shareForm.id && (userStore.isAdmin() || userStore.id == shareForm.createUserId)"
-            title="参考资料" desc="基于企业内部权威资料，在用户练题时提供相关参考，帮助其理解相关背景与依据。资料须与题库高度相关，以保障体验。">
+        <xmks-edit-card v-if="shareForm.id" title="参考资料" desc="基于企业内部权威资料，在用户练题时提供相关参考，帮助其理解相关背景与依据。资料须与题库高度相关，以保障体验。">
             <template #card-main>
                 <el-form ref="shareFormRef" :model="shareForm" :rules="shareFormRules" label-width="100" size="large"
                     class="form">
@@ -56,8 +45,7 @@
             <template #card-side>
                 <el-upload :http-request="customUpload" :show-file-list="false" accept=".doc,.docx,.pdf,DOC,DOCX,PDF"
                     :limit="4" :before-upload="uploadBefore" :multiple="true" :on-success="uploadSuccess">
-                    <el-button type="primary" class="form__btn" :class="{ 'form__btn--warn': clearConfirm }"
-                        style="margin-bottom: 14px;">上传资料</el-button>
+                    <el-button type="primary" class="form__btn" style="margin-bottom: 14px;">上传资料</el-button>
                 </el-upload>
             </template>
         </xmks-edit-card>
@@ -129,7 +117,6 @@ const formRef = ref<FormInstance>()// 表单引用
 const form = reactive<QuestionBank>({
     id: null,
     name: '',
-    shareAuth: 1,
 })
 
 const formRules = reactive<FormRules>({// 表单规则
@@ -143,9 +130,9 @@ const clearConfirm = ref(false) // 清空确认
 
 const shareFormRef = ref<FormInstance>()// 表单引用
 const shareForm = reactive({// 表单
-    id: null,// ID
-    shareAuth: null,// ID
-    createUserId: null,// ID
+    id: null,
+    shareAuth: null,
+    createUserId: null,
 })
 const shareFormRules = reactive<FormRules>({// 表单校验规则
     shareAuth: [

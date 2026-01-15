@@ -89,7 +89,9 @@ public class AuthConf {
 						"/api/question-bank/**", //
 						"/api/question/**", //
 						"/api/exam/**", //
-						"/api/exer/**"//
+						"/api/exer/**",//
+						"/api/course/**",//
+						"/api/courseMaterial/**"//
 				)//
 				.hasAnyRole("ADMIN", "SUB_ADMIN")//
 				// ========== 管理员、子管理员、阅卷用户 ==========

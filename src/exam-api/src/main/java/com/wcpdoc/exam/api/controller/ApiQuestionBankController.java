@@ -75,12 +75,6 @@ public class ApiQuestionBankController extends BaseController {
 			if (!ValidateUtil.isValid(questionBank.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			if (!ValidateUtil.isValid(questionBank.getShareAuth())) {
-				throw new MyException("参数错误：shareAuth");
-			}
-			if (!(questionBank.getShareAuth() >= 1 && questionBank.getShareAuth() <= 3)) {
-				throw new MyException("参数错误：shareAuth");
-			}
 			// if (existName(questionBank)) {
 			// throw new MyException("名称已存在");
 			// } // 不同的子管理员添加可以重复
@@ -96,6 +90,7 @@ public class ApiQuestionBankController extends BaseController {
 			questionBank.setQaSubNum(0);
 			questionBank.setQaObjNum(0);
 			questionBank.setQuestionNum(0);
+			questionBank.setShareAuth(1);// 默认私有
 			questionBank.setState(1);
 			questionBank.setCreateUserId(getCurUser().getId());
 			questionBank.setUpdateTime(new Date());
@@ -226,14 +221,15 @@ public class ApiQuestionBankController extends BaseController {
 		try {
 			// 数据校验
 			QuestionBank entity = questionBankService.getById(id);
-			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+					|| QuestionBankUtil.hasWrite(entity))) {
 				throw new MyException("无操作权限");
 			}
 			if (!(shareAuth >= 1 && shareAuth <= 3)) {
 				throw new MyException("参数错误：shareAuth");
 			}
 
-			// 保存题库
+			// 权限更新
 			entity.setShareAuth(shareAuth);
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());

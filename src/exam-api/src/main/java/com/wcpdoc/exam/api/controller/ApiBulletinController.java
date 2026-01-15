@@ -50,7 +50,7 @@ public class ApiBulletinController extends BaseController {
 	}
 
 	/**
-	 * 添加公告
+	 * 公告添加
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * 
@@ -71,23 +71,23 @@ public class ApiBulletinController extends BaseController {
 				throw new MyException("参数错误：title");
 			}
 
-			// 添加公告
+			// 公告添加
 			bulletin.setState(1);
 			bulletin.setUpdateTime(new Date());
 			bulletin.setUpdateUserId(getCurUser().getId());
 			bulletinService.save(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加公告错误：{}", e.getMessage());
+			log.error("公告添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加公告错误：", e);
+			log.error("公告添加错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 修改公告
+	 * 公告修改
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * 
@@ -108,23 +108,27 @@ public class ApiBulletinController extends BaseController {
 				throw new MyException("参数错误：title");
 			}
 
-			// 添加公告
-			bulletin.setState(1);
-			bulletin.setUpdateTime(new Date());
-			bulletin.setUpdateUserId(getCurUser().getId());
-			bulletinService.updateById(bulletin);
+			// 公告修改
+			Bulletin entity = bulletinService.getById(bulletin.getId());
+			entity.setStartTime(bulletin.getStartTime());
+			entity.setEndTime(bulletin.getEndTime());
+			entity.setTitle(bulletin.getTitle());
+			entity.setContent(bulletin.getContent());
+			entity.setUpdateUserId(getCurUser().getId());
+			entity.setUpdateTime(new Date());
+			bulletinService.updateById(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改公告错误：{}", e.getMessage());
+			log.error("公告修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改公告错误：", e);
+			log.error("公告修改错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 删除公告
+	 * 公告删除
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * 
@@ -134,21 +138,23 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			Bulletin bulletin = bulletinService.getById(id);
-			bulletin.setState(0);
-			bulletinService.updateById(bulletin);
+			Bulletin entity = bulletinService.getById(id);
+			entity.setState(0);
+			entity.setUpdateUserId(getCurUser().getId());
+			entity.setUpdateTime(new Date());
+			bulletinService.updateById(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除公告错误：{}", e.getMessage());
+			log.error("公告删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除公告错误：", e);
+			log.error("公告删除错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取公告
+	 * 公告获取
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * 
@@ -158,15 +164,19 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/get")
 	public PageResult get(Integer id) {
 		try {
-			Bulletin bulletin = bulletinService.getById(id);
-			return PageResultEx.ok().addAttr("id", bulletin.getId()).addAttr("startTime", bulletin.getStartTime())
-					.addAttr("endTime", bulletin.getEndTime()).addAttr("title", bulletin.getTitle())
-					.addAttr("content", bulletin.getContent());
+			Bulletin entity = bulletinService.getById(id);
+			return PageResultEx.ok()//
+					.addAttr("id", entity.getId())//
+					.addAttr("startTime", entity.getStartTime())//
+					.addAttr("endTime", entity.getEndTime())//
+					.addAttr("title", entity.getTitle())//
+					.addAttr("content", entity.getContent())//
+			;
 		} catch (MyException e) {
-			log.error("获取公告错误：{}", e.getMessage());
+			log.error("公告获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取公告错误：", e);
+			log.error("公告获取错误：", e);
 			return PageResult.err();
 		}
 	}

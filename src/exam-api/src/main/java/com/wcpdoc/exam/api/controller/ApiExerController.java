@@ -156,19 +156,19 @@ public class ApiExerController extends BaseController {
 	public PageResult del(Integer id) {
 		try {
 			// 数据校验
-			Exer exer = exerService.getById(id);
-			if (!(CurLoginUserUtil.isSelf(exer.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
+			Exer entity = exerService.getById(id);
+			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin())) {
 				throw new MyException("无操作权限");
 			}
-			if (exer.getState().intValue() == 0) {
+			if (entity.getState().intValue() == 0) {
 				throw new MyException("已删除");
 			}
 
 			// 删除
-			exer.setState(0);
-			exer.setUpdateTime(new Date());
-			exer.setUpdateUserId(getCurUser().getId());
-			exerService.updateById(exer);
+			entity.setState(0);
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
+			exerService.updateById(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("练习删除错误：{}", e.getMessage());

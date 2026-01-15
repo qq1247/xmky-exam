@@ -46,6 +46,9 @@ public class QuestionBankServiceImpl extends BaseServiceImp<QuestionBank> implem
 				|| QuestionBankUtil.hasWrite(entity))) {
 			throw new MyException("无操作权限");
 		}
+		if (entity.getState().intValue() == 0) {
+			throw new MyException("已删除");
+		}
 
 		// 题库删除
 		entity.setObjectiveNum(0);
