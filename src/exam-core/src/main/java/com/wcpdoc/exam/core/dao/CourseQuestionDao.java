@@ -31,7 +31,8 @@ public interface CourseQuestionDao extends RBaseDao<CourseQuestion> {
 	}
 
 	default List<CourseQuestion> getList(Integer courseMaterialId) {
-		return selectList(new LambdaQueryWrapper<CourseQuestion>()
-				.eq(CourseQuestion::getCourseMaterialId, courseMaterialId).orderByAsc(CourseQuestion::getAnswerTime));
+		return selectList(new LambdaQueryWrapper<CourseQuestion>()//
+				.eq(CourseQuestion::getCourseMaterialId, courseMaterialId)//
+				.orderByAsc(CourseQuestion::getCourseTime));
 	}
 }

@@ -60,8 +60,20 @@ public class CourseServiceImpl extends BaseServiceImp<Course> implements CourseS
 		entity.setContent(course.getContent());
 		entity.setOrgIds(course.getOrgIds());
 		entity.setUserIds(course.getUserIds());
-		course.setUpdateUserId(getCurUser().getId());
-		course.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		entity.setUpdateTime(new Date());
+		updateById(entity);
+	}
+
+	@Override
+	public void del(Integer id) {
+		// 数据校验
+		Course entity = delValide(id);
+
+		// 课程删除
+		entity.setState(0);
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
 		updateById(entity);
 	}
 
@@ -127,6 +139,18 @@ public class CourseServiceImpl extends BaseServiceImp<Course> implements CourseS
 				|| CourseUtil.hasWrite(entity))) {
 			throw new MyException("无操作权限");
 		}
+	}
+
+	private Course delValide(Integer id) {
+		Course entity = getById(id);
+		if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+				|| CourseUtil.hasWrite(entity))) {
+			throw new MyException("无操作权限");
+		}
+		if (entity.getState().intValue() == 0) {
+			throw new MyException("已删除");
+		}
+		return entity;
 	}
 
 }

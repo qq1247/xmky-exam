@@ -57,7 +57,7 @@ public class ApiCourseController extends BaseController {
 		try {
 			if (CurLoginUserUtil.isAdmin()) {// 管理员看所有
 
-			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员登录，各看各的创建的
+			} else if (CurLoginUserUtil.isSubAdmin()) {// 子管理员登录，看自己创建的和有共享权限的
 				pageIn.addParm("subAdminUserId", getCurUser().getId());
 			} else if (CurLoginUserUtil.isExamUser()) {// 考试用户看（管理或子管理）分配给自己的
 				User user = baseCacheService.getUser(getCurUser().getId());
@@ -137,21 +137,7 @@ public class ApiCourseController extends BaseController {
 	@RequestMapping("/del")
 	public PageResult del(Integer id) {
 		try {
-			// 数据校验
-			Course entity = courseService.getById(id);
-			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
-					|| CourseUtil.hasWrite(entity))) {
-				throw new MyException("无操作权限");
-			}
-			if (entity.getState().intValue() == 0) {
-				throw new MyException("已删除");
-			}
-
-			// 课程删除
-			entity.setState(0);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			courseService.updateById(entity);
+			courseService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("课程删除错误：{}", e.getMessage());
@@ -175,7 +161,7 @@ public class ApiCourseController extends BaseController {
 		try {
 			Course entity = courseService.getById(id);
 			if (!(CurLoginUserUtil.isSelf(entity.getCreateUserId()) || CurLoginUserUtil.isAdmin()
-					|| CourseUtil.hasWrite(entity))) {
+					|| CourseUtil.hasRead(entity))) {
 				throw new MyException("无操作权限");
 			}
 

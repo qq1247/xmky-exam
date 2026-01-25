@@ -59,6 +59,11 @@ const router = createRouter({
                     meta: { title: '我的练习列表' },
                 },
                 {
+                    path: 'my-course-list',
+                    component: () => import('@/views/exam-user/my-course/my-course-list.vue'),
+                    meta: { title: '我的课程列表' },
+                },
+                {
                     path: 'my-mark-list',
                     component: () => import('@/views/mark-user/my-mark/my-mark-list.vue'),
                     meta: { title: '我的阅卷列表' },
@@ -437,6 +442,23 @@ const router = createRouter({
                     path: 'paper/:exerId/:id',
                     component: () => import('@/views/exam-user/my-exer/my-exer-paper.vue'),
                     meta: { title: '我的练习' },
+                },
+            ]
+        },
+        {
+            path: '/my-course',
+            meta: { title: '我的课程导航' },
+            component: () => import('@/views/exam-user/my-course/my-course-nav.vue'),
+            children: [
+                {
+                    path: 'read/:courseId',
+                    component: () => import('@/views/exam-user/my-course/my-course-read.vue'),
+                    meta: { title: '学前阅读' },
+                },
+                {
+                    path: 'paper/:courseId',
+                    component: () => import('@/views/exam-user/my-course/my-course-paper.vue'),
+                    meta: { title: '我的课程' },
                 },
             ]
         },

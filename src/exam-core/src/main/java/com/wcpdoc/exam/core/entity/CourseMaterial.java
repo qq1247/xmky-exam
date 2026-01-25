@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.time.LocalTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -21,7 +22,7 @@ public class CourseMaterial {
 	private String name;
 	private String content;
 	private Integer videoFileId;
-	private Integer videoSecond;
+	private LocalTime videoTime;
 	private Integer questionNum;
 	private Integer courseId;
 	private Integer no;

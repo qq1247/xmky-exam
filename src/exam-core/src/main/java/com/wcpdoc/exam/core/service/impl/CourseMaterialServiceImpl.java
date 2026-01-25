@@ -55,25 +55,25 @@ public class CourseMaterialServiceImpl extends BaseServiceImp<CourseMaterial> im
 	}
 
 	@Override
-	public void add(CourseMaterial courseMaterial, LocalTime[] answerTimes, Integer[] questionIds) {
+	public void add(CourseMaterial courseMaterial, LocalTime[] courseTimes, Integer[] questionIds) {
 		// 数据校验
 		Course course = addValid0(courseMaterial);
-		double videoSecond = addValid(courseMaterial, course, answerTimes, questionIds);
+		double videoSecond = addValid(courseMaterial, course, courseTimes, questionIds);
 
 		// 课程资料添加
-		courseMaterial.setQuestionNum(ValidateUtil.isValid(answerTimes) ? answerTimes.length : 0);
+		courseMaterial.setQuestionNum(ValidateUtil.isValid(courseTimes) ? courseTimes.length : 0);
 		courseMaterial.setUpdateTime(new Date());
 		courseMaterial.setUpdateUserId(getCurUser().getId());
-		courseMaterial.setVideoSecond((int) videoSecond);// 向下取整
+		courseMaterial.setVideoTime(LocalTime.ofSecondOfDay((int) videoSecond));// 向下取整
 		courseMaterial.setState(1);
 		save(courseMaterial);
 
 		// 课程试题添加
-		if (ValidateUtil.isValid(answerTimes) && ValidateUtil.isValid(questionIds)) {
+		if (ValidateUtil.isValid(courseTimes) && ValidateUtil.isValid(questionIds)) {
 			List<CourseQuestion> courseQuestionList = new ArrayList<>();
-			for (int i = 0; i < answerTimes.length; i++) {
+			for (int i = 0; i < courseTimes.length; i++) {
 				CourseQuestion courseQuestion = new CourseQuestion();
-				courseQuestion.setAnswerTime(answerTimes[i]);
+				courseQuestion.setCourseTime(courseTimes[i]);
 				courseQuestion.setQuestionId(questionIds[i]);
 				courseQuestion.setCourseId(course.getId());
 				courseQuestion.setCourseMaterialId(courseMaterial.getId());
@@ -81,7 +81,7 @@ public class CourseMaterialServiceImpl extends BaseServiceImp<CourseMaterial> im
 				courseQuestion.setUpdateUserId(getCurUser().getId());
 				courseQuestionList.add(courseQuestion);
 			}
-			courseQuestionList.sort(Comparator.comparing(CourseQuestion::getAnswerTime));// 按答题时间排序
+			courseQuestionList.sort(Comparator.comparing(CourseQuestion::getCourseTime));// 按答题时间排序
 			for (CourseQuestion courseQuestion : courseQuestionList) {
 				courseQuestionService.save(courseQuestion);
 			}
@@ -92,12 +92,12 @@ public class CourseMaterialServiceImpl extends BaseServiceImp<CourseMaterial> im
 	}
 
 	@Override
-	public void update(CourseMaterial courseMaterial, LocalTime[] answerTimes, Integer[] questionIds) {
+	public void update(CourseMaterial courseMaterial, LocalTime[] courseTimes, Integer[] questionIds) {
 		// 数据校验
 		CourseMaterial entity = updateValid0(courseMaterial);
-		double videoSecond = updateValid(courseMaterial, entity, answerTimes, questionIds);
+		double videoSecond = updateValid(courseMaterial, entity, courseTimes, questionIds);
 
-		// 课程资料复制新版本，并删除旧版本
+		// 课程资料复制新版本，并删除旧版本（只要修改就表示需要重学）
 		entity.setState(0);
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
@@ -108,32 +108,35 @@ public class CourseMaterialServiceImpl extends BaseServiceImp<CourseMaterial> im
 		newCourseMaterial.setId(null);
 		newCourseMaterial.setState(1);
 		newCourseMaterial.setParentId(entity.getId()); // 用于追溯历史
-
 		newCourseMaterial.setName(courseMaterial.getName());
 		newCourseMaterial.setContent(courseMaterial.getContent());
 		newCourseMaterial.setVideoFileId(courseMaterial.getVideoFileId());
-		newCourseMaterial.setVideoSecond((int) videoSecond);// 向下取整
-		newCourseMaterial.setQuestionNum(ValidateUtil.isValid(answerTimes) ? answerTimes.length : 0);
+		newCourseMaterial.setVideoTime(LocalTime.ofSecondOfDay((int) videoSecond));// 向下取整
+		newCourseMaterial.setQuestionNum(ValidateUtil.isValid(courseTimes) ? courseTimes.length : 0);
 		newCourseMaterial.setNo(courseMaterial.getNo());
 		newCourseMaterial.setUpdateTime(new Date());
 		newCourseMaterial.setUpdateUserId(getCurUser().getId());
 		save(newCourseMaterial);
 
 		// 课程试题添加
-		if (ValidateUtil.isValid(answerTimes) && ValidateUtil.isValid(questionIds)) {
-			List<CourseQuestion> courseQuestionList = new ArrayList<>();
-			for (int i = 0; i < answerTimes.length; i++) {
+		List<CourseQuestion> courseQuestionList = courseQuestionService.getList(entity.getId());
+		for (CourseQuestion courseQuestion : courseQuestionList) {
+			courseQuestionService.removeById(courseQuestion.getId());
+		}
+		if (ValidateUtil.isValid(courseTimes) && ValidateUtil.isValid(questionIds)) {
+			List<CourseQuestion> _courseQuestionList = new ArrayList<>();
+			for (int i = 0; i < courseTimes.length; i++) {
 				CourseQuestion courseQuestion = new CourseQuestion();
-				courseQuestion.setAnswerTime(answerTimes[i]);
+				courseQuestion.setCourseTime(courseTimes[i]);
 				courseQuestion.setQuestionId(questionIds[i]);
 				courseQuestion.setCourseId(newCourseMaterial.getCourseId());
 				courseQuestion.setCourseMaterialId(newCourseMaterial.getId());
 				courseQuestion.setUpdateTime(new Date());
 				courseQuestion.setUpdateUserId(getCurUser().getId());
-				courseQuestionList.add(courseQuestion);
+				_courseQuestionList.add(courseQuestion);
 			}
-			courseQuestionList.sort(Comparator.comparing(CourseQuestion::getAnswerTime));// 按答题时间排序
-			for (CourseQuestion courseQuestion : courseQuestionList) {
+			_courseQuestionList.sort(Comparator.comparing(CourseQuestion::getCourseTime));// 按答题时间排序
+			for (CourseQuestion courseQuestion : _courseQuestionList) {
 				courseQuestionService.save(courseQuestion);
 			}
 		}
@@ -283,5 +286,10 @@ public class CourseMaterialServiceImpl extends BaseServiceImp<CourseMaterial> im
 			throw new MyException("参数错误：courseId");
 		}
 		return courseService.getById(courseMaterial.getCourseId());
+	}
+
+	@Override
+	public List<CourseMaterial> getList(Integer courseId) {
+		return courseMaterialDao.getList(courseId);
 	}
 }

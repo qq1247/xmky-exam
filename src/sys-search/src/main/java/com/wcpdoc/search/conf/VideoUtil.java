@@ -33,7 +33,7 @@ public class VideoUtil {
 
 		try (InputStream is = new FileInputStream(videoFile)) {
 			MP4Parser parser = new MP4Parser();
-			BodyContentHandler handler = new BodyContentHandler(0);
+			BodyContentHandler handler = new BodyContentHandler(1024);
 			Metadata metadata = new Metadata();
 			ParseContext context = new ParseContext();
 			parser.parse(is, handler, metadata, context);

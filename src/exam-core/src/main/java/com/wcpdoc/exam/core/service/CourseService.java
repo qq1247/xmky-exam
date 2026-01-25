@@ -28,4 +28,13 @@ public interface CourseService extends BaseService<Course> {
 	 */
 	void update(Course course);
 
+	/**
+	 * 课程删除
+	 * 
+	 * v1.0 zhanghc 2026-01-12 10:03:53
+	 * 
+	 * @param course void
+	 */
+	void del(Integer id);
+
 }

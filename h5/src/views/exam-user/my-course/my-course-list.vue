@@ -1,6 +1,6 @@
 <template>
-    <div class="course-list">
-        <div class="course-list__head">
+    <div class="my-course-list">
+        <div class="my-course-list__head">
             <el-form :model="queryForm" :inline="true" size="large" class="query">
                 <el-form-item label="">
                     <el-input v-model="queryForm.name" placeholder="请输入名称" />
@@ -10,64 +10,35 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-scrollbar max-height="calc(100vh - 360px)" class="course-list__main">
-            <xmks-card-add name="添加课程" @click="$router.push('/course/add')"></xmks-card-add>
-            <xmks-card-data v-for="course in listpage.list" :key="course.id" :title="course.name" tag-name="课程" :btns="[{
-                name: '设置',
-                icon: 'icon-liebiao-01',
-                event: () => $router.push(`/course/set/${course.id}`)
-            }, {
-                name: '资料列表',
-                icon: 'icon-a-16ri-05',
-                event: () => $router.push(`/course/course-nav/list/${course.id}`)
-            }, {
-                name: '统计',
-                icon: 'icon-liebiao-02',
-                event: () => $router.push(`/course/statis/${course.id}`)
-            }]" class="course">
-                <div class="course__state">
-                    <span class="course__pre-txt">
-                        发布课程：<span class="course__num">{{ dictStore.getValue('STATE_PS', course.state) }}</span>
-                    </span>
-                    <!-- <span class="course__pre-txt">
-                        允许评论：<span class="course__num">{{ dictStore.getValue('STATE_YN', course.commentState) }}</span>
-                    </span> -->
+        <el-scrollbar max-height="calc(100vh - 360px)" class="my-course-list__main">
+            <xmks-card-empty v-if="listpage.total === 0" name="暂无课程" icon="icon-tubiaoziti22-22"></xmks-card-empty>
+            <xmks-card-data v-else v-for="course in listpage.list" :key="course.id" :title="course.name" tag-name="课程"
+                class="my-course">
+                <div class="my-course__exam-time">
                 </div>
-                <div class="course__outer">
-                    <div class="course__inner">
-                        <span class="course__num">
+                <div class="my-course__outer">
+                    <div class="my-course__inner">
+                        <span class="my-course__num">
                             {{ course.courseMaterialNum }}<span class="course__unit">个</span>
                         </span>
-                        <span class="course__after-txt">资料合计</span>
+                        <span class="my-course__after-txt">资料合计</span>
                     </div>
-                    <div class="course__inner">
-                        <span class="course__num">
+                    <div class="my-course__inner">
+                        <span class="my-course__num">
                             {{ course.questionNum }}<span class="course__unit">道</span>
                         </span>
-                        <span class="course__after-txt">试题合计</span>
-                    </div>
-                    <div class="course__inner">
-                        <span class="course__num">
-                            {{ course.orgIds.length }}<span class="course__unit">个</span>
-                        </span>
-                        <span class="course__after-txt">机构已选</span>
-                    </div>
-                    <div class="course__inner">
-                        <span class="course__num">
-                            {{ course.userIds.length }}<span class="course__unit">人</span>
-                        </span>
-                        <span class="course__after-txt">用户已选</span>
+                        <span class="my-course__after-txt">试题合计</span>
                     </div>
                 </div>
-                <div class="course__other">
-                    <span class="course__time">{{ course.updateTime }}</span>
-                    <span class="course__username">
-                        {{ course.createUserName }} /
-                        {{ dictStore.getValue('SHARE_AUTH', course.shareAuth) }}权限</span>
+                <div class="my-course__other">
+                    <div></div>
+                    <el-button type="primary" class="my-course__btn" @click="toCourse(course)">
+                        进入课程
+                    </el-button>
                 </div>
             </xmks-card-data>
         </el-scrollbar>
-        <div class="course-list__foot">
+        <div class="my-course-list__foot">
             <el-pagination v-model:current-page="listpage.curPage" v-model:page-size="listpage.pageSize"
                 :total="listpage.total" background layout="prev, pager, next" :hide-on-single-page="true" size="large"
                 class="pagination" @size-change="query" @current-change="query" @prev-click="query"
@@ -79,18 +50,18 @@
 import { reactive, onMounted, } from 'vue'
 import type { Listpage } from '@/ts/common/listpage'
 import XmksCardData from '@/components/card/xmks-card-data.vue'
-import XmksCardAdd from '@/components/card/xmks-card-add.vue'
-import { useDictStore } from '@/stores/dict'
-import { courseListpage } from '@/api/course/course'
+import XmksCardEmpty from '@/components/card/xmks-card-empty.vue'
+import { useRouter } from 'vue-router'
+import { myCourseCourseListpage } from '@/api/my/my-course'
 
 /************************变量定义相关***********************/
-const dictStore = useDictStore() // 字典缓存
+const router = useRouter()
 const queryForm = reactive({// 查询表单
-    name: '',
+    name: '', // 课程名称
 })
 const listpage = reactive<Listpage>({// 分页列表
     curPage: 1,
-    pageSize: 5,
+    pageSize: 6,
     total: 0,
     list: [],
 })
@@ -103,8 +74,9 @@ onMounted(() => {
 /************************事件相关*****************************/
 // 查询
 async function query() {
-    const { data: { code, data } } = await courseListpage({
+    const { data: { code, data } } = await myCourseCourseListpage({
         ...queryForm,
+        state: 1,
         curPage: listpage.curPage,
         pageSize: listpage.pageSize,
     })
@@ -117,15 +89,20 @@ async function query() {
     listpage.total = data.total
 }
 
+// 课程进入
+async function toCourse(course: any) {
+    router.push(`/my-course/read/${course.id}`)
+}
+
 </script>
 <style lang="scss" scoped>
-.course-list {
+.my-course-list {
     display: flex;
     flex-direction: column;
     width: 1200px;
     margin: 20px 0px;
 
-    .course-list__head {
+    .my-course-list__head {
         .query {
             .el-form-item {
                 width: 260px;
@@ -148,7 +125,7 @@ async function query() {
         }
     }
 
-    :deep(.course-list__main) {
+    :deep(.my-course-list__main) {
         flex: 1;
 
         .el-scrollbar__view {
@@ -156,32 +133,32 @@ async function query() {
             grid-template-columns: repeat(3, 1fr);
             gap: 20px 20px;
 
-            .course {
+            .my-course {
                 display: flex;
                 flex-direction: column;
                 height: 220px;
 
-                .course__state {
+                .my-course__exam-time {
                     display: flex;
                     justify-content: center;
                     align-items: baseline;
-                    margin-top: 15px;
+                    margin-top: 10px;
 
-                    .course__pre-txt {
+                    .my-course__pre-txt {
                         font-size: 12px;
                         color: #8F939C;
                         margin-right: 20px;
 
-                        .course__num {
-                            font-size: 12px;
+                        .my-course__num {
+                            font-size: 16px;
                             color: #333333;
                         }
                     }
                 }
 
-                .course__outer {
+                .my-course__outer {
                     display: grid;
-                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-columns: repeat(2, 1fr);
                     height: 74px;
                     justify-content: center;
                     align-items: center;
@@ -189,7 +166,7 @@ async function query() {
                     background: #EFF5FA;
                     border-radius: 6px 6px 6px 6px;
 
-                    .course__inner {
+                    .my-course__inner {
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
@@ -212,18 +189,18 @@ async function query() {
                             }
                         }
 
-                        .course__num {
+                        .my-course__num {
                             font-size: 16px;
                             color: #333333;
 
-                            .course__unit {
+                            .my-course__unit {
                                 font-size: 10px;
                                 color: #8F939C;
                             }
                         }
 
 
-                        .course__after-txt {
+                        .my-course__after-txt {
                             font-size: 12px;
                             color: #8F939C;
                             flex: 1 0 100%;
@@ -233,18 +210,29 @@ async function query() {
                     }
                 }
 
-                .course__other {
+                .my-course__other {
                     display: flex;
                     justify-content: space-between;
-                    margin-top: 20px;
+                    align-items: center;
+                    margin-top: 16px;
                     font-size: 12px;
                     color: #8F939C;
+
+                    .my-course__btn {
+                        height: 30px;
+                        padding: 0px 20px;
+                        border-radius: 6px;
+                        border: 0px;
+                        color: #FFFFFF;
+                        font-size: 14px;
+                        background-image: linear-gradient(to right, #04C7F2, #259FF8);
+                    }
                 }
             }
         }
     }
 
-    .course-list__foot {
+    .my-course-list__foot {
         display: flex;
         justify-content: center;
 

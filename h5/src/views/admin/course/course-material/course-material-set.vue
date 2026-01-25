@@ -29,9 +29,9 @@
                         <el-input v-model="form.content" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }"
                             :show-word-limit="true" maxlength="128" placeholder="请输入简介" />
                     </el-form-item>
-                    <el-form-item label=" 答题" prop="courseTimes">
+                    <el-form-item label=" 答题" prop="courseQuestions">
                         <div v-for="(courseTime, index) in form.courseQuestions" :key="index" class="form__times">
-                            <el-time-picker v-model="courseTime.answerTime" format="HH:mm:ss" value-format="HH:mm:ss"
+                            <el-time-picker v-model="courseTime.courseTime" format="HH:mm:ss" value-format="HH:mm:ss"
                                 placeholder="请选择时间" />
                             <xmks-select v-model="(courseTime.questionId as number)" url="question/listpage"
                                 :params="{}" search-parm-name="title" option-label="title" option-value="id"
@@ -52,9 +52,9 @@
                             <span class="form__option-btn-txt">添加时间</span>
                         </el-button>
                     </el-form-item>
-                    <el-form-item label="排序" prop="no">
+                    <el-form-item label="第" prop="no">
                         <el-input-number v-model="form.no" :min="1" :max="100" :precision="0" controls-position="right"
-                            size="large" />
+                            size="large" />&nbsp;小节
                     </el-form-item>
                     <el-form-item>
                         <el-button v-if="$route.path.indexOf('add') !== -1" type="primary" class="form__btn"
@@ -104,14 +104,21 @@ const formRules = reactive<FormRules>({// 表单规则
         { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
     ],
     content: [
-        { required: true, message: '请输入名称', trigger: 'blur' },
-        { min: 1, max: 16, message: '长度介于0-128', trigger: 'blur' },
+        { required: true, message: '请输入简介', trigger: 'blur' },
+        { min: 1, max: 128, message: '长度介于1-128', trigger: 'blur' },
     ],
-    videoFileId: [
-        { required: false, message: '请选择视频', trigger: 'blur' },
-    ],
+    videoFileId: [{
+        trigger: 'blur',
+        validator: (rule: any, value: any, callback: any) => {
+            if (!videoFileList.value[0]?.uid) {
+                return callback(new Error('请上传视频'));
+            }
+
+            return callback()
+        }
+    }],
     no: [
-        { required: false, message: '请选择排序', trigger: 'blur' },
+        { required: true, message: '请选择排序', trigger: 'blur' },
     ],
     courseQuestions: [{
         trigger: 'blur',
@@ -119,19 +126,19 @@ const formRules = reactive<FormRules>({// 表单规则
             if (!Array.isArray(value) || value.length === 0) {
                 return callback();
             }
-            const answerTimes = new Set<string>();
+            const courseTimes = new Set<string>();
             for (let i = 0; i < value.length; i++) {
                 const item = value[i];
-                if (!item.answerTime) {
+                if (!item.courseTime) {
                     return callback(new Error(`第 ${i + 1} 行：请选择时间`));
                 }
                 if (!item.questionId) {
                     return callback(new Error(`第 ${i + 1} 行：请选择试题`));
                 }
-                if (answerTimes.has(item.answerTime)) {
+                if (courseTimes.has(item.courseTime)) {
                     return callback(new Error(`第 ${i + 1} 行：时间不能重复`));
                 }
-                answerTimes.add(item.answerTime);
+                courseTimes.add(item.courseTime);
             }
             return callback()
         }
@@ -210,13 +217,13 @@ async function add() {
         content: form.content,
         courseId: route.params.courseId,
         videoFileId: videoFileList.value[0]?.uid,
-        answerTimes: [] as string[],
+        courseTimes: [] as string[],
         questionIds: [] as string[],
         no: form.no,
     };
 
     form.courseQuestions.forEach((q) => {
-        params.answerTimes.push(q.answerTime ?? '');
+        params.courseTimes.push(q.courseTime ?? '');
         params.questionIds.push(q.questionId?.toString() ?? '');
     });
 
@@ -244,13 +251,13 @@ async function edit() {
         content: form.content,
         courseId: route.params.courseId,
         videoFileId: videoFileList.value[0]?.uid,
-        answerTimes: [] as string[],
+        courseTimes: [] as string[],
         questionIds: [] as string[],
         no: form.no,
     };
 
     form.courseQuestions.forEach((q) => {
-        params.answerTimes.push(q.answerTime ?? '');
+        params.courseTimes.push(q.courseTime ?? '');
         params.questionIds.push(q.questionId?.toString() ?? '');
     });
 
@@ -280,8 +287,8 @@ async function de1() {
 // 添加选项
 function addOption() {
     form.courseQuestions.push({
-        answerTime: '00:00:00',
-        questionId: null
+        courseTime: '00:00:00',
+        questionId: ''
     })
 }
 

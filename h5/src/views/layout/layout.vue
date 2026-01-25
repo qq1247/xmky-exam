@@ -15,11 +15,12 @@
                         <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                             index="/exer-list">练习</el-menu-item>
                         <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
-                            index="/course-list">学习</el-menu-item>
+                            index="/course-list">课程</el-menu-item>
                         <el-menu-item v-if="userStore.isExamUser()" index="/my-exer-list">练习</el-menu-item>
                         <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"
                             index="/exam-list">考试</el-menu-item>
                         <el-menu-item v-if="userStore.isMarkUser()" index="/my-mark-list">阅卷</el-menu-item>
+                        <el-menu-item v-if="userStore.isExamUser()" index="/my-course-list">课程</el-menu-item>
                         <el-menu-item v-if="userStore.isExamUser() || userStore.isTempUser()"
                             index="/my-exam-list">考试</el-menu-item>
                         <el-menu-item v-if="userStore.isAdmin() || userStore.isSubAdmin()"

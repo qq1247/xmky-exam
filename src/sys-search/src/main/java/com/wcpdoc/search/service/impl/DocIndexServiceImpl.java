@@ -153,7 +153,6 @@ public class DocIndexServiceImpl implements DocIndexService {
 				}
 
 				results.add(DocSummary.builder()//
-						.id(doc.get("bizId"))//
 						.id(doc.get("fileId"))//
 						.title(doc.get("title"))//
 						.summaryList(summaryList)//

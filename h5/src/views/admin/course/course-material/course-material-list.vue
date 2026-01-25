@@ -29,13 +29,13 @@
                             {{ courseMaterial.name }}
                         </el-tag>
                         <el-tag class="list__tag list__tag--mark-type">
-                            视频{{ courseMaterial.videoSecond }}秒
+                            {{ courseMaterial.videoTime }}
                         </el-tag>
                         <el-tag class="list__tag list__tag--score">
                             试题{{ courseMaterial.questionNum }}道
                         </el-tag>
                         <el-tag class="list__tag list__tag--username">
-                            {{ courseMaterial.updateUserName }}
+                            第{{ courseMaterial.no }}小节
                         </el-tag>
                     </div>
                     <div class="list__opt">

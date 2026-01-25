@@ -8,6 +8,6 @@ export interface CourseMaterial {
     no: number // 排序
 }
 export interface CourseQuestion {
-    answerTime: string // 答题时间（小时分秒）
-    questionId: number | null; // 试题ID
+    courseTime: string // 课程时间（小时分秒）
+    questionId: number | string; // 试题ID
 }

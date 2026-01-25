@@ -9,18 +9,18 @@ import com.github.yulichang.query.MPJQueryWrapper;
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.CourseMaterial;
+import com.wcpdoc.exam.core.entity.MyCourseMaterial;
 
 /**
- * 课程资料数据访问层接口
+ * 我的课程资料数据访问层接口
  * 
  * v1.0 zhanghc 2026-01-12 10:03:53
  */
-public interface CourseMaterialDao extends RBaseDao<CourseMaterial> {
+public interface MyCourseMaterialDao extends RBaseDao<MyCourseMaterial> {
 	@Override
 	default PageOut getListpage(PageIn pageIn) {
 		Page<Map<String, Object>> page = selectJoinMapsPage(pageIn.toPage(), //
-				new MPJQueryWrapper<CourseMaterial>().setAlias("COURSE_MATERIAL")//
+				new MPJQueryWrapper<MyCourseMaterial>().setAlias("COURSE_MATERIAL")//
 						.leftJoin("EXM_COURSE COURSE ON COURSE_MATERIAL.COURSE_ID = COURSE.ID")
 						.leftJoin("SYS_USER USER ON COURSE_MATERIAL.UPDATE_USER_ID = USER.ID")
 						.select("COURSE_MATERIAL.ID", "COURSE_MATERIAL.NAME", "COURSE_MATERIAL.CONTENT",
@@ -36,10 +36,36 @@ public interface CourseMaterialDao extends RBaseDao<CourseMaterial> {
 		return new PageOut(page.getRecords(), page.getTotal());
 	}
 
-	default List<CourseMaterial> getList(Integer courseId) {
-		return selectList(new LambdaQueryWrapper<CourseMaterial>()//
-				.eq(CourseMaterial::getCourseId, courseId)//
-				.eq(CourseMaterial::getState, 1)//
-				.orderByAsc(CourseMaterial::getNo));
+	/**
+	 * 我的课程资料列表
+	 * 
+	 * v1.0 zhanghc 2026-01-25 13:29:21
+	 * 
+	 * @param courseId
+	 * @param userId
+	 * @return List<MyCourseMaterial>
+	 */
+	default List<MyCourseMaterial> getList(Integer userId, Integer courseId) {
+		return selectList(new LambdaQueryWrapper<MyCourseMaterial>()//
+				.eq(MyCourseMaterial::getUserId, userId)//
+				.eq(MyCourseMaterial::getCourseId, courseId)//
+				.ne(MyCourseMaterial::getState, 0)//
+				.orderByAsc(MyCourseMaterial::getNo));
+	}
+
+	/**
+	 * 
+	 * 
+	 * v1.0 zhanghc 2026-01-25 13:29:17
+	 * 
+	 * @param userId
+	 * @param courseMaterialId
+	 * @return MyCourseMaterial
+	 */
+	default MyCourseMaterial getMyCourseMaterial(Integer userId, Integer courseMaterialId) {
+		return selectOne(new LambdaQueryWrapper<MyCourseMaterial>()//
+				.eq(MyCourseMaterial::getUserId, userId)//
+				.eq(MyCourseMaterial::getCourseMaterialId, courseMaterialId)//
+				.ne(MyCourseMaterial::getState, 0));//
 	}
 }

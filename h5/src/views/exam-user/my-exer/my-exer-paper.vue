@@ -49,6 +49,7 @@
                 </div>
                 <el-scrollbar height="calc(100vh - 269px)" class="paper">
                     <div class="paper__head">
+                        <input type="hidden" id="question_id" :value="curExamQuestion?.questionId" />
                         <el-form ref="formRef" :model="form" :rules="formRules" class="form">
                             <el-form-item prop="score" :rules="formRules.score">
                                 <el-button :disabled="curQuestionIndex <= 0" text class="paper__btn"

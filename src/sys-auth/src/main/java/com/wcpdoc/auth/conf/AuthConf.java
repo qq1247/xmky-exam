@@ -89,8 +89,8 @@ public class AuthConf {
 						"/api/question-bank/**", //
 						"/api/question/**", //
 						"/api/exam/**", //
-						"/api/exer/**",//
-						"/api/course/**",//
+						"/api/exer/**", //
+						"/api/course/**", //
 						"/api/courseMaterial/**"//
 				)//
 				.hasAnyRole("ADMIN", "SUB_ADMIN")//
@@ -101,8 +101,11 @@ public class AuthConf {
 				.requestMatchers("/api/my-exam/**")//
 				.hasAnyRole("EXAM_USER", "TEMP_USER")//
 				// ========== 考试用户 ==========
-				.requestMatchers("/api/my-exer/**", "/api/my-comment/**")//
-				.hasAnyRole("EXAM_USER")//
+				.requestMatchers(//
+						"/api/my-exer/**", //
+						"/api/my-comment/**", //
+						"/api/my-course/**"//
+				).hasAnyRole("EXAM_USER")//
 				// ========== 管理员 ==========
 				.requestMatchers("/api/**")//
 				.hasRole("ADMIN")//

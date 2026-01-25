@@ -84,7 +84,6 @@ import { courseAdd, courseDel, courseEdit, courseGet, courseShare, courseState }
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import xmksSelect from '@/components/xmks-select.vue'
 import { useDictStore } from '@/stores/dict'
-import { useUserStore } from '@/stores/user'
 import type { Course } from '@/ts/course/course'
 import { type FormInstance, type FormRules } from 'element-plus'
 import { onMounted, reactive, ref } from 'vue'
@@ -93,7 +92,6 @@ import { useRoute, useRouter } from 'vue-router'
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
 const router = useRouter()// 路由
-const userStore = useUserStore()// 字典缓存
 const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
 const form = reactive<Course>({
@@ -111,8 +109,8 @@ const formRules = reactive<FormRules>({// 表单规则
         { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
     ],
     content: [
-        // { required: true, message: '请输入简介', trigger: 'blur' },
-        { min: 0, max: 128, message: '长度介于0-128', trigger: 'blur' },
+        { required: true, message: '请输入简介', trigger: 'blur' },
+        { min: 1, max: 128, message: '长度介于1-128', trigger: 'blur' },
     ],
     shareAuth: [
         { required: true, message: '请选择共享权限', trigger: 'blur' },

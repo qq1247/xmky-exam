@@ -71,12 +71,14 @@ public class ApiCourseMaterialController extends BaseController {
 	 * v1.0 zhanghc 2026-01-12 10:03:53
 	 * 
 	 * @param courseMaterial
+	 * @param courseTimes
+	 * @param questionIds
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
-	public PageResult add(CourseMaterial courseMaterial, LocalTime[] answerTimes, Integer[] questionIds) {
+	public PageResult add(CourseMaterial courseMaterial, LocalTime[] courseTimes, Integer[] questionIds) {
 		try {
-			courseMaterialService.add(courseMaterial, answerTimes, questionIds);
+			courseMaterialService.add(courseMaterial, courseTimes, questionIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("课程资料添加错误：{}", e.getMessage());
@@ -93,12 +95,14 @@ public class ApiCourseMaterialController extends BaseController {
 	 * v1.0 zhanghc 2026-01-12 10:03:53
 	 * 
 	 * @param courseMaterial
+	 * @param questionIds
+	 * @return PageResult
 	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
-	public PageResult edit(CourseMaterial courseMaterial, LocalTime[] answerTimes, Integer[] questionIds) {
+	public PageResult edit(CourseMaterial courseMaterial, LocalTime[] courseTimes, Integer[] questionIds) {
 		try {
-			courseMaterialService.update(courseMaterial, answerTimes, questionIds);
+			courseMaterialService.update(courseMaterial, courseTimes, questionIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("课程资料修改错误：{}", e.getMessage());
@@ -159,7 +163,7 @@ public class ApiCourseMaterialController extends BaseController {
 					.addAttr("no", entity.getNo()) //
 					.addAttr("courseQuestions", courseQuestionList.stream().map(courseQuestion -> {
 						Map<String, Object> data = new HashMap<>();
-						data.put("answerTime", courseQuestion.getAnswerTime());
+						data.put("courseTime", courseQuestion.getCourseTime());
 						data.put("questionId", courseQuestion.getQuestionId());
 						data.put("questionTitle",
 								examCacheService.getQuestion(courseQuestion.getQuestionId()).getTitle());

@@ -481,6 +481,9 @@ public class ApiMyExerController extends BaseController {
 				} else if (QuestionUtil.hasQA(question) || QuestionUtil.hasFillBlank(question)) {// 填空问答用答案；判断不用（因为只有对错）
 					content.append(StringUtil.join(questionPart.getAnswers(), ""));
 				}
+				if (ValidateUtil.isValid(question.getAnalysis())) {// 如果有解析也检索，效果更好
+					content.append(question.getAnalysis());
+				}
 
 				questionPart
 						.setDocSummaryList(docIndexService.search(question.getQuestionBankId(), content.toString(), 3));

@@ -55,9 +55,5 @@ withDefaults(
         color: #999999;
         line-height: 48px;
     }
-
-
-
-
 }
 </style>
