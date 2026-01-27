@@ -143,6 +143,7 @@ const bulletinList = ref<any[]>(); // 公告列表
 const curTabIndex = ref(0); // 当前选择标签页
 const navBtnList = ref([
 	{ name: '练习', icon: 'icon-icon-pencil' },
+	{ name: '课程', icon: 'icon-datiqia' },
 	{ name: '考试', icon: 'icon-icon-pen' },
 	/* { name: '错题', icon: 'icon-icon-top_01' },
 	{ name: '收藏', icon: 'icon-icon-top-05' }, */
@@ -228,11 +229,17 @@ function quickNav({ detail: { index } }) {
 	}
 	if (index === 1) {
 		uni.navigateTo({
-			url: '/pages/exam-user/my-exam/my-exam'
+			url: '/pages/exam-user/my-course/my-course'
 		});
 		return;
 	}
 	if (index === 2) {
+		uni.navigateTo({
+			url: '/pages/exam-user/my-exam/my-exam'
+		});
+		return;
+	}
+	if (index === 3) {
 		uni.navigateTo({
 			url: '/pages/exam-user/profile/profile'
 		});

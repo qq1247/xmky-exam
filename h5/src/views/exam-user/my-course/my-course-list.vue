@@ -89,7 +89,7 @@ async function query() {
     listpage.total = data.total
 }
 
-// 课程进入
+// 去学习
 async function toCourse(course: any) {
     router.push(`/my-course/read/${course.id}`)
 }

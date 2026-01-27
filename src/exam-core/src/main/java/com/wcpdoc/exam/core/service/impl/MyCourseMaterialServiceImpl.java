@@ -59,67 +59,69 @@ public class MyCourseMaterialServiceImpl extends BaseServiceImp<MyCourseMaterial
 	}
 
 	@Override
-	public void generate(Integer courseId) {
+	public synchronized void generate(Integer courseId) {
 		// 数据校验
 		generateValid(courseId);
 
 		// 我的课程资料对比更新（管理员添加或删除的课程同步到用户课程）
 		List<CourseMaterial> courseMaterialList = courseMaterialService.getList(courseId);
 		List<MyCourseMaterial> myCourseMaterialList = myCourseMaterialDao.getList(getCurUser().getId(), courseId);
-		courseMaterialList.stream()
+		List<CourseMaterial> newCourseMaterialList = courseMaterialList.stream()
 				.filter(courseMaterial -> myCourseMaterialList.stream().noneMatch(myCourseMaterial -> myCourseMaterial
 						.getCourseMaterialId().intValue() == courseMaterial.getId().intValue()))
-				.forEach(courseMaterial -> {
-					MyCourseMaterial myCourseMaterial = new MyCourseMaterial();
-					myCourseMaterial.setCourseId(courseMaterial.getCourseId());
-					myCourseMaterial.setCourseMaterialId(courseMaterial.getId());
-					myCourseMaterial.setUserId(getCurUser().getId());
-					myCourseMaterial.setName(courseMaterial.getName());
-					myCourseMaterial.setContent(courseMaterial.getContent());
-					myCourseMaterial.setVideoFileId(courseMaterial.getVideoFileId());
-					myCourseMaterial.setVideoTime(courseMaterial.getVideoTime());
-					myCourseMaterial.setQuestionNum(courseMaterial.getQuestionNum());
-					myCourseMaterial.setNo(courseMaterial.getNo());
-					myCourseMaterial.setWatchTime(LocalTime.of(0, 0, 0));
-					myCourseMaterial.setState(2); // 状态（0：删除；1：完成；2：未开始；3：进行中）
-					myCourseMaterial.setUpdateUserId(getCurUser().getId());
-					myCourseMaterial.setUpdateTime(new Date());
-					save(myCourseMaterial);
+				.toList();
+		for (CourseMaterial courseMaterial : newCourseMaterialList) {
+			MyCourseMaterial myCourseMaterial = new MyCourseMaterial();
+			myCourseMaterial.setCourseId(courseMaterial.getCourseId());
+			myCourseMaterial.setCourseMaterialId(courseMaterial.getId());
+			myCourseMaterial.setUserId(getCurUser().getId());
+			myCourseMaterial.setName(courseMaterial.getName());
+			myCourseMaterial.setContent(courseMaterial.getContent());
+			myCourseMaterial.setVideoFileId(courseMaterial.getVideoFileId());
+			myCourseMaterial.setVideoTime(courseMaterial.getVideoTime());
+			myCourseMaterial.setQuestionNum(courseMaterial.getQuestionNum());
+			myCourseMaterial.setNo(courseMaterial.getNo());
+			myCourseMaterial.setWatchTime(LocalTime.of(0, 0, 0));
+			myCourseMaterial.setState(2); // 状态（0：删除；1：完成；2：未开始；3：进行中）
+			myCourseMaterial.setUpdateUserId(getCurUser().getId());
+			myCourseMaterial.setUpdateTime(new Date());
+			save(myCourseMaterial);
 
-					List<CourseQuestion> courseQuestionList = courseQuestionService.getList(courseMaterial.getId());
-					courseQuestionList.forEach(courseQuestion -> {
-						MyCourseQuestion myCourseQuestion = new MyCourseQuestion();
-						myCourseQuestion.setCourseId(courseQuestion.getCourseId());
-						myCourseQuestion.setCourseMaterialId(courseQuestion.getCourseMaterialId());
-						myCourseQuestion.setQuestionId(courseQuestion.getQuestionId());
-						myCourseQuestion.setCourseTime(courseQuestion.getCourseTime());
-						myCourseQuestion.setUserId(getCurUser().getId());
-						myCourseQuestion.setAnswerTime(null);
-						myCourseQuestion.setState(1);
-						myCourseQuestion.setUpdateUserId(getCurUser().getId());
-						myCourseQuestion.setUpdateTime(new Date());
-						myCourseQuestionService.save(myCourseQuestion);
-					});
+			List<CourseQuestion> courseQuestionList = courseQuestionService.getList(courseMaterial.getId());
+			for (CourseQuestion courseQuestion : courseQuestionList) {
+				MyCourseQuestion myCourseQuestion = new MyCourseQuestion();
+				myCourseQuestion.setCourseId(courseQuestion.getCourseId());
+				myCourseQuestion.setCourseMaterialId(courseQuestion.getCourseMaterialId());
+				myCourseQuestion.setQuestionId(courseQuestion.getQuestionId());
+				myCourseQuestion.setCourseTime(courseQuestion.getCourseTime());
+				myCourseQuestion.setUserId(getCurUser().getId());
+				myCourseQuestion.setAnswerTime(null);
+				myCourseQuestion.setState(1);
+				myCourseQuestion.setUpdateUserId(getCurUser().getId());
+				myCourseQuestion.setUpdateTime(new Date());
+				myCourseQuestionService.save(myCourseQuestion);
+			}
+		}
 
-				});
-		myCourseMaterialList.stream()
+		List<MyCourseMaterial> delMyCourseMaterialList = myCourseMaterialList.stream()
 				.filter(myCourseMaterial -> courseMaterialList.stream().noneMatch(courseMaterial -> courseMaterial
 						.getId().intValue() == myCourseMaterial.getCourseMaterialId().intValue()))
-				.forEach(myCourseMaterial -> {
-					myCourseMaterial.setState(0);
-					myCourseMaterial.setUpdateUserId(getCurUser().getId());
-					myCourseMaterial.setUpdateTime(new Date());
-					updateById(myCourseMaterial);
+				.toList();
+		for (MyCourseMaterial myCourseMaterial : delMyCourseMaterialList) {
+			myCourseMaterial.setState(0);
+			myCourseMaterial.setUpdateUserId(getCurUser().getId());
+			myCourseMaterial.setUpdateTime(new Date());
+			updateById(myCourseMaterial);
 
-					List<MyCourseQuestion> myCourseQuestionList = myCourseQuestionService.getList(getCurUser().getId(),
-							courseId);
-					myCourseQuestionList.forEach(mcq -> {
-						mcq.setState(0);
-						mcq.setUpdateTime(new Date());
-						mcq.setUpdateUserId(getCurUser().getId());
-						myCourseQuestionService.updateById(mcq);
-					});
-				});
+			List<MyCourseQuestion> myCourseQuestionList = myCourseQuestionService.getList(getCurUser().getId(),
+					courseId);
+			for (MyCourseQuestion myCourseQuestion : myCourseQuestionList) {
+				myCourseQuestion.setState(0);
+				myCourseQuestion.setUpdateTime(new Date());
+				myCourseQuestion.setUpdateUserId(getCurUser().getId());
+				myCourseQuestionService.updateById(myCourseQuestion);
+			}
+		}
 	}
 
 	@Override
@@ -197,10 +199,12 @@ public class MyCourseMaterialServiceImpl extends BaseServiceImp<MyCourseMaterial
 			return false;
 		}
 
-		myCourseQuestion.setAnswerTime(new Date());
-		myCourseQuestion.setUpdateTime(new Date());
-		myCourseQuestion.setUpdateUserId(getCurUser().getId());
-		myCourseQuestionService.updateById(myCourseQuestion);
+		if (!ValidateUtil.isValid(myCourseQuestion.getAnswerTime())) {
+			myCourseQuestion.setAnswerTime(new Date());
+			myCourseQuestion.setUpdateTime(new Date());
+			myCourseQuestion.setUpdateUserId(getCurUser().getId());
+			myCourseQuestionService.updateById(myCourseQuestion);
+		}
 		return true;
 	}
 

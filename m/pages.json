@@ -20,6 +20,12 @@
 		}, {
 			"path": "pages/exam-user/my-exer/my-paper"
 		}, {
+			"path": "pages/exam-user/my-course/my-course"
+		}, {
+			"path": "pages/exam-user/my-course/my-read"
+		}, {
+			"path": "pages/exam-user/my-course/my-paper"
+		}, {
 			"path": "pages/exam-user/profile/profile"
 		}, {
 			"path": "pages/exam-user/profile/pwd"
@@ -31,6 +37,10 @@
 			"path": "pages/admin/question-bank/question-bank"
 		}, {
 			"path": "pages/admin/question-bank/question"
+		}, {
+			"path": "pages/admin/course/course"
+		}, {
+			"path": "pages/admin/course/course-material"
 		}, {
 			"path": "pages/admin/question-bank/question-view"
 		}, {

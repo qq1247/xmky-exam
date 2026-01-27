@@ -21,7 +21,7 @@
                     @change="(userAnswers: string[]) => (curCourseQuestion as ExamQuestion).userAnswers = userAnswers">
                 </xmks-question>
                 <div class="paper__foot">
-                    <el-button type="primary" class="my-course__btn" @click="answer(course)">
+                    <el-button type="primary" class="my-course__btn" @click="answer()">
                         确认作答
                     </el-button>
                 </div>
@@ -33,9 +33,13 @@
                         <li v-for="(myCourseMaterial, index) in myCourseMaterials" :key="index"
                             :class="{ 'succ': myCourseMaterial.state === 1, 'active': curMyCourseMaterial && curMyCourseMaterial?.courseMaterialId === myCourseMaterial.courseMaterialId }"
                             @click="() => {
+                                videoPlayerRef.pause()
                                 curMyCourseMaterial = myCourseMaterial
                                 videoOptions.src = `${downloadUrl}?id=${curMyCourseMaterial.videoFileId}`
+                                videoOptions.title = `${curMyCourseMaterial.name}`
+                                videoOptions.currentTime = 0
                                 triggeredTimes.clear()
+                                answerShow = false
                             }">
                             <span :class="['iconfont',
                                 { 'icon-lianxi-61': myCourseMaterial.state === 1 },
@@ -55,7 +59,6 @@ import { longzeVideoPlay } from "longze-vue3-video-player";
 import XmksQuestion from '@/components/question/xmks-question.vue';
 import { myCourseAnswer, myCourseCourseListpage, myCourseFinish, myCourseList, myCourseQuestion } from '@/api/my/my-course';
 import type { MyCourseMaterial } from '@/ts/course/my-course-material';
-import type { Question } from '@/ts/exam/question';
 import type { ExamQuestion } from '@/ts/exam/exam';
 import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
@@ -104,9 +107,11 @@ onMounted(async () => {
     );
     if (_myCourseMaterial) {// 默认显示第一个未开始或进行中的课程资料
         curMyCourseMaterial.value = _myCourseMaterial
+        videoOptions.title = _myCourseMaterial.name
         videoOptions.src = `${downloadUrl}?id=${_myCourseMaterial.videoFileId}`
     } else {// 否则重看第一个课程资料
         curMyCourseMaterial.value = myCourseMaterials.value[0]
+        videoOptions.title = myCourseMaterials.value[0].name
         videoOptions.src = `${downloadUrl}?id=${myCourseMaterials.value[0].videoFileId}`
     }
 })
@@ -121,7 +126,7 @@ async function courseQuery() {
 
 // 我的课程查询
 async function myCourseListQuery() {
-    const { data: { data } } = await myCourseList({ courseId: 1 })
+    const { data: { data } } = await myCourseList({ courseId: route.params.courseId })
     myCourseMaterials.value.push(...data)
 }
 
@@ -143,6 +148,9 @@ async function onTimeupdate(event: Event) {
                 answerShow.value = true
                 triggeredTimes.add(triggerTime);
                 videoPlayerRef.value.pause()
+                if (document.fullscreenElement) {
+                    await document.exitFullscreen()
+                }
 
                 const { data: { data } } = await myCourseQuestion({
                     courseMaterialId: curMyCourseMaterial.value.courseMaterialId,

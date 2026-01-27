@@ -43,7 +43,7 @@
                             <span class="opt-panel__progress-label">课程进度：</span>
                             <el-progress class="opt-panel__progress-bar" :percentage="50">
                                 <el-button text class="opt-panel__progress-label">{{ watchedVideoNum }}/{{ videoNum
-                                }}</el-button>
+                                    }}</el-button>
                             </el-progress>
                         </div>
                         <!-- <div class="opt-panel__time">
@@ -66,14 +66,11 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import XmksCardGuide from '@/components/card/xmks-card-guide.vue'
 import type { User } from '@/ts/base/user'
 import { userGet } from '@/api/base/user'
-import { useUserStore } from '@/stores/user'
 import { useRoute, useRouter } from 'vue-router'
 import { myCourseCourseListpage, myCourseGenerate, myCourseList } from '@/api/my/my-course'
 import type { MyCourseMaterial } from '@/ts/course/my-course-material'
-import { tr } from 'element-plus/es/locales.mjs'
 
 /************************变量定义相关***********************/
-const userStore = useUserStore(); // 用户缓存
 const route = useRoute()// 路由
 const router = useRouter()// 路由
 const user = reactive<User>({ // 用户
@@ -87,9 +84,9 @@ const user = reactive<User>({ // 用户
 const course = reactive({
     name: '',
     content: '',
-})
-const myCourseMaterials = ref<MyCourseMaterial[]>([])
-const showBtn = ref(false)
+}) // 课程信息
+const myCourseMaterials = ref<MyCourseMaterial[]>([]) // 课程资料
+const showBtn = ref(false) // 按钮显示
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
@@ -101,34 +98,27 @@ onMounted(async () => {
 })
 
 /************************计算属性相关*************************/
-// 总题数
-const questionNum = computed(() => {
+const questionNum = computed(() => {// 总题数
     return myCourseMaterials.value.reduce((total, myCourseMaterial) => {
         return total + myCourseMaterial.questions?.length as number
     }, 0)
 })
-
-// 未答题数
-const unAnsweredQuestionNum = computed(() => {
+const unAnsweredQuestionNum = computed(() => {// 未答题数
     return myCourseMaterials.value.reduce((total, myCourseMaterial) => {
         return total + myCourseMaterial.questions.filter(q => !q.answerTime).length
     }, 0)
 })
-
-// 总资料数
-const videoNum = computed(() => {
+const videoNum = computed(() => {// 总资料数
     return myCourseMaterials.value.length
 })
-
-// 已完成学习数量
-const watchedVideoNum = computed(() => {
+const watchedVideoNum = computed(() => {// 已完成学习数量
     return myCourseMaterials.value.filter(myCourseMaterial => myCourseMaterial.state === 1).length
 })
 
 /************************事件相关*****************************/
 // 用户查询
 async function userQuery() {
-    const { data: { data } } = await userGet({ id: userStore.id })
+    const { data: { data } } = await userGet({})
     user.id = data.id;
     user.name = data.name;
     user.loginName = data.loginName;
