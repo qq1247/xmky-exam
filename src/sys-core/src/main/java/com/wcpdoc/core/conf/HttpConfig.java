@@ -36,7 +36,6 @@ public class HttpConfig {
 		return WebClient.builder()//
 				.codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024)) // 1MB
 				.clientConnector(new ReactorClientHttpConnector(httpClient))//
-				.defaultHeader("User-Agent", "xmky-exam/6.0")//
 				.build();
 	}
 }

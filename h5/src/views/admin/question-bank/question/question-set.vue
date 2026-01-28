@@ -121,8 +121,8 @@
                         </el-col>
                         <el-col v-if="hasMultipleChoice(form)" :span="12">
                             <el-form-item label="漏选得分" prop="scores[0]">
-                                <el-input-number v-model="form.scores[0]" :min="0.5" :max="10" :step="0.5"
-                                    :precision="2" controls-position="right" />
+                                <el-input-number v-model="form.scores[0]" :min="0" :max="10" :step="0.5" :precision="2"
+                                    controls-position="right" />
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -240,13 +240,12 @@ import { questionAdd, questionCopy, questionDel, questionEdit, questionGet, ques
 import XmksEditCard from '@/components/card/xmks-card-edit.vue'
 import http from '@/request'
 import { useDictStore } from '@/stores/dict'
-import { useUserStore } from '@/stores/user'
 import type { Question } from '@/ts/exam/question'
 import { escape2Html } from '@/util/htmlUtil'
 import { toChinaNum, toLetter } from '@/util/numberUtil'
 import { hasFillBlank, hasJudge, hasMultipleChoice, hasObjective, hasQA, hasSingleChoice, hasSubjective } from '@/util/questionUtil'
 import { Decimal } from 'decimal.js-light'
-import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadInstance, type UploadProps, type UploadRawFile, type UploadRequestOptions, type UploadUserFile } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadInstance, type UploadRawFile, type UploadRequestOptions, type UploadUserFile } from 'element-plus'
 import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { VueDraggable } from 'vue-draggable-plus'
@@ -258,7 +257,6 @@ import { fileUpload } from '@/api/sys/file'
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
 const router = useRouter()// 路由
-const userStore = useUserStore()// 用户缓存
 const dictStore = useDictStore()// 字典缓存
 const formRef = ref<FormInstance>()// 表单引用
 const form = reactive<Question>({// 表单
@@ -340,7 +338,7 @@ const formRules = reactive<FormRules>({// 表单规则
     scores: [{
         trigger: 'blur',
         validator: (rule: any, value: any, callback: any) => {
-            if (!value) {
+            if (value === '' || value == null) {
                 return callback(new Error('请输入分值'))
             }
             if (!/^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/.test(value)) {
@@ -355,7 +353,6 @@ const formRules = reactive<FormRules>({// 表单规则
 })
 const delConfirm = ref(false) // 删除确认
 
-const uploadUrl = `${http.defaults.baseURL}file/upload`// 上传地址
 const downloadUrl = `${http.defaults.baseURL}file/download`// 下载地址
 const imgFileList = ref<UploadUserFile[]>([])
 const moveFormRef = ref<FormInstance>()// 表单引用

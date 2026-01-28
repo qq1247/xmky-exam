@@ -6,7 +6,7 @@ import router from '@/router'
 
 // http请求
 const http = axios.create({
-    baseURL: (window as any).domain.url,
+    baseURL: window.domain?.url,
     timeout: 10000,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [function (data, headers) {
@@ -25,7 +25,7 @@ const http = axios.create({
     }],
 })
 const refreshHttp = axios.create({
-    baseURL: (window as any).domain.url,
+    baseURL: window.domain?.url,
     timeout: 6000,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     transformRequest: [function (data) {
