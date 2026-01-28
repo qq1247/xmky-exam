@@ -31,7 +31,7 @@ public class VerCheckJob {
 	private final ParmService parmService;
 	private final BaseCacheService baseCacheService;
 
-	@Scheduled(cron = "0 0 0 * * ?")
+	@Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Shanghai")
 	public void execute() {
 		try {
 			// 一分钟内随机时间请求，消除并发
