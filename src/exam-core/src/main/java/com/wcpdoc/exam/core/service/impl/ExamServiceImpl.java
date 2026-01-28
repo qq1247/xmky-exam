@@ -940,17 +940,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 							if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
 								myQuestion.setScores(Stream.of(examRule.getScores()).collect(Collectors.toList()));
-							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
-									&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
-//								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
-//									questionAnswerCache.put(myQuestion.getQuestionId(),
-//											examCacheService.getQuestionAnswerList(myQuestion.getQuestionId()));
-//								}
-//								List<QuestionAnswer> questionAnswerList = questionAnswerCache
-//										.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
-								List<QuestionAnswer> questionAnswerList = examCacheService
-										.getQuestionAnswerList(myQuestion.getQuestionId());
-								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
+							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答
+									&& QuestionUtil.hasObjective(question)) {
+								if (examRule.getScore().compareTo(question.getScore()) == 0) {// 抽题规则分数和该题分数一致，优先使用该题分数
+									List<QuestionAnswer> questionAnswerList = examCacheService
+											.getQuestionAnswerList(question.getId());
+									myQuestion.setScores(
+											questionAnswerList.stream().map(QuestionAnswer::getScore).toList());
+								} else {// 否则平均分配分数
+									List<QuestionAnswer> questionAnswerList = examCacheService
+											.getQuestionAnswerList(myQuestion.getQuestionId());
+									myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
+								}
 							}
 
 							// if (ExamUtil.hasQuestionRand(examInfo)) { // 如果是试题乱序 本身已随机，该选项无效
@@ -1120,7 +1121,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 						Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
 						QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
-						if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin() || QuestionBankUtil.hasRead(questionBank))) {
+						if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+								|| QuestionBankUtil.hasRead(questionBank))) {
 							throw new MyException(String.format("试题无权限，编号：%s", examQuestion.getQuestionId()));
 						}
 					}
@@ -1235,7 +1237,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					int validQuestionNum = 0;// 符合当前抽题规则的有效题数
 					for (Question question : questionListCache.get(examRule.getQuestionBankId())) {
 						QuestionBank questionBank = questionBankService.getById(question.getQuestionBankId());
-						if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin() || QuestionBankUtil.hasRead(questionBank))) {
+						if (!(CurLoginUserUtil.isSelf(questionBank.getCreateUserId()) || CurLoginUserUtil.isAdmin()
+								|| QuestionBankUtil.hasRead(questionBank))) {
 							throw new MyException(String.format("试题无权限，编号：%s", question.getId()));
 						}
 
