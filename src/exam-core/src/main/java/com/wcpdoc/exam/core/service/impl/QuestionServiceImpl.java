@@ -549,8 +549,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (fillBlankNum == 0) {
 				throw new MyException("最少1个填空");
 			}
-			if (fillBlankNum > 7) {
-				throw new MyException("最多7个填空");
+			if (fillBlankNum > 20) {
+				throw new MyException("最多20个填空");
 			}
 			if (fillBlankNum != answers.size()) {
 				throw new MyException("填空和答案数量不匹配");

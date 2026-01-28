@@ -503,8 +503,8 @@ watch(() => form.title, (title) => {
     let fillblanksNum = title.match(/[_]{5,}/g)?.length//获取填空数量
     if (!fillblanksNum) {
         fillblanksNum = 0
-    } else if (fillblanksNum > 7) {// 最多7个填空
-        fillblanksNum = 7
+    } else if (fillblanksNum > 20) {// 最多20个填空
+        fillblanksNum = 20
     }
 
     while (fillblanksNum > form.answers.length) {// 填空和答案对齐（多退少补）

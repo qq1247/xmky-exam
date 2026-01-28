@@ -375,8 +375,8 @@ function parseQuestion(questionTxt: string[]) {
         const matchs = title.match(/_{5,}/g)
         if (matchs) {
             fillBlanksCount = matchs.length
-            if (fillBlanksCount > 7) {
-                question.errs = `填空数量不能大于7个：${questionTxt.join('')}`
+            if (fillBlanksCount > 20) {
+                question.errs = `填空数量不能大于20个：${questionTxt.join('')}`
                 return question
             }
 
