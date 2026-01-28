@@ -66,6 +66,9 @@ public class ApiMyExamController extends BaseController {
 				if ((Integer) map.remove("examRankState") == 2) {// 排名状态（1：公布；2：不公布）
 					map.put("no", null);// 不显示排名
 				}
+				if ((Integer) map.get("state") != 3) {// bug修复：用户未交卷，显示答题时间是错误的
+					map.put("answerEndTime", null);
+				}
 			}
 
 			return PageResultEx.ok().data(pageOut);
@@ -93,7 +96,7 @@ public class ApiMyExamController extends BaseController {
 			Exam exam = examCacheService.getExam(examId);
 			return PageResultEx.ok()// 考试用户没有exam/get权限，所以字段在这里回显
 					.addAttr("answerStartTime", myExam.getAnswerStartTime())
-					.addAttr("answerEndTime", myExam.getAnswerEndTime())//
+					.addAttr("answerEndTime", myExam.getState() == 3 ? myExam.getAnswerEndTime() : null)// bug修复：用户未交卷，显示答题时间是错误的
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore",

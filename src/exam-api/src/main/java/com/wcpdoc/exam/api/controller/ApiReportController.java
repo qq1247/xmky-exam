@@ -285,6 +285,9 @@ public class ApiReportController extends BaseController {
 				if (examMarkType == 2 && examMarkState != 3) {// 如果是主观题试卷，且考试未结束，不显示分数
 					map.put("myExamTotalScore", null);// 阅完一张会打分，但是会二次修改分数，不应该显示中间状态
 				}
+				if ((Integer) map.get("myExamState") != 3) {
+					map.put("myExamAnswerEndTime", null);// bug修复：用户未交卷，显示答题时间是错误的
+				}
 			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (MyException e) {
