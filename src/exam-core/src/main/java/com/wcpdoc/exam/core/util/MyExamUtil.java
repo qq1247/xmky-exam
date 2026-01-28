@@ -219,7 +219,7 @@ public class MyExamUtil {
 				}
 
 				for (String synonym : synonyms) {// 循环每一项同义词（保密审查 保密调查）
-					if (userAnswers[i].contains(synonym)) {// 如果用户某一空答案，匹配某一项关键词的同义词
+					if (userAnswers[i].equals(synonym)) {// 如果用户某一空答案，匹配某一项关键词的同义词 // bug修复：contains改为equals，例如标准答案为 "15"，用户答 "1" 或 "150" 应判为错误
 						myQuestion.setUserScore(BigDecimalUtil.newInstance(myQuestion.getUserScore())
 								.add(myQuestion.getScores().get(j)).getResult());// 累计该关键词的分数
 						useAnswers.add(j);
