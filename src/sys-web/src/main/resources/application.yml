@@ -8,16 +8,14 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    #driver-class-name: com.mysql.cj.jdbc.Driver
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    #url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     url: jdbc:p6spy:mysql://127.0.0.1:3306/xmky_exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: root    
     hikari:
       minimum-idle: 10
-      maximum-pool-size: 100 #mysql5.7默认151，预留一些，防止其他人调试连接不上
+      maximum-pool-size: 100
 demo:
   mode: false  
 sys:
-  ver: 6.0.0
+  ver: 6.1.0

@@ -86,7 +86,6 @@ const videoOptions = reactive({// 视频播放器选项
     currentTime: 0, //默认开始时间
     controlBtns: [
         'volume',
-        'fullScreen',
     ],
 });
 const course = reactive({// 课程
@@ -100,6 +99,11 @@ const curCourseQuestion = ref<ExamQuestion>() // 当前课程试题
 
 /************************组件生命周期相关*********************/
 onMounted(async () => {
+    const videoEl = videoPlayerRef.value?.$el?.querySelector('video');
+    if (videoEl && 'disablePictureInPicture' in videoEl) {
+        videoEl.disablePictureInPicture = true;// 禁止画中画
+    }
+
     courseQuery()
     await myCourseListQuery()
     const _myCourseMaterial = myCourseMaterials.value.find(

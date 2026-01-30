@@ -377,11 +377,6 @@ const router = createRouter({
                     meta: { title: '课程设置' },
                 },
                 {
-                    path: 'statis/:id',
-                    component: () => import('@/views/admin/course/course-statis.vue'),
-                    meta: { title: '课程统计' },
-                },
-                {
                     path: 'course-nav',
                     component: () => import('@/views/admin/course/course-material/course-material-nav.vue'),
                     meta: { title: '课程资料' },

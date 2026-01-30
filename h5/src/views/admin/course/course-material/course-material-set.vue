@@ -34,11 +34,11 @@
                             <el-time-picker v-model="courseTime.courseTime" format="HH:mm:ss" value-format="HH:mm:ss"
                                 placeholder="请选择时间" />
                             <xmks-select v-model="(courseTime.questionId as number)" url="question/listpage"
-                                :params="{}" search-parm-name="title" option-label="title" option-value="id"
-                                :options="questions" :multiple="false" clearable :page-size="5"
+                                :params="{ markType: 1 }" search-parm-name="title" option-label="title"
+                                option-value="id" :options="questions" :multiple="false" clearable :page-size="5"
                                 search-placeholder="请输入题干进行筛选" placeholder="请选择试题">
                                 <template #default="{ option }">
-                                    {{ option.id }} - {{ option.title }}
+                                    {{ option.id }} - {{ escape2Html(option.title) }}
                                 </template>
                             </xmks-select>
                             <span class="iconfont icon-tubiaoziti2-01 form__times-btn" @click="delOption(index)"></span>
@@ -81,6 +81,7 @@ import XmksSelect from '@/components/xmks-select.vue'
 import http from '@/request'
 import type { CourseMaterial } from '@/ts/course/course-material'
 import type { Question } from '@/ts/exam/question'
+import { escape2Html } from '@/util/htmlUtil'
 import { ElMessage, genFileId, type FormInstance, type FormRules, type UploadFile, type UploadFiles, type UploadInstance, type UploadRawFile, type UploadRequestOptions, type UploadUserFile } from 'element-plus'
 import { longzeVideoPlay } from "longze-vue3-video-player"
 import { onMounted, reactive, ref } from 'vue'

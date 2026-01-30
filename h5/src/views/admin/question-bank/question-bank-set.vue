@@ -60,7 +60,7 @@
                             option-value="id" :multiple="true" clearable :page-size="100" search-placeholder="请输入题干进行筛选"
                             placeholder="请输入题干进行筛选">
                             <template #default="{ option }">
-                                {{ option.id }} - {{ option.title }}
+                                {{ option.id }} - {{ escape2Html(option.title) }}
                             </template>
                         </xmks-select>
                     </el-form-item>
@@ -107,6 +107,7 @@ import { questionMove } from '@/api/exam/question'
 import { useDictStore } from '@/stores/dict'
 import { useUserStore } from '@/stores/user'
 import { fileUpload } from '@/api/sys/file'
+import { escape2Html } from '@/util/htmlUtil'
 
 /************************变量定义相关***********************/
 const route = useRoute()// 路由
