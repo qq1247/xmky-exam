@@ -20,10 +20,6 @@
                 name: '资料列表',
                 icon: 'icon-a-16ri-05',
                 event: () => $router.push(`/course/course-nav/list/${course.id}`)
-            }, {
-                name: '统计',
-                icon: 'icon-liebiao-02',
-                event: () => $router.push(`/course/statis/${course.id}`)
             }]" class="course">
                 <div class="course__state">
                     <span class="course__pre-txt">

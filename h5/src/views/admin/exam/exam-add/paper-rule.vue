@@ -43,7 +43,7 @@
                     @click="toolbars.markOptionShow = !toolbars.markOptionShow">
                     <span class="iconfont icon-icon-05 paper-toolbar__btn-icon"></span>
                     <span class="paper-toolbar__btn-txt">{{ toolbars.markOptionShow ? '隐藏删除' : '显示删除'
-                        }}</span>
+                    }}</span>
                 </el-button>
             </div>
             <div class="paper__wrap">
@@ -131,8 +131,8 @@
                                         placeholder="请选择题库" class="paper-question__question-bank">
                                         <template #default="{ option }">
                                             {{ option.name }} （单选{{ option.singleNum }} / 多选{{ option.multipleNum }} /
-                                            客观填空{{ option.fillBlankObjNum }} / 判断{{ option.judgeNum }} / 客观问答{{
-                                                option.qaObjNum }}）
+                                            填空{{ option.fillBlankObjNum + option.fillBlankSubNum }} / 判断{{
+                                                option.judgeNum }} / 问答{{ option.qaObjNum + option.qaSubNum }}）
                                         </template>
                                     </xmks-select>
                                 </el-form-item>

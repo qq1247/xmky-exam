@@ -13,8 +13,8 @@
                             :disabled="!!form.id" placeholder="请选择题库">
                             <template #default="{ option }">
                                 {{ option.name }} （单选{{ option.singleNum }} / 多选{{ option.multipleNum }} /
-                                客观填空{{ option.multipleNum }} / 判断{{ option.judgeNum }} / 客观问答{{
-                                    option.qaObjNum }}）
+                                填空{{ option.fillBlankObjNum + option.fillBlankSubNum }} / 判断{{ option.judgeNum }} /
+                                问答{{ option.qaObjNum + option.qaSubNum }}）
                             </template>
                         </xmks-select>
                     </el-form-item>

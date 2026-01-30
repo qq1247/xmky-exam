@@ -158,13 +158,11 @@ async function myCourseListQuery() {
 async function onTimeupdate(event: any) {
 	const playTime = Math.floor(event.detail.currentTime); // 向下取整，避免浮点误差
 
-	// #ifdef H5 // 微信小程序使用:enable-progress-gesture="false"控制
 	if (Math.abs(playTime - lastTime.value) > 2) {
 		videoPlayerRef.value.seek(lastTime.value);
 		return; // 不允许拖拽看视频
 	}
 	lastTime.value = playTime;
-	// #endif
 
 	if (curMyCourseMaterial.value?.questions?.length) {
 		for (const curMyCourseQuestion of curMyCourseMaterial.value?.questions) {

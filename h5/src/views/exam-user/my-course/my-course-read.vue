@@ -41,7 +41,7 @@
                         </div>
                         <div class="opt-panel__progress">
                             <span class="opt-panel__progress-label">课程进度：</span>
-                            <el-progress class="opt-panel__progress-bar" :percentage="50">
+                            <el-progress class="opt-panel__progress-bar" :percentage="watchedVideoNum / videoNum * 100">
                                 <el-button text class="opt-panel__progress-label">{{ watchedVideoNum }}/{{ videoNum
                                     }}</el-button>
                             </el-progress>

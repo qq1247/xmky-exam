@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
  * 
  * v1.0 chenyun 2021年12月28日上午9:12:11
  */
-@WebFilter
+@WebFilter(asyncSupported = true)
 public class XssFilter implements Filter {
 
 	@Override
