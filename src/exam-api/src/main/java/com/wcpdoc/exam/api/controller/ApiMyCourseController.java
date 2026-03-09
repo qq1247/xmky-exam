@@ -71,6 +71,7 @@ public class ApiMyCourseController extends BaseController {
 				map.remove("updateTime");
 				map.remove("shareAuth");
 				map.remove("createUserName");
+				map.remove("state");
 			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {

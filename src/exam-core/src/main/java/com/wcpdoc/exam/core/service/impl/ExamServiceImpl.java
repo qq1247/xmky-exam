@@ -880,8 +880,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						}
 					}
 					if (ExamUtil.hasOptionRand(examInfo)) {// 如果是选项乱序
-						Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
-						if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
+						if (ExamUtil.hasQuestion(myQuestion)) {
+							Question question = examCacheService.getQuestion(examQuestion.getQuestionId());
+							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
 //							if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
 //								questionOptionCache.put(myQuestion.getQuestionId(),
 //										examCacheService.getQuestionOptionList(myQuestion.getQuestionId()));
@@ -889,10 +890,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //							List<QuestionOption> questionOptionList = questionOptionCache
 //									.get(myQuestion.getQuestionId());// A,B,C,D
 
-							List<QuestionOption> questionOptionList = examCacheService
-									.getQuestionOptionList(myQuestion.getQuestionId());// A,B,C,D
-							myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
-							myQuestionService.updateById(myQuestion);
+								List<QuestionOption> questionOptionList = examCacheService
+										.getQuestionOptionList(myQuestion.getQuestionId());// A,B,C,D
+								myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
+								myQuestionService.updateById(myQuestion);
+							}
 						}
 					}
 				}
