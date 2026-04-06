@@ -96,7 +96,8 @@ public class ApiMyExamController extends BaseController {
 			Exam exam = examCacheService.getExam(examId);
 			return PageResultEx.ok()// 考试用户没有exam/get权限，所以字段在这里回显
 					.addAttr("answerStartTime", myExam.getAnswerStartTime())
-					.addAttr("answerEndTime", myExam.getState() == 3 ? myExam.getAnswerEndTime() : null)// bug修复：用户未交卷，显示答题时间是错误的
+					//.addAttr("answerEndTime", myExam.getState() == 3 ? myExam.getAnswerEndTime() : null)// bug修复：用户未交卷，显示答题时间是错误的
+					.addAttr("answerEndTime", myExam.getAnswerEndTime())// bug修复：需要在答题页面显示倒计时
 					.addAttr("markStartTime", myExam.getMarkStartTime())//
 					.addAttr("markEndTime", myExam.getMarkEndTime())//
 					.addAttr("objectiveScore",
